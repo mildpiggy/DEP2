@@ -1,0 +1,20 @@
+citHeader("To cite the DEP package in publications use:")
+
+citEntry(entry="article",
+         title  = "Proteome-wide identification of ubiquitin interactions using UbIA-MS",
+         author = personList(
+           person(given="Xiaofei", family="Zhang"),
+           person(given="Arne H", family="Smits"),
+           person(given="Gabrielle BA", family="van Tilburg"),
+           person(given="Huib", family="Ovaa"),
+           person(given="Wolfgang", family="Huber"),
+           person(given="Michiel", family="Vermeulen")),
+         journal = "Nature Protocols",
+         year = "2018",
+         volume = "13",
+         pages = "530–550",
+         textVersion = paste("Xiaofei Zhang, Arne H. Smits, Gabrielle B.A. van Tilburg,
+         Huib Ovaa, Wolfgang Huber and Michiel Vermeulen.",
+           "Proteome-wide identification of ubiquitin interactions using UbIA-MS.",
+           "Nature Protocols (2018).")
+         )

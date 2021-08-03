@@ -1,0 +1,149 @@
+---
+title: "DEP report"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: united
+  pdf_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(dev = 'pdf')
+```
+
+This report presents an overview of the DEP analysis.
+
+## Summary
+
+Original file contains _`r nrow(data)`_ proteins groups, of which _`r nrow(dep)`_ proteins were reproducibly quantified.    
+
+In total _`r ncol(data)`_ samples were detected.
+
+<span style="color:blue">`r colnames(data)`</span>   
+   
+
+
+#### `r nrow(dep[rowData(dep)$significant, ])` proteins differ significantly between samples.
+
+Parameters used:  
+
+* tested contrasts = <span style="color:blue">`r gsub("_p.adj", "", colnames(rowData(dep))[grep("p.adj", colnames(rowData(dep)))])`</span>  
+* adjusted p <= <span style="color:blue">`r param$alpha`</span>  
+* |logFC| >= <span style="color:blue">`r param$lfc`</span>  
+
+\pagebreak
+
+## Protein numbers
+
+Protein identifications per sample.
+
+```{r,echo=FALSE}
+pg_width = ncol(filt) / 3
+if (pg_width > 10) { pg_width = 10 }
+```
+
+```{r numbers, echo=FALSE, warning=FALSE, fig.height = 4, fig.width = pg_width}
+plot_numbers(filt)
+```
+
+Proteins coverage in all samples.
+
+```{r coverage, echo=FALSE, warning=FALSE, fig.height = 4, fig.width = 3}
+plot_coverage(filt)
+```
+
+\pagebreak
+
+## Normalization
+
+The data was normalized using 'vsn'.
+
+```{r,echo=FALSE}
+norm_height = ncol(filt) / 2
+```
+
+```{r norm, echo=FALSE, warning=FALSE, fig.height = norm_height}
+plot_normalization(filt, norm)
+```
+
+\pagebreak
+
+## Missing values
+
+To asses the type of missing data (random or not), a heatmap of missing values is plotted.
+If data is randomly missing, use the "knn" option for imputation.
+If the missing data is biased to certain samples (e.g. controls) which are expected to be depleted of certain proteins, use the "QRILC", "MinProb" or "man" options for imputation.
+
+
+```{r missval, echo=FALSE, fig.width = 5, fig.height = 5}
+plot_missval(norm)
+```
+
+\pagebreak
+
+Quantitative information of proteins with and without missing values.
+
+```{r missval2, echo=FALSE, fig.width = 5, fig.height = 5}
+plot_detect(norm)
+```
+
+\pagebreak
+
+Intensity distributions before and after imputation.
+
+```{r imputation, echo=FALSE, fig.width = 5, fig.height = 5}
+plot_imputation(norm, dep)
+```
+
+\pagebreak
+
+## Output plots of the data
+
+### PCA plot
+
+```{r, echo=FALSE}
+num = 400
+if (nrow(dep) < 400) num = nrow(dep)
+```
+
+```{r, echo=FALSE, fig.width = 5.5, fig.height= 4}
+plot_pca(dep, n = num)
+```
+
+### Correlation matrix
+
+```{r, echo=FALSE, fig.width = 5.5, fig.height= 4}
+plot_cor(dep)
+```
+
+### Heatmaps
+
+```{r,echo=FALSE}
+len = nrow(dep[rowData(dep)$significant, ]) / 7
+if (len < 2) { len = 2 }
+```
+
+```{r,echo=FALSE}
+df <- assay(dep[rowData(dep)$significant, ]) - rowMeans(assay(dep[rowData(dep)$significant, ]))
+col_lim <- quantile(df, probs= 0.95) - quantile(df, probs= 0.05)
+if (len < col_lim) { col_lim = 2 }
+```
+
+```{r heatmap_1, echo=FALSE, fig.width = 5, fig.height = len}
+plot_heatmap(dep, "contrast", k = 6, col_limit = (2 * col_lim))
+```
+
+```{r,echo=FALSE}
+width = ncol(filt) / 3
+if (width < 5) { width = 5 }
+if (width > 10) { width = 10 }
+```
+
+```{r heatmap_2, echo=FALSE, fig.width = width, fig.height = len}
+plot_heatmap(dep, "centered", k = 6, col_limit = col_lim)
+```
+
+
