@@ -17,7 +17,7 @@ Install and load the package:
 ``` r
 if (!requireNamespace("BiocManager", quietly=TRUE))
     install.packages("BiocManager")
-BiocManager::install("DEP")
+devt
 
 library("DEP2")
 ```

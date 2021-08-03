@@ -1,10 +1,10 @@
-source(paste(system.file("shiny_apps", "LFQ", package = "DEP"), "/source.R", sep = ""))
+source(paste(system.file("shiny_apps", "LFQ", package = "DEP2"), "/source.R", sep = ""))
 
 library(shinyWidgets)
 library(dplyr)
 library(tibble)
 library(SummarizedExperiment)
-library(DEP)
+library(DEP2)
 library(shiny)
 library(shinydashboard)
 library(shinyBS)
@@ -25,7 +25,7 @@ ui <- shinyUI(
       sidebarMenu(#* sidebarMenu----
         convertMenuItem(#** Welcome menuItem ----
           menuItem("Welcome", selected = FALSE, tabName = "Welcome_tab", icon = icon("th")), "Welcome_tab"
-          ),                                       
+          ),
         convertMenuItem(#** DEP menuItem ----
         menuItem("DEP-LFQ options", selected = TRUE, tabName = "DEP_tab", icon = icon("th"),
                  menuItem("Files", selected = TRUE,
@@ -34,7 +34,7 @@ ui <- shinyUI(
                     #actionButton("help_format_DEP",width = 12,
                     #              label = "", icon = icon("bell")
                     #      )),
-                   column(width = 9, 
+                   column(width = 9,
                    fileInput('file1',width = "300px",
                            'ProteinGroups.txt',
                            accept=c('text/csv',
@@ -89,7 +89,7 @@ ui <- shinyUI(
                               choices = c(c("man", MSnbase::imputeMethods())[1:9], "mixed on proteins", "mixed on samples"),
                               selected = "MinProb"),
                  shinyBS::bsTooltip("imputation", "Choose an imputation method", "right", options = list(container = "body")),
-                 actionButton("help_imputation", 
+                 actionButton("help_imputation",
                     label = "Detailed information", #icon = icon("question-circle"),
                     style = "color: #f6f6f6; background-color: #2c3b41; border-color: #2c3b41; text-align: left; margin: 0 0 0px 0px",
                     #rgba(255, 255, 255, 0.1) rgba(0, 0, 0, 0.1)
@@ -123,11 +123,11 @@ ui <- shinyUI(
                  shinyBS::bsTooltip("downloadTable", "Choose a dataset to save, and here we offer four forms of datasets for downloading including results.txt, significant_proteins.txt, displayed_subset.txt, full_dataset.txt", "right", options = list(container = "body")),
                  shinyBS::bsTooltip("downloadButton", "Click on it to download the selected dataset", "right", options = list(container = "body")),
                  shinyBS::bsTooltip("downloadButton_for_save_RData", "Click on it to Save the RData, and when you upload the results.RData in the menuItem [Files] next time, you can get the same result as this time", "right", options = list(container = "body"))
-        ), "DEP_tab"       
+        ), "DEP_tab"
           ),
         convertMenuItem(#** Annotation menuItem ----
         menuItem("Annotation options", selected = TRUE, tabName = "Annotation_tab", icon = icon("th"),
-          menuItem("Import from", selected = TRUE, 
+          menuItem("Import from", selected = TRUE,
                       checkboxInput("import_from_for_annotation", "DEP-LFQ or DEG-RNAseq", value = FALSE)
             ),
           uiOutput("import_for_annotation"),
@@ -145,19 +145,19 @@ ui <- shinyUI(
           tags$hr(),
           tags$style(type="text/css", "#downloadannotation {background-color:white;color: black;font-family: Source Sans Pro}"),
           uiOutput("downloadannotation_for_output"),
-          shinyBS::bsTooltip("import_from_for_annotation", "Import genes from the result of DEP-LFQ or DEG-RNAseq panel", "top", options = list(container = "body")),          
+          shinyBS::bsTooltip("import_from_for_annotation", "Import genes from the result of DEP-LFQ or DEG-RNAseq panel", "top", options = list(container = "body")),
           shinyBS::bsTooltip("import_for_annotation", "Choose genes that you want to do the gene annotation. UPregu for DEP-LFQ: up-regulated genes for DEP-LFQ panel; DOWNregu for DEP-LFQ: down-regulated genes for DEP-LFQ panel; UPDOWN for DEP-LFQ: all regulated genes, up- and down- regulated for DEP-LFQ panel; UPregu for DEG-RNAseq: up-regulated genes for DEG-RNAseq panel; DOWNregu for DEG-RNAseq: down-regulated genes for DEG-RNAseq panel; UPDOWN for DEG-RNAseq: all regulated genes, up- and down- regulated for DEG-RNAseq panel", "right", options = list(container = "body")),
-          shinyBS::bsTooltip("import_contrast_for_annotation", "The contrast that you want to do the gene annotation. Note that: [Any significant] represents the genes that are significant in at least one contrast", "right", options = list(container = "body")),          
+          shinyBS::bsTooltip("import_contrast_for_annotation", "The contrast that you want to do the gene annotation. Note that: [Any significant] represents the genes that are significant in at least one contrast", "right", options = list(container = "body")),
           shinyBS::bsTooltip("text_input_for_annotation", "Paste gene list here", "right", options = list(container = "body")),
           shinyBS::bsTooltip("organism_for_annotation", "Select the organism", "right", options = list(container = "body")),
           shinyBS::bsTooltip("analyze_for_annotation", "Click on it to analyze", "right", options = list(container = "body")),
           shinyBS::bsTooltip("downloadannotation_for_output", "Click on it to download the annotation table", "right", options = list(container = "body"))
-          ), "Annotation_tab"          
+          ), "Annotation_tab"
           ),
         menuItem("ORA options", selected = TRUE, icon = icon("th"),
           convertMenuItem(#** GO analysis ----
             menuItem("GO options", selected = TRUE, tabName = "GO_tab", icon = icon("angle-double-right"),#bookmark bars book-open
-              menuItem("Import from", selected = TRUE, 
+              menuItem("Import from", selected = TRUE,
                           checkboxInput("import_from_for_go", "DEP-LFQ or DEG-RNAseq", value = FALSE)
                 ),
               uiOutput("import_for_go"),
@@ -181,16 +181,16 @@ ui <- shinyUI(
               uiOutput("downloadTable_go"),
               uiOutput("downloadButton_go"),
               # downloadButton("downloadgo", "Save table")
-              shinyBS::bsTooltip("import_from_for_go", "Import genes from the result of DEP-LFQ or DEG-RNAseq panel", "top", options = list(container = "body")),          
+              shinyBS::bsTooltip("import_from_for_go", "Import genes from the result of DEP-LFQ or DEG-RNAseq panel", "top", options = list(container = "body")),
               shinyBS::bsTooltip("import_for_go", "Choose genes that you want to do the GO analysis. UPregu for DEP-LFQ: up-regulated genes for DEP-LFQ panel; DOWNregu for DEP-LFQ: down-regulated genes for DEP-LFQ panel; UPDOWN for DEP-LFQ: all regulated genes, up- and down- regulated for DEP-LFQ panel; UPregu for DEG-RNAseq: up-regulated genes for DEG-RNAseq panel; DOWNregu for DEG-RNAseq: down-regulated genes for DEG-RNAseq panel; UPDOWN for DEG-RNAseq: all regulated genes, up- and down- regulated for DEG-RNAseq panel", "right", options = list(container = "body")),
-              shinyBS::bsTooltip("import_contrast_for_go", "The contrast that you want to do the GO analysis. Note that: [Any significant] represents the genes that are significant in at least one contrast, and when you select [Any significant], you should not choose [If with log2 fold change]", "right", options = list(container = "body")),          
+              shinyBS::bsTooltip("import_contrast_for_go", "The contrast that you want to do the GO analysis. Note that: [Any significant] represents the genes that are significant in at least one contrast, and when you select [Any significant], you should not choose [If with log2 fold change]", "right", options = list(container = "body")),
               shinyBS::bsTooltip("text_input_for_go", "Paste your gene list here", "right", options = list(container = "body")),
               shinyBS::bsTooltip("organism_for_go", "Select the organism", "right", options = list(container = "body")),
               shinyBS::bsTooltip("df_with_lg2fc", "Whether your gene list with log2 fold change", "right", options = list(container = "body")),
               shinyBS::bsTooltip("analyze_for_go", "Click on it to analyze", "right", options = list(container = "body")),
               shinyBS::bsTooltip("downloadTable_go", "Choose a dataset to save, and here we offer two forms of datasets for downloading including full_results.txt, significant_results.txt", "right", options = list(container = "body")),
               shinyBS::bsTooltip("downloadButton_go", "Click on it to download the result table", "right", options = list(container = "body"))
-              ), "GO_tab"           
+              ), "GO_tab"
             ),
           convertMenuItem(#** KEGG analysis ----
             menuItem("KEGG options", selected = TRUE, tabName = "KEGG_tab", icon = icon("angle-double-right"),
@@ -204,7 +204,7 @@ ui <- shinyUI(
               #                "colorBy",
               #                c("pvalue", "p.adjust"),
               #                selected = "p.adjust"),
-              menuItem("Import from", selected = TRUE, 
+              menuItem("Import from", selected = TRUE,
                           checkboxInput("import_from_for_kegg", "DEP-LFQ or DEG-RNAseq", value = FALSE)
                 ),
               uiOutput("import_for_kegg"),
@@ -218,16 +218,16 @@ ui <- shinyUI(
               uiOutput("downloadTable_kegg"),
               uiOutput("downloadButton_kegg"),
               # downloadButton("downloadkegg", "Save table")
-              shinyBS::bsTooltip("import_from_for_kegg", "Import genes from the result of DEP-LFQ or DEG-RNAseq panel", "top", options = list(container = "body")),          
+              shinyBS::bsTooltip("import_from_for_kegg", "Import genes from the result of DEP-LFQ or DEG-RNAseq panel", "top", options = list(container = "body")),
               shinyBS::bsTooltip("import_for_kegg", "Choose genes that you want to do the KEGG analysis. UPregu for DEP-LFQ: up-regulated genes for DEP-LFQ panel; DOWNregu for DEP-LFQ: down-regulated genes for DEP-LFQ panel; UPDOWN for DEP-LFQ: all regulated genes, up- and down- regulated for DEP-LFQ panel; UPregu for DEG-RNAseq: up-regulated genes for DEG-RNAseq panel; DOWNregu for DEG-RNAseq: down-regulated genes for DEG-RNAseq panel; UPDOWN for DEG-RNAseq: all regulated genes, up- and down- regulated for DEG-RNAseq panel", "right", options = list(container = "body")),
-              shinyBS::bsTooltip("import_contrast_for_kegg", "The contrast that you want to do the KEGG analysis. Note that: [Any significant] represents the genes that are significant in at least one contrast, and when you select [Any significant], you should not choose [If with log2 fold change]", "right", options = list(container = "body")),          
+              shinyBS::bsTooltip("import_contrast_for_kegg", "The contrast that you want to do the KEGG analysis. Note that: [Any significant] represents the genes that are significant in at least one contrast, and when you select [Any significant], you should not choose [If with log2 fold change]", "right", options = list(container = "body")),
               shinyBS::bsTooltip("text_input_for_kegg", "Paste your gene list here", "right", options = list(container = "body")),
               shinyBS::bsTooltip("organism_for_kegg", "Select the organism: hsa represents human, mmu represents mouse", "right", options = list(container = "body")),
               shinyBS::bsTooltip("df_with_lg2fc_for_kegg", "Whether your gene list with log2 fold change", "right", options = list(container = "body")),
               shinyBS::bsTooltip("analyze_for_kegg", "Click on it to analyze", "right", options = list(container = "body")),
               shinyBS::bsTooltip("downloadTable_kegg", "Choose a dataset to save, and here we offer two forms of datasets for downloading including full_results.txt, significant_results.txt", "right", options = list(container = "body")),
               shinyBS::bsTooltip("downloadButton_kegg", "Click on it to download the result table", "right", options = list(container = "body"))
-              ), "KEGG_tab"      
+              ), "KEGG_tab"
             ),
           convertMenuItem(#** Reactome analysis ----
             menuItem("Reactome options", selected = TRUE, tabName = "Reactome_tab", icon = icon("angle-double-right"),
@@ -241,7 +241,7 @@ ui <- shinyUI(
               #                "colorBy",
               #                c("pvalue", "p.adjust"),
               #                selected = "p.adjust"),
-              menuItem("Import from", selected = TRUE, 
+              menuItem("Import from", selected = TRUE,
                           checkboxInput("import_from_for_reactome", "DEP-LFQ or DEG-RNAseq", value = FALSE)
                 ),
               uiOutput("import_for_reactome"),
@@ -255,16 +255,16 @@ ui <- shinyUI(
               uiOutput("downloadTable_reactome"),
               uiOutput("downloadButton_reactome"),
               # downloadButton("downloadreactome", "Save table")
-              shinyBS::bsTooltip("import_from_for_reactome", "Import genes from the result of DEP-LFQ or DEG-RNAseq panel", "top", options = list(container = "body")),          
+              shinyBS::bsTooltip("import_from_for_reactome", "Import genes from the result of DEP-LFQ or DEG-RNAseq panel", "top", options = list(container = "body")),
               shinyBS::bsTooltip("import_for_reactome", "Choose genes that you want to do the reactome analysis. UPregu for DEP-LFQ: up-regulated genes for DEP-LFQ panel; DOWNregu for DEP-LFQ: down-regulated genes for DEP-LFQ panel; UPDOWN for DEP-LFQ: all regulated genes, up- and down- regulated for DEP-LFQ panel; UPregu for DEG-RNAseq: up-regulated genes for DEG-RNAseq panel; DOWNregu for DEG-RNAseq: down-regulated genes for DEG-RNAseq panel; UPDOWN for DEG-RNAseq: all regulated genes, up- and down- regulated for DEG-RNAseq panel", "right", options = list(container = "body")),
-              shinyBS::bsTooltip("import_contrast_for_reactome", "The contrast that you want to do the reactome analysis. Note that: [Any significant] represents the genes that are significant in at least one contrast, and when you select [Any significant], you should not choose [If with log2 fold change]", "right", options = list(container = "body")),          
+              shinyBS::bsTooltip("import_contrast_for_reactome", "The contrast that you want to do the reactome analysis. Note that: [Any significant] represents the genes that are significant in at least one contrast, and when you select [Any significant], you should not choose [If with log2 fold change]", "right", options = list(container = "body")),
               shinyBS::bsTooltip("text_input_for_reactome", "Paste your gene list here", "right", options = list(container = "body")),
               shinyBS::bsTooltip("organism_for_reactome", "Select the organism", "right", options = list(container = "body")),
               shinyBS::bsTooltip("df_with_lg2fc_for_reactome", "Whether your gene list with log2 fold change", "right", options = list(container = "body")),
               shinyBS::bsTooltip("analyze_for_reactome", "Click on it to analyze", "right", options = list(container = "body")),
               shinyBS::bsTooltip("downloadTable_reactome", "Choose a dataset to save, and here we offer two forms of datasets for downloading including full_results.txt, significant_results.txt", "right", options = list(container = "body")),
               shinyBS::bsTooltip("downloadButton_reactome", "Click on it to download the result table", "right", options = list(container = "body"))
-              ), "Reactome_tab"            
+              ), "Reactome_tab"
             )
           ),
         menuItem("GSEA options", selected = TRUE, icon = icon("th"),
@@ -279,7 +279,7 @@ ui <- shinyUI(
             #                "colorBy",
             #                c("pvalue", "p.adjust"),
             #                selected = "p.adjust"),
-            menuItem("Import from", selected = TRUE, 
+            menuItem("Import from", selected = TRUE,
                         checkboxInput("import_from_for_gsego", "DEP-LFQ or DEG-RNAseq", value = FALSE)
               ),
             uiOutput("import_for_gsego"),
@@ -292,15 +292,15 @@ ui <- shinyUI(
             uiOutput("downloadTable_gsego"),
             uiOutput("downloadButton_gsego"),
             # downloadButton("downloadgsego", "Save table")
-            shinyBS::bsTooltip("import_from_for_gsego", "Import genes from the result of DEP-LFQ or DEG-RNAseq panel", "top", options = list(container = "body")),          
+            shinyBS::bsTooltip("import_from_for_gsego", "Import genes from the result of DEP-LFQ or DEG-RNAseq panel", "top", options = list(container = "body")),
             shinyBS::bsTooltip("import_for_gsego", "Choose genes that you want to do the gseGO analysis. DEP-LFQ: import from DEP-LFQ panel; DEG-RNAseq: import from DEG-RNAseq panel", "right", options = list(container = "body")),
-            shinyBS::bsTooltip("import_contrast_for_gsego", "The contrast that you want to do the gseGO analysis", "right", options = list(container = "body")),          
+            shinyBS::bsTooltip("import_contrast_for_gsego", "The contrast that you want to do the gseGO analysis", "right", options = list(container = "body")),
             shinyBS::bsTooltip("text_input_for_gsego", "Paste your gene list with log2 fold change here", "right", options = list(container = "body")),
             shinyBS::bsTooltip("organism_for_gsego", "Select the organism", "right", options = list(container = "body")),
             shinyBS::bsTooltip("analyze_for_gsego", "Click on it to analyze", "right", options = list(container = "body")),
             shinyBS::bsTooltip("downloadTable_gsego", "Choose a dataset to save, and here we offer two forms of datasets for downloading including full_results.txt, significant_results.txt", "right", options = list(container = "body")),
             shinyBS::bsTooltip("downloadButton_gsego", "Click on it to download the result table", "right", options = list(container = "body"))
-            ), "gseGO_tab"            
+            ), "gseGO_tab"
             ),
           convertMenuItem(#** gseKEGG analysis----
             menuItem("gseKEGG options", selected = TRUE, tabName = "gseKEGG_tab", icon = icon("angle-double-right"),
@@ -313,7 +313,7 @@ ui <- shinyUI(
               #                "colorBy",
               #                c("pvalue", "p.adjust"),
               #                selected = "p.adjust"),
-              menuItem("Import from", selected = TRUE, 
+              menuItem("Import from", selected = TRUE,
                           checkboxInput("import_from_for_gsekegg", "DEP-LFQ or DEG-RNAseq", value = FALSE)
                 ),
               uiOutput("import_for_gsekegg"),
@@ -326,9 +326,9 @@ ui <- shinyUI(
               uiOutput("downloadTable_gsekegg"),
               uiOutput("downloadButton_gsekegg"),
               # downloadButton("downloadgsekegg", "Save table")
-              shinyBS::bsTooltip("import_from_for_gsekegg", "Import genes from the result of DEP-LFQ or DEG-RNAseq panel", "top", options = list(container = "body")),          
+              shinyBS::bsTooltip("import_from_for_gsekegg", "Import genes from the result of DEP-LFQ or DEG-RNAseq panel", "top", options = list(container = "body")),
               shinyBS::bsTooltip("import_for_gsekegg", "Choose genes that you want to do the gseKEGG analysis. DEP-LFQ: import from DEP-LFQ panel; DEG-RNAseq: import from DEG-RNAseq panel", "right", options = list(container = "body")),
-              shinyBS::bsTooltip("import_contrast_for_gsekegg", "The contrast that you want to do the gseKEGG analysis", "right", options = list(container = "body")),          
+              shinyBS::bsTooltip("import_contrast_for_gsekegg", "The contrast that you want to do the gseKEGG analysis", "right", options = list(container = "body")),
               shinyBS::bsTooltip("text_input_for_gsekegg", "Paste your gene list with log2 fold change here", "right", options = list(container = "body")),
               shinyBS::bsTooltip("organism_for_gsekegg", "Select the organism: hsa represents human, mmu represents mouse", "right", options = list(container = "body")),
               shinyBS::bsTooltip("analyze_for_gsekegg", "Click on it to analyze", "right", options = list(container = "body")),
@@ -347,7 +347,7 @@ ui <- shinyUI(
               #                "colorBy",
               #                c("pvalue", "p.adjust"),
               #                selected = "p.adjust"),
-              menuItem("Import from", selected = TRUE, 
+              menuItem("Import from", selected = TRUE,
                           checkboxInput("import_from_for_gsereactome", "DEP-LFQ or DEG-RNAseq", value = FALSE)
                 ),
               uiOutput("import_for_gsereactome"),
@@ -360,27 +360,27 @@ ui <- shinyUI(
               uiOutput("downloadTable_gsereactome"),
               uiOutput("downloadButton_gsereactome"),
               # downloadButton("downloadgsereactome", "Save table")
-              shinyBS::bsTooltip("import_from_for_gsereactome", "Import genes from the result of DEP-LFQ or DEG-RNAseq panel", "top", options = list(container = "body")),          
+              shinyBS::bsTooltip("import_from_for_gsereactome", "Import genes from the result of DEP-LFQ or DEG-RNAseq panel", "top", options = list(container = "body")),
               shinyBS::bsTooltip("import_for_gsereactome", "Choose genes that you want to do the gseReactome analysis. DEP-LFQ: import from DEP-LFQ panel; DEG-RNAseq: import from DEG-RNAseq panel", "right", options = list(container = "body")),
-              shinyBS::bsTooltip("import_contrast_for_gsereactome", "The contrast that you want to do the gseReactome analysis", "right", options = list(container = "body")),          
+              shinyBS::bsTooltip("import_contrast_for_gsereactome", "The contrast that you want to do the gseReactome analysis", "right", options = list(container = "body")),
               shinyBS::bsTooltip("text_input_for_gsereactome", "Paste your gene list with log2 fold change here", "right", options = list(container = "body")),
               shinyBS::bsTooltip("organism_for_gsereactome", "Select the organism", "right", options = list(container = "body")),
               shinyBS::bsTooltip("analyze_for_gsereactome", "Click on it to analyze", "right", options = list(container = "body")),
               shinyBS::bsTooltip("downloadTable_gsereactome", "Choose a dataset to save, and here we offer two forms of datasets for downloading including full_results.txt, significant_results.txt", "right", options = list(container = "body")),
               shinyBS::bsTooltip("downloadButton_gsereactome", "Click on it to download the result table", "right", options = list(container = "body"))
-              ), "gseReactome_tab"           
+              ), "gseReactome_tab"
             )
           ),
         convertMenuItem(#** PPI menuItem----
         menuItem("PPITools options", selected = TRUE, tabName = "PPI_tab", icon = icon("th"),
                  # selectInput("organism",
                  #             "select organism",
-                 #             choices=dir(system.file("PPIdata",package = "DEP")),
+                 #             choices=dir(system.file("PPIdata",package = "DEP2")),
                  #             selected="human"),
                  # # actionButton("load_PPIdata","Load Datas First!"),
                  # helpText("choose organism string data to load", br(),"If it doesn't exist app will report an error.", br(),"you need to download file from string following it"),
                  # h4("paste your gene list"),
-          menuItem("Import from", selected = TRUE, 
+          menuItem("Import from", selected = TRUE,
                       checkboxInput("import_from_for_ppi", "DEP-LFQ or DEG-RNAseq", value = FALSE)
             ),
           uiOutput("import_for_ppi"),
@@ -390,7 +390,7 @@ ui <- shinyUI(
                  uiOutput("input_text"),
                  selectInput("organism",
                              "Select organism",
-                             choices=dir(system.file("PPIdata",package = "DEP")),
+                             choices=dir(system.file("PPIdata",package = "DEP2")),
                              selected="human"),
                  # actionButton("load_PPIdata","Load Datas First!"),
                  helpText("choose organism string data to load", br(),"If it doesn't exist, app will report an error.", br(),"you need to download file from string first"),
@@ -415,13 +415,13 @@ ui <- shinyUI(
                  tags$style(type="text/css", "#downloadPPInetwork {background-color:white;color: black;font-family: Source Sans Pro}"),
                  # h4("\n"),
                  uiOutput("download_PPITable"),
-                 h6(), 
+                 h6(),
                  uiOutput("download_PPInetwork"),
                  # downloadButton("downloadPPITable", "Save table"),
                  # downloadButton("downloadPPInetwork", "Save network")
-          shinyBS::bsTooltip("import_from_for_ppi", "Import genes from the result of DEP-LFQ or DEG-RNAseq panel", "top", options = list(container = "body")),          
+          shinyBS::bsTooltip("import_from_for_ppi", "Import genes from the result of DEP-LFQ or DEG-RNAseq panel", "top", options = list(container = "body")),
           shinyBS::bsTooltip("import_for_ppi", "Choose genes that you want to do the PPI(Protein-Protein Interaction Networks). UPregu for DEP-LFQ: up-regulated genes for DEP-LFQ panel; DOWNregu for DEP-LFQ: down-regulated genes for DEP-LFQ panel; UPDOWN for DEP-LFQ: all regulated genes, up- and down- regulated for DEP-LFQ panel; UPregu for DEG-RNAseq: up-regulated genes for DEG-RNAseq panel; DOWNregu for DEG-RNAseq: down-regulated genes for DEG-RNAseq panel; UPDOWN for DEG-RNAseq: all regulated genes, up- and down- regulated for DEG-RNAseq panel", "right", options = list(container = "body")),
-          shinyBS::bsTooltip("import_contrast_for_ppi", "The contrast that you want to do the PPI(Protein-Protein Interaction Networks). Note that: [Any significant] represents the genes that are significant in at least one contrast", "right", options = list(container = "body")),       
+          shinyBS::bsTooltip("import_contrast_for_ppi", "The contrast that you want to do the PPI(Protein-Protein Interaction Networks). Note that: [Any significant] represents the genes that are significant in at least one contrast", "right", options = list(container = "body")),
           shinyBS::bsTooltip("input_text", "Paste gene list here", "top", options = list(container = "body")),
           shinyBS::bsTooltip("organism", "Select the organism", "right", options = list(container = "body")),
           shinyBS::bsTooltip("chooseScore", "Select which type of evidence will contribute to the prediction of the score under the active interaction sources", "right", options = list(container = "body")),
@@ -429,7 +429,7 @@ ui <- shinyUI(
           shinyBS::bsTooltip("String_annalysis", "Click on it to analyze", "right", options = list(container = "body")),
           shinyBS::bsTooltip("download_PPITable", "Click on it to download the Protein-Protein Interaction table", "right", options = list(container = "body")),
           shinyBS::bsTooltip("download_PPInetwork", "Click on it to download the PPI(Protein-Protein Interaction Network)", "right", options = list(container = "body"))
-        ), "PPI_tab"          
+        ), "PPI_tab"
           ),
         convertMenuItem(#** DEG-RNAseq menuItem----
         menuItem("DEG-RNAseq options", selected = TRUE, tabName = "RNAseq_tab", icon = icon("th"),
@@ -468,7 +468,7 @@ ui <- shinyUI(
                   # uiOutput("choose_expfac1"),
                   # uiOutput("choose_expfac2"),
                   uiOutput("control_for_RNAseq"),
-                  uiOutput("test_manual_for_RNAseq"),                  
+                  uiOutput("test_manual_for_RNAseq"),
                   numericInput("filter_rowsum", "Threshold row sums", min = 0, max = 10000, value = 10)
                   ),
                  menuItem("ID Transformation", selected = TRUE,
@@ -508,11 +508,11 @@ ui <- shinyUI(
           shinyBS::bsTooltip("analyze_for_DERNAseq", "Click on it to analyze", "right", options = list(container = "body")),
           shinyBS::bsTooltip("downloadTable_for_DERNAseq", "Choose a dataset to save, and here we offer two forms of datasets for downloading including full_results.txt, significant_results.txt", "right", options = list(container = "body")),
           shinyBS::bsTooltip("downloadButton_for_DERNAseq", "Click on it to download the result table", "right", options = list(container = "body"))
-        ), "RNAseq_tab"          
+        ), "RNAseq_tab"
           ),
         convertMenuItem(#** PR-Heatmap menuItem----
         menuItem("PR-Heatmap options", selected = TRUE, tabName = "PRHeatmap_tab", icon = icon("th"),
-                menuItem("Import from", selected = TRUE, 
+                menuItem("Import from", selected = TRUE,
                   checkboxInput("import_from_for_PR_Heatmap", "DEP-LFQ and DEG-RNAseq", value = FALSE),
                   uiOutput("import_contrast_for_PR_Heatmap")),
                 # menuItem(
@@ -530,7 +530,7 @@ ui <- shinyUI(
                          "top",
                          options = list(container = "body")
                        ))
-                   ),                  
+                   ),
                   # ),
         #          menuItem("Files", selected = TRUE,
         #            fluidRow(
@@ -568,11 +568,11 @@ ui <- shinyUI(
                  tags$hr(),
                  tags$style(type="text/css", "#download_table_for_pro_rna {background-color:white;color: black;font-family: Source Sans Pro}"),
                  uiOutput("downloadbutton_table_for_pro_rna"),
-          shinyBS::bsTooltip("import_from_for_PR_Heatmap", "Import results from the result of DEP-LFQ and DEG-RNAseq panel", "top", options = list(container = "body")),          
+          shinyBS::bsTooltip("import_from_for_PR_Heatmap", "Import results from the result of DEP-LFQ and DEG-RNAseq panel", "top", options = list(container = "body")),
           shinyBS::bsTooltip("import_contrast_for_PR_Heatmap", "The contrast that you are interested in. Note that: 1). The contrast tested in both DEP-LFQ panel and DEG-RNAseq panel  must be the same; 2) It will extract the significant results of both DEP-LFQ and DEG-RNAseq upon your selected contrast; 3).[Any significant] represents the genes that are significant in at least one contrast", "right", options = list(container = "body")),
           shinyBS::bsTooltip("analyze_for_pro_rna", "Click on it to start", "right", options = list(container = "body")),
           shinyBS::bsTooltip("downloadbutton_table_for_pro_rna", "Click on it to download the table", "right", options = list(container = "body"))
-        ), "PRHeatmap_tab"          
+        ), "PRHeatmap_tab"
           ),
         convertMenuItem(#** Extralinks menuItem ----
           menuItem("Extralinks", selected = FALSE, tabName = "Extralinks_tab", icon = icon("th")), "Extralinks_tab"
@@ -588,17 +588,17 @@ ui <- shinyUI(
   # ),
   # tags$head(tags$style(HTML('/* body */.content-wrapper, .right-side {background-color: white;}'))),
   # tags$style(".content {background-color: white;}"),
-      includeCSS(system.file("shiny_apps/LFQ/www", "style.css", package = "DEP")),
+      includeCSS(system.file("shiny_apps/LFQ/www", "style.css", package = "DEP2")),
       tabItems(#* tabItems----
       tabItem(#** Welcome tabItem----
         tabName = "Welcome_tab",
             fluidRow(
               column(style = "background-color:white;",
                 width = 12,
-                includeMarkdown(system.file("extdata", "Tutorial.md", package = "DEP"))
+                includeMarkdown(system.file("extdata", "Tutorial.md", package = "DEP2"))
               )
             )
-        ),        
+        ),
         tabItem(#** DEP tabItem----
           tabName = "DEP_tab",
           helpText("Please cite: "),
@@ -657,7 +657,7 @@ ui <- shinyUI(
                                ),
                       tabPanel(title = "Heatmap",
                               fluidRow(
-                                column(width = 6, 
+                                column(width = 6,
                                     box(checkboxInput("manual_heatmap",
                                                    "Manual heatmap",
                                                    value = FALSE), width = 12)
@@ -671,7 +671,7 @@ ui <- shinyUI(
                                ),
                                fluidRow(
                                 box(uiOutput("heatmap_cntrst"), width = 12)
-                                ),                        
+                                ),
                                # fluidRow(
                                #   box(checkboxInput("manual_heatmap",
                                #                     "Manual heatmap",
@@ -734,7 +734,7 @@ ui <- shinyUI(
                                fluidRow(
                                  uiOutput("plot"),
                                  downloadButton('downloadHeatmap', 'Save heatmap')),
-          shinyBS::bsTooltip("colorbar", "Choose the color palette of the colorbar", "top", options = list(container = "body")),                               
+          shinyBS::bsTooltip("colorbar", "Choose the color palette of the colorbar", "top", options = list(container = "body")),
           shinyBS::bsTooltip("manual_heatmap", "Whether plot the manual heatmap", "top", options = list(container = "body")),
           shinyBS::bsTooltip("heatmap_cntrst", "Choose the contrasts that you want to show, act when [Manual heatmap] is TRUE, can be one or more contrasts", "top", options = list(container = "body")),
           shinyBS::bsTooltip("k", "Set the number of k-means clusters", "top", options = list(container = "body")),
@@ -763,7 +763,7 @@ ui <- shinyUI(
                                  box(checkboxInput("my_breaks",
                                                    "My breaks",
                                                    value = FALSE),
-                                 multiInput("mybreaks","Mybreaks",choices = seq(-40, 40, 0.5)), 
+                                 multiInput("mybreaks","Mybreaks",choices = seq(-40, 40, 0.5)),
                                  numericInput("Volcano_Width",
                                                   "width",
                                                   min = 1, max = 30, value = 7),
@@ -819,7 +819,7 @@ ui <- shinyUI(
                                                       palette = "square",
                                                       value = "#BEBEBE")
                                 )
-                            ),                        
+                            ),
                                fluidRow(
                                  box(uiOutput("Volcano_cntrst"), width = 8),
                                  box(selectizeInput("labelWay",
@@ -839,11 +839,11 @@ ui <- shinyUI(
                                     uiOutput("Peptides1"),
                                     uiOutput("Peptides2"),
                                     # ),
-                                  # column(width = 6, uiOutput("Peptides2")),                               
+                                  # column(width = 6, uiOutput("Peptides2")),
                                   numericInput("stroke",
                                                   "point outside width",
                                                   min = 0, max = 5, value = 0.6),
-                                  uiOutput("selected_proteins"), 
+                                  uiOutput("selected_proteins"),
                                      numericInput("showNum",
                                                   "show number",
                                                   min = 0, max = 100000, value = 20),
@@ -852,7 +852,7 @@ ui <- shinyUI(
                                                   min = 0, max = 20, value = 9),
                                      numericInput("dotsize",
                                                   "dot size",
-                                                  min = 0, max = 20, value = 2), 
+                                                  min = 0, max = 20, value = 2),
                                      numericInput("custom_volcano_Width",
                                                   "width",
                                                   min = 1, max = 30, value = 7),
@@ -878,7 +878,7 @@ ui <- shinyUI(
           shinyBS::bsTooltip("if_label_rectangle", "Whether add rectangle underneath the text, making it easier to read", "top", options = list(container = "body")),
           shinyBS::bsTooltip("if_peptide_color", "Whether set the color of the points,(default, purple: Peptides == 1, blue: Peptides == 2)", "top", options = list(container = "body")),
           shinyBS::bsTooltip("Peptides1", "Set the color of the points which the number of Peptides == 1", "top", options = list(container = "body")),
-          shinyBS::bsTooltip("Peptides2", "Set the color of the points which the number of Peptides == 2", "top", options = list(container = "body")),          
+          shinyBS::bsTooltip("Peptides2", "Set the color of the points which the number of Peptides == 2", "top", options = list(container = "body")),
           shinyBS::bsTooltip("stroke", "Set the thickness of black line around the point", "top", options = list(container = "body")),
           shinyBS::bsTooltip("selected_proteins", "Choose the point labels to show, act when [label Way] is selected proteins", "top", options = list(container = "body")),
           shinyBS::bsTooltip("showNum", "Set the number of the labels to add, act when [label way] is significant, up or down. Note that, when it is larger than the number of significant result, it is seted to the number of significant result", "top", options = list(container = "body")),
@@ -887,7 +887,7 @@ ui <- shinyUI(
           shinyBS::bsTooltip("custom_volcano_Width", "Width of the figure to export", "top", options = list(container = "body")),
           shinyBS::bsTooltip("custom_volcano_Height", "Height of the figure to export", "top", options = list(container = "body")),
           shinyBS::bsTooltip("P_adj", "Whether or not to use adjusted p values", "top", options = list(container = "body")),
-          shinyBS::bsTooltip("Same_width", "Whether the x axis to have the same width from 0", "top", options = list(container = "body"))          
+          shinyBS::bsTooltip("Same_width", "Whether the x axis to have the same width from 0", "top", options = list(container = "body"))
                       )
 
                ),
@@ -917,7 +917,7 @@ ui <- shinyUI(
           shinyBS::bsTooltip("Indicate", "Set the color, shape and facet_wrap of the plot", "top", options = list(container = "body")),
           shinyBS::bsTooltip("if_square", "Whether x limit is equal to y limit", "top", options = list(container = "body")),
           shinyBS::bsTooltip("pca_Width", "Width of the figure to export", "top", options = list(container = "body")),
-          shinyBS::bsTooltip("pca_Height", "Height of the figure to export", "top", options = list(container = "body"))          
+          shinyBS::bsTooltip("pca_Height", "Height of the figure to export", "top", options = list(container = "body"))
                       ),
                       #tabPanel(title = "Pca plot",
                       #         plotOutput("pca", height = 600),
@@ -928,19 +928,19 @@ ui <- shinyUI(
                                 box(selectizeInput("Pearson_pal",
                                        "color panel",
                                        choices = c("BrBG", "PiYG", "PRGn", "PuOr", "RdBu", "RdGy", "RdYlBu", "RdYlGn", "Spectral", "Blues",  "BuGn", "BuPu", "GnBu", "Greens" , "Greys", "Oranges", "OrRd", "PuBu", "PuBuGn", "PuRd", "Purples", "RdPu", "Reds", "YlGn", "YlGnBu", "YlOrBr", "YlOrRd"),
-                                       selected = c("PRGn"), multiple = FALSE), 
+                                       selected = c("PRGn"), multiple = FALSE),
                                     checkboxInput("Pearson_pal_rev",
                                                    "pal rev",
                                                    value = FALSE), width = 4),
                                 box(numericInput("Pearson_Width",
                                                   "width",
-                                                  min = 1, max = 30, value = 7), 
+                                                  min = 1, max = 30, value = 7),
                                     numericInput("Pearson_Height",
                                                   "height",
                                                   min = 1, max = 30, value = 7), width = 4),
                                 box(numericInput("Pearson_lower",
                                                   "lower",
-                                                  min = -1, max = 1, value = -1), 
+                                                  min = -1, max = 1, value = -1),
                                     numericInput("Pearson_upper",
                                                   "upper",
                                                   min = -1, max = 1, value = 1), width = 4)
@@ -948,7 +948,7 @@ ui <- shinyUI(
                                fluidRow(
                                 box(checkboxInput("add_values_for_DEP_person",
                                                    "Add values",
-                                                   value = FALSE), 
+                                                   value = FALSE),
                                     numericInput("value_size_for_DEP_person",
                                                   "Value size",
                                                   min = 1, max = 30, value = 10),
@@ -972,7 +972,7 @@ ui <- shinyUI(
                                 box(selectizeInput("Gower_pal",
                                        "color panel",
                                        choices = c("BrBG", "PiYG", "PRGn", "PuOr", "RdBu", "RdGy", "RdYlBu", "RdYlGn", "Spectral", "Blues",  "BuGn", "BuPu", "GnBu", "Greens" , "Greys", "Oranges", "OrRd", "PuBu", "PuBuGn", "PuRd", "Purples", "RdPu", "Reds", "YlGn", "YlGnBu", "YlOrBr", "YlOrRd"),
-                                       selected = c("YlOrRd"), multiple = FALSE), 
+                                       selected = c("YlOrRd"), multiple = FALSE),
                                    checkboxInput("Gower_pal_rev",
                                                    "pal rev",
                                                    value = TRUE), width = 6),
@@ -986,7 +986,7 @@ ui <- shinyUI(
                              fluidRow(
                                 box(checkboxInput("add_values_for_DEP_gower",
                                                    "Add values",
-                                                   value = FALSE), 
+                                                   value = FALSE),
                                     numericInput("value_size_for_DEP_gower",
                                                   "Value size",
                                                   min = 1, max = 30, value = 10),
@@ -1083,7 +1083,7 @@ ui <- shinyUI(
                           ),
                         fluidRow(
                             plotOutput("detect", height = 600),
-                            downloadButton('downloadDetect', 'Save')      
+                            downloadButton('downloadDetect', 'Save')
                           ),
           shinyBS::bsTooltip("detect_Width", "Width of the figure to export", "top", options = list(container = "body")),
           shinyBS::bsTooltip("detect_Height", "Height of the figure to export", "top", options = list(container = "body"))
@@ -1155,7 +1155,7 @@ ui <- shinyUI(
         box(selectizeInput("go_ont",
                           "Ontology",
                           choices = c("BP", "CC", "MF", "ALL"),
-                          selected = c("BP"), multiple = FALSE), 
+                          selected = c("BP"), multiple = FALSE),
             width = 2),
         box(numericInput("go_p",
                          "P value",
@@ -1677,7 +1677,7 @@ ui <- shinyUI(
         box(selectizeInput("gsego_ont",
                           "Ontology",
                           choices = c("BP", "CC", "MF", "ALL"),
-                          selected = c("BP"), multiple = FALSE), 
+                          selected = c("BP"), multiple = FALSE),
             width = 2),
         box(numericInput("gsego_p",
                          "P value",
@@ -2213,7 +2213,7 @@ ui <- shinyUI(
                                                       value = "#ADD8E6")
                                               # textInput("linecolor", "input line color(like:  #ADD8E6)", "#ADD8E6")
                                               ),
-                                       
+
                                        column(width = 3,
                                               checkboxInput("changewidth",
                                                             "whether change link width by connection",
@@ -2248,7 +2248,7 @@ ui <- shinyUI(
                                        column(width = 2,
                                               selectizeInput("smoothtype",
                                                              "type to smooth the line",
-                                                             choices=c('dynamic', 'continuous', 'discrete', 'diagonalCross', 'straightCross', 'horizontal', 
+                                                             choices=c('dynamic', 'continuous', 'discrete', 'diagonalCross', 'straightCross', 'horizontal',
                                                                        'vertical', 'curvedCW', 'curvedCCW', 'cubicBezier'),
                                                              selected="continuous")),
                                        column(width = 3,
@@ -2279,7 +2279,7 @@ ui <- shinyUI(
           shinyBS::bsTooltip("String_Table", "the table of PPI (Protein-Protein Interaction)", "top", options = list(container = "body"))
                             )
                      )
-                     
+
               )
             )
    ),
@@ -2304,7 +2304,7 @@ ui <- shinyUI(
                          label = "Contrasts",
                          choices = c("control", "all", "manual"),
                          selected = "control", inline = TRUE),
-            width = 2),        
+            width = 2),
           shinyBS::bsTooltip("p_for_DERNAseq", "Set the false discovery rate threshold", "top", options = list(container = "body")),
           shinyBS::bsTooltip("lfc_for_DERNAseq", "Set the log2 fold change threshold", "top", options = list(container = "body")),
           shinyBS::bsTooltip("pres_for_RNAseq", "The type of data scaling used for heatmap plotting. Either the raw or the centered log2-intensity (centered)", "top", options = list(container = "body")),
@@ -2359,7 +2359,7 @@ ui <- shinyUI(
           shinyBS::bsTooltip("Indicate_for_RNAseq", "Set the color, shape and facet_wrap of the plot", "top", options = list(container = "body")),
           shinyBS::bsTooltip("if_square_for_RNAseq", "Whether x limit is equal to y limit", "top", options = list(container = "body")),
           shinyBS::bsTooltip("pca_Width_for_RNAsqe", "Width of the figure to export", "top", options = list(container = "body")),
-          shinyBS::bsTooltip("pca_Height_for_RNAseq", "Height of the figure to export", "top", options = list(container = "body"))          
+          shinyBS::bsTooltip("pca_Height_for_RNAseq", "Height of the figure to export", "top", options = list(container = "body"))
                       ),
                       #tabPanel(title = "Pca plot",
                       #         plotOutput("pca", height = 600),
@@ -2370,19 +2370,19 @@ ui <- shinyUI(
                                 box(selectizeInput("Pearson_pal_for_RNAseq",
                                        "color panel",
                                        choices = c("BrBG", "PiYG", "PRGn", "PuOr", "RdBu", "RdGy", "RdYlBu", "RdYlGn", "Spectral", "Blues",  "BuGn", "BuPu", "GnBu", "Greens" , "Greys", "Oranges", "OrRd", "PuBu", "PuBuGn", "PuRd", "Purples", "RdPu", "Reds", "YlGn", "YlGnBu", "YlOrBr", "YlOrRd"),
-                                       selected = c("PRGn"), multiple = FALSE), 
+                                       selected = c("PRGn"), multiple = FALSE),
                                     checkboxInput("Pearson_pal_rev_for_RNAseq",
                                                    "pal rev",
                                                    value = FALSE), width = 4),
                                 box(numericInput("Pearson_Width_for_RNAseq",
                                                   "width",
-                                                  min = 1, max = 30, value = 7), 
+                                                  min = 1, max = 30, value = 7),
                                     numericInput("Pearson_Height_for_RNAseq",
                                                   "height",
                                                   min = 1, max = 30, value = 7), width = 4),
                                 box(numericInput("Pearson_lower_for_RNAseq",
                                                   "lower",
-                                                  min = -1, max = 1, value = -1), 
+                                                  min = -1, max = 1, value = -1),
                                     numericInput("Pearson_upper_for_RNAseq",
                                                   "upper",
                                                   min = -1, max = 1, value = 1), width = 4)
@@ -2390,7 +2390,7 @@ ui <- shinyUI(
                                fluidRow(
                                 box(checkboxInput("add_values_for_RNAseq_person",
                                                    "Add values",
-                                                   value = FALSE), 
+                                                   value = FALSE),
                                     numericInput("value_size_for_RNAseq_person",
                                                   "Value size",
                                                   min = 1, max = 30, value = 10),
@@ -2414,7 +2414,7 @@ ui <- shinyUI(
                                 box(selectizeInput("Gower_pal_for_RNAseq",
                                        "color panel",
                                        choices = c("BrBG", "PiYG", "PRGn", "PuOr", "RdBu", "RdGy", "RdYlBu", "RdYlGn", "Spectral", "Blues",  "BuGn", "BuPu", "GnBu", "Greens" , "Greys", "Oranges", "OrRd", "PuBu", "PuBuGn", "PuRd", "Purples", "RdPu", "Reds", "YlGn", "YlGnBu", "YlOrBr", "YlOrRd"),
-                                       selected = c("YlOrRd"), multiple = FALSE), 
+                                       selected = c("YlOrRd"), multiple = FALSE),
                                    checkboxInput("Gower_pal_rev_for_RNAseq",
                                                    "pal rev",
                                                    value = TRUE), width = 6),
@@ -2428,7 +2428,7 @@ ui <- shinyUI(
                              fluidRow(
                                 box(checkboxInput("add_values_for_RNAseq_gower",
                                                    "Add values",
-                                                   value = FALSE), 
+                                                   value = FALSE),
                                     numericInput("value_size_for_RNAseq_gower",
                                                   "Value size",
                                                   min = 1, max = 30, value = 10),
@@ -2461,7 +2461,7 @@ ui <- shinyUI(
                                  ),
                                 fluidRow(
                                     box(uiOutput("heatmap_cntrst_for_RNAseq"), width = 12)
-                                    ),                        
+                                    ),
                                # fluidRow(
                                #   box(checkboxInput("manual_heatmap_for_RNAseq",
                                #                     "Manual heatmap",
@@ -2516,7 +2516,7 @@ ui <- shinyUI(
                                fluidRow(
                                   uiOutput("plot_heatmap_for_RNAseq"),
                                  downloadButton('downloadHeatmap_for_DERNAseq', 'Save heatmap')),
-          shinyBS::bsTooltip("colorbar_for_RNAseq", "Choose the color palette of the colorbar", "top", options = list(container = "body")),                                                              
+          shinyBS::bsTooltip("colorbar_for_RNAseq", "Choose the color palette of the colorbar", "top", options = list(container = "body")),
           shinyBS::bsTooltip("manual_heatmap_for_RNAseq", "Whether plot the manual heatmap", "top", options = list(container = "body")),
           shinyBS::bsTooltip("heatmap_cntrst_for_RNAseq", "Choose the contrasts that you want to show, act when [Manual heatmap] is TRUE, can be one or more contrasts", "top", options = list(container = "body")),
           shinyBS::bsTooltip("k_for_RNAseq", "Set the number of k-means clusters", "top", options = list(container = "body")),
@@ -2554,7 +2554,7 @@ ui <- shinyUI(
                                                       palette = "square",
                                                       value = "#BEBEBE")
                                 )
-                            ),                        
+                            ),
                                fluidRow(
                                  box(selectizeInput("labelWay_for_RNAseq",
                                        "label way",
@@ -2573,7 +2573,7 @@ ui <- shinyUI(
                                   checkboxInput("labeled_for_RNAseq_customvolcano",
                                                    "labeled",
                                                    value = FALSE),
-                                  uiOutput("selected_proteins_for_RNAseq"), 
+                                  uiOutput("selected_proteins_for_RNAseq"),
                                      numericInput("showNum_for_RNAseq",
                                                   "show number",
                                                   min = 0, max = 100000, value = 20),
@@ -2582,7 +2582,7 @@ ui <- shinyUI(
                                                   min = 0, max = 20, value = 9),
                                      numericInput("dotsize_for_RNAseq",
                                                   "dot size",
-                                                  min = 0, max = 20, value = 2), 
+                                                  min = 0, max = 20, value = 2),
                                      numericInput("custom_volcano_Width_for_RNAseq",
                                                   "width",
                                                   min = 1, max = 30, value = 7),
@@ -2602,7 +2602,7 @@ ui <- shinyUI(
                                ),
           shinyBS::bsTooltip("up_color_for_RNAseq", "Set the color of the points those are up-regulated", "top", options = list(container = "body")),
           shinyBS::bsTooltip("down_color_for_RNAseq", "Set the color of the points those are down-regulated", "top", options = list(container = "body")),
-          shinyBS::bsTooltip("stable_color_for_RNAseq", "Set the color of the points those are not significant", "top", options = list(container = "body")),                               
+          shinyBS::bsTooltip("stable_color_for_RNAseq", "Set the color of the points those are not significant", "top", options = list(container = "body")),
           shinyBS::bsTooltip("labelWay_for_RNAseq", "Choose the way of adding labels, one of all significant, up, down, and selected proteins", "top", options = list(container = "body")),
           shinyBS::bsTooltip("contrast_for_RNAseq_customvolcano", "Choose the contrast that you want to show", "top", options = list(container = "body")),
           shinyBS::bsTooltip("if_label_rectangle_for_RNAseq", "Whether add rectangle underneath the text, making it easier to read", "top", options = list(container = "body")),
@@ -2615,11 +2615,11 @@ ui <- shinyUI(
           shinyBS::bsTooltip("custom_volcano_Width_for_RNAseq", "Width of the figure to export", "top", options = list(container = "body")),
           shinyBS::bsTooltip("custom_volcano_Height_for_RNAseq", "Height of the figure to export", "top", options = list(container = "body")),
           shinyBS::bsTooltip("P_adj_for_RNAseq", "Whether or not to use adjusted p values", "top", options = list(container = "body")),
-          shinyBS::bsTooltip("Same_width_for_RNAseq", "Whether the x axis to have the same width from 0", "top", options = list(container = "body"))          
+          shinyBS::bsTooltip("Same_width_for_RNAseq", "Whether the x axis to have the same width from 0", "top", options = list(container = "body"))
                       ),
                       tabPanel(title = "MA plot",
                               fluidRow(
-                                box(uiOutput("selected_proteins_for_RNAseq_MAplot"), 
+                                box(uiOutput("selected_proteins_for_RNAseq_MAplot"),
                                   uiOutput("contrast_for_RNAseq_MA"), width = 6),
                                 box(checkboxInput("add_rug_for_RNAseq",
                                                    "Add rug",
@@ -2629,7 +2629,7 @@ ui <- shinyUI(
                                                    value = FALSE),
                                     checkboxInput("labeled_for_RNAseq_MAplot",
                                                    "Labeled",
-                                                   value = FALSE),  
+                                                   value = FALSE),
                                 width = 6)
                                 ),
                                fluidRow(
@@ -2654,7 +2654,7 @@ ui <- shinyUI(
                       tabPanel(title = "Selected Gene",
                                fluidRow(
                                  box(
-                                  uiOutput("selected_genes_for_RNAseq"), 
+                                  uiOutput("selected_genes_for_RNAseq"),
                                   uiOutput("selected_group_for_RNAseq"), width = 8),
                                  box(checkboxInput("ylimZero_for_RNAseq",
                                                    "ylimZero",
@@ -2775,18 +2775,18 @@ ui <- shinyUI(
                                        choices = c("BrBG", "PiYG", "PRGn", "PuOr", "RdBu", "RdGy", "RdYlBu", "RdYlGn", "Spectral"),
                                        selected = c("RdBu"), multiple = FALSE), width = 12)
                                     )
-                                 
-                                 ),                                
+
+                                 ),
                                # fluidRow(
                                #   box(uiOutput("Type_for_PRheatmap"), width = 12)
                                #   ),
                                fluidRow(
                                   uiOutput("plot_heatmap_for_pro_rna"),
-                                 downloadButton('downloadHeatmap_for_pro_rna', 'Save heatmap'))  
+                                 downloadButton('downloadHeatmap_for_pro_rna', 'Save heatmap'))
                    , width = 12)
         )
           ),
-          shinyBS::bsTooltip("colorbar_for_PRheatmap", "Choose the color palette of the colorbar", "top", options = list(container = "body")),                                                              
+          shinyBS::bsTooltip("colorbar_for_PRheatmap", "Choose the color palette of the colorbar", "top", options = list(container = "body")),
           shinyBS::bsTooltip("row_font_size_for_pro_rna", "Set the size of row labels", "top", options = list(container = "body")),
           shinyBS::bsTooltip("col_font_size_for_pro_rna", "Set the size of column labels", "top", options = list(container = "body")),
           shinyBS::bsTooltip("size_for_pro_rna", "Set the height of the plot region", "top", options = list(container = "body")),
@@ -2804,8 +2804,8 @@ ui <- shinyUI(
             fluidRow(
               column(
                 width = 12,
-                includeMarkdown(system.file("extdata", "extralinks.md", package = "DEP"))
-                
+                includeMarkdown(system.file("extdata", "extralinks.md", package = "DEP2"))
+
               )
             )
 
@@ -2813,7 +2813,7 @@ ui <- shinyUI(
 )
 
         )
-      
+
     )
   )
 
@@ -2877,7 +2877,7 @@ server <- shinyServer(function(input, output) {
                               choices=test_manual_name, selected = NULL, multiple = TRUE)
              }
     })
-  
+
   output$Peptides1 <- renderUI({
     if(input$if_peptide_color) {
      colourInput(inputId = "Peptides_1",
@@ -2920,7 +2920,7 @@ server <- shinyServer(function(input, output) {
     data <<- data()
     cols <- grep("^LFQ", colnames(data))
 
-    filtered <- DEP:::filter_MaxQuant(data, input$filt)
+    filtered <- DEP2:::filter_MaxQuant(data, input$filt)
     unique_names <- make_unique(filtered, input$name, input$id)
 
     if (input$anno == "columns") {
@@ -2936,27 +2936,27 @@ server <- shinyServer(function(input, output) {
      my_norm <<- normalize_vsn(filt())
   })
 
-  
+
   imp <-  reactive({
      inFile1 <- input$resultRData
 
      if(is.null(inFile1)){
       if(input$imputation == "mixed on proteins") {
-        # Extract protein names with missing values 
+        # Extract protein names with missing values
         # in all replicates of at least one condition
         proteins_MNAR <- get_df_long(norm()) %>%
           dplyr::group_by(name, condition) %>%
-          dplyr::summarize(NAs = all(is.na(intensity))) %>% 
-          dplyr::filter(NAs) %>% 
-          dplyr::pull(name) %>% 
-          unique()        
+          dplyr::summarize(NAs = all(is.na(intensity))) %>%
+          dplyr::filter(NAs) %>%
+          dplyr::pull(name) %>%
+          unique()
 
         # Get a logical vector
-        MNAR <- names(norm()) %in% proteins_MNAR        
+        MNAR <- names(norm()) %in% proteins_MNAR
 
         # Perform a mixed imputation
         my_imp <<- impute(
-          norm(), 
+          norm(),
           fun = "mixed",
           randna = !MNAR, # we have to define MAR which is the opposite of MNAR
           mar = "knn", # imputation function for MAR
@@ -2977,7 +2977,7 @@ server <- shinyServer(function(input, output) {
 
             # Combine into the SummarizedExperiment object
             assay(sample_specific_imputation) <- cbind(
-                MSnbase::exprs(MSnSet_imputed1), 
+                MSnbase::exprs(MSnSet_imputed1),
                 MSnbase::exprs(MSnSet_imputed2))
             my_imp <<- sample_specific_imputation
             validate(
@@ -2986,14 +2986,14 @@ server <- shinyServer(function(input, output) {
             my_imp
             } else {
               #set.seed(12345)
-              my_imp <<- DEP::impute(norm(), input$imputation)
+              my_imp <<- DEP2::impute(norm(), input$imputation)
             }
         }
     } else {
      return(NULL)
     }
     })
-  
+
 
   df <- reactive({
     if(input$contrasts == "control") {
@@ -3001,7 +3001,7 @@ server <- shinyServer(function(input, output) {
       need(input$control != "", "Please select a control condition under menuItem Columns in the DEP-LFQ options of the sidebar")
     )
     }
-    
+
     if(input$contrasts == "manual") {
       validate(
       need(input$test_manual != "", "Please select manual contrasts to test under menuItem Columns")
@@ -3032,7 +3032,7 @@ server <- shinyServer(function(input, output) {
           } else {
             df <- test_limma(se = imp(), type = input$contrasts, test = input$test_manual)
           }
-      } 
+      }
       } else {
       #load your saved RData in order to get the same result (imp is the key of if result from two analysis being the same)
       load(file = inFile1$datapath)
@@ -3043,7 +3043,7 @@ server <- shinyServer(function(input, output) {
           } else {
             df <- test_limma(se = my_imp, type = input$contrasts, control = input$control)
           }
-      } 
+      }
 
       if(input$contrasts == "all") {
         if(input$fdr_correction == "fdrtool") {
@@ -3051,7 +3051,7 @@ server <- shinyServer(function(input, output) {
           } else {
             df <- test_limma(se = my_imp, type = input$contrasts)
           }
-      } 
+      }
 
       if(input$contrasts == "manual") {
         if(input$fdr_correction == "fdrtool") {
@@ -3068,14 +3068,14 @@ server <- shinyServer(function(input, output) {
     my_dep <<- add_rejections(df(), input$p, input$lfc)
   })
 
-  
+
   output$Save_RData <- downloadHandler(
     filename = function() { paste("results", ".RData", sep = "") },
     content = function(file) {
     	withProgress(message = 'Please wait ...', value = 0.66, {
       save(my_data, my_filt, my_norm, my_imp, my_dep, file=file)})}
   )
-  	
+
   ## All object and functions upon 'Analyze' input  ### ----------------------
 
   observeEvent(input$analyze, {
@@ -3178,21 +3178,21 @@ server <- shinyServer(function(input, output) {
         selectizeInput("mysplit",
                        "my split",
                        choices = c(1 : input$k), multiple = TRUE)
-      
+
     })
 
     output$Custom_columns_order <- renderUI({
         selectizeInput("Custom_columns_order",
                        "Custom columns order",
                        choices = colnames(assay(dep())), multiple = TRUE)
-      
+
     })
 
     output$Custom_columns_order_for_missval_heatmap <- renderUI({
       selectizeInput("Custom_columns_order_for_missval_heatmap",
                        "Custom columns order",
                        choices = colnames(assay(dep())), multiple = TRUE)
-      }) 
+      })
 
 
     output$volcano_cntrst <- renderUI({
@@ -3226,11 +3226,11 @@ server <- shinyServer(function(input, output) {
 
     ### Reactive functions ### ------------------------------------------------
     excluded <- reactive({
-      DEP:::exclude_deps(dep(), input$exclude)
+      DEP2:::exclude_deps(dep(), input$exclude)
     })
 
     selected <- reactive({
-      DEP:::select_deps(excluded(), input$select)
+      DEP2:::select_deps(excluded(), input$select)
     })
 
     res <- reactive({
@@ -3238,7 +3238,7 @@ server <- shinyServer(function(input, output) {
     })
 
     table <- reactive({
-      DEP:::get_table(res(), input$pres)
+      DEP2:::get_table(res(), input$pres)
     })
 
     selected_plot_input <- reactive ({
@@ -3304,7 +3304,7 @@ server <- shinyServer(function(input, output) {
                      peptide_1_color = input$Peptides_1,
                      peptide_2_color = input$Peptides_2
                      )
-        }) 
+        })
       }
     })
 
@@ -3587,7 +3587,7 @@ output$import_for_annotation <- renderUI({
                               "Choose genes",
                               choices = c("UPregu for DEP-LFQ", "DOWNregu for DEP-LFQ", "UPDOWN for DEP-LFQ", "UPregu for DEG-RNAseq", "DOWNregu for DEG-RNAseq", "UPDOWN for DEG-RNAseq"),
                               selected = "UPregu for DEP-LFQ")
-    }       
+    }
     })
 
 output$import_contrast_for_annotation <- renderUI({
@@ -3599,23 +3599,23 @@ if(input$import_for_annotation == "UPregu for DEP-LFQ" | input$import_for_annota
     } else {
       validate(need(!is.null(countData()), "Please go to the DEG-RNAseq options, and do the differential analysis first"))
       selectizeInput("import_contrast_for_annotation", "Contrast", choices = c(as.data.frame(my_res_for_RNAseq_4$res_for_RNAseq_Filter) %>% tibble::rownames_to_column(.) %>% dplyr::rename(., Gene = rowname) %>% colnames() %>% grep("_significant", ., value = T) %>% gsub("_significant", "", .) %>% unique(), "Any significant"), selected = NULL)
-    }    
+    }
   } else {
     return(NULL)
   }
-  
+
   })
 
 output$text_input_for_annotation <- renderUI({
   if(!input$import_from_for_annotation){
-    textAreaInput(inputId = "text_input_for_annotation", label = "Please paste your gene list", placeholder = "TP53\nPTEN", rows = 8, width = "100%")  
+    textAreaInput(inputId = "text_input_for_annotation", label = "Please paste your gene list", placeholder = "TP53\nPTEN", rows = 8, width = "100%")
   }
   })
 
 output$organism_for_annotation <- renderUI({
   # if(!input$import_from_for_annotation){
     selectizeInput("organism_for_annotation", "Select organism", choices=c("human","mouse"), selected="human")
-  # }  
+  # }
   })
 
 ######### observeEvent for gene annotation input
@@ -3724,7 +3724,7 @@ observeEvent(input$analyze_for_annotation,{
     if(!nrow(gene_df) == 0) {
       gene_df <<- gene_df %>% dplyr::filter(!is.na(name))
     }
-    
+
     if(nrow(gene_df) == 0) {
           output$annotation_Table <- DT::renderDataTable({
           shiny::validate(need(nrow(gene_df) != 0, message = "No genes meet your requirements, and can not do the annotation analysis"))
@@ -3748,14 +3748,14 @@ observeEvent(input$analyze_for_annotation,{
     #                              keytype = "SYMBOL",
     #                              column = "ENTREZID")
     check_ids <<- my_to_entrezid(orgDB = orgDB, gene = as.character(gene_df$name))$id
-    # shiny::validate(need(class(check_ids) != "logical", message = "No genes can be mapped to ENTREZID, and can not do the  annotation analysis")) 
+    # shiny::validate(need(class(check_ids) != "logical", message = "No genes can be mapped to ENTREZID, and can not do the  annotation analysis"))
     if(class(check_ids) == "logical") {
           output$annotation_Table <- DT::renderDataTable({
             shiny::validate(need(class(check_ids) != "logical", message = "No genes can be mapped to ENTREZID, and can not do the  annotation analysis"))
             DT::datatable(data.frame(a = "I am for check"), filter = 'top', options = list( autoWidth = F,scrollX = TRUE))
     })
-    }  
-    shiny::validate(need(class(check_ids) != "logical", message = "No genes can be mapped to ENTREZID, and can not do the  annotation analysis"))                             
+    }
+    shiny::validate(need(class(check_ids) != "logical", message = "No genes can be mapped to ENTREZID, and can not do the  annotation analysis"))
     ids <- gene_df$ENTREZID <- check_ids
 
     gene_df$ENTREZID <- as.character(gene_df$ENTREZID)
@@ -3779,7 +3779,7 @@ observeEvent(input$analyze_for_annotation,{
     # library(future.apply)
     # plan(multiprocess)
     # system.time(annots <- future_sapply(IDS,mergego,bgo=bgo) )
-    
+
     library(parallel)
     cpus = detectCores(logical = F)
     cl <- makeCluster(cpus)
@@ -3793,13 +3793,13 @@ observeEvent(input$analyze_for_annotation,{
     annots2 <<- annots %>% t() %>%as.data.frame() %>%mutate(ENTREZID=colnames(annots))
     mergepg <<- merge(gene_df,annots2,by.x="ENTREZID",by.y="ENTREZID")
     mergepg = mergepg[ , c(2, 7, 1, 3:6, 8:9)]
-    
+
 
     output$annotation_Table <- DT::renderDataTable(
       mergepg, filter = 'top', options = list( autoWidth = F,scrollX = TRUE
       )
     )
-    
+
     output$downloadannotation <- downloadHandler(
       filename = function() { paste("gene annotation", ".txt", sep = "") },
       content = function(file) {
@@ -3819,7 +3819,7 @@ output$import_for_go <- renderUI({
                               "Choose genes",
                               choices = c("UPregu for DEP-LFQ", "DOWNregu for DEP-LFQ", "UPDOWN for DEP-LFQ", "UPregu for DEG-RNAseq", "DOWNregu for DEG-RNAseq", "UPDOWN for DEG-RNAseq"),
                               selected = "UPregu for DEP-LFQ")
-    }       
+    }
     })
 
 output$import_contrast_for_go <- renderUI({
@@ -3831,23 +3831,23 @@ if(input$import_for_go == "UPregu for DEP-LFQ" | input$import_for_go == "DOWNreg
     } else {
       validate(need(!is.null(countData()), "Please go to the DEG-RNAseq options, and do the differential analysis first"))
       selectizeInput("import_contrast_for_go", "Contrast", choices = c(as.data.frame(my_res_for_RNAseq_4$res_for_RNAseq_Filter) %>% tibble::rownames_to_column(.) %>% dplyr::rename(., Gene = rowname) %>% colnames() %>% grep("_significant", ., value = T) %>% gsub("_significant", "", .) %>% unique(), "Any significant"), selected = NULL)
-    }    
+    }
   } else {
     return(NULL)
   }
-  
+
   })
 
 output$text_input_for_go <- renderUI({
   if(!input$import_from_for_go){
-    textAreaInput(inputId = "text_input_for_go", label = "Please paste your gene list", placeholder = "TP53\nPTEN\n\nor\n\nTP53  6.21\nPTEN  -1.53", rows = 8, width = "100%")  
+    textAreaInput(inputId = "text_input_for_go", label = "Please paste your gene list", placeholder = "TP53\nPTEN\n\nor\n\nTP53  6.21\nPTEN  -1.53", rows = 8, width = "100%")
   }
   })
 
 output$organism_for_go <- renderUI({
   # if(!input$import_from_for_go){
     selectizeInput("organism_for_go", "Select organism", choices=c("human","mouse"), selected="human")
-  # }  
+  # }
   })
 
 output$df_with_lg2fc <- renderUI({
@@ -3869,7 +3869,7 @@ output$df_with_lg2fc <- renderUI({
     output$downloadButton_go <- renderUI({
       downloadButton('downloadgo', 'Save table', class = "downloadgo")
     })
-    
+
     ## reactive functions
     if(!input$import_from_for_go) {
       genelist <- reactive({ strsplit(input$text_input_for_go,'\n')[[1]] })
@@ -3895,8 +3895,8 @@ output$df_with_lg2fc <- renderUI({
         })
     }
 
-     
-    
+
+
     if(input$import_from_for_go) {
       if(input$import_for_go == "UPregu for DEP-LFQ" | input$import_for_go == "DOWNregu for DEP-LFQ" | input$import_for_go == "UPDOWN for DEP-LFQ") {
         if(input$import_contrast_for_go == "Any significant") {
@@ -3905,7 +3905,7 @@ output$df_with_lg2fc <- renderUI({
             } else {
               if(input$import_for_go == "UPregu for DEP-LFQ") {
                 index <- get_results(dep()) %>% colnames(.) %>% grep("_ratio", ., value = T)
-                df <- get_results(dep()) %>% dplyr::filter(significant)              
+                df <- get_results(dep()) %>% dplyr::filter(significant)
                 cols_diff = df %>% dplyr::select(index)
                 cols_diff_reject = cols_diff > 0
                 cols_diff_reject[is.na(cols_diff_reject)] <- FALSE
@@ -3936,7 +3936,7 @@ output$df_with_lg2fc <- renderUI({
                     gene_df <<- get_results(dep()) %>% dplyr::filter(get(paste(input$import_contrast_for_go, "significant", sep = "_"))) %>% filter(get(paste(input$import_contrast_for_go, "ratio", sep = "_")) > 0) %>% dplyr::select(name)
                     } else {
                       gene_df <<- get_results(dep()) %>% dplyr::filter(get(paste(input$import_contrast_for_go, "significant", sep = "_"))) %>% filter(get(paste(input$import_contrast_for_go, "ratio", sep = "_")) > 0) %>% dplyr::select(name, paste(input$import_contrast_for_go, "ratio", sep = "_")) %>% dplyr::rename(fc = paste(input$import_contrast_for_go, "ratio", sep = "_"))
-                    }                  
+                    }
                   } else {
                     if(input$import_for_go == "DOWNregu for DEP-LFQ") {
                       if(!input$df_with_lg2fc) {
@@ -3980,21 +3980,21 @@ output$df_with_lg2fc <- renderUI({
                     gene_df <<- as.data.frame(my_res_for_RNAseq_4$res_for_RNAseq_Filter) %>% tibble::rownames_to_column(.) %>% dplyr::rename(., name = if(input$transid_for_RNAseq) {"symbol"} else {"rowname"}) %>% dplyr::filter(get(paste(input$import_contrast_for_go, "significant", sep = "_"))) %>% dplyr::select(name)
                     } else {
                       gene_df <<- as.data.frame(my_res_for_RNAseq_4$res_for_RNAseq_Filter) %>% tibble::rownames_to_column(.) %>% dplyr::rename(., name = if(input$transid_for_RNAseq) {"symbol"} else {"rowname"}) %>% dplyr::filter(get(paste(input$import_contrast_for_go, "significant", sep = "_"))) %>% dplyr::select(name, paste(input$import_contrast_for_go, "log2FoldChange", sep = "_")) %>% dplyr::rename(fc = paste(input$import_contrast_for_go, "log2FoldChange", sep = "_"))
-                    }                  
+                    }
                   } else {
                     if(input$import_for_go == "UPregu for DEG-RNAseq") {
                       if(!input$df_with_lg2fc) {
                         gene_df <<- as.data.frame(my_res_for_RNAseq_4$res_for_RNAseq_Filter) %>% tibble::rownames_to_column(.) %>% dplyr::rename(., name = if(input$transid_for_RNAseq) {"symbol"} else {"rowname"}) %>% dplyr::filter(get(paste(input$import_contrast_for_go, "significant", sep = "_"))) %>% dplyr::filter(get(paste(input$import_contrast_for_go, "log2FoldChange", sep = "_")) > 0) %>% dplyr::select(name)
                         } else {
                           gene_df <<- as.data.frame(my_res_for_RNAseq_4$res_for_RNAseq_Filter) %>% tibble::rownames_to_column(.) %>% dplyr::rename(., name = if(input$transid_for_RNAseq) {"symbol"} else {"rowname"}) %>% dplyr::filter(get(paste(input$import_contrast_for_go, "significant", sep = "_"))) %>% dplyr::filter(get(paste(input$import_contrast_for_go, "log2FoldChange", sep = "_")) > 0) %>% dplyr::select(name, paste(input$import_contrast_for_go, "log2FoldChange", sep = "_")) %>% dplyr::rename(fc = paste(input$import_contrast_for_go, "log2FoldChange", sep = "_"))
-                        }                      
+                        }
                       } else {
                         if(input$import_for_go == "DOWNregu for DEG-RNAseq") {
                           if(!input$df_with_lg2fc) {
                             gene_df <<- as.data.frame(my_res_for_RNAseq_4$res_for_RNAseq_Filter) %>% tibble::rownames_to_column(.) %>% dplyr::rename(., name = if(input$transid_for_RNAseq) {"symbol"} else {"rowname"}) %>% dplyr::filter(get(paste(input$import_contrast_for_go, "significant", sep = "_"))) %>% dplyr::filter(get(paste(input$import_contrast_for_go, "log2FoldChange", sep = "_")) < 0) %>% dplyr::select(name)
                             } else {
                               gene_df <<- as.data.frame(my_res_for_RNAseq_4$res_for_RNAseq_Filter) %>% tibble::rownames_to_column(.) %>% dplyr::rename(., name = if(input$transid_for_RNAseq) {"symbol"} else {"rowname"}) %>% dplyr::filter(get(paste(input$import_contrast_for_go, "significant", sep = "_"))) %>% dplyr::filter(get(paste(input$import_contrast_for_go, "log2FoldChange", sep = "_")) < 0) %>% dplyr::select(name, paste(input$import_contrast_for_go, "log2FoldChange", sep = "_")) %>% dplyr::rename(fc = paste(input$import_contrast_for_go, "log2FoldChange", sep = "_"))
-                            }                          
+                            }
                         }
                       }
                   }
@@ -4004,7 +4004,7 @@ output$df_with_lg2fc <- renderUI({
         }
     }
 
-    
+
       if(!input$import_from_for_go) {
         gene_df_check <- try(gene_df())
         if(!class(gene_df_check) == "try-error") {
@@ -4027,9 +4027,9 @@ output$df_with_lg2fc <- renderUI({
            if(ncol(gene_df) == 2) {
              gene_df <- gene_df[!duplicated(gene_df$name),]
            }
-  }  
+  }
       # reat <<- reactive({
-                        
+
         # Create a Progress object
         progress <- shiny::Progress$new()
         progress$set(message = "Please wait ...", value = 0.66)
@@ -4037,7 +4037,7 @@ output$df_with_lg2fc <- renderUI({
         on.exit(progress$close())
         reat <<- try(goAnalysis(df = gene_df, df_with_lg2fc = input$df_with_lg2fc, organism = input$organism_for_go), silent = TRUE)
         # })
-    
+
      # test1 <<- reat()
     res <<- reactive({
       try(giveGO_res_and_table(reat = reat, ont = input$go_ont, pCutoff = input$go_p, p.adj.cutoff = input$go_padj, q.cutoff = input$go_qvalue, simplify = input$go_simplify), silent = TRUE)
@@ -4049,16 +4049,16 @@ output$df_with_lg2fc <- renderUI({
     if(!input$import_from_for_go) {
       shiny::validate(
       need(!class(gene_df_check) == "try-error", message = "No genes meet your requirements, and can not do the GO analysis")
-    )      
-    } 
+    )
+    }
 
     if(input$import_from_for_go) {
       shiny::validate(
       need(nrow(gene_df) != 0, message = "No genes meet your requirements, and can not do the GO analysis")
-    )      
-    }    
+    )
+    }
 
-    validate( need(reat, "No genes can be mapped to ENTREZID, and can not do the GO analysis"))   
+    validate( need(reat, "No genes can be mapped to ENTREZID, and can not do the GO analysis"))
       DT::datatable(res()$sig_table, filter = 'top', options = list( autoWidth = F,scrollX = TRUE))
     })
 
@@ -4072,13 +4072,13 @@ output$df_with_lg2fc <- renderUI({
     if(!input$import_from_for_go) {
       shiny::validate(
       need(!class(gene_df_check) == "try-error", message = "No genes meet your requirements, and can not do the GO analysis")
-    )      
-    } 
+    )
+    }
 
     if(input$import_from_for_go) {
       shiny::validate(
       need(nrow(gene_df) != 0, message = "No genes meet your requirements, and can not do the GO analysis")
-    )      
+    )
     }
     validate( need(reat, "No genes can be mapped to ENTREZID, and can not do the GO analysis"))
 
@@ -4146,7 +4146,7 @@ output$df_with_lg2fc <- renderUI({
       #   # Close the progress when this reactive exits (even if there's an error)
       #   on.exit(progress$close())
       withProgress(message = 'Plotting', value = 0.66, {
-      my_heatplot(res = res(), ShowCategory = input$go_ShowCategory_heat, df_with_lg2fc = input$df_with_lg2fc, ont = input$go_ont)        
+      my_heatplot(res = res(), ShowCategory = input$go_ShowCategory_heat, df_with_lg2fc = input$df_with_lg2fc, ont = input$go_ont)
         })
       })
 
@@ -4156,7 +4156,7 @@ output$df_with_lg2fc <- renderUI({
       #   # Close the progress when this reactive exits (even if there's an error)
       #   on.exit(progress$close())
       withProgress(message = 'Plotting', value = 0.66, {
-      my_cnetplot(res = res(), ShowCategory = input$go_ShowCategory_cnet, circular = input$go_circular_cnet, colorEdge = TRUE, df_with_lg2fc = input$df_with_lg2fc, ont = input$go_ont)        
+      my_cnetplot(res = res(), ShowCategory = input$go_ShowCategory_cnet, circular = input$go_circular_cnet, colorEdge = TRUE, df_with_lg2fc = input$df_with_lg2fc, ont = input$go_ont)
         })
       })
 
@@ -4166,7 +4166,7 @@ output$df_with_lg2fc <- renderUI({
       #   # Close the progress when this reactive exits (even if there's an error)
       #   on.exit(progress$close())
       withProgress(message = 'Plotting', value = 0.66, {
-      my_emaplot(res = res(), ShowCategory = input$go_ShowCategory_ema, color = input$go_color, layout = "kk", ont = input$go_ont)        
+      my_emaplot(res = res(), ShowCategory = input$go_ShowCategory_ema, color = input$go_color, layout = "kk", ont = input$go_ont)
         })
       })
 
@@ -4179,7 +4179,7 @@ output$df_with_lg2fc <- renderUI({
       #   # Close the progress when this reactive exits (even if there's an error)
       #   on.exit(progress$close())
       withProgress(message = 'Plotting', value = 0.66, {
-      my_goplot(res = res(), ShowCategory = input$go_ShowCategory_go, color = input$go_color, ont = input$go_ont, Layout = "kk",circular = input$go_circular_go)        
+      my_goplot(res = res(), ShowCategory = input$go_ShowCategory_go, color = input$go_color, ont = input$go_ont, Layout = "kk",circular = input$go_circular_go)
         })
       })
 
@@ -4192,7 +4192,7 @@ output$df_with_lg2fc <- renderUI({
     #   #   # Close the progress when this reactive exits (even if there's an error)
     #   #   on.exit(progress$close())
     #   # withProgress(message = 'Plotting', value = 0.66, {
-    #   my_plotGOgraph(res = res(), firstSigNodes = input$go_ShowCategory_GOgraph, ont = input$go_ont)        
+    #   my_plotGOgraph(res = res(), firstSigNodes = input$go_ShowCategory_GOgraph, ont = input$go_ont)
     #     # })
     #   })
 
@@ -4347,7 +4347,7 @@ output$df_with_lg2fc <- renderUI({
       #   # Close the progress when this reactive exits (even if there's an error)
       #   on.exit(progress$close())
       withProgress(message = 'Plotting', value = 0.66, {
-      my_plotGOgraph(res = res(), firstSigNodes = input$go_ShowCategory_GOgraph, ont = input$go_ont)        
+      my_plotGOgraph(res = res(), firstSigNodes = input$go_ShowCategory_GOgraph, ont = input$go_ont)
         })
       })
 
@@ -4373,7 +4373,7 @@ output$import_for_kegg <- renderUI({
                               "Choose genes",
                               choices = c("UPregu for DEP-LFQ", "DOWNregu for DEP-LFQ", "UPDOWN for DEP-LFQ", "UPregu for DEG-RNAseq", "DOWNregu for DEG-RNAseq", "UPDOWN for DEG-RNAseq"),
                               selected = "UPregu for DEP-LFQ")
-    }       
+    }
     })
 
 output$import_contrast_for_kegg <- renderUI({
@@ -4385,23 +4385,23 @@ if(input$import_for_kegg == "UPregu for DEP-LFQ" | input$import_for_kegg == "DOW
     } else {
       validate(need(!is.null(countData()), "Please go to the DEG-RNAseq options, and do the differential analysis first"))
       selectizeInput("import_contrast_for_kegg", "Contrast", choices = c(as.data.frame(my_res_for_RNAseq_4$res_for_RNAseq_Filter) %>% tibble::rownames_to_column(.) %>% dplyr::rename(., Gene = rowname) %>% colnames() %>% grep("_significant", ., value = T) %>% gsub("_significant", "", .) %>% unique(), "Any significant"), selected = NULL)
-    }    
+    }
   } else {
     return(NULL)
   }
-  
+
   })
 
 output$text_input_for_kegg <- renderUI({
   if(!input$import_from_for_kegg){
-    textAreaInput(inputId = "text_input_for_kegg", label = "Please paste your gene list", placeholder = "TP53\nPTEN\n\nor\n\nTP53  6.21\nPTEN  -1.53", rows = 8, width = "100%")  
+    textAreaInput(inputId = "text_input_for_kegg", label = "Please paste your gene list", placeholder = "TP53\nPTEN\n\nor\n\nTP53  6.21\nPTEN  -1.53", rows = 8, width = "100%")
   }
   })
 
 output$organism_for_kegg <- renderUI({
   # if(!input$import_from_for_kegg){
     selectizeInput("organism_for_kegg", "Select organism", choices=c("hsa","mmu"), selected="hsa")
-  # }  
+  # }
   })
 
 output$df_with_lg2fc_for_kegg <- renderUI({
@@ -4423,11 +4423,11 @@ output$df_with_lg2fc_for_kegg <- renderUI({
     output$downloadButton_kegg <- renderUI({
       downloadButton('downloadkegg', 'Save table', class = "downloadkegg")
     })
-    
+
     ## reactive functions
     if(!input$import_from_for_kegg) {
         genelist_kegg <- reactive({ strsplit(input$text_input_for_kegg,'\n')[[1]] })
-        gene_name_kegg <-reactive(unlist(strsplit(genelist_kegg(),";")))    
+        gene_name_kegg <-reactive(unlist(strsplit(genelist_kegg(),";")))
 
         gene_df_kegg <- reactive({
           gene_df <<- data.frame(name=gene_name_kegg())
@@ -4444,8 +4444,8 @@ output$df_with_lg2fc_for_kegg <- renderUI({
           gene_df$name = as.character(gene_df$name)
           # test <<- gene_df
         }
-          gene_df    
-          })    	
+          gene_df
+          })
     }
 
     if(input$import_from_for_kegg) {
@@ -4456,7 +4456,7 @@ output$df_with_lg2fc_for_kegg <- renderUI({
             } else {
               if(input$import_for_kegg == "UPregu for DEP-LFQ") {
                 index <- get_results(dep()) %>% colnames(.) %>% grep("_ratio", ., value = T)
-                df <- get_results(dep()) %>% dplyr::filter(significant)              
+                df <- get_results(dep()) %>% dplyr::filter(significant)
                 cols_diff = df %>% dplyr::select(index)
                 cols_diff_reject = cols_diff > 0
                 cols_diff_reject[is.na(cols_diff_reject)] <- FALSE
@@ -4487,7 +4487,7 @@ output$df_with_lg2fc_for_kegg <- renderUI({
                     gene_df_kegg <<- get_results(dep()) %>% dplyr::filter(get(paste(input$import_contrast_for_kegg, "significant", sep = "_"))) %>% filter(get(paste(input$import_contrast_for_kegg, "ratio", sep = "_")) > 0) %>% dplyr::select(name)
                     } else {
                       gene_df_kegg <<- get_results(dep()) %>% dplyr::filter(get(paste(input$import_contrast_for_kegg, "significant", sep = "_"))) %>% filter(get(paste(input$import_contrast_for_kegg, "ratio", sep = "_")) > 0) %>% dplyr::select(name, paste(input$import_contrast_for_kegg, "ratio", sep = "_")) %>% dplyr::rename(fc = paste(input$import_contrast_for_kegg, "ratio", sep = "_"))
-                    }                  
+                    }
                   } else {
                     if(input$import_for_kegg == "DOWNregu for DEP-LFQ") {
                       if(!input$df_with_lg2fc_for_kegg) {
@@ -4531,21 +4531,21 @@ output$df_with_lg2fc_for_kegg <- renderUI({
                     gene_df_kegg <<- as.data.frame(my_res_for_RNAseq_4$res_for_RNAseq_Filter) %>% tibble::rownames_to_column(.) %>% dplyr::rename(., name = if(input$transid_for_RNAseq) {"symbol"} else {"rowname"}) %>% dplyr::filter(get(paste(input$import_contrast_for_kegg, "significant", sep = "_"))) %>% dplyr::select(name)
                     } else {
                       gene_df_kegg <<- as.data.frame(my_res_for_RNAseq_4$res_for_RNAseq_Filter) %>% tibble::rownames_to_column(.) %>% dplyr::rename(., name = if(input$transid_for_RNAseq) {"symbol"} else {"rowname"}) %>% dplyr::filter(get(paste(input$import_contrast_for_kegg, "significant", sep = "_"))) %>% dplyr::select(name, paste(input$import_contrast_for_kegg, "log2FoldChange", sep = "_")) %>% dplyr::rename(fc = paste(input$import_contrast_for_kegg, "log2FoldChange", sep = "_"))
-                    }                  
+                    }
                   } else {
                     if(input$import_for_kegg == "UPregu for DEG-RNAseq") {
                       if(!input$df_with_lg2fc_for_kegg) {
                         gene_df_kegg <<- as.data.frame(my_res_for_RNAseq_4$res_for_RNAseq_Filter) %>% tibble::rownames_to_column(.) %>% dplyr::rename(., name = if(input$transid_for_RNAseq) {"symbol"} else {"rowname"}) %>% dplyr::filter(get(paste(input$import_contrast_for_kegg, "significant", sep = "_"))) %>% dplyr::filter(get(paste(input$import_contrast_for_kegg, "log2FoldChange", sep = "_")) > 0) %>% dplyr::select(name)
                         } else {
                           gene_df_kegg <<- as.data.frame(my_res_for_RNAseq_4$res_for_RNAseq_Filter) %>% tibble::rownames_to_column(.) %>% dplyr::rename(., name = if(input$transid_for_RNAseq) {"symbol"} else {"rowname"}) %>% dplyr::filter(get(paste(input$import_contrast_for_kegg, "significant", sep = "_"))) %>% dplyr::filter(get(paste(input$import_contrast_for_kegg, "log2FoldChange", sep = "_")) > 0) %>% dplyr::select(name, paste(input$import_contrast_for_kegg, "log2FoldChange", sep = "_")) %>% dplyr::rename(fc = paste(input$import_contrast_for_kegg, "log2FoldChange", sep = "_"))
-                        }                      
+                        }
                       } else {
                         if(input$import_for_kegg == "DOWNregu for DEG-RNAseq") {
                           if(!input$df_with_lg2fc_for_kegg) {
                             gene_df_kegg <<- as.data.frame(my_res_for_RNAseq_4$res_for_RNAseq_Filter) %>% tibble::rownames_to_column(.) %>% dplyr::rename(., name = if(input$transid_for_RNAseq) {"symbol"} else {"rowname"}) %>% dplyr::filter(get(paste(input$import_contrast_for_kegg, "significant", sep = "_"))) %>% dplyr::filter(get(paste(input$import_contrast_for_kegg, "log2FoldChange", sep = "_")) < 0) %>% dplyr::select(name)
                             } else {
                               gene_df_kegg <<- as.data.frame(my_res_for_RNAseq_4$res_for_RNAseq_Filter) %>% tibble::rownames_to_column(.) %>% dplyr::rename(., name = if(input$transid_for_RNAseq) {"symbol"} else {"rowname"}) %>% dplyr::filter(get(paste(input$import_contrast_for_kegg, "significant", sep = "_"))) %>% dplyr::filter(get(paste(input$import_contrast_for_kegg, "log2FoldChange", sep = "_")) < 0) %>% dplyr::select(name, paste(input$import_contrast_for_kegg, "log2FoldChange", sep = "_")) %>% dplyr::rename(fc = paste(input$import_contrast_for_kegg, "log2FoldChange", sep = "_"))
-                            }                          
+                            }
                         }
                       }
                   }
@@ -4577,7 +4577,7 @@ output$df_with_lg2fc_for_kegg <- renderUI({
            if(ncol(gene_df_kegg) == 2) {
              gene_df_kegg <- gene_df_kegg[!duplicated(gene_df_kegg$name),]
            }
-  }   
+  }
 
       # reat_kegg <<- reactive({
         # Create a Progress object
@@ -4585,15 +4585,15 @@ output$df_with_lg2fc_for_kegg <- renderUI({
         progress$set(message = "Please wait ...", value = 0.66)
         # Close the progress when this reactive exits (even if there's an error)
         on.exit(progress$close())
-        reat_kegg <- try(keggAnalysis(df = gene_df_kegg, organism = input$organism_for_kegg, df_with_lg2fc = input$df_with_lg2fc_for_kegg), silent = TRUE)      
+        reat_kegg <- try(keggAnalysis(df = gene_df_kegg, organism = input$organism_for_kegg, df_with_lg2fc = input$df_with_lg2fc_for_kegg), silent = TRUE)
         # })
-    
+
      # test1 <<- reat_kegg()
     res_kegg <<- reactive({
     # if(input$import_from_for_kegg) {
     #   shiny::validate(
     #   need(nrow(gene_df_kegg) != 0, message = "No genes meet your requirements, and can not do the KEGG analysis")
-    # )      
+    # )
     # }
     #    # validate( need(reat_kegg, "No genes can be mapped to ENTREZID, and can not do the KEGG analysis"))
     #    shiny::validate( need(class(reat_kegg) != "try-error", message = "No genes can be mapped to ENTREZID, and can not do the KEGG analysis"))
@@ -4602,7 +4602,7 @@ output$df_with_lg2fc_for_kegg <- renderUI({
 
     test2 <<- res_kegg()
 
- 
+
     # output$kegg_Table <- DT::renderDataTable(
     #   res_kegg()$sig_table, filter = 'top', options = list( autoWidth = F,scrollX = TRUE
     #   )
@@ -4611,13 +4611,13 @@ output$df_with_lg2fc_for_kegg <- renderUI({
       if(!input$import_from_for_kegg) {
       shiny::validate(
       need(!class(gene_df_kegg_check) == "try-error", message = "No genes meet your requirements, and can not do the KEGG analysis")
-    )      
+    )
     }
 
     if(input$import_from_for_kegg) {
       shiny::validate(
       need(nrow(gene_df_kegg) != 0, message = "No genes meet your requirements, and can not do the KEGG analysis")
-    )      
+    )
     }
        validate( need(reat_kegg, "No genes can be mapped to ENTREZID, and can not do the KEGG analysis"))
        # shiny::validate( need(class(reat_kegg) != "try-error", message = "No genes can be mapped to ENTREZID, and can not do the KEGG analysis"))
@@ -4628,15 +4628,15 @@ output$df_with_lg2fc_for_kegg <- renderUI({
       if(!input$import_from_for_kegg) {
       shiny::validate(
       need(!class(gene_df_kegg_check) == "try-error", message = "No genes meet your requirements, and can not do the KEGG analysis")
-    )      
+    )
     }
 
     if(input$import_from_for_kegg) {
       shiny::validate(
       need(nrow(gene_df_kegg) != 0, message = "No genes meet your requirements, and can not do the KEGG analysis")
-    )      
+    )
     }
-    validate( need(reat_kegg, "No genes can be mapped to ENTREZID, and can not do the KEGG analysis"))      
+    validate( need(reat_kegg, "No genes can be mapped to ENTREZID, and can not do the KEGG analysis"))
       num_total_kegg <- res_kegg()$all_table %>%
         nrow()
       num_signif_kegg <- res_kegg()$sig_table %>%
@@ -4694,19 +4694,19 @@ output$df_with_lg2fc_for_kegg <- renderUI({
 
     kegg_heatplot_input <- reactive({
       withProgress(message = 'Plotting', value = 0.66, {
-      heatplot_for_react_kegg(res = res_kegg(), ShowCategory = input$kegg_ShowCategory_heat, df_with_lg2fc = input$df_with_lg2fc_for_kegg)        
+      heatplot_for_react_kegg(res = res_kegg(), ShowCategory = input$kegg_ShowCategory_heat, df_with_lg2fc = input$df_with_lg2fc_for_kegg)
         })
       })
 
     kegg_cnetplot_input <- reactive({
       withProgress(message = 'Plotting', value = 0.66, {
-      cnetplot_for_react_kegg(res = res_kegg(), ShowCategory = input$kegg_ShowCategory_cnet, circular = input$kegg_circular_cnet, colorEdge = TRUE, df_with_lg2fc = input$df_with_lg2fc_for_kegg)        
+      cnetplot_for_react_kegg(res = res_kegg(), ShowCategory = input$kegg_ShowCategory_cnet, circular = input$kegg_circular_cnet, colorEdge = TRUE, df_with_lg2fc = input$df_with_lg2fc_for_kegg)
         })
       })
 
     kegg_emaplot_input <- reactive({
       withProgress(message = 'Plotting', value = 0.66, {
-      emaplot_for_react_kegg(res = res_kegg(), ShowCategory = input$kegg_ShowCategory_ema, color = input$kegg_color, layout = "kk")        
+      emaplot_for_react_kegg(res = res_kegg(), ShowCategory = input$kegg_ShowCategory_ema, color = input$kegg_color, layout = "kk")
         })
       })
 
@@ -4814,7 +4814,7 @@ output$import_for_reactome <- renderUI({
                               "Choose genes",
                               choices = c("UPregu for DEP-LFQ", "DOWNregu for DEP-LFQ", "UPDOWN for DEP-LFQ", "UPregu for DEG-RNAseq", "DOWNregu for DEG-RNAseq", "UPDOWN for DEG-RNAseq"),
                               selected = "UPregu for DEP-LFQ")
-    }       
+    }
     })
 
 output$import_contrast_for_reactome <- renderUI({
@@ -4826,23 +4826,23 @@ if(input$import_for_reactome == "UPregu for DEP-LFQ" | input$import_for_reactome
     } else {
       validate(need(!is.null(countData()), "Please go to the DEG-RNAseq options, and do the differential analysis first"))
       selectizeInput("import_contrast_for_reactome", "Contrast", choices = c(as.data.frame(my_res_for_RNAseq_4$res_for_RNAseq_Filter) %>% tibble::rownames_to_column(.) %>% dplyr::rename(., Gene = rowname) %>% colnames() %>% grep("_significant", ., value = T) %>% gsub("_significant", "", .) %>% unique(), "Any significant"), selected = NULL)
-    }    
+    }
   } else {
     return(NULL)
   }
-  
+
   })
 
 output$text_input_for_reactome <- renderUI({
   if(!input$import_from_for_reactome){
-    textAreaInput(inputId = "text_input_for_reactome", label = "Please paste your gene list", placeholder = "TP53\nPTEN\n\nor\n\nTP53  6.21\nPTEN  -1.53", rows = 8, width = "100%")  
+    textAreaInput(inputId = "text_input_for_reactome", label = "Please paste your gene list", placeholder = "TP53\nPTEN\n\nor\n\nTP53  6.21\nPTEN  -1.53", rows = 8, width = "100%")
   }
   })
 
 output$organism_for_reactome <- renderUI({
   # if(!input$import_from_for_reactome){
     selectizeInput("organism_for_reactome", "Select organism", choices=c("human","mouse"), selected="human")
-  # }  
+  # }
   })
 
 output$df_with_lg2fc_for_reactome <- renderUI({
@@ -4864,11 +4864,11 @@ output$df_with_lg2fc_for_reactome <- renderUI({
     output$downloadButton_reactome <- renderUI({
       downloadButton('downloadreactome', 'Save table', class = "downloadreactome")
     })
-    
+
     ## reactive functions
     if(!input$import_from_for_reactome) {
       genelist_reactome <- reactive({ strsplit(input$text_input_for_reactome,'\n')[[1]] })
-      gene_name_reactome <-reactive(unlist(strsplit(genelist_reactome(),";")))  
+      gene_name_reactome <-reactive(unlist(strsplit(genelist_reactome(),";")))
 
       gene_df_reactome <- reactive({
         gene_df <<- data.frame(name=gene_name_reactome())
@@ -4885,8 +4885,8 @@ output$df_with_lg2fc_for_reactome <- renderUI({
         gene_df$name = as.character(gene_df$name)
         # test <<- gene_df
       }
-        gene_df  
-        })      
+        gene_df
+        })
     }
 
     if(input$import_from_for_reactome) {
@@ -4897,7 +4897,7 @@ output$df_with_lg2fc_for_reactome <- renderUI({
             } else {
               if(input$import_for_reactome == "UPregu for DEP-LFQ") {
                 index <- get_results(dep()) %>% colnames(.) %>% grep("_ratio", ., value = T)
-                df <- get_results(dep()) %>% dplyr::filter(significant)              
+                df <- get_results(dep()) %>% dplyr::filter(significant)
                 cols_diff = df %>% dplyr::select(index)
                 cols_diff_reject = cols_diff > 0
                 cols_diff_reject[is.na(cols_diff_reject)] <- FALSE
@@ -4928,7 +4928,7 @@ output$df_with_lg2fc_for_reactome <- renderUI({
                     gene_df_reactome <<- get_results(dep()) %>% dplyr::filter(get(paste(input$import_contrast_for_reactome, "significant", sep = "_"))) %>% filter(get(paste(input$import_contrast_for_reactome, "ratio", sep = "_")) > 0) %>% dplyr::select(name)
                     } else {
                       gene_df_reactome <<- get_results(dep()) %>% dplyr::filter(get(paste(input$import_contrast_for_reactome, "significant", sep = "_"))) %>% filter(get(paste(input$import_contrast_for_reactome, "ratio", sep = "_")) > 0) %>% dplyr::select(name, paste(input$import_contrast_for_reactome, "ratio", sep = "_")) %>% dplyr::rename(fc = paste(input$import_contrast_for_reactome, "ratio", sep = "_"))
-                    }                  
+                    }
                   } else {
                     if(input$import_for_reactome == "DOWNregu for DEP-LFQ") {
                       if(!input$df_with_lg2fc_for_reactome) {
@@ -4972,21 +4972,21 @@ output$df_with_lg2fc_for_reactome <- renderUI({
                     gene_df_reactome <<- as.data.frame(my_res_for_RNAseq_4$res_for_RNAseq_Filter) %>% tibble::rownames_to_column(.) %>% dplyr::rename(., name = if(input$transid_for_RNAseq) {"symbol"} else {"rowname"}) %>% dplyr::filter(get(paste(input$import_contrast_for_reactome, "significant", sep = "_"))) %>% dplyr::select(name)
                     } else {
                       gene_df_reactome <<- as.data.frame(my_res_for_RNAseq_4$res_for_RNAseq_Filter) %>% tibble::rownames_to_column(.) %>% dplyr::rename(., name = if(input$transid_for_RNAseq) {"symbol"} else {"rowname"}) %>% dplyr::filter(get(paste(input$import_contrast_for_reactome, "significant", sep = "_"))) %>% dplyr::select(name, paste(input$import_contrast_for_reactome, "log2FoldChange", sep = "_")) %>% dplyr::rename(fc = paste(input$import_contrast_for_reactome, "log2FoldChange", sep = "_"))
-                    }                  
+                    }
                   } else {
                     if(input$import_for_reactome == "UPregu for DEG-RNAseq") {
                       if(!input$df_with_lg2fc_for_reactome) {
                         gene_df_reactome <<- as.data.frame(my_res_for_RNAseq_4$res_for_RNAseq_Filter) %>% tibble::rownames_to_column(.) %>% dplyr::rename(., name = if(input$transid_for_RNAseq) {"symbol"} else {"rowname"}) %>% dplyr::filter(get(paste(input$import_contrast_for_reactome, "significant", sep = "_"))) %>% dplyr::filter(get(paste(input$import_contrast_for_reactome, "log2FoldChange", sep = "_")) > 0) %>% dplyr::select(name)
                         } else {
                           gene_df_reactome <<- as.data.frame(my_res_for_RNAseq_4$res_for_RNAseq_Filter) %>% tibble::rownames_to_column(.) %>% dplyr::rename(., name = if(input$transid_for_RNAseq) {"symbol"} else {"rowname"}) %>% dplyr::filter(get(paste(input$import_contrast_for_reactome, "significant", sep = "_"))) %>% dplyr::filter(get(paste(input$import_contrast_for_reactome, "log2FoldChange", sep = "_")) > 0) %>% dplyr::select(name, paste(input$import_contrast_for_reactome, "log2FoldChange", sep = "_")) %>% dplyr::rename(fc = paste(input$import_contrast_for_reactome, "log2FoldChange", sep = "_"))
-                        }                      
+                        }
                       } else {
                         if(input$import_for_reactome == "DOWNregu for DEG-RNAseq") {
                           if(!input$df_with_lg2fc_for_reactome) {
                             gene_df_reactome <<- as.data.frame(my_res_for_RNAseq_4$res_for_RNAseq_Filter) %>% tibble::rownames_to_column(.) %>% dplyr::rename(., name = if(input$transid_for_RNAseq) {"symbol"} else {"rowname"}) %>% dplyr::filter(get(paste(input$import_contrast_for_reactome, "significant", sep = "_"))) %>% dplyr::filter(get(paste(input$import_contrast_for_reactome, "log2FoldChange", sep = "_")) < 0) %>% dplyr::select(name)
                             } else {
                               gene_df_reactome <<- as.data.frame(my_res_for_RNAseq_4$res_for_RNAseq_Filter) %>% tibble::rownames_to_column(.) %>% dplyr::rename(., name = if(input$transid_for_RNAseq) {"symbol"} else {"rowname"}) %>% dplyr::filter(get(paste(input$import_contrast_for_reactome, "significant", sep = "_"))) %>% dplyr::filter(get(paste(input$import_contrast_for_reactome, "log2FoldChange", sep = "_")) < 0) %>% dplyr::select(name, paste(input$import_contrast_for_reactome, "log2FoldChange", sep = "_")) %>% dplyr::rename(fc = paste(input$import_contrast_for_reactome, "log2FoldChange", sep = "_"))
-                            }                          
+                            }
                         }
                       }
                   }
@@ -5018,7 +5018,7 @@ output$df_with_lg2fc_for_reactome <- renderUI({
            if(ncol(gene_df_reactome) == 2) {
              gene_df_reactome <- gene_df_reactome[!duplicated(gene_df_reactome$name),]
            }
-  }    
+  }
 
       # reat_reactome <<- reactive({
         # Create a Progress object
@@ -5028,7 +5028,7 @@ output$df_with_lg2fc_for_reactome <- renderUI({
         on.exit(progress$close())
         reat_reactome <<- try(reactAnalysis(df = gene_df_reactome, organism = input$organism_for_reactome, df_with_lg2fc = input$df_with_lg2fc_for_reactome), silent = TRUE)
         # })
-    
+
      # test1 <<- reat_reactome()
     res_reactome <<- reactive({
       try(givekegg_reat_res_and_table(reat = reat_reactome, pCutoff = input$reactome_p, p.adj.cutoff = input$reactome_padj, q.cutoff = input$reactome_qvalue), silent = TRUE)
@@ -5040,13 +5040,13 @@ output$df_with_lg2fc_for_reactome <- renderUI({
       if(!input$import_from_for_reactome) {
       shiny::validate(
       need(!class(gene_df_reactome_check) == "try-error", message = "No genes meet your requirements, and can not do the reactome analysis")
-    )      
+    )
     }
 
     if(input$import_from_for_reactome) {
       shiny::validate(
       need(nrow(gene_df_reactome) != 0, message = "No genes meet your requirements, and can not do the reactome analysis")
-    )      
+    )
     }
     validate( need(res_reactome(), "No genes can be mapped to ENTREZID, and can not do the reactome analysis"))
       DT::datatable(res_reactome()$sig_table, filter = 'top', options = list( autoWidth = F,scrollX = TRUE))
@@ -5056,13 +5056,13 @@ output$df_with_lg2fc_for_reactome <- renderUI({
       if(!input$import_from_for_reactome) {
       shiny::validate(
       need(!class(gene_df_reactome_check) == "try-error", message = "No genes meet your requirements, and can not do the reactome analysis")
-    )      
+    )
     }
 
     if(input$import_from_for_reactome) {
       shiny::validate(
       need(nrow(gene_df_reactome) != 0, message = "No genes meet your requirements, and can not do the reactome analysis")
-    )      
+    )
     }
     validate( need(res_reactome(), "No genes can be mapped to ENTREZID, and can not do the reactome analysis"))
 
@@ -5123,19 +5123,19 @@ output$df_with_lg2fc_for_reactome <- renderUI({
 
     reactome_heatplot_input <- reactive({
       withProgress(message = 'Plotting', value = 0.66, {
-      heatplot_for_react_kegg(res = res_reactome(), ShowCategory = input$reactome_ShowCategory_heat, df_with_lg2fc = input$df_with_lg2fc_for_reactome)        
+      heatplot_for_react_kegg(res = res_reactome(), ShowCategory = input$reactome_ShowCategory_heat, df_with_lg2fc = input$df_with_lg2fc_for_reactome)
         })
       })
 
     reactome_cnetplot_input <- reactive({
       withProgress(message = 'Plotting', value = 0.66, {
-      cnetplot_for_react_kegg(res = res_reactome(), ShowCategory = input$reactome_ShowCategory_cnet, circular = input$reactome_circular_cnet, colorEdge = TRUE, df_with_lg2fc = input$df_with_lg2fc_for_reactome)        
+      cnetplot_for_react_kegg(res = res_reactome(), ShowCategory = input$reactome_ShowCategory_cnet, circular = input$reactome_circular_cnet, colorEdge = TRUE, df_with_lg2fc = input$df_with_lg2fc_for_reactome)
         })
       })
 
     reactome_emaplot_input <- reactive({
       withProgress(message = 'Plotting', value = 0.66, {
-      emaplot_for_react_kegg(res = res_reactome(), ShowCategory = input$reactome_ShowCategory_ema, color = input$reactome_color, layout = "kk")        
+      emaplot_for_react_kegg(res = res_reactome(), ShowCategory = input$reactome_ShowCategory_ema, color = input$reactome_color, layout = "kk")
         })
       })
 
@@ -5243,7 +5243,7 @@ output$import_for_gsego <- renderUI({
                               "Choose genes",
                               choices = c("DEP-LFQ", "DEG-RNAseq"),
                               selected = "DEP-LFQ")
-    }       
+    }
     })
 
 output$import_contrast_for_gsego <- renderUI({
@@ -5255,23 +5255,23 @@ if(input$import_for_gsego == "DEP-LFQ") {
     } else {
       validate(need(!is.null(countData()), "Please go to the DEG-RNAseq options, and do the differential analysis first"))
       selectizeInput("import_contrast_for_gsego", "Contrast", choices = c(as.data.frame(my_res_for_RNAseq_4$res_for_RNAseq) %>% tibble::rownames_to_column(.) %>% dplyr::rename(., Gene = rowname) %>% colnames() %>% grep("_significant", ., value = T) %>% gsub("_significant", "", .) %>% unique()), selected = NULL)
-    }    
+    }
   } else {
     return(NULL)
   }
-  
+
   })
 
 output$text_input_for_gsego <- renderUI({
   if(!input$import_from_for_gsego){
-    textAreaInput(inputId = "text_input_for_gsego", label = "Please paste your gene list", placeholder = "TP53  6.21\nPTEN  -1.53", rows = 8, width = "100%")  
+    textAreaInput(inputId = "text_input_for_gsego", label = "Please paste your gene list", placeholder = "TP53  6.21\nPTEN  -1.53", rows = 8, width = "100%")
   }
   })
 
 output$organism_for_gsego <- renderUI({
   # if(!input$import_from_for_gsego){
     selectizeInput("organism_for_gsego", "Select organism", choices=c("human","mouse"), selected="human")
-  # }  
+  # }
   })
 
   # observeEvent for gsego analysis input
@@ -5287,11 +5287,11 @@ output$organism_for_gsego <- renderUI({
     output$downloadButton_gsego <- renderUI({
       downloadButton('downloadgsego', 'Save table', class = "downloadgsego")
     })
-    
+
     ## reactive functions
     if(!input$import_from_for_gsego) {
       genelist <- reactive({ strsplit(input$text_input_for_gsego,'\n')[[1]] })
-      gene_name <-reactive(unlist(strsplit(genelist(),";")))  
+      gene_name <-reactive(unlist(strsplit(genelist(),";")))
 
       gene_df_gsego <- reactive({
         gene_df <<- data.frame(name=gene_name())
@@ -5303,7 +5303,7 @@ output$organism_for_gsego <- renderUI({
         gene_df$fc = as.numeric(as.character(gene_df$fc))
         gene_df$name = as.character(gene_df$name)
         gene_df
-        })      
+        })
     }
 
     if(input$import_from_for_gsego) {
@@ -5316,7 +5316,7 @@ output$organism_for_gsego <- renderUI({
         }
     }
       # test <<- gene_df_gsego()
-   
+
       # reat_gsego <<- reactive({
         #Create a Progress object
         progress <- shiny::Progress$new()
@@ -5325,7 +5325,7 @@ output$organism_for_gsego <- renderUI({
         on.exit(progress$close())
         reat_gsego <<- try(gsegoAnalysis(df = if(!input$import_from_for_gsego) {gene_df_gsego()} else {gene_df_gsego}, organism = input$organism_for_gsego), silent = TRUE)
         # })
-    
+
      # test1 <<- reat_gsego()
     res_gsego <- reactive({
     #   validate(
@@ -5341,12 +5341,12 @@ output$organism_for_gsego <- renderUI({
     if(input$import_from_for_gsego) {
       shiny::validate(
       need(nrow(gene_df_gsego) != 0, message = "No genes meet your requirements, and can not do the gseGO analysis")
-    )      
+    )
     }
       validate(
       need(length(input$gsego_Phenotype) != 0, "Please choose at least one Phenotype"),
       need(reat_gsego, "Sorry, I can not do the gseGO analysis")
-        )      
+        )
       DT::datatable(res_gsego()$sig_table, filter = 'top', options = list(autoWidth = F,scrollX = TRUE))
       })#selection = list(selected = c(1))
 
@@ -5355,13 +5355,13 @@ output$organism_for_gsego <- renderUI({
     if(input$import_from_for_gsego) {
       shiny::validate(
       need(nrow(gene_df_gsego) != 0, message = "No genes meet your requirements, and can not do the gseGO analysis")
-    )      
+    )
     }
       validate(
       need(length(input$gsego_Phenotype) != 0, "Please choose at least one Phenotype"),
       need(reat_gsego, "Sorry, I can not do the gseGO analysis")
-        )      
-      
+        )
+
       num_total_gsego <- res_gsego()$all_table %>%
         nrow()
       num_signif_gsego <- res_gsego()$sig_table %>%
@@ -5398,7 +5398,7 @@ output$organism_for_gsego <- renderUI({
                        "Term",
                        choices = res_gsego()$sig_table$Description, selected = res_gsego()$sig_table$Description[1], multiple = FALSE)
       }
-    })    
+    })
 
     gsego_barplot_input <- reactive({
       # # Create a Progress object
@@ -5419,7 +5419,7 @@ output$organism_for_gsego <- renderUI({
 
     gsego_heatplot_input <- reactive({
       withProgress(message = 'Plotting', value = 0.66, {
-      try(Heatplot(res_gsego()$sig_res, showCategory = input$gsego_ShowCategory_heat, foldChange = res_gsego()$de), silent = T)  
+      try(Heatplot(res_gsego()$sig_res, showCategory = input$gsego_ShowCategory_heat, foldChange = res_gsego()$de), silent = T)
         })
       })
 
@@ -5443,7 +5443,7 @@ output$organism_for_gsego <- renderUI({
                    rel_heights = c(1.5, 0.5, 1),
                    subplots = 1:3,
                    pvalue_table = TRUE,
-                   ES_geom = "line")        
+                   ES_geom = "line")
         })
       })
 
@@ -5569,7 +5569,7 @@ output$import_for_gsekegg <- renderUI({
                               "Choose genes",
                               choices = c("DEP-LFQ", "DEG-RNAseq"),
                               selected = "DEP-LFQ")
-    }       
+    }
     })
 
 output$import_contrast_for_gsekegg <- renderUI({
@@ -5581,23 +5581,23 @@ if(input$import_for_gsekegg == "DEP-LFQ") {
     } else {
       validate(need(!is.null(countData()), "Please go to the DEG-RNAseq options, and do the differential analysis first"))
       selectizeInput("import_contrast_for_gsekegg", "Contrast", choices = c(as.data.frame(my_res_for_RNAseq_4$res_for_RNAseq) %>% tibble::rownames_to_column(.) %>% dplyr::rename(., Gene = rowname) %>% colnames() %>% grep("_significant", ., value = T) %>% gsub("_significant", "", .) %>% unique()), selected = NULL)
-    }    
+    }
   } else {
     return(NULL)
   }
-  
+
   })
 
 output$text_input_for_gsekegg <- renderUI({
   if(!input$import_from_for_gsekegg){
-    textAreaInput(inputId = "text_input_for_gsekegg", label = "Please paste your gene list", placeholder = "TP53  6.21\nPTEN  -1.53", rows = 8, width = "100%")  
+    textAreaInput(inputId = "text_input_for_gsekegg", label = "Please paste your gene list", placeholder = "TP53  6.21\nPTEN  -1.53", rows = 8, width = "100%")
   }
   })
 
 output$organism_for_gsekegg <- renderUI({
   # if(!input$import_from_for_gsekegg){
     selectizeInput("organism_for_gsekegg", "Select organism", choices=c("hsa","mmu"), selected="hsa")
-  # }  
+  # }
   })
 
   # observeEvent for gsekegg analysis input
@@ -5613,11 +5613,11 @@ output$organism_for_gsekegg <- renderUI({
     output$downloadButton_gsekegg <- renderUI({
       downloadButton('downloadgsekegg', 'Save table', class = "downloadgsekegg")
     })
-    
+
     ## reactive functions
     if(!input$import_from_for_gsekegg) {
       genelist <- reactive({ strsplit(input$text_input_for_gsekegg,'\n')[[1]] })
-      gene_name <-reactive(unlist(strsplit(genelist(),";")))  
+      gene_name <-reactive(unlist(strsplit(genelist(),";")))
 
       gene_df_gsekegg <- reactive({
         gene_df <<- data.frame(name=gene_name())
@@ -5629,7 +5629,7 @@ output$organism_for_gsekegg <- renderUI({
         gene_df$fc = as.numeric(as.character(gene_df$fc))
         gene_df$name = as.character(gene_df$name)
         gene_df
-        })      
+        })
     }
 
     if(input$import_from_for_gsekegg) {
@@ -5641,7 +5641,7 @@ output$organism_for_gsekegg <- renderUI({
           }
         }
     }
-   
+
       # reat_gsekegg <<- reactive({
         # Create a Progress object
         progress <- shiny::Progress$new()
@@ -5650,7 +5650,7 @@ output$organism_for_gsekegg <- renderUI({
         on.exit(progress$close())
         reat_gsekegg <- try(gsekeggAnalysis(df = if(!input$import_from_for_gsekegg) {gene_df_gsekegg()} else {gene_df_gsekegg}, organism = input$organism_for_gsekegg), silent = TRUE)
         # })
-  
+
     res_gsekegg <<- reactive({
       try(give_gsekegg_gsereat_res_and_table(reat = reat_gsekegg, pCutoff = input$gsekegg_p, p.adj.cutoff = input$gsekegg_padj, NES.cutoff = input$gsekegg_NES, Phenotype = input$gsekegg_Phenotype), silent = TRUE)
       })
@@ -5661,12 +5661,12 @@ output$organism_for_gsekegg <- renderUI({
     if(input$import_from_for_gsekegg) {
       shiny::validate(
       need(nrow(gene_df_gsekegg) != 0, message = "No genes meet your requirements, and can not do the gsekegg analysis")
-    )      
+    )
     }
       validate(
       need(length(input$gsekegg_Phenotype) != 0, "Please choose at least one Phenotype"),
       need(reat_gsekegg, "Sorry, I can not do the gsekegg analysis")
-        )      
+        )
       DT::datatable(res_gsekegg()$sig_table, filter = 'top', options = list(autoWidth = F,scrollX = TRUE))
       })#selection = list(selected = c(1))
 
@@ -5674,12 +5674,12 @@ output$organism_for_gsekegg <- renderUI({
     if(input$import_from_for_gsekegg) {
       shiny::validate(
       need(nrow(gene_df_gsekegg) != 0, message = "No genes meet your requirements, and can not do the gsekegg analysis")
-    )      
+    )
     }
       validate(
       need(length(input$gsekegg_Phenotype) != 0, "Please choose at least one Phenotype"),
       need(reat_gsekegg, "Sorry, I can not do the gsekegg analysis")
-        )      
+        )
       num_total_gsekegg <- res_gsekegg()$all_table %>%
         nrow()
       num_signif_gsekegg <- res_gsekegg()$sig_table %>%
@@ -5716,7 +5716,7 @@ output$organism_for_gsekegg <- renderUI({
                        "Term",
                        choices = res_gsekegg()$sig_table$Description, selected = res_gsekegg()$sig_table$Description[1], multiple = FALSE)
       }
-    })    
+    })
 
     gsekegg_barplot_input <- reactive({
       # # Create a Progress object
@@ -5737,7 +5737,7 @@ output$organism_for_gsekegg <- renderUI({
 
     gsekegg_heatplot_input <- reactive({
       withProgress(message = 'Plotting', value = 0.66, {
-      try(Heatplot(res_gsekegg()$sig_res, showCategory = input$gsekegg_ShowCategory_heat, foldChange = res_gsekegg()$de), silent = T)  
+      try(Heatplot(res_gsekegg()$sig_res, showCategory = input$gsekegg_ShowCategory_heat, foldChange = res_gsekegg()$de), silent = T)
         })
       })
 
@@ -5761,7 +5761,7 @@ output$organism_for_gsekegg <- renderUI({
                    rel_heights = c(1.5, 0.5, 1),
                    subplots = 1:3,
                    pvalue_table = TRUE,
-                   ES_geom = "line")        
+                   ES_geom = "line")
         })
       })
 
@@ -5869,7 +5869,7 @@ output$import_for_gsereactome <- renderUI({
                               "Choose genes",
                               choices = c("DEP-LFQ", "DEG-RNAseq"),
                               selected = "DEP-LFQ")
-    }       
+    }
     })
 
 output$import_contrast_for_gsereactome <- renderUI({
@@ -5881,26 +5881,26 @@ if(input$import_for_gsereactome == "DEP-LFQ") {
     } else {
       validate(need(!is.null(countData()), "Please go to the DEG-RNAseq options, and the differential analysis first"))
       selectizeInput("import_contrast_for_gsereactome", "Contrast", choices = c(as.data.frame(my_res_for_RNAseq_4$res_for_RNAseq) %>% tibble::rownames_to_column(.) %>% dplyr::rename(., Gene = rowname) %>% colnames() %>% grep("_significant", ., value = T) %>% gsub("_significant", "", .) %>% unique()), selected = NULL)
-    }    
+    }
   } else {
     return(NULL)
   }
-  
+
   })
 
 output$text_input_for_gsereactome <- renderUI({
   if(!input$import_from_for_gsereactome){
-    textAreaInput(inputId = "text_input_for_gsereactome", label = "Please paste your gene list", placeholder = "TP53  6.21\nPTEN  -1.53", rows = 8, width = "100%")  
+    textAreaInput(inputId = "text_input_for_gsereactome", label = "Please paste your gene list", placeholder = "TP53  6.21\nPTEN  -1.53", rows = 8, width = "100%")
   }
   })
 
 output$organism_for_gsereactome <- renderUI({
   # if(!input$import_from_for_gsereactome){
     selectizeInput("organism_for_gsereactome", "Select organism", choices=c("human","mouse"), selected="human")
-  # }  
+  # }
   })
 
-  # observeEvent for gsereactome analysis input 
+  # observeEvent for gsereactome analysis input
   observeEvent(input$analyze_for_gsereactome,{
       ### Interactive UI functions ### ------------------------------------------
     output$downloadTable_gsereactome <- renderUI({
@@ -5913,11 +5913,11 @@ output$organism_for_gsereactome <- renderUI({
     output$downloadButton_gsereactome <- renderUI({
       downloadButton('downloadgsereactome', 'Save table', class = "downloadgsereactome")
     })
-    
+
     ## reactive functions
     if(!input$import_from_for_gsereactome) {
       genelist <- reactive({ strsplit(input$text_input_for_gsereactome,'\n')[[1]] })
-      gene_name <-reactive(unlist(strsplit(genelist(),";")))  
+      gene_name <-reactive(unlist(strsplit(genelist(),";")))
 
       gene_df_gsereactome <- reactive({
         gene_df <<- data.frame(name=gene_name())
@@ -5929,7 +5929,7 @@ output$organism_for_gsereactome <- renderUI({
         gene_df$fc = as.numeric(as.character(gene_df$fc))
         gene_df$name = as.character(gene_df$name)
         gene_df
-        })      
+        })
     }
 
     if(input$import_from_for_gsereactome) {
@@ -5940,8 +5940,8 @@ output$organism_for_gsereactome <- renderUI({
             gene_df_gsereactome <<- as.data.frame(my_res_for_RNAseq_4$res_for_RNAseq) %>% tibble::rownames_to_column(.) %>% dplyr::rename(., name = if(input$transid_for_RNAseq) {"symbol"} else {"rowname"}) %>% dplyr::select(name, paste(input$import_contrast_for_gsereactome, "log2FoldChange", sep = "_")) %>% dplyr::rename(fc = paste(input$import_contrast_for_gsereactome, "log2FoldChange", sep = "_"))
           }
         }
-    }      
-   
+    }
+
       # reat_gsereactome <<- reactive({
         # Create a Progress object
         progress <- shiny::Progress$new()
@@ -5950,7 +5950,7 @@ output$organism_for_gsereactome <- renderUI({
         on.exit(progress$close())
         reat_gsereactome <- try(gsereactAnalysis(df = if(!input$import_from_for_gsereactome) {gene_df_gsereactome()} else {gene_df_gsereactome}, organism = input$organism_for_gsereactome), silent = TRUE)
         # })
-  
+
     res_gsereactome <<- reactive({
       try(give_gsekegg_gsereat_res_and_table(reat = reat_gsereactome, pCutoff = input$gsereactome_p, p.adj.cutoff = input$gsereactome_padj, NES.cutoff = input$gsereactome_NES, Phenotype = input$gsereactome_Phenotype), silent = TRUE)
       })
@@ -5961,12 +5961,12 @@ output$organism_for_gsereactome <- renderUI({
     if(input$import_from_for_gsereactome) {
       shiny::validate(
       need(nrow(gene_df_gsereactome) != 0, message = "No genes meet your requirements, and can not do the gseReactome analysis")
-    )      
+    )
     }
       validate(
       need(length(input$gsereactome_Phenotype) != 0, "Please choose at least one Phenotype"),
       need(reat_gsereactome, "Sorry, I can not do the gsereactome analysis")
-        )      
+        )
       DT::datatable(res_gsereactome()$sig_table, filter = 'top', options = list(autoWidth = F,scrollX = TRUE))
       })#selection = list(selected = c(1))
 
@@ -5974,12 +5974,12 @@ output$organism_for_gsereactome <- renderUI({
     if(input$import_from_for_gsereactome) {
       shiny::validate(
       need(nrow(gene_df_gsereactome) != 0, message = "No genes meet your requirements, and can not do the gseReactome analysis")
-    )      
+    )
     }
       validate(
       need(length(input$gsereactome_Phenotype) != 0, "Please choose at least one Phenotype"),
       need(reat_gsereactome, "Sorry, I can not do the gsereactome analysis")
-        )      
+        )
       num_total_gsereactome <- res_gsereactome()$all_table %>%
         nrow()
       num_signif_gsereactome <- res_gsereactome()$sig_table %>%
@@ -6016,7 +6016,7 @@ output$organism_for_gsereactome <- renderUI({
                        "Term",
                        choices = res_gsereactome()$sig_table$Description, selected = res_gsereactome()$sig_table$Description[1], multiple = FALSE)
       }
-    })    
+    })
 
     gsereactome_barplot_input <- reactive({
       # # Create a Progress object
@@ -6037,7 +6037,7 @@ output$organism_for_gsereactome <- renderUI({
 
     gsereactome_heatplot_input <- reactive({
       withProgress(message = 'Plotting', value = 0.66, {
-      try(Heatplot(res_gsereactome()$sig_res, showCategory = input$gsereactome_ShowCategory_heat, foldChange = res_gsereactome()$de), silent = T)  
+      try(Heatplot(res_gsereactome()$sig_res, showCategory = input$gsereactome_ShowCategory_heat, foldChange = res_gsereactome()$de), silent = T)
         })
       })
 
@@ -6061,7 +6061,7 @@ output$organism_for_gsereactome <- renderUI({
                    rel_heights = c(1.5, 0.5, 1),
                    subplots = 1:3,
                    pvalue_table = TRUE,
-                   ES_geom = "line")        
+                   ES_geom = "line")
         })
       })
 
@@ -6170,7 +6170,7 @@ output$import_for_ppi <- renderUI({
                               "Choose genes",
                               choices = c("UPregu for DEP-LFQ", "DOWNregu for DEP-LFQ", "UPDOWN for DEP-LFQ", "UPregu for DEG-RNAseq", "DOWNregu for DEG-RNAseq", "UPDOWN for DEG-RNAseq"),
                               selected = "UPregu for DEP-LFQ")
-    }       
+    }
     })
 
 output$import_contrast_for_ppi <- renderUI({
@@ -6182,19 +6182,19 @@ if(input$import_for_ppi == "UPregu for DEP-LFQ" | input$import_for_ppi == "DOWNr
     } else {
       validate(need(!is.null(countData()), "Please go to the DEG-RNAseq options, and do the differential analysis first"))
       selectizeInput("import_contrast_for_ppi", "Contrast", choices = c(as.data.frame(my_res_for_RNAseq_4$res_for_RNAseq_Filter) %>% tibble::rownames_to_column(.) %>% dplyr::rename(., Gene = rowname) %>% colnames() %>% grep("_significant", ., value = T) %>% gsub("_significant", "", .) %>% unique(), "Any significant"), selected = NULL)
-    }    
+    }
   } else {
     return(NULL)
   }
-  
+
   })
 
 output$input_text <- renderUI({
   if(!input$import_from_for_ppi){
-    textAreaInput(inputId = "input_text", label = "Please paste your gene list", placeholder = "TP53\nPTEN", rows = 8, width = "100%")  
+    textAreaInput(inputId = "input_text", label = "Please paste your gene list", placeholder = "TP53\nPTEN", rows = 8, width = "100%")
   }
   })
-  #### observeRvent for PPITools #### 
+  #### observeRvent for PPITools ####
   observeEvent(input$String_annalysis,{
     withProgress(message = 'Please wait', value = 0, {
       memory.limit(2000000)#2GB
@@ -6207,8 +6207,8 @@ output$input_text <- renderUI({
         })
 
       if(!input$import_from_for_ppi) {
-        genelist <- strsplit(input$input_text,'\n')[[1]] 
-        gene_name <<-data.frame(name = unlist(strsplit(genelist,";")[])) 
+        genelist <- strsplit(input$input_text,'\n')[[1]]
+        gene_name <<-data.frame(name = unlist(strsplit(genelist,";")[]))
       }
       # genelist1 <<- genelist()
 
@@ -6298,12 +6298,12 @@ output$input_text <- renderUI({
     if(!nrow(gene_name) == 0) {
       gene_name <<- gene_name %>% dplyr::filter(!is.na(name))
     }
-         
+
     if(nrow(gene_name) == 0) {
          output$reactome_plot <- renderVisNetwork({
           validate(need(nrow(gene_name) != 0, "No genes meet your requirements, and can not do the PPI(Protein-Protein Interaction Network) analysis"))
           a <- reactive({
-            stringNetwork(linksTable = links2() , layoutway=input$layoutway , nodecolor= input$nodecolor , nodeshape=input$nodeshape, linecolor=input$linecolor , nodesize=input$nodesize , changesize=input$changesize , fontsize=input$PPIfontsize , changewidth=input$changewidth , linewidth=input$linewidth,smoothline = input$smoothline, smoothtype = input$smoothtype,highlightkey=input$highlightkey) 
+            stringNetwork(linksTable = links2() , layoutway=input$layoutway , nodecolor= input$nodecolor , nodeshape=input$nodeshape, linecolor=input$linecolor , nodesize=input$nodesize , changesize=input$changesize , fontsize=input$PPIfontsize , changewidth=input$changewidth , linewidth=input$linewidth,smoothline = input$smoothline, smoothtype = input$smoothtype,highlightkey=input$highlightkey)
             })
           assign("aplot",a(),envir =  strEnv)
           a()
@@ -6312,14 +6312,14 @@ output$input_text <- renderUI({
       validate(need(nrow(gene_name) != 0, "No genes meet your requirements, and can not do the PPI(Protein-Protein Interaction Network) analysis"))
       strEnv = get_string_Env()
       speciesname <- input$organism
-      
+
       use_cache = F
       if(exists(c("load succed"),envir = strEnv) && get("speciesname",envir = strEnv) == speciesname && get("load succed",envir = strEnv)){
         use_cache = T
       }
       if(!use_cache) load_PPIdata(speciesname)
-      
-      
+
+
       orgDbname = switch(speciesname,
                          "human" = "org.Hs.eg.db",
                          "mouse" = "org.Mm.eg.db",
@@ -6333,40 +6333,40 @@ output$input_text <- renderUI({
       eval(parse(text = paste("library(",orgDbname,")",sep = "")))
       orgDb <- get(orgDbname)
       ## transform geneID
-      
-      # geneID <- gene_name$name %>% bitr(fromType = "SYMBOL", 
-      #                                   toType = "ENTREZID", 
-      #                                   OrgDb = orgDb, 
+
+      # geneID <- gene_name$name %>% bitr(fromType = "SYMBOL",
+      #                                   toType = "ENTREZID",
+      #                                   OrgDb = orgDb,
       #                                   drop = T)
       geneID <- my_to_entrezid(orgDB = orgDb, gene = as.character(gene_name$name)) %>% tibble::rownames_to_column() %>% dplyr::rename(SYMBOL = rowname, ENTREZID = id) %>% dplyr::select(SYMBOL, ENTREZID) %>% dplyr::filter(!is.na(ENTREZID))
       if(nrow(geneID) == 0) {
          output$reactome_plot <- renderVisNetwork({
           validate(need(nrow(geneID) != 0, "No genes can be mapped to ENTREZID, and can not do the PPI(Protein-Protein Interaction Network) analysis"))
           a <- reactive({
-            stringNetwork(linksTable = links2() , layoutway=input$layoutway , nodecolor= input$nodecolor , nodeshape=input$nodeshape, linecolor=input$linecolor , nodesize=input$nodesize , changesize=input$changesize , fontsize=input$PPIfontsize , changewidth=input$changewidth , linewidth=input$linewidth,smoothline = input$smoothline, smoothtype = input$smoothtype,highlightkey=input$highlightkey) 
+            stringNetwork(linksTable = links2() , layoutway=input$layoutway , nodecolor= input$nodecolor , nodeshape=input$nodeshape, linecolor=input$linecolor , nodesize=input$nodesize , changesize=input$changesize , fontsize=input$PPIfontsize , changewidth=input$changewidth , linewidth=input$linewidth,smoothline = input$smoothline, smoothtype = input$smoothtype,highlightkey=input$highlightkey)
             })
           assign("aplot",a(),envir =  strEnv)
           a()
         })
       }
-      validate(need(nrow(geneID) != 0, "No genes meet your requirements, and can not do the PPI(Protein-Protein Interaction Network) analysis"))                                              
-      
+      validate(need(nrow(geneID) != 0, "No genes meet your requirements, and can not do the PPI(Protein-Protein Interaction Network) analysis"))
+
       aliasDf <- get("aliasDf",envir = strEnv)
       proteinsDf <- get("proteinsDf",envir = strEnv)
       protein_links_detail <- get("protein_links_detail",envir = strEnv)
       data_mapped <<- geneID %>% mymap(my_data_frame_id_col_names = "ENTREZID",
-                                       aliasDf=get("aliasDf",envir = strEnv), 
+                                       aliasDf=get("aliasDf",envir = strEnv),
                                        proteinsDf=get("proteinsDf",envir = strEnv), ## data_mapped 3cols ENTREZID SYMBOL STRING_id
                                        removeUnmappedRows = TRUE,reload = F)
       incProgress(0.3)
-      link_table <- reactive({myget_interactions(protein_detail = get("protein_links_detail",envir = strEnv),mapped_data = data_mapped,choose_scores = input$chooseScore, score_cutoff = 400)}) 
+      link_table <- reactive({myget_interactions(protein_detail = get("protein_links_detail",envir = strEnv),mapped_data = data_mapped,choose_scores = input$chooseScore, score_cutoff = 400)})
       links <- reactive({
         link_table() %>%                                                ## links 3cols from to weight from&to is SYMBOL
-          mutate(from = data_mapped[match(from, data_mapped$STRING_id), "SYMBOL"]) %>% 
-          mutate(to = data_mapped[match(to, data_mapped$STRING_id), "SYMBOL"]) 
-      }) 
+          mutate(from = data_mapped[match(from, data_mapped$STRING_id), "SYMBOL"]) %>%
+          mutate(to = data_mapped[match(to, data_mapped$STRING_id), "SYMBOL"])
+      })
       links2 <- reactive({filterlink(links(), scorecutoff=input$scorecutoff) })
-      
+
       output$String_Table <- DT::renderDataTable(
         links2(), filter = 'top', options = list( autoWidth = F,scrollX = TRUE
         )
@@ -6380,7 +6380,7 @@ output$input_text <- renderUI({
         output$network <- renderVisNetwork({
           validate(need(nrow(links2()) != 0, "There is no Protein-Protein Interaction Network"))
           a <- reactive({
-            stringNetwork(linksTable = links2() , layoutway=input$layoutway , nodecolor= input$nodecolor , nodeshape=input$nodeshape, linecolor=input$linecolor , nodesize=input$nodesize , changesize=input$changesize , fontsize=input$PPIfontsize , changewidth=input$changewidth , linewidth=input$linewidth,smoothline = input$smoothline, smoothtype = input$smoothtype,highlightkey=input$highlightkey) 
+            stringNetwork(linksTable = links2() , layoutway=input$layoutway , nodecolor= input$nodecolor , nodeshape=input$nodeshape, linecolor=input$linecolor , nodesize=input$nodesize , changesize=input$changesize , fontsize=input$PPIfontsize , changewidth=input$changewidth , linewidth=input$linewidth,smoothline = input$smoothline, smoothtype = input$smoothtype,highlightkey=input$highlightkey)
             })
           assign("aplot",a(),envir =  strEnv)
           a()
@@ -6395,7 +6395,7 @@ output$input_text <- renderUI({
                         row.names = FALSE,
                         sep ="\t") }
         )
-        
+
         output$downloadPPInetwork <- downloadHandler(
           filename = "stringNetwork.html",
           content = function(file) {
@@ -6405,10 +6405,10 @@ output$input_text <- renderUI({
       })
       incProgress(0.2)
     })
-    
+
   })
 # # analysis for DEG-RNAseq
-# 
+#
 ### UI functions output ui### --------------------------------------------------------
     output$dds_design <- renderUI({
       if(!is.null(input$file2_for_DERNAseq)) {
@@ -6529,7 +6529,7 @@ output$input_text <- renderUI({
               selectizeInput("test_manual_for_RNAseq",
               label = "Manual test",
               choices = apply(test_manual_name, 2, function(i){paste(i[1], i[2], sep = "_vs_")}), selected = NULL, multiple = TRUE)
-              }            
+              }
     })
 
     output$ui_nrcores <- renderUI({
@@ -6686,21 +6686,21 @@ output$input_text <- renderUI({
         selectizeInput("heatmap_cntrst_for_RNAseq",
                        "Contrast",
                        choices = gsub("_significant", "", colnames(df)[cols]), multiple = TRUE)
-    })      
+    })
 
 
     output$mysplit_for_RNAseq <- renderUI({
         selectizeInput("mysplit_for_RNAseq",
                        "my split",
                        choices = c(1 : input$k_for_RNAseq), multiple = TRUE)
-      
+
     })
 
     output$Custom_columns_order_for_RNAseq <- renderUI({
         selectizeInput("Custom_columns_order_for_RNAseq",
                        "Custom columns order",
                        choices = colnames(ntd()), multiple = TRUE)
-      
+
     })
 
     output$selected_proteins_for_RNAseq <- renderUI({
@@ -6722,7 +6722,7 @@ output$input_text <- renderUI({
         selectizeInput("contrast_for_RNAseq_customvolcano",
                        "Contrast",
                        choices = gsub("_significant", "", colnames(df)[cols]), selected =  gsub("_significant", "", colnames(df)[cols])[1], multiple = FALSE)
-    })        
+    })
 
     output$selected_proteins_for_RNAseq_MAplot <- renderUI({
       if(input$selected_genes_for_RNAseq_MAplot) {
@@ -6745,7 +6745,7 @@ output$input_text <- renderUI({
         selectizeInput("contrast_for_RNAseq_MA",
                        "Contrast",
                        choices = gsub("_significant", "", colnames(df)[cols]), selected = gsub("_significant", "", colnames(df)[cols])[1], multiple = FALSE)
-    })    
+    })
 
     output$selected_genes_for_RNAseq <- renderUI({
       withProgress(message = 'Please Wait',value = 0.66, {
@@ -6764,7 +6764,7 @@ output$input_text <- renderUI({
 
     })
 
-  
+
 
     dds_1 <- reactive({
           DESeqDataSetFromMatrix(countData = countData(),colData = exdesign(), design = as.formula(paste0("~", paste(input$dds_design, collapse = " + "))))
@@ -6819,13 +6819,13 @@ output$input_text <- renderUI({
         # test2 <<- get(annoSpecies_df[input$speciesSelect, ]$pkg)
       if(input$set_no_map_to_rowname) {
           res_for_RNAseq$symbol[which(is.na(res_for_RNAseq$symbol))] = rownames(res_for_RNAseq)[which(is.na(res_for_RNAseq$symbol))]
-        }        
+        }
       }
 
       return(res_for_RNAseq)
       # res_for_RNAseq$Status = ifelse(res_for_RNAseq$padj < input$p_for_DERNAseq & abs(res_for_RNAseq$log2FoldChange) >= input$lfc_for_DERNAseq, ifelse(res_for_RNAseq$log2FoldChange >= input$lfc_for_DERNAseq, "Up-regulated", "Down-regulated"), "Non-significant")
       # res_for_RNAseq_Filter <- res_for_RNAseq[which(res_for_RNAseq$padj < input$p_for_DERNAseq & abs(res_for_RNAseq$log2FoldChange) >= input$lfc_for_DERNAseq),]
-      # res_for_RNAseq_Filter <- res_for_RNAseq_Filter[order(res_for_RNAseq_Filter$padj),] 
+      # res_for_RNAseq_Filter <- res_for_RNAseq_Filter[order(res_for_RNAseq_Filter$padj),]
 
       # return(list(res_for_RNAseq = res_for_RNAseq, res_for_RNAseq_Filter = res_for_RNAseq_Filter))
         })
@@ -6857,7 +6857,7 @@ output$input_text <- renderUI({
         return(assay_ntd)
       }
       })
-    # res merge with ntd, only for download 
+    # res merge with ntd, only for download
     res_for_RNAseq_merge <- reactive({
       res_for_RNAseq_merge = as.data.frame(res_for_RNAseq_4()$res_for_RNAseq)
       res_for_RNAseq_merge$gene = rownames(res_for_RNAseq_merge)
@@ -6930,7 +6930,7 @@ output$input_text <- renderUI({
                      stable_color = input$stable_color_for_RNAseq,
                      up_color = input$up_color_for_RNAseq
                      )
-        }) 
+        })
     })
 
     pca_input_for_RNAseq <- reactive({
@@ -7104,19 +7104,19 @@ output$input_text <- renderUI({
 
     output$file2_for_pro_rna <- renderUI({
       if(!input$import_from_for_PR_Heatmap) {
-      fileInput('file2_for_pro_rna',width = "300px", 
+      fileInput('file2_for_pro_rna',width = "300px",
                 'RNAseq_normalized_count\nmatrix.txt',
                 accept=c('text/csv', 'text/comma-separated-values,text/plain', '.csv'))
       }
-      })  
+      })
 
     output$file3_for_pro_rna <- renderUI({
       if(!input$import_from_for_PR_Heatmap) {
       fileInput('file3_for_pro_rna',width = "300px",
                 'Genelist.txt',
-                accept=c('text/csv', 'text/comma-separated-values,text/plain', '.csv'))  
+                accept=c('text/csv', 'text/comma-separated-values,text/plain', '.csv'))
       }
-      })  
+      })
 
     output$help_format_PRO_RNA <- renderUI({
       if(!input$import_from_for_PR_Heatmap) {
@@ -7142,7 +7142,7 @@ output$input_text <- renderUI({
         } else {
           radioButtons(inputId = "Type_for_PRheatmap", label = "Choose the genes to show", choices = c("at least one", "both", "both significant"), selected = "both", inline = TRUE)
         }
-      })    
+      })
 
   observeEvent(input$analyze_for_pro_rna, {
     withProgress(message = "Please wait...", {
@@ -7166,7 +7166,7 @@ output$input_text <- renderUI({
         return(NULL)
        read.csv(inFile$datapath, header = TRUE,
                sep = "\t", stringsAsFactors = FALSE)
-    })    
+    })
 
     gene_for_pro_rna <- reactive({
       inFile <- input$file3_for_pro_rna
@@ -7177,7 +7177,7 @@ output$input_text <- renderUI({
                sep = "\t", stringsAsFactors = FALSE)
           return(file)
         }
-    })    
+    })
   } else {
     pro_for_pro_rna <- reactive({
       pro = get_df_wide(dep())
@@ -7206,16 +7206,16 @@ output$input_text <- renderUI({
   ht_lis <- reactive({
     if(!input$import_from_for_PR_Heatmap) {
       plot_pro_rna_heatmap(
-        rna = rna_for_pro_rna(), 
-        pro = pro_for_pro_rna(), 
-        gene = gene_for_pro_rna(), 
-        Type = input$Type_for_PRheatmap, 
-        row_font_size = input$row_font_size_for_pro_rna, 
-        col_font_size = input$col_font_size_for_pro_rna, 
-        column_title_size = input$column_title_size_for_pro_rna, 
-        Numcol_pro = input$Numcol_pro_for_pro_rna, 
-        Numcol_rna = input$Numcol_rna_for_pro_rna, 
-        cluster_columns = input$cluster_columns_for_pro_rna, 
+        rna = rna_for_pro_rna(),
+        pro = pro_for_pro_rna(),
+        gene = gene_for_pro_rna(),
+        Type = input$Type_for_PRheatmap,
+        row_font_size = input$row_font_size_for_pro_rna,
+        col_font_size = input$col_font_size_for_pro_rna,
+        column_title_size = input$column_title_size_for_pro_rna,
+        Numcol_pro = input$Numcol_pro_for_pro_rna,
+        Numcol_rna = input$Numcol_rna_for_pro_rna,
+        cluster_columns = input$cluster_columns_for_pro_rna,
         color = input$colorbar_for_PRheatmap)
       } else {
         if(input$import_contrast_for_PR_Heatmap == "Any significant") {
@@ -7226,17 +7226,17 @@ output$input_text <- renderUI({
           contrast = input$import_contrast_for_PR_Heatmap
         }
        plot_pro_rna_heatmap_for_whole(
-        rna = rna_for_pro_rna(), 
-        pro = pro_for_pro_rna(), 
-        manual = manual, 
-        contrast = contrast, 
-        Type = input$Type_for_PRheatmap, 
-        row_font_size = input$row_font_size_for_pro_rna, 
-        col_font_size = input$col_font_size_for_pro_rna, 
-        column_title_size = input$column_title_size_for_pro_rna, 
-        Numcol_pro = input$Numcol_pro_for_pro_rna, 
-        Numcol_rna = input$Numcol_rna_for_pro_rna, 
-        cluster_columns = input$cluster_columns_for_pro_rna, 
+        rna = rna_for_pro_rna(),
+        pro = pro_for_pro_rna(),
+        manual = manual,
+        contrast = contrast,
+        Type = input$Type_for_PRheatmap,
+        row_font_size = input$row_font_size_for_pro_rna,
+        col_font_size = input$col_font_size_for_pro_rna,
+        column_title_size = input$column_title_size_for_pro_rna,
+        Numcol_pro = input$Numcol_pro_for_pro_rna,
+        Numcol_rna = input$Numcol_rna_for_pro_rna,
+        cluster_columns = input$cluster_columns_for_pro_rna,
         color = input$colorbar_for_PRheatmap)
       }
     })
@@ -7245,7 +7245,7 @@ output$input_text <- renderUI({
       ht_lis()$dat, filter = 'top', options = list( autoWidth = F,scrollX = TRUE
       )
     )
-    
+
     output$download_table_for_pro_rna <- downloadHandler(
       filename = function() { paste("data", ".txt", sep = "") },
       content = function(file) {
@@ -7281,10 +7281,10 @@ output$input_text <- renderUI({
   observeEvent(input$help_format_DEP, {
     showModal(modalDialog(
       title = "Format specifications for DEP-LFQ",
-      includeMarkdown(system.file("extdata", "DEP_LFQ.md", package = "DEP")),
+      includeMarkdown(system.file("extdata", "DEP_LFQ.md", package = "DEP2")),
       h4("Example:"),
       tags$img(
-        src = base64enc::dataURI(file = system.file("extdata", "DEP_LFQ.png", package = "DEP"), mime = "image/png"),
+        src = base64enc::dataURI(file = system.file("extdata", "DEP_LFQ.png", package = "DEP2"), mime = "image/png"),
         width = 750
       ),
       easyClose = TRUE,
@@ -7296,7 +7296,7 @@ output$input_text <- renderUI({
   observeEvent(input$help_imputation, {
           showModal(modalDialog(
             title = "The detailed information of imputation methods",
-            includeMarkdown(system.file("extdata", "impute.md", package = "DEP")),
+            includeMarkdown(system.file("extdata", "impute.md", package = "DEP2")),
             easyClose = TRUE,
             footer = NULL,
             size = "l"
@@ -7307,10 +7307,10 @@ output$input_text <- renderUI({
   observeEvent(input$help_format_RNA, {
     showModal(modalDialog(
       title = "Format specifications for DEG-RNAseq",
-      includeMarkdown(system.file("extdata", "DEG_RNAseq.md", package = "DEP")),
+      includeMarkdown(system.file("extdata", "DEG_RNAseq.md", package = "DEP2")),
       h4("Example:"),
       tags$img(
-        src = base64enc::dataURI(file = system.file("extdata", "DEG_RNAseq.png", package = "DEP"), mime = "image/png"),
+        src = base64enc::dataURI(file = system.file("extdata", "DEG_RNAseq.png", package = "DEP2"), mime = "image/png"),
         width = 750
       ),
       easyClose = TRUE,
@@ -7323,10 +7323,10 @@ output$input_text <- renderUI({
   observeEvent(input$help_format_PRO_RNA, {
     showModal(modalDialog(
       title = "Format specifications for PR-Heatmap",
-      includeMarkdown(system.file("extdata", "PR_Heatmap.md", package = "DEP")),
+      includeMarkdown(system.file("extdata", "PR_Heatmap.md", package = "DEP2")),
       h4("Example:"),
       tags$img(
-        src = base64enc::dataURI(file = system.file("extdata", "PR_Heatmap.png", package = "DEP"), mime = "image/png"),
+        src = base64enc::dataURI(file = system.file("extdata", "PR_Heatmap.png", package = "DEP2"), mime = "image/png"),
         width = 750
       ),
       easyClose = TRUE,
@@ -7335,7 +7335,7 @@ output$input_text <- renderUI({
     ))
   })
 
-  
+
 
 
 
