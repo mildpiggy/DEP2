@@ -2044,7 +2044,7 @@ server <- shinyServer(function(input, output) { # *server----
     data <- data()
     filtered = filter_peptide(data)
     # cols <- grep("^LFQ", colnames(data))
-    # filtered <- DEP:::filter_MaxQuant(data)
+    # filtered <- DEP2:::filter_MaxQuant(data)
     # unique_names <- make_unique(filtered, input$name, input$id)
     ecols <- grep("^Intensity. *",colnames(data),value = F) %>% .[!.%in%grep("__",colnames(data),value = F)]
     if (input$anno == "columns") {
@@ -2110,7 +2110,7 @@ server <- shinyServer(function(input, output) { # *server----
           my_imp
         } else {
           #set.seed(12345)
-          my_imp <<- DEP::impute(norm(), input$imputation)
+          my_imp <<- DEP2::impute(norm(), input$imputation)
         }
       }
     } else {
@@ -2317,11 +2317,11 @@ server <- shinyServer(function(input, output) { # *server----
 
     ### Reactive functions ### ------------------------------------------------
     excluded <- reactive({
-      DEP:::exclude_deps(dep(), input$exclude)
+      DEP2:::exclude_deps(dep(), input$exclude)
     })
 
     selected <- reactive({
-      DEP:::select_deps(excluded(), input$select)
+      DEP2:::select_deps(excluded(), input$select)
     })
 
     res <- reactive({
