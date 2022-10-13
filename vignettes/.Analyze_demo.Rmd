@@ -1,0 +1,246 @@
+---
+title: "DEP2 Analyze Demo"
+author:
+- name: Huanmu
+output:
+  BiocStyle::html_document
+abstract: |
+  This is a demo for goupmeeting.
+vignette: |
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  eval = T,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+```{r include=FALSE}
+library(BiocStyle)
+library(dplyr)
+library(tibble)
+library(purrr)
+library(SummarizedExperiment)
+library(DEP2)
+require(shiny)
+require(shinydashboard)
+require(shinyBS)
+# library(shinydashboardPlus)
+library(shinyvalidate)
+library(shinyWidgets)
+library(bslib)
+library(ComplexHeatmap)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(limma)
+library(colourpicker)
+library(QFeatures)
+library(grid)
+library(fdrtool)
+```
+
+# Begin
+
+DEP2 provide two kinds of proteomics analyze:
+
+1.  Driectly from proteingroups- or enriched-peptides-level quantification
+
+    Require proteomics or modified peptide table, containing a assay in wide format.
+
+2.  Resummarize protein-level from peptide-level quantification
+
+    Require overall peptide table, containing a assay in wide format.
+
+## Directly from quantification
+Require proteingroup or modified peptide table and experiment design (optional)
+
+### Begin from proteingroups
+
+```{r}
+## read in PGs table
+pg_table <- read.csv("example/proteinGroups(2).txt", sep = "\t")
+
+## creat row identifiers name and ID using giving 'names' and 'ids' columns
+pg_unique <- make_unique(pg_table, names = "Gene.names", ids = "Protein.IDs", delim = ";")
+head(pg_unique[, c("name", "ID")])
+
+## construct a SummarizedExperiment object
+expression_cols <- grep("^LFQ.intensity", colnames(pg_unique),value = F)
+PG_SE <- make_se_parse(proteins_unique = pg_unique, columns = expression_cols, mode = "delim")
+
+
+
+## abundance assay
+assay(PG_SE[1:5, 1:9])
+
+## row infomations
+rowData(PG_SE)[1:5, 1:4]
+
+## col design
+colData(PG_SE)
+PG_SE <- make_se(proteins_unique = pg_unique, columns = expression_cols, 
+                  expdesign = data.frame(colData(PG_SE))
+                  )
+```
+
+
+### Begin from modified peptide
+
+```{r}
+## read in modified sites table
+PTM_table <- read.csv("example/GlyGly (K)Sites.txt",sep = "\t")
+## creat row identifiers name and ID using giving 'names' and 'ids' columns, copy "gene_name", "protein_ID"
+PTM_unique <- make_unique_ptm(PTM_table, 
+                             gene_name = "Gene.names", protein_ID = "Protein", 
+                             aa = "Amino.acid", pos = "Position")
+
+PTM_unique[1:5, c("name", "ID","gene_name","protein_ID")]
+
+## construct a SummarizedExperiment object
+grep("^(Intensity.)", colnames(PTM_unique),value = T)
+grep("^(Intensity.)[^_]*_[0-9]+$", colnames(PTM_unique),value = T)
+PTM_SE <- make_se_parse(PTM_unique, columns = grep("^(Intensity.)[^_]*_[0-9]+$", colnames(PTM_unique)), mode = "delim")
+assay(PTM_SE)[1:5,]
+colData(PTM_SE)
+```
+
+
+## Re-aggregation from peptide quantification
+Read in a peptide table and creat a QFeatures object
+```{r}
+Pep_table <- read.csv("example/USP15KO_mef_peptides.txt",sep = "\t")
+grep("^(Intensity.)", colnames(Pep_table),value = T) ## expression cols
+head(Pep_table$Proteins) ## protein IDs
+
+## construct QFeatures object
+PEP_pe <- make_pe_parse(Peptide = Pep_table, ecols = grep("^(Intensity.)", colnames(Pep_table)), protein_col = "Proteins",mode = "delim")
+class(PEP_pe)
+experiments(PEP_pe)
+class(PEP_pe[["peptideRaw"]])
+colData(PEP_pe)
+```
+
+# Differentail analyze for proteomics
+
+
+## Direct
+*Filter*
+```{r}
+PG_filter <- filter_se(PG_SE, thr = 0, missnum = 2, filter_formula = ~Potential.contaminant!="+"& Reverse != "+")
+
+nrow(PG_SE)
+nrow(PG_filter)
+plot_missval(PG_SE)
+plot_missval(PG_filter)
+
+PTM_filter <- filter_se(PTM_SE, thr = 0, missnum = NULL, filter_formula = ~Potential.contaminant!="+"& Reverse != "+")
+```
+
+*Normalization*
+```{r}
+PG_norm <- normalize_vsn(PG_filter)
+plot_normalization(PG_filter, PG_norm)
+plot_cvs(PG_filter)
+plot_cvs(PG_norm) ##Plot sample coefficient of variation
+
+PTM_norm <- normalize_vsn(PTM_filter)
+```
+
+*imputation*
+```{r}
+PG_imp <- DEP2::impute(PG_norm, fun = "MinDet")
+plot_imputation(PG_norm, PG_imp)
+
+PTM_imp <- DEP2::impute(PTM_norm, fun = "MinDet")
+plot_imputation(PTM_norm, PTM_imp)
+# PTM_imp <- impute(PTM_norm, fun = "RF")
+
+```
+
+*hypothesis testing*
+```{r}
+cat("weg")
+PG_diff <- DEP2::test_diff(PG_imp, type = "control",control = "Biotin")
+PG_res <- DEP2::add_rejections(PG_diff, thresholdmethod = "intersect" , alpha = 0.01, lfc  = 2)
+
+PTM_diff <- DEP2::test_diff(PTM_imp, type = "control",control = "GFP", fdr.type = "Storey's qvalue") ## adjusted by Qvalue
+PTM_res <- DEP2::add_rejections(PTM_diff, thresholdmethod = "curve" , curvature  = 1, x0_fold = 2)
+
+DEP2::plot_heatmap(PG_res)
+DEP2::plot_heatmap(PG_res, kmeans = T, k = 4)
+DEP2::plot_heatmap(PG_res, kmeans = T, k = 4, split_order = 4:1) ## reorder clusters
+
+(choose_pro <- DEP2:::get_signicant(PG_res) %>% rownames() %>% sample(.,10))
+DEP2::plot_heatmap(PG_res, chooseToshow = choose_pro) ## choose some proteins
+(DEP2:::get_contract(PG_res))
+DEP2::plot_heatmap(PG_res, manual_contrast = "H2A_vs_Biotin") ## reduce contrast
+DEP2::plot_ma_pro(PG_res,contrast = "H2A_vs_Biotin") ## MV proteins
+
+```
+
+## Re-aggregation
+
+*filter*
+```{r}
+PEP_filter <- filter_pe(PEP_pe, thr = 1, missnum = 2, filter_formula = ~Potential.contaminant!="+"& Reverse != "+")
+```
+
+*normalize*
+```{r}
+# PEP_filter[["peptideImp"]] <- impute(PEP_filter[["peptideRaw"]], fun = "knn")
+
+PEP_QF <- addAssay(PEP_filter, 
+                   logTransform(PEP_filter[[1]]),
+                   name = "peptidesLog")
+PEP_QF <- QFeatures::normalize(PEP_QF, 
+                    i = "peptidesLog",
+                    name = "peptidesNorm",
+                    method = "center.median")
+
+PEP_QF <- addAssay(PEP_QF, 
+                   DEP2::impute(PEP_QF[["peptidesNorm"]], fun = "knn"),
+                   name = "peptidesImp")
+experiments(PEP_QF)
+plot_imputation(PEP_QF[["peptidesNorm"]], PEP_QF[["peptidesImp"]])
+limma::plotDensities(assay(PEP_QF[["peptidesNorm"]]))
+limma::plotDensities(assay(PEP_QF[["peptidesImp"]]))
+
+```
+
+
+```{r eval=T, include=TRUE}
+# rowData(PEP_QF[["peptidesImp"]]) ->temp
+# str(temp)
+PEP_QF <- suppressWarnings(aggregate_pe(PEP_QF,
+                                        aggrefun = "RobustSummary", aggregate_Peptide_Type = "Unique + Razor",
+                                        fcol = "Proteins", peptide_assay_name = "peptidesImp", reserve = "Gene.names"
+                          ))
+
+experiments(PEP_QF)
+
+## take the protein SummarizedExperiment out
+pep_se = PEP_QF[["protein"]]
+colnames(rowData(pep_se))
+rowData(pep_se) <- make_unique(rowData(pep_se) %>% as.data.frame(), 
+                                     names =  "Gene.names", 
+                                     ids = "smallestProteingroups", 
+                                     delim = ";")
+rownames(pep_se) = rowData(pep_se)$name
+pep_norm <- normalize_vsn(pep_se)
+
+pep_diff = DEP2::test_diff(pep_norm, type = "control", control = "WT",fdr.type = "BH")
+pep_res = add_rejections(pep_diff)
+
+plot_heatmap(pep_res)
+```
+
+
+

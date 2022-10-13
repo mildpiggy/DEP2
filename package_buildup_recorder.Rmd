@@ -1,0 +1,93 @@
+---
+title: "DEP2 development Notebook"
+# output:
+#   html_document:
+#     df_print: paged
+output: html_notebook ## 如果安装rnotebook来输出
+Author: huanmu
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook in DEP2 buildup
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = T,
+  eval = F, ## do not eval when export html
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# perpare step
+
+## library neccesarry package
+
+```{r split=FALSE}
+library(devtools)
+library(usethis)
+library(testthat)
+library(dplyr)
+```
+
+## Link github
+```{r split=FALSE}
+use_git()
+usethis::use_git_remote(  ## 导入具体仓库信息. ssh方法。推荐方法
+  "origin",
+  "git@github.com:mildpiggy/DEP2.git",
+  overwrite = TRUE
+)
+usethis::git_remotes() 
+usethis::use_git_config()
+```
+
+## format DESCRIPTION
+```{r}
+usethis::use_tidy_description()
+```
+
+## creat readme.rmd
+```{r}
+use_readme_rmd()
+build_readme() 
+```
+
+## creat license file, use mit license
+```{r}
+use_mit_license() ##生成mit license 的 LICENSE 和 LICENSER.md
+```
+
+## denpends packages
+```{r}
+import_packages = c("ggplot2","dplyr","purrr","tibble","readr","SummarizedExperiment (>= 1.11.5)","MSnbase",
+                    "QFeatures","limma","vsn","fdrtool","ggrepel","ComplexHeatmap")
+import_packages %>% sapply(., function(x){use_package(x,type = "Imports")})
+import_packages_github = c("")
+# usethis::use_package("SummarizedExperiment",type = "Imports",min_version = "1.11.5")
+
+```
+
+
+## creact functions file
+```{r}
+r_files = c(
+  "functions_DEP",
+  "functions_reggregation",
+  "functions_peptide",
+  "functions_enrichment",
+  "functions_app",
+  "function_workflow",
+  "plot_function_QC",
+  "plot_function_result",
+  "plot_function_explore",
+  "gg_theme",
+  "workflow_functions",
+  "zzz"
+)
+sapply(r_files, function(x){use_r(x,open = F)})
+use_r("DEP_rna")
+```
+
+
+

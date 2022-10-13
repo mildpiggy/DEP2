@@ -1,0 +1,193 @@
+---
+title: "DEP2 Analyze Demo"
+author:
+- name: Huanmu
+output:
+  BiocStyle::html_document
+abstract: |
+  This is a demo for goupmeeting.
+vignette: |
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  eval = T,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+
+```{r include=FALSE}
+library(BiocStyle)
+library(dplyr)
+library(tibble)
+library(purrr)
+library(SummarizedExperiment)
+# library(DEP2)
+library(DEP2)
+require(shiny)
+require(shinydashboard)
+require(shinyBS)
+# library(shinydashboardPlus)
+library(shinyvalidate)
+library(shinyWidgets)
+library(bslib)
+library(ComplexHeatmap)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(limma)
+library(colourpicker)
+library(QFeatures)
+library(grid)
+library(fdrtool)
+library(magrittr)
+library(clusterProfiler)
+source("./R/functions_enrichment.R")
+
+Cnetplot <- function (x, showCategory = 5, foldChange = NULL, layout = "kk",
+                      colorEdge = FALSE, circular = FALSE, node_label = "all",
+                      ...) {
+  node_label <- match.arg(node_label, c("category", "gene",
+                                        "all", "none"))
+  if (circular) {
+    layout <- "linear"
+    geom_edge <- geom_edge_arc
+  }
+  else {
+    geom_edge <- geom_edge_link
+  }
+  geneSets <- extract_geneSets(x, showCategory)
+  g <- list2graph(geneSets)
+  foldChange <- fc_readable(x, foldChange)
+  size <- sapply(geneSets, length)
+  V(g)$size <- min(size)/2
+  n <- length(geneSets)
+  V(g)$size[1:n] <- size
+  if (colorEdge) {
+    E(g)$category <- rep(names(geneSets), sapply(geneSets,
+                                                 length))
+    edge_layer <- geom_edge(aes_(color = ~category), alpha = 0.8)
+  }
+  else {
+    edge_layer <- geom_edge(alpha = 0.8, colour = "darkgrey")
+  }
+  if (!is.null(foldChange)) {
+    fc <- foldChange[V(g)$name[(n + 1):length(V(g))]]
+    V(g)$color <- NA
+    V(g)$color[(n + 1):length(V(g))] <- fc
+    palette <- fc_palette(fc)
+    p <- ggraph(g, layout = layout, circular = circular) +
+      edge_layer + geom_node_point(aes_(color = ~as.numeric(as.character(color)),
+                                        size = ~size)) + scale_color_gradientn(name = "log2 fold change",
+                                                                               colors = palette, na.value = "#E5C494")
+  }
+  else {
+    V(g)$color <- "#B3B3B3"
+    V(g)$color[1:n] <- "#E5C494"
+    p <- ggraph(g, layout = layout, circular = circular) +
+      edge_layer + geom_node_point(aes_(color = ~I(color),
+                                        size = ~size))
+  }
+  p <- p + scale_size(range = c(3, 10), breaks = unique(round(seq(min(size),
+                                                                  max(size), length.out = 4)))) + theme_void()
+  if (node_label == "category") {
+    p <- p + geom_node_text(aes_(label = ~name), data = p$data[1:n,
+    ], repel = TRUE)
+  }
+  else if (node_label == "gene") {
+    p <- p + geom_node_text(aes_(label = ~name), data = p$data[-c(1:n),
+    ], repel = TRUE)
+  }
+  else if (node_label == "all") {
+    p <- p +
+      geom_node_text(aes_(label = ~name), data = p$data, repel = TRUE, max.overlaps = Inf)
+    # geom_node_text(aes_(label = ~name), data = p$data[-c(1:n),
+    # ], repel = TRUE) +
+    # geom_node_text(aes_(label = ~name), data = p$data[1:n,
+    # ], repel = TRUE)
+  }
+  return(p)
+}
+```
+
+# Begin
+
+DEP2 provide two kinds of proteomics analyze:
+
+1.  Driectly from proteingroups- or enriched-peptides-level quantification
+
+    Require proteomics or modified peptide table, containing a assay in wide format.
+
+2.  Resummarize protein-level from peptide-level quantification
+
+    Require overall peptide table, containing a assay in wide format.
+
+## Directly from quantification
+Require proteingroup or modified peptide table and experiment design (optional)
+
+### Begin from proteingroups
+
+```{r}
+## read in PGs table
+pg_table <- read.csv("example/proteinGroups(2).txt", sep = "\t")
+
+## creat row identifiers name and ID using giving 'names' and 'ids' columns
+pg_unique <- make_unique(pg_table, names = "Gene.names", ids = "Protein.IDs", delim = ";")
+head(pg_unique[, c("name", "ID")])
+
+## construct a SummarizedExperiment object
+expression_cols <- grep("^LFQ.intensity", colnames(pg_unique),value = F)
+PG_SE <- make_se_parse(proteins_unique = pg_unique, columns = expression_cols, mode = "delim")
+
+PG_filter <- filter_se(PG_SE, thr = 0, missnum = 2, filter_formula = ~Potential.contaminant!="+"& Reverse != "+")
+
+PG_norm <- normalize_vsn(PG_filter)
+PG_imp <- DEP2::impute(PG_norm, fun = "MinDet")
+
+PG_diff <- DEP2::test_diff(PG_imp, type = "control",control = "Biotin")
+PG_res <- DEP2::add_rejections(PG_diff, thresholdmethod = "intersect" , alpha = 0.01, lfc  = 2)
+
+class(PG_res)
+```
+
+## enrichment analysis
+```{r}
+get_contrast = DEP2:::get_contrast
+get_signicant = DEP2:::get_signicant
+ORA_res = test_ORA(PG_res, type = "GO")
+class(ORA_res)
+# exctract significant terms
+ORA_res_sig = get_ORA_result(ORA_res,pvalueCutoff = 0.05, qvalueCutoff = 0.2,return_table = F)
+class(ORA_res_sig)
+dotplot(ORA_res_sig)
+barplot(ORA_res_sig)
+# Cnetplot(x = ORA_res_sig, showCategory = 15, foldChange = NULL, circular = T, colorEdge = T, ont = "BP")
+
+# exctract tables of significant terms by return_table = T
+ORA_res_sig_table = get_ORA_result(ORA_res,pvalueCutoff = 0.05, qvalueCutoff = 0.2, return_table = T)
+DT::datatable(head(ORA_res_sig_table))
+
+
+```
+
+```{r}
+ORA_cluster_res = test_ORA(PG_res, type = "GO", by_contrast = T)
+ORA_cluster_res_sig = get_ORA_result(ORA_cluster_res,pvalueCutoff = 0.05, qvalueCutoff = 0.2,return_table = F)
+dotplot(ORA_cluster_res_sig)
+```
+
+
+
+
+
+
+
+
+
