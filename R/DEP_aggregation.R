@@ -264,7 +264,7 @@ reducedataframe <- function (x, k, count = FALSE, simplify = TRUE, drop = FALSE,
 
 
 ## modified from QFeatures:::.aggregateQFeatures, add reserve for reducedataframe
-#' @importFrom MsCoreUtils aggregate_by_vector aggregate_by_matrix robustSummary colCounts
+#' @importFrom MsCoreUtils aggregate_by_vector robustSummary colCounts
 .aggregateSE <- function(object, fcol, fun, reserve,...) {
   if (missing(fcol))
     stop("'fcol' is required.")
