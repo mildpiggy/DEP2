@@ -33,7 +33,7 @@ Imports:
     visNetwork,
     msigdbr,
     ReactomePA,
-    dndselectr
+    serenity-r/dndselectr
 biocViews: Proteomics, MassSpectrometry, DifferentialExpression, DataRepresentation
 VignetteBuilder: knitr
 
