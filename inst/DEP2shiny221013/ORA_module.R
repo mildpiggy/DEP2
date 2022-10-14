@@ -1,6 +1,13 @@
 source("ORA_submodule.R")
 source("source_enrich_ana.R")
-# library(shinyTree)
+library(enrichplot)
+library(ggplot2)
+
+library(DOSE)
+library(GO.db)
+library(dplyr)
+library(clusterProfiler.dplyr)
+library(ReactomePA)
 
 #* ORA UI ----
 ORA_UI <- function(id){
@@ -38,7 +45,7 @@ ORA_sidebar_mod <-  function(id,label="ORA_sidabar"){
       selectizeInput(ns("type_for_ORA"), "Select database", choices = c("GO", "KEGG", "Reactome", "Msigdb"), selected = "GO", multiple = TRUE),
       conditionalPanel(condition = paste0("input['",ns("type_for_ORA"),"'] &&","input['",ns("type_for_ORA"),"'].indexOf('Msigdb') > -1"), #&& Msigdb in the selectize of type_for_ORA
                        tagList(checkboxGroupInput(ns("Msigdb_opt"), label = "Msigdb subsets",
-                                    choices = c("c2.cp (Canonical pathways)" = "C2.CP",
+                                    choices = c("c2.cp (Canonical pathways )" = "C2.CP",
                                                 "c2.cgp (chemical and genetic perturbations)" = "C2.CGP",
                                                 "c2.cp.biocarta" = "C2.BIOCARTA",
                                                 "c3.all (motif gene sets)" = "C3", "c3.tft (transcription factor targets)" = "C3.TFT",
@@ -50,14 +57,14 @@ ORA_sidebar_mod <-  function(id,label="ORA_sidabar"){
                                  "right",
                                  options = list(container = "body")
                                )),
-                       conditionalPanel(condition = paste0("input['",ns("Msigdb_opt"),"'] &&","input['",ns("Msigdb_opt"),"'].indexOf('other') > -1"), #&& Msigdb in the selectize of type_for_ORA
-                                        div(style = "word-wrap:break-word;overflow-wrap: break-word;width:100%;overflow-x: auto;",
-                                            shinyTree(ns("Msigdb_opt2"), checkbox =T,theme="proton", themeIcons = FALSE, themeDots = T),
-                                            verbatimTextOutput(ns("shinyTreeselect")),
-                                            verbatimTextOutput(ns("shinyTreeselect2")),
-                                            verbatimTextOutput(ns("shinyTreeselect3")),
-                                        )
-                       ),
+                       # conditionalPanel(condition = paste0("input['",ns("Msigdb_opt"),"'] &&","input['",ns("Msigdb_opt"),"'].indexOf('other') > -1"), #&& Msigdb in the selectize of type_for_ORA
+                       #                  div(style = "word-wrap:break-word;overflow-wrap: break-word;width:100%;overflow-x: auto;",
+                       #                      shinyTree(ns("Msigdb_opt2"), checkbox =T,theme="proton", themeIcons = FALSE, themeDots = T),
+                       #                      verbatimTextOutput(ns("shinyTreeselect")),
+                       #                      verbatimTextOutput(ns("shinyTreeselect2")),
+                       #                      verbatimTextOutput(ns("shinyTreeselect3")),
+                       #                  )
+                       # ),
                        p(a("  MsigDB link",
                            href = "http://www.gsea-msigdb.org/gsea/msigdb/index.jsp",
                            target="_blank"))
@@ -219,34 +226,34 @@ ORA_server_module2 <- function(id, Omics_res) {
       }, priority = 1, ignoreNULL = F)
 
       #* Msigdb_options shinyTree input ----
-      output$Msigdb_opt2 <- renderTree({
-        list("C1 (Gene sets corresponding to human chromosome and cytogenetic band)" = "C1",
-             "C2 (Gene sets curated from online pathway databases and the biomedical literature)" =
-               list("CGP (chemical and genetic perturbations)" = "CGP",
-                    "CP (Canonical pathways)" =
-                      list("CP:BIOCARTA (Gene sets from BioCarta pathway database)" = "CP:BIOCARTA",
-                           "CP:PID (Gene sets from PID pathway database)" = "CP:PID",
-                           "CP:WIKIPATHWAYS (Gene sets from WikiPathways database)" = "CP:WIKIPATHWAYS")
-                    ),
-             "C3 (Gene sets representing potential targets of regulation by transcription factors or microRNAs)" =
-               list("MIR (microRNA targets)" =
-                      list("MIR:MIRDB (Human miRNA targets as catalogued by miRDB)" = "MIR:MIRDB",
-                           "MIR:MIR_Legacy (Older gene sets that sharing putative target sites of human miRNA in 3'-UTRs)" = "MIR:MIR_Legacy")
-                    ),
-             "C4 (Computational gene sets defined by mining large collections of cancer-oriented microarray data)" =
-               list("CGN (cancer gene neighborhoods by Subramanian, Tamayo et al. 2005.)" = "CGN",
-                    "CM (cancer modules Segal et al. 2004.)" = "CM"),
-             "C5 (ontology gene sets)" =
-               list("HPO (Human Phenotype Ontology)" = "HPO"),
-             "C8 (Gene sets curated cluster markers for cell types identified in single-cell sequencing studies of human tissue)" = "C8")
-
-      })
-      Msigdb_opt_selected2 <- reactive({
-        tree_sel <- get_selected(input$Msigdb_opt2 , format = "slices")
-        tree_sel_save <<- tree_sel
-        # shinytreeInput_treatment(tree_sel %>% unlist() %>% names)
-        tree_sel_save2 <<- shinytreeInput_treatment(tree_sel %>% unlist() %>% names)
-      })
+      # output$Msigdb_opt2 <- renderTree({
+      #   list("C1 (Gene sets corresponding to human chromosome and cytogenetic band)" = "C1",
+      #        "C2 (Gene sets curated from online pathway databases and the biomedical literature)" =
+      #          list("CGP (chemical and genetic perturbations)" = "CGP",
+      #               "CP (Canonical pathways)" =
+      #                 list("CP:BIOCARTA (Gene sets from BioCarta pathway database)" = "CP:BIOCARTA",
+      #                      "CP:PID (Gene sets from PID pathway database)" = "CP:PID",
+      #                      "CP:WIKIPATHWAYS (Gene sets from WikiPathways database)" = "CP:WIKIPATHWAYS")
+      #               ),
+      #        "C3 (Gene sets representing potential targets of regulation by transcription factors or microRNAs)" =
+      #          list("MIR (microRNA targets)" =
+      #                 list("MIR:MIRDB (Human miRNA targets as catalogued by miRDB)" = "MIR:MIRDB",
+      #                      "MIR:MIR_Legacy (Older gene sets that sharing putative target sites of human miRNA in 3'-UTRs)" = "MIR:MIR_Legacy")
+      #               ),
+      #        "C4 (Computational gene sets defined by mining large collections of cancer-oriented microarray data)" =
+      #          list("CGN (cancer gene neighborhoods by Subramanian, Tamayo et al. 2005.)" = "CGN",
+      #               "CM (cancer modules Segal et al. 2004.)" = "CM"),
+      #        "C5 (ontology gene sets)" =
+      #          list("HPO (Human Phenotype Ontology)" = "HPO"),
+      #        "C8 (Gene sets curated cluster markers for cell types identified in single-cell sequencing studies of human tissue)" = "C8")
+      #
+      # })
+      # Msigdb_opt_selected2 <- reactive({
+      #   tree_sel <- get_selected(input$Msigdb_opt2 , format = "slices")
+      #   tree_sel_save <<- tree_sel
+      #   # shinytreeInput_treatment(tree_sel %>% unlist() %>% names)
+      #   tree_sel_save2 <<- shinytreeInput_treatment(tree_sel %>% unlist() %>% names)
+      # })
 
       #* input handle ----
       # genelist <- reactive({ strsplit(input$text_input_for_ORA,'\n')[[1]] })
@@ -398,7 +405,9 @@ ORA_server_module2 <- function(id, Omics_res) {
                                    # gene_df = gene_df,
                                    gene_id = gene_id(),  organism_for_ORA = ORA_organism,
                                    annoSpecies_df = annoSpecies_df,
-                                   Msigdb_selection = input$Msigdb_opt, Msigdb_selection2 = Msigdb_opt_selected2()) # id here should not add the namespace prefix. Don't use ns("Msigdb")
+                                   Msigdb_selection = input$Msigdb_opt, Msigdb_selection2 = NULL
+                                     # Msigdb_opt_selected2()
+                                   ) # id here should not add the namespace prefix. Don't use ns("Msigdb")
         }
 
       })

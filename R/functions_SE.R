@@ -66,7 +66,7 @@ filter_se <- function(se,
   assertthat::assert_that(inherits(se, "SummarizedExperiment"),
                           is.null(thr)|is.numeric(thr)|is.integer(thr), is.null(missnum)|is.numeric(missnum)|is.integer(missnum),
                           is.null(filter_formula)|is.character(filter_formula)|is_formula(filter_formula),
-                          is.numeric(fraction), length(fraction) == 1)
+                          is.null(fraction)|is.numeric(fraction), is.null(fraction)|length(fraction) == 1)
   origin_se = se
 
   if(inherits(se,"DESeqDataSet")){

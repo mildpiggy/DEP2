@@ -249,12 +249,12 @@ GSEA_server_module <- function(id, Omics_res) {
       #
       # })
 
-      Msigdb_opt_selected2 <- reactive({
-        tree_sel <- get_selected(input$Msigdb_opt2 , format = "slices")
-        tree_sel_save <<- tree_sel
-        # shinytreeInput_treatment(tree_sel %>% unlist() %>% names)
-        tree_sel_save2 <- shinytreeInput_treatment(tree_sel %>% unlist() %>% names)
-      })
+      # Msigdb_opt_selected2 <- reactive({
+      #   tree_sel <- get_selected(input$Msigdb_opt2 , format = "slices")
+      #   tree_sel_save <<- tree_sel
+      #   # shinytreeInput_treatment(tree_sel %>% unlist() %>% names)
+      #   tree_sel_save2 <- shinytreeInput_treatment(tree_sel %>% unlist() %>% names)
+      # })
 
       #** input handle ----
       # genelist <- reactive({ strsplit(input$text_input_for_GSEA,'\n')[[1]] })
@@ -409,7 +409,9 @@ GSEA_server_module <- function(id, Omics_res) {
                                    # gene_df = gene_df,
                                    gene_list = gene_list(),  organism_for_GSEA = GSEA_organism,
                                    annoSpecies_df = annoSpecies_df,
-                                   Msigdb_selection = input$Msigdb_opt, Msigdb_selection2 = Msigdb_opt_selected2()) # id here should not add the namespace prefix. Don't use ns("Msigdb")
+                                   Msigdb_selection = input$Msigdb_opt, Msigdb_selection2 = NULL
+                                     # Msigdb_opt_selected2()
+                                   ) # id here should not add the namespace prefix. Don't use ns("Msigdb")
         }
 
       })

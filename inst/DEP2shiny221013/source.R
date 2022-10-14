@@ -2547,8 +2547,6 @@ rm_digit_end <- function(x){
 
 ################## for gene list tool
 
-dragulaInput = esquisse::dragulaInput
-
 get_dep_genelist_Env <- function () {
   if (!exists(".genelist_dep_Env", envir = .GlobalEnv)) {
     pos <- 1

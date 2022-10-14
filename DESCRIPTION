@@ -34,7 +34,8 @@ Imports:
     visNetwork,
     msigdbr,
     ReactomePA,
-    dndselectr
+    dndselectr,
+    IHW, ashr, apeglm
 Remotes:
     serenity-r/dndselectr
 biocViews: Proteomics, MassSpectrometry, DifferentialExpression, DataRepresentation

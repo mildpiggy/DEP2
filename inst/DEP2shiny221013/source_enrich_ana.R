@@ -8,7 +8,7 @@ library(GO.db)
 library(AnnotationDbi)
 library(reactome.db)
 library(stringr)
-library(shinyTree)
+# library(shinyTree)
 # library(org.Hs.eg.db)
 # library(org.Mm.eg.db)
 # library(org.Rn.eg.db)
@@ -225,7 +225,7 @@ my_get_GO_data <- function (OrgDb, ont, keytype)
                           paste(sub(".db$","",pkgname) ,".sqlite",sep=""), package=pkgname)
     if (!file.exists(dbfile))
       stop("DB file '", dbfile, "' not found")
-    con <- dbConnect(RSQLite::SQLite(), dbfile)
+    con <- DBI::dbConnect(RSQLite::SQLite(), dbfile)
     # dbListTables(con) ## check tables in orgDb
 
     genestbl = switch(keytype,
@@ -305,74 +305,74 @@ my_to_entrezid <- function(orgDB = org.Hs.eg.db, gene) {
 ## geneid : entrezid, class as: character
 ## keytype: "ENTREZID"
 ## genedb： one of mouse:"org.Mm.eg.db"; human:"org.Hs.eg.db"; rat:org.Rn.eg.db: default "org.Hs.eg.db"
-Geneannotate <- function(geneid,keytype="ENTREZID",genedb){
-  GOdata <- GO.db
-  ##ago <- NA
-  #ago<- AnnotationDbi::select(genedb, keys=geneid, columns = c("GO","ENTREZID","ENSEMBL", "SYMBOL", "PFAM", "UNIPROT", "GENENAME", "PATH"), keytype = keytype)
-  ago<- AnnotationDbi::select(genedb, keys=geneid, columns = c("GO","ENTREZID", "SYMBOL", "PFAM", "GENENAME", "PATH"), keytype = keytype)
-  ago <- ago %>% mutate(numb=c(1:nrow(ago)))
-  # try(temgo<-AnnotationDbi::select(GOdata,key=ago$GO,columns = c("DEFINITION","TERM"),keytype = "GOID"))
-  try(temgo<-AnnotationDbi::select(GOdata,key=ago$GO,columns = c("TERM"),keytype = "GOID"))
-  temgo <- temgo %>% mutate(numb=c(1:nrow(ago)))
-  bgo <- merge(ago,temgo,by="numb")
-
-  kegg <- ko2name(ko = paste("ko","",bgo$PATH, sep = ""))
-  names(kegg)[2] = "kegg"
-  names(kegg)[1] = "PATH"
-  kegg[ , 1] = gsub("ko", "", kegg[ , 1])
-  kegg = kegg[!duplicated(kegg$kegg), ]
-
-  bgo <- dplyr::left_join(x = bgo, y = kegg, by = "PATH")
-
-  react = AnnotationDbi::select(reactome.db, keys = geneid, columns = c("REACTOMEID", "PATHNAME"), keytypes="ENTREZID")
-  names(react)[3] = "react"
-  bgo <- dplyr::left_join(x = bgo, y = react, by = "ENTREZID")
-  #################### test
-  pfamAC = as.data.frame(PFAMID)
-  names(pfamAC)[1:2] = c("PFAM", "PFAM_ID")
-
-  bgo = dplyr::left_join(x = bgo, y = pfamAC, by = "PFAM")
-
-  IDS <<- unique(bgo$ENTREZID)
-  return(bgo)
-}
+# Geneannotate <- function(geneid,keytype="ENTREZID",genedb){
+#   GOdata <- GO.db
+#   ##ago <- NA
+#   #ago<- AnnotationDbi::select(genedb, keys=geneid, columns = c("GO","ENTREZID","ENSEMBL", "SYMBOL", "PFAM", "UNIPROT", "GENENAME", "PATH"), keytype = keytype)
+#   ago<- AnnotationDbi::select(genedb, keys=geneid, columns = c("GO","ENTREZID", "SYMBOL", "PFAM", "GENENAME", "PATH"), keytype = keytype)
+#   ago <- ago %>% mutate(numb=c(1:nrow(ago)))
+#   # try(temgo<-AnnotationDbi::select(GOdata,key=ago$GO,columns = c("DEFINITION","TERM"),keytype = "GOID"))
+#   try(temgo<-AnnotationDbi::select(GOdata,key=ago$GO,columns = c("TERM"),keytype = "GOID"))
+#   temgo <- temgo %>% mutate(numb=c(1:nrow(ago)))
+#   bgo <- merge(ago,temgo,by="numb")
+#
+#   kegg <- ko2name(ko = paste("ko","",bgo$PATH, sep = ""))
+#   names(kegg)[2] = "kegg"
+#   names(kegg)[1] = "PATH"
+#   kegg[ , 1] = gsub("ko", "", kegg[ , 1])
+#   kegg = kegg[!duplicated(kegg$kegg), ]
+#
+#   bgo <- dplyr::left_join(x = bgo, y = kegg, by = "PATH")
+#
+#   react = AnnotationDbi::select(reactome.db, keys = geneid, columns = c("REACTOMEID", "PATHNAME"), keytypes="ENTREZID")
+#   names(react)[3] = "react"
+#   bgo <- dplyr::left_join(x = bgo, y = react, by = "ENTREZID")
+#   #################### test
+#   pfamAC = as.data.frame(PFAMID)
+#   names(pfamAC)[1:2] = c("PFAM", "PFAM_ID")
+#
+#   bgo = dplyr::left_join(x = bgo, y = pfamAC, by = "PFAM")
+#
+#   IDS <<- unique(bgo$ENTREZID)
+#   return(bgo)
+# }
 
 # x: Geneannotate函数返回对象bgo$ENTREZID
 # bgo： Geneannotate函数返回对象bgo
-mergego <- function(x,bgo){
-  library(dplyr)
-  subgo <- bgo %>% dplyr::filter(ENTREZID==x)
-  subgo <- subgo[!duplicated(subgo$GO),]
-  GOCC <- subgo%>%dplyr::filter(ONTOLOGY=="CC") %>%dplyr::select("TERM")%>%unlist()%>% paste0(collapse = " ; ")
-  GOBP <- subgo%>%dplyr::filter(ONTOLOGY=="BP") %>%dplyr::select("TERM")%>%unlist()%>% paste0(collapse = " ;  ")
-  GOMF <- subgo%>%dplyr::filter(ONTOLOGY=="MF") %>%dplyr::select("TERM")%>%unlist()%>% paste0(collapse = " ;  ")
-
-  #DECC <- subgo%>%dplyr::filter(ONTOLOGY=="CC") %>%dplyr::select("DEFINITION")%>%unlist()%>% paste0(collapse = " ;  ")
-  #DEBP <- subgo%>%dplyr::filter(ONTOLOGY=="BP") %>%dplyr::select("DEFINITION")%>%unlist()%>% paste0(collapse = " ;  ")
-  #DEMF <- subgo%>%dplyr::filter(ONTOLOGY=="MF") %>%dplyr::select("DEFINITION")%>%unlist()%>% paste0(collapse = " ;  ")
-  #GOs <- c(GOCC,DECC,GOBP,DEBP,GOMF,DEMF)
-  GOs <- c(GOCC,GOBP,GOMF)
-
-  subpfam <- bgo %>% dplyr::filter(ENTREZID==x)
-  subpfam <- subpfam[!duplicated(subpfam$PFAM_ID),]
-  pfam <- subpfam %>% dplyr::select("PFAM_ID") %>% unlist() %>% paste0(collapse = " ; ")
-
-
-  sub_gene.descri <- bgo %>% dplyr::filter(ENTREZID==x)
-  sub_gene.descri <- sub_gene.descri[!duplicated(sub_gene.descri$GENENAME),]
-  gene.descri <- sub_gene.descri %>% dplyr::select("GENENAME") %>% unlist() %>% paste0(collapse = " ; ")
-
-  subkegg <- bgo %>% dplyr::filter(ENTREZID==x)
-  subkegg <- subkegg[!duplicated(subkegg$kegg),]
-  kegg <- subkegg %>% dplyr::select("kegg") %>% unlist() %>% paste0(collapse = " ; ")
-
-  subreact <- bgo %>% dplyr::filter(ENTREZID==x)
-  subreact <- subreact[!duplicated(subreact$react),]
-  react <- subreact %>% dplyr::select("react") %>% unlist() %>% paste0(collapse = " ; ")
-
-  res = c(GOs, pfam, gene.descri, kegg, react)
-  return(res)
-}
+# mergego <- function(x,bgo){
+#   library(dplyr)
+#   subgo <- bgo %>% dplyr::filter(ENTREZID==x)
+#   subgo <- subgo[!duplicated(subgo$GO),]
+#   GOCC <- subgo%>%dplyr::filter(ONTOLOGY=="CC") %>%dplyr::select("TERM")%>%unlist()%>% paste0(collapse = " ; ")
+#   GOBP <- subgo%>%dplyr::filter(ONTOLOGY=="BP") %>%dplyr::select("TERM")%>%unlist()%>% paste0(collapse = " ;  ")
+#   GOMF <- subgo%>%dplyr::filter(ONTOLOGY=="MF") %>%dplyr::select("TERM")%>%unlist()%>% paste0(collapse = " ;  ")
+#
+#   #DECC <- subgo%>%dplyr::filter(ONTOLOGY=="CC") %>%dplyr::select("DEFINITION")%>%unlist()%>% paste0(collapse = " ;  ")
+#   #DEBP <- subgo%>%dplyr::filter(ONTOLOGY=="BP") %>%dplyr::select("DEFINITION")%>%unlist()%>% paste0(collapse = " ;  ")
+#   #DEMF <- subgo%>%dplyr::filter(ONTOLOGY=="MF") %>%dplyr::select("DEFINITION")%>%unlist()%>% paste0(collapse = " ;  ")
+#   #GOs <- c(GOCC,DECC,GOBP,DEBP,GOMF,DEMF)
+#   GOs <- c(GOCC,GOBP,GOMF)
+#
+#   subpfam <- bgo %>% dplyr::filter(ENTREZID==x)
+#   subpfam <- subpfam[!duplicated(subpfam$PFAM_ID),]
+#   pfam <- subpfam %>% dplyr::select("PFAM_ID") %>% unlist() %>% paste0(collapse = " ; ")
+#
+#
+#   sub_gene.descri <- bgo %>% dplyr::filter(ENTREZID==x)
+#   sub_gene.descri <- sub_gene.descri[!duplicated(sub_gene.descri$GENENAME),]
+#   gene.descri <- sub_gene.descri %>% dplyr::select("GENENAME") %>% unlist() %>% paste0(collapse = " ; ")
+#
+#   subkegg <- bgo %>% dplyr::filter(ENTREZID==x)
+#   subkegg <- subkegg[!duplicated(subkegg$kegg),]
+#   kegg <- subkegg %>% dplyr::select("kegg") %>% unlist() %>% paste0(collapse = " ; ")
+#
+#   subreact <- bgo %>% dplyr::filter(ENTREZID==x)
+#   subreact <- subreact[!duplicated(subreact$react),]
+#   react <- subreact %>% dplyr::select("react") %>% unlist() %>% paste0(collapse = " ; ")
+#
+#   res = c(GOs, pfam, gene.descri, kegg, react)
+#   return(res)
+# }
 ############ gene: gene name , class as character
 # sym_to_entr <- function(gene) {
 #   ids <- bitr(gene, fromType = "SYMBOL",
@@ -389,18 +389,7 @@ the1stname <- function(gene.name){
 
 
 ##go analysis function for DEP
-library(enrichplot)
-library(ggplot2)
-library(ggthemes)
 
-# library(org.Mm.eg.db)
-# library(org.Hs.eg.db)
-# library(org.Rn.eg.db)
-library(DOSE)
-# library(openxlsx)
-library(GO.db)
-library(dplyr)
-library(clusterProfiler.dplyr)
 #df: left gene right fc or log2fc (colnames is always fc), the output legend is awlays fold change
 #organism: "Human", "mouse" or "rat", ...
 #must be form reat <- goAnalysis(), because following use name reat
@@ -1055,18 +1044,6 @@ heatplot_for <- function(res, ShowCategory = 30, df_with_lg2fc = FALSE) {
 # *GSEA functions ----------------------------------------------------------
 
 ########## gsego analysis function for DEP
-library(enrichplot)
-library(ggplot2)
-library(ggthemes)
-library(clusterProfiler)
-# library(org.Mm.eg.db)
-# library(org.Hs.eg.db)
-# library(org.Rn.eg.db)
-library(DOSE)
-# library(openxlsx)
-library(GO.db)
-library(dplyr)
-library(clusterProfiler.dplyr)
 #df: left gene right fc or log2fc (colnames is always fc), the output legend is awlays fold change
 #organism: "Human", "mouse" or "rat", ...
 #must be form reat <- goAnalysis(), because following use name reat
@@ -1344,19 +1321,6 @@ my_gseaplot2 <- function (x, geneSetID, title = "", color = "green", base_size =
 }
 
 ########## gseKEGG gsereactome analysis function for DEP
-library(enrichplot)
-library(ggplot2)
-library(ggthemes)
-library(clusterProfiler)
-# library(org.Mm.eg.db)
-# library(org.Hs.eg.db)
-# library(org.Rn.eg.db)
-library(DOSE)
-# library(openxlsx)
-library(GO.db)
-library(dplyr)
-library(clusterProfiler.dplyr)
-library(ReactomePA)
 
 
 #df: left gene right fc or log2fc (colnames is always fc), the output legend is awlays fold change
@@ -1495,19 +1459,15 @@ give_gseOther_res_and_table<- function(reat, pCutoff = 0.05, p.adj.cutoff = 0.25
 
 ## $add for msigdb analysis
 
-library(msigdbr)
-library(enrichplot)
-library(clusterProfiler)
-library(dplyr)
-library(ggnewscale)
-library(ComplexHeatmap)
-library(AnnotationDbi)
+
 #df: left gene right fc or log2fc (colnames is always fc), the output legend is awlays fold change
 #organism: "Human", "mouse" or "rat", ...
 #must be form reat <- keggAnalysis(), because following use name reat
 #species_df: data frame which have columns species, pkg and organism
 msigdb_Analysis <- function(gene_id, organism="Human", df_with_lg2fc = FALSE, species_df, category, subcategory){
-
+  library(msigdbr)
+  library(enrichplot)
+  library(clusterProfiler)
   speciesID = switch (organism,
                       "Human" = "Homo sapiens",
                       "Mouse" = "Mus musculus",
