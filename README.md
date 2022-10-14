@@ -1,21 +1,15 @@
----
-editor_options: 
-  markdown: 
-    wrap: 72
----
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # DEP2
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
 DEP2 provides an comprehensive analysis workflow for mass spectrometry
 based proteomics data, developed from the previous package DEP. This
 package provided differential expression/enrichment analysis pipelines
-for various data including protein-level quantity(e.g. proteingroup),
+for various data including protein-level quantity(e.g. proteingroup),
 peptide-level quantity data and modification-specific proteomics
 (quantities of modified peptides). Inherited from DEP, DEP2 provides
 functions for data processing, hypothesis testing (via limma) and
@@ -28,7 +22,7 @@ modularization.
 
 ## Installation
 
-You can install `DEP2` from GitHub with:
+You can install DEP2 from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
@@ -46,4 +40,4 @@ DEP2::run_app()
 
 ## Vignettes
 
-View the Vignettes for more information ...
+View the Vignettes for more information …

@@ -19,8 +19,7 @@ knitr::opts_chunk$set(
 <!-- badges: end -->
 
 DEP2 provides an comprehensive analysis workflow for mass spectrometry based proteomics data, 
-developed from the previous package DEP. This package provided differential expression/enrichment analysis pipelines for various data 
-including protein-level quantity(e.g. proteingroup), peptide-level quantity data and modification-specific proteomics (quantities of modified peptides). Inherited from DEP, DEP2 provides functions for data processing, hypothesis testing (via limma) and visualization. The peptide to protein aggregation strategy is integrated into workflows. To reduced the barrier in omics analysis, downstream functional exploration are packaged as suites including functional enrichment, timecourse cluster and protein-protein interaction network. DEP2 also contains an easy-used shiny application designed under modularization.
+developed from the previous package DEP. This package provided differential expression/enrichment analysis pipelines for various data including protein-level quantity(e.g. proteingroup), peptide-level quantity data and modification-specific proteomics (quantities of modified peptides). Inherited from DEP, DEP2 provides functions for data processing, hypothesis testing (via limma) and visualization. The peptide to protein aggregation strategy is integrated into workflows. To reduced the barrier in omics analysis, downstream functional exploration are packaged as suites including functional enrichment, timecourse cluster and protein-protein interaction network. DEP2 also contains an easy-used shiny application designed under modularization.
 
 ## Installation
 You can install DEP2 from [GitHub](https://github.com/) with:
@@ -29,27 +28,16 @@ You can install DEP2 from [GitHub](https://github.com/) with:
 # install.packages("devtools")
 devtools::install_github("mildpiggy/DEP2")
 ```
-## Example
+## Run shiny application
+Run the build-in shiny application though `run_app` function
 
-This is a basic example which shows you how to solve a common problem:
-
-```{r example}
+```{r example,eval=FALSE}
 library(DEP2)
-## basic example code
+DEP2::run_app()
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+## Vignettes
 
-```{r cars}
-summary(cars)
-```
+View the Vignettes for more information ...
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this. You could also use GitHub Actions to re-render `README.Rmd` every time you push. An example workflow can be found here: <https://github.com/r-lib/actions/tree/master/examples>.
 
-You can also embed plots, for example:
-
-```{r pressure, echo = FALSE}
-plot(pressure)
-```
-
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
