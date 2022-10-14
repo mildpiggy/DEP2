@@ -74,7 +74,7 @@ ui <- navbarPage(
         style = "background-color:white;",
         width = 12,
         # includeMarkdown("Tutorial.md")
-        # uiOutput("htmlpage")
+        uiOutput("htmlpage")
         # includeHTML("../rmd_test/test2.html")
         # includeCSS("../rmd_test/test2.html") ## use includeCSS to insert html vignette with css. includeHTML cause
         # includeMarkdown("../rmd_test/test2.md")
@@ -106,18 +106,31 @@ server <- function(input, output,session = session) {
   # bs_themer()
   # DEP_env = reactive({get_DEPglobal_env()})
   ## input of addmod
-  output$htmlpage <- renderUI({
 
-    # HTML(markdown::markdownToHTML(
-    #   knitr::knit("../rmd_test/test2.Rmd", quiet = TRUE),
-    #   # "../rmd_test/test2.html",
-    #   fragment.only=T))
-    tags$iframe(
-      seamless="seamless",
-      src="../rmd_test/test2.html",
-      width="100%", height="400", frameBorder="0")
+  # output$htmlpage <- renderUI({
+  #   # HTML(markdown::markdownToHTML(
+  #   #   knitr::knit("./test2.Rmd", quiet = TRUE),
+  #   #   # "./test2.html",
+  #   #   fragment.only=T))
+  #   tags$iframe(
+  #     seamless="seamless",
+  #     src="./test2.html",
+  #     width="100%", height="400", frameBorder="0")
+  #
+  # })
+
+  output$htmlpage <- renderUI({
+    HTML("./test2.html")
+    HTML(markdown::markdownToHTML(
+      knitr::knit("./test2.Rmd", quiet = TRUE),
+      # "./rmd_test/test2.html",
+      fragment.only=T))
 
   })
+  # output$htmlpage = output$mark <- renderUI({
+  #   print(getwd())
+  #   HTML("./test2.html")
+  # })
 
   observeEvent(input$addmod, {
     # id <- paste0("Dropdown", input$append, "a")
