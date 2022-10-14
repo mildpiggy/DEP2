@@ -12,18 +12,23 @@ editor_options:
 
 <!-- badges: end -->
 
-The goal of DEP2 is to …
+DEP2 provides an comprehensive analysis workflow for mass spectrometry
+based proteomics data, developed from the previous package DEP. This
+package provided differential expression/enrichment analysis pipelines
+for various data including protein-level quantity(e.g. proteingroup),
+peptide-level quantity data and modification-specific proteomics
+(quantities of modified peptides). Inherited from DEP, DEP2 provides
+functions for data processing, hypothesis testing (via limma) and
+visualization. The peptide to protein aggregation strategy is integrated
+into workflows. To reduced the barrier in omics analysis, downstream
+functional exploration are packaged as suites including functional
+enrichment, timecourse cluster and protein-protein interaction network.
+DEP2 also contains an easy-used shiny application designed under
+modularization.
 
 ## Installation
 
-You can install the released version of DEP2 from
-[CRAN](https://CRAN.R-project.org) with:
-
-``` r
-install.packages("DEP2")
-```
-
-And the development version from [GitHub](https://github.com/) with:
+You can install `DEP2` from GitHub with:
 
 ``` r
 # install.packages("devtools")
