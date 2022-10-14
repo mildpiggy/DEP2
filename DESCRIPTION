@@ -22,10 +22,11 @@ Suggests:
 Imports: 
     DEP, ComplexHeatmap, dplyr, tibble, data.table, ggplot2, MsCoreUtils,
     limma, MSnbase, missForest, purrr, QFeatures, DESeq2, readr, SummarizedExperiment (>= 1.11.5), 
-    vsn, fdrtool, lazyeval, S4Vectors, clusterProfiler(>= 4.3.1.900), 
+    vsn, fdrtool, lazyeval, S4Vectors, clusterProfiler(>= 4.3.1.900), clusterProfiler.dplyr,
     RColorBrewer, circlize, shiny, rmarkdown, DT, msigdbr, rlang,
     ggrepel,
     colourpicker,
+    shinyvalidate, shinyWidgets, shinythemes, shinyBS, shinyFeedback,
     ggVennDiagram,
     TCseq,
     Rtsne,
@@ -37,7 +38,8 @@ Imports:
     dndselectr,
     IHW, ashr, apeglm
 Remotes:
-    serenity-r/dndselectr
+    serenity-r/dndselectr,
+    YuLab-SMU/clusterProfiler.dplyr
 biocViews: Proteomics, MassSpectrometry, DifferentialExpression, DataRepresentation
 VignetteBuilder: knitr
 

@@ -21,7 +21,7 @@ source("DEP_ptm_modules.R")
 source("PPI_module.R")
 source("Timecourse_module.R")
 
-library(BiocStyle)
+# library(BiocStyle)
 library(dplyr)
 library(tibble)
 library(purrr)
