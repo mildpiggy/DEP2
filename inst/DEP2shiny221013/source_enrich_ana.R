@@ -3,7 +3,7 @@
 library(clusterProfiler)
 library(dplyr)
 library(parallel)
-library(PFAM.db)
+# library(PFAM.db)
 library(GO.db)
 library(AnnotationDbi)
 library(reactome.db)
