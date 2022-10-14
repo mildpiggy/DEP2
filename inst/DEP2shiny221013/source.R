@@ -726,7 +726,7 @@ library(tibble)
 library(ggplot2)
 library(RColorBrewer)
 library(BiocParallel)
-library(apeglm)
+library(apeglm) ## shrink
 library(DESeq2)
 # library(org.Hs.eg.db)
 library(AnnotationDbi)

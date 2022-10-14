@@ -175,7 +175,7 @@ get_exdesign_parse <- function(label, mode = c("delim", "char"),
 #' Differential expression test on a DESeqDataSet
 #'
 #' \code{test_diff_deg} performs a differential expression test based on
-#' \link{DESeq2} package and format test result from \link[DESeq2]{DESeq}() and \link[DESeq2]{results}().
+#' \code{DESeq2} package and format the test results from \link[DESeq2]{DESeq}() and \link[DESeq2]{results}().
 #'
 #' @param dds A DESeqDataSet object.
 #'
@@ -234,6 +234,7 @@ test_diff_deg <- function(dds, type = c("all", "control", "manual"), control = N
   rowData(dds2) = rd
   return(dds2)
 }
+
 
 
 get_res <- function (dds, type = c("all", "control",  "manual"), control = NULL,

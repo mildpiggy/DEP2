@@ -464,7 +464,7 @@ normalize_pe <- function(pe, method = c("diff.median", "quantiles", "quantiles.r
 #' contains the normalized peptide assay
 #' @param aggrefun 	A function used for quantitative feature aggregation.
 #' It can be a character in "RobustSummary","medianPolish","totalMean" or a function.
-#' Details see \code{\link{QFeatures::aggregateFeatures}}
+#' Details see \code{\link[QFeatures]{aggregateFeatures}}
 #' @param aggregate_Peptide_Type Character in "Unique + Razor" or "unique".
 #' Use what kind of peptides to summarise proteins.
 #' @param fcol Character(1), defining how to summarise the features. Exist in \code{rowData(pe)}.

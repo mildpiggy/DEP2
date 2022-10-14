@@ -14,7 +14,7 @@ test_PPI(
 )
 }
 \arguments{
-\item{x}{A SummarizedExperiment/DEGdata output from \code{\link{add_adjections}} or
+\item{x}{A SummarizedExperiment/DEGdata output from \code{\link{add_rejections}} or
 a charachter vector containing candidate identifiers(SYMBOL, EntrezID, UniprotID or ENSEMBL).}
 
 \item{contrasts}{Character, specifies the contrasts to get significant candidates.}
@@ -40,8 +40,8 @@ based on a local STRING database.
 }
 \details{
 Identifiers in x are firstly transformed to entrezID and then mapped the relative STRING id.
-Next the protein-protein interaction is exctracted from STRING.link.detail.\n
+Next the protein-protein interaction is exctracted from STRING.link.detail.
 The local STRING data (including protein.info, protein.aliases and protein.links.detailed) is necessary for this function.
-If it is absent, \code{test_PPI} will download from \link\link{stringdb-static.org/download/} automatically according
+If it is absent, \code{test_PPI} will download from \href{http://stringdb-static.org/download/}{STRING} automatically according
 \code{species} and \code{STRING.version}.
 }

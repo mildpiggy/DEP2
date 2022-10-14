@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions_ppi.R
 \name{load_PPIdata}
 \alias{load_PPIdata}
-\title{Check and load a local STRING data. If local file do not exist, will try to download from \link\link{stringdb-static.org/download/}.}
+\title{Check and load a local STRING data. If local file do not exist, will try to download from \href{http://stringdb-static.org/download/}{STRING}.}
 \usage{
 load_PPIdata(speciesname, STRING.version = "11.5", STRINGdata_path = NULL)
 }
@@ -12,5 +12,5 @@ load_PPIdata(speciesname, STRING.version = "11.5", STRINGdata_path = NULL)
 \item{STRINGdata_path}{NULL or a selected path. Recommend NULL.}
 }
 \description{
-Check and load a local STRING data. If local file do not exist, will try to download from \link\link{stringdb-static.org/download/}.
+Check and load a local STRING data. If local file do not exist, will try to download from \href{http://stringdb-static.org/download/}{STRING}.
 }

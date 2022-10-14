@@ -510,8 +510,8 @@ manual_impute <- function(se, scale = 0.3, shift = 1.8) {
 #' Used to create the design matrix.
 #' @param fdr.type Character(1), the method to control false discovery rate,
 #' one of "Strimmer's qvalue(t)","Strimmer's qvalue(p)","BH","Storey's qvalue".
-#' "Strimmer's qvalue" calculate fdr vis \code{\link{fdrtool::fdrtool}()} using t-statistic or p values from limma.
-#' "BH" calculate fdr vis \code{\link{stats::p.adjust}()} using "BH" method .
+#' "Strimmer's qvalue" calculate fdr vis \code{\link[fdrtool]{fdrtool}()} using t-statistic or p values from limma.
+#' "BH" calculate fdr vis \code{\link[stats]{p.adjust}()} using "BH" method .
 #' "Storey's qvalue"  calculate fdr vis \code{\link{stats::qvalue}()}.
 #' @param contrast_upon C the contrast to bulid upon which column in experimentdesign
 #' @param filter_ihw logical(1),Whether to use ihw to perform independent filtering and p-value adjustment, default FALSE

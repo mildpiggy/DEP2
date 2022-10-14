@@ -215,7 +215,7 @@ plot_single_deg <- function(deg, genes, type = c("contrast", "centered"), plot =
   if(length(grep("_p.adj|_diff", colnames(row_data))) < 1) {
     stop("'[contrast]_diff' and '[contrast]_p.adj' columns are not present in '",
          deparse(substitute(deg)),
-         "'\nRun get_res() to obtain the required columns",
+         "'\nRun test_diff_deg() to obtain the required columns",
          call. = FALSE)
   }
   row_data$name <- rownames(row_data)
@@ -779,7 +779,7 @@ setMethod("plot_heatmap",
 
   ntf = filtered@ntf
   if(all(dim(ntf) == c(0,0))){
-    stop("The ntf slot is empty, please run get_res, or assign it by a normalized assay")
+    stop("The ntf slot is empty, please run test_diff_deg, or assign it by a normalized assay")
   }
   if( any(dim(ntf) != dim(assay(filtered))) ){
     stop("The size of ntf is uncorrect.")
@@ -1135,7 +1135,7 @@ statistics_plot <- function(dep,x = c("-log10.padj", "-log10.pval","padj","pval"
 #'
 #' @param object SummarizedExperiment,
 #' Data object for which differentially enriched proteins are annotated
-#' (output from \code{\link{test_diff}()} or \code{\link{get_res}()} and \code{\link{add_rejections}()}).
+#' (output from \code{\link{test_diff}()} or \code{\link{test_diff_deg}()} and \code{\link{add_rejections}()}).
 #' @param contrast Character(1),
 #' Specifies the contrast to plot.
 #' @param label_size numeric(1),

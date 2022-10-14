@@ -46,5 +46,5 @@ c("SampleA_vs_SampleC", "SampleB_vs_SampleC").}
 }
 \description{
 \code{test_diff_deg} performs a differential expression test based on
-\link{DESeq2} package and format test result from \link[DESeq2]{DESeq}() and \link[DESeq2]{results}().
+\code{DESeq2} package and format the test results from \link[DESeq2]{DESeq}() and \link[DESeq2]{results}().
 }

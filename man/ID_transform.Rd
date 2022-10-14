@@ -13,7 +13,7 @@ ID_transform(
 )
 }
 \arguments{
-\item{x}{SummarizedExperiment object from \code{\link{make_se}()}) or \code{\link{make_pe}()}), or a DEGdata object from \code{\link{get_res}()}).}
+\item{x}{SummarizedExperiment object from \code{\link{make_se}()}) or \code{\link{make_pe}()}), or a DEGdata object from \code{\link{test_diff_deg}()}).}
 
 \item{from_columns}{Character(), the origin ID from one of "rownames" or colnames of \code{rowData(x)}}
 

@@ -19,7 +19,7 @@ contains the normalized peptide assay}
 
 \item{aggrefun}{A function used for quantitative feature aggregation.
 It can be a character in "RobustSummary","medianPolish","totalMean" or a function.
-Details see \code{\link{QFeatures::aggregateFeatures}}}
+Details see \code{\link[QFeatures]{aggregateFeatures}}}
 
 \item{aggregate_Peptide_Type}{Character in "Unique + Razor" or "unique".
 Use what kind of peptides to summarise proteins.}

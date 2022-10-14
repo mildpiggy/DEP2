@@ -50,7 +50,7 @@ annoSpecies_df <- function(){
 #' The annotation package of certain species must be installed. Using \code{annoSpecies_df}
 #' to check species names and
 #'
-#' @param x SummarizedExperiment object from \code{\link{make_se}()}) or \code{\link{make_pe}()}), or a DEGdata object from \code{\link{get_res}()}).
+#' @param x SummarizedExperiment object from \code{\link{make_se}()}) or \code{\link{make_pe}()}), or a DEGdata object from \code{\link{test_diff_deg}()}).
 #' @param from_columns Character(), the origin ID from one of "rownames" or colnames of \code{rowData(x)}
 #' @param fromtype Character(1), the type of origin ID, e.g. "ENSEMBEL", "SYMBOL", "UNIPROT", "ENTREZID".
 #' @param species Character(1), the species name.
@@ -238,13 +238,13 @@ test_ORA <- function(x,
       filter(!is.na(ENTREZID)) %>% filter(!duplicated(ENTREZID))
     if(type == "GO"){
       cat("Star enrich GO terms by",nrow(ids),"ENTREZIDs.")
-      enrich_res <- goAnalysis(ids, organism = species, species_df = the_annoSpecies_df, pAdjustMethod = pAdjustMethod)
+      enrich_res <- goAnalysis(ids, organism = species, species_df = the_annoSpecies_df, pAdjustMethod = pAdjustMethod, ...)
     }else if(type == "KEGG"){
       cat("Star enrich KEGG terms by",nrow(ids),"ENTREZIDs.")
-      enrich_res <- keggAnalysis(ids, organism = species, species_df = the_annoSpecies_df, pAdjustMethod = pAdjustMethod)
+      enrich_res <- keggAnalysis(ids, organism = species, species_df = the_annoSpecies_df, pAdjustMethod = pAdjustMethod, ...)
     }else if(type == "REACTOME"){
       cat("Star enrich REACTOME terms by",nrow(ids),"ENTREZIDs.")
-      enrich_res <- reactAnalysis(ids, organism = species, species_df = the_annoSpecies_df, pAdjustMethod = pAdjustMethod)
+      enrich_res <- reactAnalysis(ids, organism = species, species_df = the_annoSpecies_df, pAdjustMethod = pAdjustMethod, ...)
     }
 
   }else{ ## comparecluster, the input gene_id_list is a list
@@ -642,7 +642,7 @@ keggAnalysis <- function(gene_id,
 
 #' @import ReactomePA
 reactAnalysis <- function(gene_id, organism="Human", pAdjustMethod, species_df,
-                          pvalueCutoff = 1, qvalueCutoff = 1){
+                          pvalueCutoff = 1, qvalueCutoff = 1, ...){
   organism <- species_df$reactome_organism[species_df$species == organism]
   if(class(gene_id) == "data.frame"){
     reat <- try(ReactomePA::enrichPathway(gene = gene_id$ENTREZID, organism = organism,

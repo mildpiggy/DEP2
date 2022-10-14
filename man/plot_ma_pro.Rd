@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_function_explore.R
 \name{plot_ma_pro}
 \alias{plot_ma_pro}
-\title{MA-plot of RNA expression data}
+\title{MA-plot of quantity data}
 \usage{
 plot_ma_pro(
   x,
@@ -24,7 +24,7 @@ plot_ma_pro(
 \arguments{
 \item{x}{SummarizedExperiment,
 Data object for which differentially enriched proteins are annotated
-(output from \code{\link{test_diff}()} and \code{\link{add_rejections}()}).}
+(output from \code{\link{test_diff}()} and \code{\link{test_diff_deg}()}).}
 
 \item{contrast}{Character.
 Only plot on certain contrasts.}
@@ -65,5 +65,5 @@ labels on the features to mark}
 
 }
 \description{
-Plot MA-plot for a differential test result out from \code{\link{get_res}()}.
+Plot MA-plot for a differential test result.
 }

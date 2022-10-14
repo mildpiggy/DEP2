@@ -34,7 +34,7 @@ plot_volcano(
 \arguments{
 \item{object}{SummarizedExperiment,
 Data object for which differentially enriched proteins are annotated
-(output from \code{\link{test_diff}()} or \code{\link{get_res}()} and \code{\link{add_rejections}()}).}
+(output from \code{\link{test_diff}()} or \code{\link{test_diff_deg}()} and \code{\link{add_rejections}()}).}
 
 \item{contrast}{Character(1),
 Specifies the contrast to plot.}

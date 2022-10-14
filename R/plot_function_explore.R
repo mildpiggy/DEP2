@@ -941,13 +941,13 @@ plot_ma_RNA <- function(x,
 }
 
 
-#' MA-plot of RNA expression data
+#' MA-plot of quantity data
 #'
-#' Plot MA-plot for a differential test result out from \code{\link{get_res}()}.
+#' Plot MA-plot for a differential test result.
 #'
 #' @param x SummarizedExperiment,
 #' Data object for which differentially enriched proteins are annotated
-#' (output from \code{\link{test_diff}()} and \code{\link{add_rejections}()}).
+#' (output from \code{\link{test_diff}()} and \code{\link{test_diff_deg}()}).
 #' @param intgenes Vector of name, highlighted on plot by \code{intgenes_color}
 #' column is provided in \code{x}, or else the identifiers specified in the
 #' row names
