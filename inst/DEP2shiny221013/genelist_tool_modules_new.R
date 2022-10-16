@@ -436,15 +436,15 @@ genelist_tool_UI <- function(id,labelname = "GenelisttoolUI"){
       ),
 
     ),
-    fluidRow(verbatimTextOutput(ns("modules1"))),
+    # fluidRow(verbatimTextOutput(ns("modules1"))),
     fluidRow(
       column(width = 4,
              h4("Venn plotly"),
              plotlyOutput(ns("venn_plotly"),height = "600px")
       ),
       column(width = 8,
-             verbatimTextOutput(ns("venn_selected")),
-             verbatimTextOutput(ns("venn_selected2")),
+             # verbatimTextOutput(ns("venn_selected")), ## to show selected venn_click()
+             # verbatimTextOutput(ns("venn_selected2")), ## to show selected venn_click2()
              h4("Subset Heatmap"),
              fluidRow(
                column(width = 3,
@@ -477,16 +477,11 @@ genelist_tool_UI <- function(id,labelname = "GenelisttoolUI"){
       #            bsCollapsePanel("venn selected",
       #                            "f",
       #                            # uiOutput(ns("venn_plot")),
-      # verbatimTextOutput(ns("venn_selected")),
-      # verbatimTextOutput(ns("venn_selected2")),
-      #                            plotOutput(ns("heatmap_selected")),
-      #                            style = "success")
-      # ),
       # uiOutput(ns("overlayheatmap_plot"))
     ), ## render heatmap according dropzone inputs assay and event_data of venn plot plotly_click.
-    fluidRow(
-      column(verbatimTextOutput(ns("inputvals1")),width = 3),
-      actionButton(ns("save_modsession"),"save mod session"))
+    # fluidRow(
+    #   column(verbatimTextOutput(ns("inputvals1")),width = 3),
+    #   actionButton(ns("save_modsession"),"save mod session"))
   )
 }
 
@@ -989,31 +984,31 @@ genelist_tool_Server <- function(id, Omics_res){
           }
         }, priority = 1, ignoreNULL = F, ignoreInit = T)
 
-      observeEvent(input$save_modsession, {
-        session_saved2 <<- session
-        session_saved3 <<- session$parent
-        session_saved4 <<- .subset2(session, "parent")
-        re_domain <<- getDefaultReactiveDomain() ## the session is the getDefaultReactiveDomain()
-        # cat(aaa())
-        # aaa_saved <<- aaa
-      })
+      # observeEvent(input$save_modsession, {
+      #   session_saved2 <<- session
+      #   session_saved3 <<- session$parent
+      #   session_saved4 <<- .subset2(session, "parent")
+      #   re_domain <<- getDefaultReactiveDomain() ## the session is the getDefaultReactiveDomain()
+      #   # cat(aaa())
+      #   # aaa_saved <<- aaa
+      # })
 
 
       output$showme <- renderText({
         paste("Dropzone:", paste0(input$dropzone, collapse = " "))
       })
 
-      output$inputvals1 <- renderPrint({
-        reactiveValuesToList(input)
-      })
+      # output$inputvals1 <- renderPrint({
+      #   reactiveValuesToList(input)
+      # })
 
-      output$venn_selected <- renderPrint({
-        venn_click()
-      })
+      # output$venn_selected <- renderPrint({
+      #   venn_click()
+      # })
 
-      output$venn_selected2 <- renderPrint({
-        venn_click2()
-      })
+      # output$venn_selected2 <- renderPrint({
+      #   venn_click2()
+      # })
 
       heatmap_plot = reactive({
         library(ComplexHeatmap)

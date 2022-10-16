@@ -1264,11 +1264,12 @@ DEP_pep_server_module <- function(id){
             if(i == 1){
               filter_formula = paste( "~(is.na(",filtcol,")|",filtcol,"=='')")
             }else{
-              filter_formula = paste(filter_formula, paste( "&&(is.na(",filtcol,")|",filtcol,"=='')"))
+              filter_formula = paste(filter_formula, paste( "&(is.na(",filtcol,")|",filtcol,"=='')"))
             }
           }
           filter_formula = as.formula(filter_formula)
         }
+        filter_formula_save <<- filter_formula
         pe_filt <- DEP2::filter_pe(pe, thr = input$thr,
                                    filter_formula = filter_formula)
         pe_filt_save <<- pe_filt
