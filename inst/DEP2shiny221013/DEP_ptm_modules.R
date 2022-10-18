@@ -1836,11 +1836,11 @@ DEP_ptm_server_module <- function(id, Omics_res){
       })
 
     excluded_ptm <- reactive({
-      DEP2:::exclude_deps(dep_ptm(), input$exclude_ptm)
+      DEP2:::exclude_contrasts(dep_ptm(), input$exclude_ptm)
     })
 
     selected_ptm <- reactive({
-      DEP2:::select_deps(excluded_ptm(), input$select_ptm)
+      DEP2:::select_contrasts(excluded_ptm(), input$select_ptm)
     })
 
     res_ptm <- reactive({

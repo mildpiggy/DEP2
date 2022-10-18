@@ -26,7 +26,7 @@ Imports:
     RColorBrewer, circlize, shiny, rmarkdown, DT, msigdbr, rlang,
     ggrepel,
     colourpicker,
-    shinyvalidate, shinyWidgets, shinythemes, shinyBS, shinyFeedback,
+    shinyvalidate, shinyWidgets, shinythemes, shinyBS, shinyFeedback, shinydashboardPlus,
     ggVennDiagram,
     TCseq,
     Rtsne,
