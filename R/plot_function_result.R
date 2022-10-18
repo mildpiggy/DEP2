@@ -419,7 +419,6 @@ setGeneric("plot_heatmap", function(object,
 #' @rdname plot_heatmap
 
 #' @exportMethod plot_heatmap
-#' @rdname plot_heatmap
 setMethod("plot_heatmap",
           "SummarizedExperiment",
           function(object, ...){
