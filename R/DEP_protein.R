@@ -802,7 +802,10 @@ NULL
 setMethod("add_rejections",
           "SummarizedExperiment",
           function(diff, ...){
-            add_rejections.SummarizedExperiment(diff = diff,...)
+            add_rejections.SummarizedExperiment(diff = diff,
+                                                alpha = alpha, lfc = lfc, thresholdmethod = thresholdmethod, curvature = curvature, x0_fold = x0_fold
+                                                # ...
+                                                )
           }
 )
 # add_rejections(my_dep_save)
@@ -878,7 +881,7 @@ add_rejections.SummarizedExperiment <- function (diff, alpha = 0.05, lfc = 1,thr
 
     if (length(cols_p) == 1) {
       x = row_data[, cols_diff]
-      x = fun.outlier(x) %>% na.omit()
+      x = fun.outlier(x) %>% stats::na.omit()
       fit <- fitnormal(x)
       σ = sqrt(fit$theta[2])
       x0 = x0_fold*σ

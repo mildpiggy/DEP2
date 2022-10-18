@@ -321,7 +321,10 @@ get_res <- function (dds, type = c("all", "control",  "manual"), control = NULL,
 setMethod("add_rejections",
           "DEGdata",
           function(diff, ...){
-            add_rejections.DEGdata(diff = diff,...)
+            add_rejections.DEGdata(diff = diff,
+                                   alpha = alpha, lfc = lfc, thresholdmethod = thresholdmethod, curvature = curvature, x0_fold = x0_fold
+                                   # ...
+                                   )
           }
 )
 
