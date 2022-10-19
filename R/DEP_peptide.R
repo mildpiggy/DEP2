@@ -166,15 +166,15 @@ correct_PTM_by_Protein = function(enriched_peptide , relative_protein, correct_k
 }
 
 
-# need packages: UniprotR, trackViewer.
-plot_lolliplot <- function(se_ptm, gene_name, protein_ID){
-
-
-  # Uniport_FD <- GetFamily_Domains(protein_ID)
-  # Uniport_FD[Uniport_FD,]
-
-
-}
+# # need packages: UniprotR, trackViewer.
+# plot_lolliplot <- function(se_ptm, gene_name, protein_ID){
+#
+#
+#   # Uniport_FD <- GetFamily_Domains(protein_ID)
+#   # Uniport_FD[Uniport_FD,]
+#
+#
+# }
 
 
 
