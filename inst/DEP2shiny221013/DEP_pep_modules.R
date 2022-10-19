@@ -76,8 +76,8 @@ DEP_pep_sidebar_mod <-  function(id){
                   ),
                   bsCollapsePanel("Data proccess",
                                   style = "primary",
-                                  uiOutput(ns("id")),
                                   uiOutput(ns("name")),
+                                  uiOutput(ns("id")),
                                   selectizeInput(ns("delim"), "Delimiter", choices = c(";", "|", ","), selected = ";"),
                                   uiOutput(ns("filt")),
                                   numericInput(ns("thr"), "allowed max.miss.num at least one condition", min = 0, max = 20, value = 0),
@@ -218,6 +218,16 @@ DEP_pep_body_mod <- function(id){
     mainPanel(
       #** DEP tabItem----
       # tabName = "DEP_tab",
+      fluidRow(tags$head(tags$style(type="text/css", "
+                        #loadmessage {
+                        top: 0px; left: 0px;
+                        width: 100%; padding: 5px 0px 5px 0px;
+                        text-align: center; font-weight: bold;
+                        font-size: 100%; color: #000000;
+                        background-color: #FFC1C1; z-index: 105;}")), ## 提示条的样式
+               conditionalPanel(condition="$('html').hasClass('shiny-busy')",
+                                tags$div("calculating...please wait...",id="loadmessage"))
+      ),
       helpText("Please cite: "),
       fluidRow(
         # box(numericInput("p",

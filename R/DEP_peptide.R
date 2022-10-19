@@ -154,10 +154,10 @@ correct_PTM_by_Protein = function(enriched_peptide , relative_protein, correct_k
   PTM_assay3 = left_join(PTM_assay2,protein_assay3 , by= c("key",correct_level))
   PTM_assay3$pro_expression[is.na(PTM_assay3$pro_expression)] = 0
   PTM_assay3$expression = PTM_assay3$expression - PTM_assay3$pro_expression
-  PTM_assay3_save <<- PTM_assay3
+  # PTM_assay3_save <<- PTM_assay3
   PTM_assay4 = spread(PTM_assay3[,c("rowid","label","expression")],key = label,value = expression  ) %>%
     arrange(rowid) %>% .[,colnames(enriched_peptide2)] %>% `rownames<-` (rownames(enriched_peptide2))
-  PTM_assay4_save <<- PTM_assay4
+  # PTM_assay4_save <<- PTM_assay4
 
   assay(enriched_peptide2) = PTM_assay4
 
@@ -175,6 +175,7 @@ correct_PTM_by_Protein = function(enriched_peptide , relative_protein, correct_k
 #
 #
 # }
+
 
 
 

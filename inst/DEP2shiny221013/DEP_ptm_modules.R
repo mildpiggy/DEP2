@@ -887,9 +887,16 @@ DEP_ptm_server_module <- function(id, Omics_res){
         thedf <- reactive(NULL)
 
         ### UI functions ### --------------------------------------------------------
+        output$name_ptm <- renderUI({
+          shiny::validate(need(!is.null(data_ptm()), " "))
+          selectizeInput(session$ns("name_ptm"),
+                         "Gene name column",
+                         choices=colnames(data_ptm()),
+                         selected = "Gene.names")
+        })
 
         output$id_ptm <- renderUI({
-
+          shiny::validate(need(!is.null(data_ptm()), " "))
           selectizeInput(session$ns("id_ptm"),
                          "Protin ID column",
                          choices=colnames(data_ptm()),
@@ -1822,13 +1829,7 @@ DEP_ptm_server_module <- function(id, Omics_res){
       sliderInput(inputId = session$ns("Tsne_perplexity_ptm"),"perplexity",min=1,max= (ncol(dep_ptm())-1)/3 - 2^(-31) ,value=2)
     )
 
-    output$name_ptm <- renderUI({
 
-      selectizeInput(session$ns("name_ptm"),
-                     "Gene name column",
-                     choices=colnames(data_ptm()),
-                     selected = "Gene.names")
-    })
 
     ### Reactive functions ### ------------------------------------------------
     name_for_choose_ptm <- reactive({

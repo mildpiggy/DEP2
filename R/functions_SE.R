@@ -79,7 +79,7 @@ filter_se <- function(se,
     se <- se[keeprow,]
   }
   if(!is.null(thr)){
-    message("filter base on missing number is <= ",thr,"in at least one condition.\n")
+    message("filter base on missing number is <= ",thr," in at least one condition.\n")
     se <- filter_missval(se, thr)
   }
 

@@ -180,7 +180,7 @@ test_PPI <- function(x,
 #' @return
 #' A visNetwork plot or a igraph obejct according \code{returntype}.
 #' @export
-#' @import igraph
+#' @importFrom  igraph graph_from_data_frame graph_attr degree V E
 #' @import visNetwork
 #' @examples
 #/. stringNetwork
@@ -194,43 +194,43 @@ PPInetwork <- function(PPIlinks, layoutway = "layout_components",nodecolor = "#2
   links3 <- PPIlinks
   nodes <- PPIlinks %>% { data.frame(gene = c(.$from, .$to)) } %>% distinct()
   net <- igraph::graph_from_data_frame(d=links3,vertices=nodes,directed = F)
-  graph_attr(net, "layout") <- get(layoutway, envir = asNamespace("igraph"))
+  igraph::graph_attr(net, "layout") <- get(layoutway, envir = asNamespace("igraph"))
   if(nodeshape == "circle"){
     nodes$shape = "dot"
   }else{
     nodes$shape = nodeshape
   }
 
-  V(net)$shape <- nodeshape
+  igraph::V(net)$shape <- nodeshape
 
   if(changewidth){
     links3$width <- links3$combined_score/1500*linewidth
-    E(net)$width = links3$combined_score/1500*linewidth
+    igraph::E(net)$width = links3$combined_score/1500*linewidth
   }else{
     links3$width =linewidth
-    E(net)$width = linewidth/4
+    igraph::E(net)$width = linewidth/4
   }
   cat(changesize)
   if(changesize){
     nodes$size <- igraph::degree(net)*nodesize/2
-    V(net)$size <- igraph::degree(net)*nodesize/2/6
+    igraph::V(net)$size <- igraph::degree(net)*nodesize/2/6
     # cat(111)
     # cat(changesize)
   }else{
     nodes$size = nodesize
-    V(net)$size <- nodesize/6
+    igraph::V(net)$size <- nodesize/6
     # cat(222)
   }
   if(highlightkey){
     nodes$color <- ifelse(igraph::degree(net)>=6,"#B54434",nodecolor)
-    V(net)$color <- ifelse(igraph::degree(net)>=6,"#B54434",nodecolor)
+    igraph::V(net)$color <- ifelse(igraph::degree(net)>=6,"#B54434",nodecolor)
   }else{
     nodes$color = nodecolor
-    V(net)$color <- nodecolor
+    igraph::V(net)$color <- nodecolor
   }
-  V(net)$label.cex <- fontsize/50
-  V(net)$label.dist <- -0.17*V(net)$size
-  net_save <<- net
+  igraph::V(net)$label.cex <- fontsize/50
+  igraph::V(net)$label.dist <- -0.17*V(net)$size
+  # net_save <<- net
 
   # nodes$size =200
   colnames(nodes)[1] <- "id"
@@ -253,13 +253,13 @@ PPInetwork <- function(PPIlinks, layoutway = "layout_components",nodecolor = "#2
                forceAtlas2Based = list(gravitationalConstant = -500))
 
   if(returntype == "visNetwork"){
-    cat("111")
+    # cat("111")
     return(nwplot)
   }else if(returntype == "igraph"){
-    cat("222")
+    # cat("222")
     return(net)
   }
-  cat("333")
+  # cat("333")
   # return(nwplot)
 }
 

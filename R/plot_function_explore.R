@@ -252,7 +252,7 @@ plot_cor <- function (x, significant = TRUE, lower = -1, upper = 1, pal = "PRGn"
          call. = FALSE)
   }
   if (any(is.na(assay(x)))) {
-    stop("Missing values in '", xarse(substitute(x)),
+    stop("Missing values in '", deparse(substitute(x)),
          "'. Use plot_dist() instead")
   }
 

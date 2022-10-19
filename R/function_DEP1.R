@@ -150,7 +150,7 @@ delete_suffix <- function(words) {
 #' @export
 get_df_wide <- function(se) {
   # Show error if inputs are not the required classes
-  assert_that(inherits(se, "SummarizedExperiment"))
+  assertthat::assert_that(inherits(se, "SummarizedExperiment"))
 
   # Show error if inputs do not contain required columns
   if (!"name" %in% colnames(rowData(se, use.names = FALSE))) {
