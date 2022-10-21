@@ -139,11 +139,11 @@ make_se <- function (proteins_unique, columns, expdesign, log2transform = TRUE)
                           is.data.frame(expdesign))
   if(is.numeric(columns)) columns = as.integer(columns)
   if(is.character(columns)){
-    if(!all(columns %in% colnames(Peptide)))
-      stop("columns should be the columns in ", deparse(substitute(Peptide)), "but ", columns[!columns %in% colnames(Peptide)],"do not exist.")
-    columns = which(colnames(Peptide) %in% columns)
+    if(!all(columns %in% colnames(proteins_unique)))
+      stop("columns should be the columns in ", deparse(substitute(proteins_unique)), "but ", columns[!columns %in% colnames(proteins_unique)],"do not exist.")
+    columns = which(colnames(proteins_unique) %in% columns)
   }else if(is.integer(columns)){
-    assert_that(all(columns %in% 1:nrow(Peptide)))
+    assert_that(all(columns %in% 1:nrow(proteins_unique)))
   }
   if (any(!c("name", "ID") %in% colnames(proteins_unique))) {
     stop("'name' and/or 'ID' columns are not present in '",
@@ -245,11 +245,11 @@ make_se_parse <- function (proteins_unique, columns, mode = c("char", "delim"),
                             1, is.character(sep), length(sep) == 1)
   if(is.numeric(columns)) columns = as.integer(columns)
   if(is.character(columns)){
-    if(!all(columns %in% colnames(Peptide)))
-      stop("columns should be the columns in ", deparse(substitute(Peptide)), "but ", columns[!columns %in% colnames(Peptide)],"do not exist.")
-    columns = which(colnames(Peptide) %in% columns)
+    if(!all(columns %in% colnames(proteins_unique)))
+      stop("columns should be the columns in ", deparse(substitute(proteins_unique)), "but ", columns[!columns %in% colnames(proteins_unique)],"do not exist.")
+    columns = which(colnames(proteins_unique) %in% columns)
   }else if(is.integer(columns)){
-    assert_that(all(columns %in% 1:nrow(Peptide)))
+    assert_that(all(columns %in% 1:nrow(proteins_unique)))
   }
   mode <- match.arg(mode)
   if (any(!c("name", "ID") %in% colnames(proteins_unique))) {
