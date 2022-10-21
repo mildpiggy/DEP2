@@ -1241,15 +1241,16 @@ DEP_pep_server_module <- function(id){
           need(all(input$intensitycols %in% colnames(Peptide)) & length(input$intensitycols) > 1 , "Please select the Expression columns in the sidebar")
           Ecols <- which(colnames(Peptide) %in% input$intensitycols)
           if (input$anno == "columns") {
-            pe <- DEP2::make_pe_parse(Peptide, ecols = Ecols,
-                                      protein_col = "Pepid",
+            pe <- DEP2::make_pe_parse(Peptide, columns = Ecols,
+                                      # protein_col = "Pepid",
                                       mode = "delim", sep = "_",
                                       remove_prefix = input$remove_prefix,
                                       log2transform = T)
           }
           if (input$anno == "expdesign") {
-            pe <- DEP2::make_pe(Peptide = Peptide, ecols = Ecols,
-                                protein_col = "Pepid", expdesign = expdesign(),
+            pe <- DEP2::make_pe(Peptide = Peptide, columns = Ecols,
+                                # protein_col = "Pepid",
+                                expdesign = expdesign(),
                                 log2transform = T)
             colData(pe)$replicate = as.character(colData(se)$replicate)
           }
