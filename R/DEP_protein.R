@@ -48,6 +48,7 @@ clean_character <- function(express_assay){
 #' # Check colnames and pick the appropriate columns
 #' colnames(data)
 #' data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
+#' @importFrom dplyr mutate
 #' @export
 make_unique <- function(proteins, names, ids, delim = ";") {
   # Show error if inputs are not the required classes
@@ -95,9 +96,9 @@ make_unique <- function(proteins, names, ids, delim = ";") {
   # Take the first identifier per row and make unique names.
   # If there is no name, the ID will be taken.
   proteins_unique <- proteins %>%
-    mutate(name = gsub(paste0(delim, ".*"), "", get(names)),
-           ID = gsub(paste0(delim, ".*"), "", get(ids)),
-           name = make.unique(ifelse(name == "" |
+    dplyr::mutate(name = gsub(paste0(delim, ".*"), "", get(names)),
+                  ID = gsub(paste0(delim, ".*"), "", get(ids)),
+                  name = make.unique(ifelse(name == "" |
                                               is.na(name), ID, name)))
   return(proteins_unique)
 }
@@ -134,9 +135,16 @@ make_unique <- function(proteins, names, ids, delim = ";") {
 #' @export
 make_se <- function (proteins_unique, columns, expdesign, log2transform = TRUE)
 {
-  if(is.numeric(columns)) columns = as.integer(columns)
-  assertthat::assert_that(is.data.frame(proteins_unique), is.integer(columns),
+  assertthat::assert_that(is.data.frame(proteins_unique), is.numeric(columns)|is.integer(columns)| is.character(columns),
                           is.data.frame(expdesign))
+  if(is.numeric(columns)) columns = as.integer(columns)
+  if(is.character(columns)){
+    if(!all(columns %in% colnames(Peptide)))
+      stop("columns should be the columns in ", deparse(substitute(Peptide)), "but ", columns[!columns %in% colnames(Peptide)],"do not exist.")
+    columns = which(colnames(Peptide) %in% columns)
+  }else if(is.integer(columns)){
+    assert_that(all(columns %in% 1:nrow(Peptide)))
+  }
   if (any(!c("name", "ID") %in% colnames(proteins_unique))) {
     stop("'name' and/or 'ID' columns are not present in '",
          deparse(substitute(proteins_unique)), "'.\nRun make_unique() to obtain the required columns",
@@ -229,12 +237,20 @@ make_se <- function (proteins_unique, columns, expdesign, log2transform = TRUE)
 #' se <- make_se_parse(data_unique, columns, mode = "char", chars = 1)
 #' se <- make_se_parse(data_unique, columns, mode = "delim", sep = "_")
 #' @export
-make_se_parse = function (proteins_unique, columns, mode = c("char", "delim"),
+make_se_parse <- function (proteins_unique, columns, mode = c("char", "delim"),
                           chars = 1, sep = "_", remove_prefix = T, remove_suffix = F, log2transform = T)
 {
-  assertthat::assert_that(is.data.frame(proteins_unique), is.integer(columns),
+  assertthat::assert_that(is.data.frame(proteins_unique), is.numeric(columns)|is.integer(columns)| is.character(columns),
                           is.character(mode), is.numeric(chars), length(chars) ==
                             1, is.character(sep), length(sep) == 1)
+  if(is.numeric(columns)) columns = as.integer(columns)
+  if(is.character(columns)){
+    if(!all(columns %in% colnames(Peptide)))
+      stop("columns should be the columns in ", deparse(substitute(Peptide)), "but ", columns[!columns %in% colnames(Peptide)],"do not exist.")
+    columns = which(colnames(Peptide) %in% columns)
+  }else if(is.integer(columns)){
+    assert_that(all(columns %in% 1:nrow(Peptide)))
+  }
   mode <- match.arg(mode)
   if (any(!c("name", "ID") %in% colnames(proteins_unique))) {
     stop("'name' and/or 'ID' columns are not present in '",
@@ -363,6 +379,8 @@ normalize_vsn <- function (se)
 #'
 #' imputed_manual <- impute(norm, fun = "man", shift = 1.8, scale = 0.3)
 #' @export
+#' @importFrom MSnbase impute exprs
+#' @importFrom missForest missForest
 impute <- function (se, fun = c("bpca", "knn", "QRILC", "MLE", "MinDet",
                                 "MinProb", "man", "min", "zero", "mixed", "nbavg","RF"), ...)
 {
@@ -485,7 +503,7 @@ manual_impute <- function(se, scale = 0.3, shift = 1.8) {
 #' \code{test_diff} performs a differential enrichment/expression test based on
 #' protein/peptide-wise linear models and empirical Bayes
 #' statistics using \pkg{limma}. False Discovery Rates are estimated
-#' using \code{Strimmer's qvalue}, \code{Benjamini-Hochberg fdr} or \code{Storey's qvalue}.
+#' using \code{"Strimmer's qvalue"}, \code{"Benjamini-Hochberg fdr"} or \code{"Storey's qvalue"}.
 #'
 #' @param se SummarizedExperiment,
 #' Proteomics data from quantity table (output from \code{\link{make_se}()},
@@ -544,13 +562,8 @@ manual_impute <- function(se, scale = 0.3, shift = 1.8) {
 #' # Test for differentially expressed proteins with a custom design formula
 #' diff <- test_diff(imputed, "control", "Ctrl",
 #'     design_formula = formula(~ 0 + condition + replicate))
+#' @importFrom fdrtool fdrtool
 #' @export
-# setMethod("test_diff",
-#           "SummarizedExperiment",
-#           function(se, ...){
-#             .test_diff(se = se,...)
-#           }
-# )
 test_diff <- function(se, type = c("all", "control", "manual"),
                       control = NULL, test = NULL,
                       design_formula = formula(~ 0 + condition),
@@ -599,8 +612,7 @@ test_diff <- function(se, type = c("all", "control", "manual"),
   }
 
   # Show error if inputs do not contain required columns
-  fdr.type <- match.arg(fdr.type)
-  cat(fdr.type)
+  # fdr.type <- match.arg(fdr.type)
   # variables in formula
   variables <- terms.formula(design_formula) %>%
     attr(., "variables") %>%
@@ -697,13 +709,13 @@ test_diff <- function(se, type = c("all", "control", "manual"),
   eB_fit <- eBayes(contrast_fit,trend = FALSE)
 
   # function to retrieve the results of
-  # the differential expression test using 'fdrtool'
+  # the differential expression test using 'fdrtool',('BH','qvalue')
   retrieve_fun <- function(comp, fit = eB_fit, fdr.type){
     res <- topTable(fit, sort.by = "t", coef = comp,
                     number = Inf, confint = TRUE)
     res <- res[!is.na(res$t),]
 
-    if(fdr.type == "Strimmer's qvalue(t)"){
+    if(fdr.type == "Strimmer's qvalue(t)"){ ##
       fdr_res <- fdrtool(res$t,plot = FALSE, verbose = FALSE)
       res$qval <- fdr_res$qval
     }
@@ -725,6 +737,7 @@ test_diff <- function(se, type = c("all", "control", "manual"),
     return(res)
   }
 
+  message(fdr.type)
   # Retrieve the differential expression test results
   limma_res <- purrr::map_df(cntrst, retrieve_fun,fdr.type = fdr.type)
 
