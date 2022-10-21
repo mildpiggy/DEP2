@@ -8,13 +8,12 @@
 #' @param Peptide
 #' Data.frame,
 #' Peptide table with its belonging proteingroup.
-#' @param ecols A numeric indicating the indices of the columns
+#' @param columns A numeric indicating the indices of the columns
 #' to be used as expression values. Can also be a character indicating the names of the columns.
-#' @param protein_col An optional character(1) or numeric(1) indicating the column of
-#' peptides' proteins/proteingroups information.
 #' @param expdesign A data.frame.
 #' Experimental design with 'label', 'condition'
 #' and 'replicate' information.
+#' @param fnames An optional character(1) or numeric(1) indicating the column identifier.
 #' @param assay_name
 #' An character(1) to name assay in the QFeatures object.
 #' @param log2transform Logical(1), whether log2 transform the assay, default TRUE.
@@ -23,15 +22,22 @@
 #' @export
 #'
 #' @examples
-make_pe <- function(Peptide, ecols, protein_col,
+make_pe <- function(Peptide, columns,
                     expdesign,
+                    fnames,
                     assay_name = "peptideRaw",
                     log2transform = T){
-  if(is.numeric(ecols)) ecols = as.integer(ecols)
-  assertthat::assert_that(is.data.frame(Peptide), is.integer(ecols),
+  assertthat::assert_that(is.data.frame(Peptide), is.numeric(columns)|is.integer(columns)| is.character(columns),
                           is.data.frame(expdesign), is.character(assay_name), length(assay_name) == 1)
-
-  if (any(!apply(Peptide[, ecols], 2, is.numeric))) {
+  if(is.numeric(columns)) columns = as.integer(columns)
+  if(is.character(columns)){
+    if(!all(columns %in% colnames(Peptide)))
+      stop("columns should be the columns in ", deparse(substitute(Peptide)), "but ", columns[!columns %in% colnames(Peptide)],"do not exist.")
+    columns = which(colnames(Peptide) %in% columns)
+  }else if(is.integer(columns)){
+    assert_that(all(columns %in% 1:nrow(Peptide)))
+  }
+  if (any(!apply(Peptide[, columns], 2, is.numeric))) {
     stop("Specified 'columns' should be numeric", "\nRun make_pe() with the appropriate columns as argument.",
          " Or run clean_character() to filter character values(like 'NA'), and transfer numeric in these columns",
          call. = FALSE)
@@ -51,20 +57,20 @@ make_pe <- function(Peptide, ecols, protein_col,
 
   rownames(expdesign) = expdesign$label
 
-  raw = Peptide[,ecols]
+  raw = Peptide[,columns]
   expdesign <- mutate(expdesign, label = make.names(label), condition = make.names(condition)) %>%
     unite(ID, condition, replicate, remove = FALSE)
   rownames(expdesign) <- expdesign$ID
   matched <- match(make.names(delete_prefix(expdesign$label)),
                    make.names(delete_prefix(colnames(raw))) )
   if(any(is.na(matched))
-     # && sum(matched,na.rm = T) != length(ecols)
+     # && sum(matched,na.rm = T) != length(columns)
   ){
     matched <- match(make.names(expdesign$label),
                      make.names(colnames(raw)) )
   }
   if (any(is.na(matched))
-      # && sum(matched,na.rm = T) != length(ecols)
+      # && sum(matched,na.rm = T) != length(columns)
   ) {
     stop("Labels of the experimental design do not match ",
          "with column names in 'proteins_unique'", "\nRun make_se() with the correct labels in the experimental design",
@@ -72,10 +78,10 @@ make_pe <- function(Peptide, ecols, protein_col,
   }
   colnames(raw)[matched] <- expdesign$ID
   raw <- raw[, !is.na(colnames(raw))][rownames(expdesign)]
-  colnames(Peptide)[ecols] = colnames(raw)
+  colnames(Peptide)[columns] = colnames(raw)
 
-  QF <- readQFeatures(table = Peptide, ecol = ecols,
-                      fnames = protein_col,
+  QF <- readQFeatures(table = Peptide, ecol = columns,
+                      fnames = fnames,
                       name = assay_name)
   rowData(QF[[assay_name]])$nNonZero <- rowSums(assay(QF[[assay_name]]) > 0)
   # if(!is.null(NAnum))   QF <- filterFeatures(QF, ~ nNonZero >= (ncol(assay(QF[["peptideRaw"]])) - NAnum))
@@ -117,14 +123,25 @@ make_pe <- function(Peptide, ecols, protein_col,
 #'
 #' @examples
 make_pe_parse <- function(Peptide,
-                          ecols,
-                          protein_col,
+                          columns,
+                          fnames,
                           mode = c("char", "delim"),
                           chars = 1, sep = "_", remove_prefix = T,
                           assay_name = "peptideRaw",
                           log2transform = T){
+  assertthat::assert_that(is.data.frame(Peptide), is.numeric(columns)|is.integer(columns)| is.character(columns),
+                          is.character(assay_name), length(assay_name) == 1)
   mode <- match.arg(mode)
-  if (any(!apply(Peptide[, ecols], 2, is.numeric))) {
+
+  if(is.numeric(columns)) columns = as.integer(columns)
+  if(is.character(columns)){
+    if(!all(columns %in% colnames(Peptide)))
+      stop("columns should be the columns in ", deparse(substitute(Peptide)), "but ", columns[!columns %in% colnames(Peptide)],"do not exist.")
+    columns = which(colnames(Peptide) %in% columns)
+  }else if(is.integer(columns)){
+    assert_that(all(columns %in% 1:nrow(Peptide)))
+  }
+  if (any(!apply(Peptide[, columns], 2, is.numeric))) {
     stop("specified 'columns' should be numeric", "\nRun make_pe_parse() with the appropriate columns as argument",
          call. = FALSE)
   }
@@ -133,10 +150,10 @@ make_pe_parse <- function(Peptide,
     Peptide <- as.data.frame(Peptide)
 
   if(remove_prefix){
-    colnames(Peptide)[ecols] <- DEP2:::delete_prefix(colnames(Peptide)[ecols]) %>% make.names()
+    colnames(Peptide)[columns] <- DEP2:::delete_prefix(colnames(Peptide)[columns]) %>% make.names()
   }
   if (mode == "char") {
-    expdesign <- data.frame(label = colnames(Peptide)[ecols], stringsAsFactors = FALSE) %>%
+    expdesign <- data.frame(label = colnames(Peptide)[columns], stringsAsFactors = FALSE) %>%
       mutate(condition = substr(label, 1, nchar(label) -
                                   chars), replicate = substr(label, nchar(label) +
                                                                1 - chars, nchar(label))) %>% unite(ID, condition,
@@ -144,22 +161,22 @@ make_pe_parse <- function(Peptide,
   }
   if (mode == "delim") {
     # colnames(raw) = gsub(get_suffix(colnames(raw)),"", colnames(raw))
-    expdesign <- data.frame(label = colnames(Peptide)[ecols], stringsAsFactors = FALSE) %>%
+    expdesign <- data.frame(label = colnames(Peptide)[columns], stringsAsFactors = FALSE) %>%
       separate(label, c("condition", "replicate"), sep = sep,
                remove = FALSE, extra = "merge") %>% unite(ID,
                                                           condition, replicate, remove = FALSE)
   }
 
   rownames(expdesign) = expdesign$label
-  Peptide[,ecols] = apply(Peptide[,ecols], 2, function(x){
+  Peptide[,columns] = apply(Peptide[,columns], 2, function(x){
     # temp1 <<- x
     # temp <<- as.integer(x)
     x[!(!grepl("[A-z]",x) & grepl("\\d",x))] = 0
     return(as.numeric(x))
   })
 
-  QF <- readQFeatures(table = Peptide, ecol = ecols,
-                      fnames = protein_col,
+  QF <- readQFeatures(table = Peptide, ecol = columns,
+                      fnames = fnames,
                       name = assay_name)
   rowData(QF[[assay_name]])$nNonZero <- rowSums(assay(QF[[assay_name]]) > 0)
   # if(!is.null(NAnum))   QF <- filterFeatures(QF, ~ nNonZero >= (ncol(assay(QF[["peptideRaw"]])) - NAnum))
@@ -223,24 +240,14 @@ filter_pe <- function(pe,
 #' @importFrom S4Vectors split
 reducedataframe <- function (x, k, count = FALSE, simplify = TRUE, drop = FALSE, reserve)
 {
-  # x_save <<- x
-  # k_save <<- k
-  # count_save <<- count
-  # simplify_save <<- simplify
-  # drop_save <<- drop
-  # reserve_save <<- reserve
-  # cat("aaaa1")
   res <- S4Vectors::split(x, k)
-  # res_save <<- res
   lens <- unname(lengths(res))
-  # lens_save1 <<- lens
   colnames(x)
-  # cat("aa")
+
   if (simplify | drop)
-    invars <- QFeatures:::invariant_cols2(res)
+    invars <- invariant_cols2(res)
   res <- DataFrame(res)
-  # res_save1 <<- res
-  # cat("bb")
+
   if(!is.null(reserve)){
     invars <- c(invars,which(colnames(res) %in% reserve)) %>% unique
   }
@@ -248,20 +255,25 @@ reducedataframe <- function (x, k, count = FALSE, simplify = TRUE, drop = FALSE,
     for (i in invars) res[[i]] <- unname(sapply(res[[i]],
                                                 "[[", 1))
   }
-  # res_save2 <<- res
-  # cat("cc")
+
   if (drop)
     res <- res[, invars, drop = FALSE]
-  # cat("dd")
-  # res_save3 <<- res
-  # lens_save2 <<- lens
+
   if (count)
     res[[".n"]] <- lens
-  # cat("ee")
+
   res
 }
 
-
+## from QFeatures:::invariant_cols2
+invariant_cols2 <- function (x)
+{
+  res <- rep(NA, length(x[[1]]))
+  for (i in seq_along(res)) {
+    res[i] <- all(lengths(lapply(x[, i], unique)) == 1)
+  }
+  which(res)
+}
 
 ## modified from QFeatures:::.aggregateQFeatures, add reserve for reducedataframe
 #' @importFrom MsCoreUtils aggregate_by_vector robustSummary colCounts
@@ -326,7 +338,7 @@ Peptide_distribution <- function(pe_norm, i = "peptideNorm", fcol = "Proteins"){
 
   ## get the smallestUnique PGs
   SU_PGs <- smallestUniqueGroups(allpgs)
-  SU_PGs_uniquecounts <- allpgs[allpgs %in% SU_PGs] %>% table ## 计算每个最终 PG 的unique数量
+  SU_PGs_uniquecounts <- allpgs[allpgs %in% SU_PGs] %>% table ## The unique peptide number in each SU PGs
   SU_PGs_uniquecounts %>% class
   SU_PGs_list1 <- strsplit(SU_PGs,";",fixed = F)
   names(SU_PGs_list1) <- SU_PGs
@@ -347,8 +359,9 @@ Peptide_distribution <- function(pe_norm, i = "peptideNorm", fcol = "Proteins"){
       temp = temp[temp$uniquecounts == temp$uniquecounts[1],]
       razorPG = temp$suPG[match(x,temp$proteinsID) %>% na.omit %>% .[1]]
       return(razorPG)
-    })}) %>% system.time
-  class(nonSU_PGs_list3)
+    })
+  }) %>% system.time # to calulate spend time
+  # class(nonSU_PGs_list3)
 
   rd$smallestProteingroups <- ifelse(rd$peptide.type=="unique" , rd[,fcol], nonSU_PGs_list3[match(rd[,fcol],names(nonSU_PGs_list3))])
   rowData(pe_norm[[i]]) <- rd
@@ -356,16 +369,16 @@ Peptide_distribution <- function(pe_norm, i = "peptideNorm", fcol = "Proteins"){
 }
 
 
-## The function from msqrob2, design the smallestUniqueGroups
+## The function from msqrob2, design the smallestUniqueGroups.
 smallestUniqueGroups <- function(proteins,
                                  split = ";") {
   b <- strsplit(x = as.character(unique(proteins)), split = split, fixed = TRUE)
-
+  ## b is a list store proteins names(or ids)
   included <- vector()
 
-  j <- 1
+  j <- 1 # j control how many proteins in a single names vector(protein group)
   while (length(b) != 0) {
-    #提出b这个list中length是j的蛋白名,included
+    # To exctract the names vectors contain j proteins from list b.
     included <- c(
       included,
       vapply(
@@ -375,16 +388,16 @@ smallestUniqueGroups <- function(proteins,
       )
     )
     a <- unlist(b[vapply(b, length, integer(1)) == j])
-    ##提出b这个list中length > j的蛋白名
-    b <- b[vapply(b, length, integer(1)) > j]
+    # To exctract the names vectors contain more than j proteins from list b.
+    b <- b[vapply(b, length, integer(1)) > j] # remove names with <= j proteins from list b
 
     if (length(b) != 0) {
       sel <- vector()
       for (i in seq_len(length(b))) {
-        sel[i] <- !any(b[[i]] %in% a) #length是1的蛋白名,即included不在list中length > 1的蛋白名中为TRUE，在的话为FALSE
+        sel[i] <- !any(b[[i]] %in% a) # if names contains a protein overlapped in included F, else T.
       }
-      b <- b[sel] #把length是1的蛋白名,即included不在list中length > 1的蛋白名中为TRUE，提出来，重新赋予b
-      j <- j + 1 #j=2再返回while循环
+      b <- b[sel] # remove long pgs with any protein overlapped with short PGs. Make long pgs overlap with short PGs.
+      j <- j + 1 # increase j
     }
   }
 
