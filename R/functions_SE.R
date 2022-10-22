@@ -13,9 +13,7 @@ NAiszero <- function(se){
   return(se)
 }
 
-#' @importFrom QFeatures zeroIsNA
-#' @export
-zeroIsNA <- QFeatures::zeroIsNA
+
 
 #' Filter SummarizedExperiment on missing values or formula
 #'
@@ -70,7 +68,7 @@ filter_se <- function(se,
   origin_se = se
 
   if(inherits(se,"DESeqDataSet")){
-    se <- zeroIsNA(se) ## DESeqDataSet missing values is store as zero
+    se <- QFeatures::zeroIsNA(se) ## DESeqDataSet missing values is store as zero
   }
   if(!is.null(missnum)){
     message("filter base on missing number <= ",missnum,"\n")
