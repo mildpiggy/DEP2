@@ -1,5 +1,3 @@
-theassay = assay(norm_pg)
-theassay_imp <- GS_imp_wrapper(assay(norm_pg), n_cores = 2)
 
 #' pre_processing_GS_wrapper
 #'
