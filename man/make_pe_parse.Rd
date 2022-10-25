@@ -6,8 +6,8 @@
 \usage{
 make_pe_parse(
   Peptide,
-  ecols,
-  protein_col,
+  columns,
+  fnames,
   mode = c("char", "delim"),
   chars = 1,
   sep = "_",
@@ -20,11 +20,10 @@ make_pe_parse(
 \item{Peptide}{Data.frame,
 Peptide table with its belonging proteingroup.}
 
-\item{ecols}{A numeric indicating the indices of the columns
+\item{columns}{A numeric indicating the indices of the columns
 to be used as expression values. Can also be a character indicating the names of the columns.}
 
-\item{protein_col}{An optional character(1) or numeric(1) indicating the column of
-peptides' proteins/proteingroups information.}
+\item{fnames}{An optional character(1) or numeric(1) indicating the column identifier.}
 
 \item{mode}{"char" or "delim",
 The mode of parsing the column headers.

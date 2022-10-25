@@ -6,9 +6,9 @@
 \usage{
 make_pe(
   Peptide,
-  ecols,
-  protein_col,
+  columns,
   expdesign,
+  fnames,
   assay_name = "peptideRaw",
   log2transform = T
 )
@@ -17,15 +17,14 @@ make_pe(
 \item{Peptide}{Data.frame,
 Peptide table with its belonging proteingroup.}
 
-\item{ecols}{A numeric indicating the indices of the columns
+\item{columns}{A numeric indicating the indices of the columns
 to be used as expression values. Can also be a character indicating the names of the columns.}
-
-\item{protein_col}{An optional character(1) or numeric(1) indicating the column of
-peptides' proteins/proteingroups information.}
 
 \item{expdesign}{A data.frame.
 Experimental design with 'label', 'condition'
 and 'replicate' information.}
+
+\item{fnames}{An optional character(1) or numeric(1) indicating the column identifier.}
 
 \item{assay_name}{An character(1) to name assay in the QFeatures object.}
 

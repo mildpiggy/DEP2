@@ -32,8 +32,8 @@ A filter expression, written as a formula.}
 \item{assay_name}{Character(1),
 the name of which assay to perform filter.}
 
-\item{return_keeprows}{Logical(1),
-in at least one condition.}
+\item{return_keeprows}{Logical(1), default FALSE, return the trimmed object.
+If TURE return the rows number that pass through filter.}
 }
 \value{
 A filtered Qfeatures object,

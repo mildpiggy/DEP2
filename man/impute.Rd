@@ -7,7 +7,7 @@
 impute(
   se,
   fun = c("bpca", "knn", "QRILC", "MLE", "MinDet", "MinProb", "man", "min", "zero",
-    "mixed", "nbavg", "RF"),
+    "mixed", "nbavg", "RF", "GSimp"),
   ...
 )
 }
@@ -19,7 +19,7 @@ proteins with too many missing values using \code{\link{filter_missval}()}
 and normalize the data using \code{\link{normalize_vsn}()}.}
 
 \item{fun}{"bpca", "knn", "QRILC", "MLE", "MinDet",
-"MinProb", "man", "min", "zero", "mixed", "nbavg" or "RF",
+"MinProb", "man", "min", "zero", "mixed", "nbavg", "GSimp" or "RF",
 Function used for data imputation based on \code{\link{manual_impute}}("man")
 , \code{\link[MSnbase]{impute,MSnSet-method}} and \code{\link[missForest]{missForest}}("RF").}
 

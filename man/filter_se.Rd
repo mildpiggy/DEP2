@@ -10,8 +10,8 @@ filter_se(
   missnum = NULL,
   fraction = NULL,
   filter_formula = NULL,
-  return_keeprows = FALSE,
-  rowsum_threshold = NULL
+  rowsum_threshold = NULL,
+  return_keeprows = FALSE
 )
 }
 \arguments{
@@ -27,11 +27,15 @@ in at least one condition. At least in one condition, missing values number < or
 Sets the threshold for the allowed max number among all samples,
 missing values number < or = 'missnum' in each row.}
 
+\item{fraction}{A numeric from 0 to 1, threshold of missing occupancy of each row}
+
 \item{filter_formula}{Formula or character(1).
 A filter expression, written as a formula.}
 
-\item{return_keeprows}{Logical(1),
-in at least one condition.}
+\item{rowsum_threshold}{A numeric, row sum of intensity(abundance) must larger than it.}
+
+\item{return_keeprows}{Logical(1), default FALSE, return the trimmed object.
+If TURE return the rows number that pass through filter.}
 }
 \value{
 A filtered SummarizedExperiment object,

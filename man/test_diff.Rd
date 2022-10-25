@@ -61,7 +61,7 @@ containing diff, test result from limma and fdr estimates of differential expres
 \code{test_diff} performs a differential enrichment/expression test based on
 protein/peptide-wise linear models and empirical Bayes
 statistics using \pkg{limma}. False Discovery Rates are estimated
-using \code{Strimmer's qvalue}, \code{Benjamini-Hochberg fdr} or \code{Storey's qvalue}.
+using \code{"Strimmer's qvalue"}, \code{"Benjamini-Hochberg fdr"} or \code{"Storey's qvalue"}.
 }
 \examples{
 # Load example
