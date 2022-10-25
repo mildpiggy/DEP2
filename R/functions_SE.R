@@ -32,10 +32,12 @@ NAiszero <- function(se){
 #' @param missnum Integer(1),
 #' Sets the threshold for the allowed max number among all samples,
 #' missing values number < or = 'missnum' in each row.
+#' @param fraction A numeric from 0 to 1, threshold of missing occupancy of each row
 #' @param filter_formula Formula or character(1).
 #' A filter expression, written as a formula.
-#' @param return_keeprows Logical(1),
-#' in at least one condition.
+#' @param rowsum_threshold A numeric, row sum of intensity(abundance) must larger than it.
+#' @param return_keeprows Logical(1), default FALSE, return the trimmed object.
+#' If TURE return the rows number that pass through filter.
 #' @return A filtered SummarizedExperiment object,
 #' or a vector of keep rows if \code{return_keeprows} is TRUE
 #' @examples
@@ -59,11 +61,11 @@ filter_se <- function(se,
                       missnum = NULL,
                       fraction = NULL,
                       filter_formula = NULL,
-                      return_keeprows = FALSE,
-                      rowsum_threshold = NULL){
+                      rowsum_threshold = NULL,
+                      return_keeprows = FALSE){
   assertthat::assert_that(inherits(se, "SummarizedExperiment"),
                           is.null(thr)|is.numeric(thr)|is.integer(thr), is.null(missnum)|is.numeric(missnum)|is.integer(missnum),
-                          is.null(filter_formula)|is.character(filter_formula)|is_formula(filter_formula),
+                          is.null(filter_formula)|is.character(filter_formula)|purrr::is_formula(filter_formula),
                           is.null(fraction)|is.numeric(fraction), is.null(fraction)|length(fraction) == 1)
   origin_se = se
 
@@ -82,7 +84,7 @@ filter_se <- function(se,
   }
 
   if(!is.null(fraction)){
-    if(min < 0 | min > 1) {
+    if(fraction < 0 | fraction > 1) {
       warning("invalid filter threshold 'fraction' applied",
               "Run filter_se() with a percent ranging from 0 to 1.\n",
               "Skipped the filter by 'fraction'")
