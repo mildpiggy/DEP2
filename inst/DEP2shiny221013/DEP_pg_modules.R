@@ -1426,8 +1426,8 @@ DEP_pg_server_module <- function(id){
 
           if(input$contrasts == "all") {
             # df <- df_all()
-            df_all <- DEP2::test_diff(se = imp(), type = "all",
-                                      fdr.type = FDR_type())
+            df <- DEP2::test_diff(se = imp(), type = "all",
+                                  fdr.type = FDR_type())
           }
 
           if(input$contrasts == "manual") {
@@ -1445,9 +1445,8 @@ DEP_pg_server_module <- function(id){
 
           if(input$contrasts == "all") {
             load(file = inFile1$datapath)
-            df_all <- DEP2::test_diff(se = my_imp, type = "all",
+            df <- DEP2::test_diff(se = my_imp, type = "all",
                                       fdr.type = FDR_type())
-            # df <- df_all()
           }
 
           if(input$contrasts == "manual") {

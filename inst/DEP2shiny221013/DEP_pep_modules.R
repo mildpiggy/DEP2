@@ -1437,33 +1437,35 @@ DEP_pep_server_module <- function(id){
         inFile1 <- NULL
         if(is.null(inFile1)){
           if(input$contrasts == "control"){
-            df <- test_diff(se = imp(), type = input$contrasts, control = input$control,
-                            fdr.type = FDR_type())
+            df <- DEP2::test_diff(se = imp(), type = input$contrasts, control = input$control,
+                                  fdr.type = FDR_type())
           }
 
           if(input$contrasts == "all") {
-            df <- df_all()
+            df <- DEP2::test_diff(se = imp(), type = "all",
+                                  fdr.type = FDR_type())
           }
 
           if(input$contrasts == "manual") {
-            df <- test_diff(se = imp(), type = input$contrasts, test = input$test_manual,
-                            fdr.type = FDR_type())
+            df <- DEP2::test_diff(se = imp(), type = input$contrasts, test = input$test_manual,
+                                  fdr.type = FDR_type())
           }
         } else {
           #load your saved RData in order to get the same result (imp is the key of if result from two analysis being the same)
           load(file = inFile1$datapath)
           if(input$contrasts == "control"){
-            df <- test_diff(se = my_imp, type = input$contrasts, control = input$control,
-                            fdr.type = FDR_type())
+            df <- DEP2::test_diff(se = my_imp, type = input$contrasts, control = input$control,
+                                  fdr.type = FDR_type())
           }
 
           if(input$contrasts == "all") {
-            df <- df_all()
+            df <- DEP2::test_diff(se = my_imp, type = "all",
+                                  fdr.type = FDR_type())
           }
 
           if(input$contrasts == "manual") {
-            df <- test_diff(se = my_imp, type = input$contrasts, test = input$test_manual,
-                            fdr.type = FDR_type())
+            df <- DEP2::test_diff(se = my_imp, type = input$contrasts, test = input$test_manual,
+                                  fdr.type = FDR_type())
           }
         }
         my_df <<- df

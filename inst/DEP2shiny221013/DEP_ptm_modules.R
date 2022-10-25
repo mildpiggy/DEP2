@@ -1536,7 +1536,7 @@ DEP_ptm_server_module <- function(id, Omics_res){
         }else{
           my_imp = imp_ptm()
         }
-        # if(is.null(inFile1)){
+        if(is.null(inFile1)){
           if(input$contrasts_ptm == "control"){
             df <- test_diff(se = my_imp, type = input$contrasts_ptm, control = input$control_ptm,
                              fdr.type = FDR_type_ptm())
@@ -1550,24 +1550,24 @@ DEP_ptm_server_module <- function(id, Omics_res){
             df <- test_diff(se = my_imp, type = input$contrasts_ptm, test = input$test_manual_ptm,
                             fdr.type = FDR_type_ptm())
           }
-        # } else {
-          # load your saved RData in order to get the same result (imp is the key of if result from two analysis being the same)
-        #   load(file = inFile1$datapath)
-        #   my_imp <- my_imp
-        #   if(input$contrasts_ptm == "control"){
-        #     df <- test_diff(se = my_imp, type = input$contrasts_ptm, control = input$control_ptm,
-        #                      fdr.type = FDR_type_ptm())
-        #   }
-        #
-        #   if(input$contrasts_ptm == "all") {
-        #     df <- test_diff(se = my_imp, type = "all", fdr.type = FDR_type_ptm())
-        #   }
-        #
-        #   if(input$contrasts_ptm == "manual") {
-        #     df <- test_diff(se = my_imp, type = input$contrasts_ptm, test = input$test_manual_ptm,
-        #                      fdr.type = FDR_type_ptm())
-        #   }
-        # }
+        } else {
+        # load your saved RData in order to get the same result (imp is the key of if result from two analysis being the same)
+          load(file = inFile1$datapath)
+          my_imp <- my_imp
+          if(input$contrasts_ptm == "control"){
+            df <- test_diff(se = my_imp, type = input$contrasts_ptm, control = input$control_ptm,
+                             fdr.type = FDR_type_ptm())
+          }
+
+          if(input$contrasts_ptm == "all") {
+            df <- test_diff(se = my_imp, type = "all", fdr.type = FDR_type_ptm())
+          }
+
+          if(input$contrasts_ptm == "manual") {
+            df <- test_diff(se = my_imp, type = input$contrasts_ptm, test = input$test_manual_ptm,
+                             fdr.type = FDR_type_ptm())
+          }
+        }
         # my_df <<- df
         return(df)
       })
