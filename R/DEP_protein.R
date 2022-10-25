@@ -349,7 +349,7 @@ normalize_vsn <- function (se)
 #' proteins with too many missing values using \code{\link{filter_missval}()}
 #' and normalize the data using \code{\link{normalize_vsn}()}.
 #' @param fun "bpca", "knn", "QRILC", "MLE", "MinDet",
-#' "MinProb", "man", "min", "zero", "mixed", "nbavg" or "RF",
+#' "MinProb", "man", "min", "zero", "mixed", "nbavg", "GSimp" or "RF",
 #' Function used for data imputation based on \code{\link{manual_impute}}("man")
 #' , \code{\link[MSnbase]{impute,MSnSet-method}} and \code{\link[missForest]{missForest}}("RF").
 #' @param ... Additional arguments for imputation functions as depicted in
@@ -382,7 +382,7 @@ normalize_vsn <- function (se)
 #' @importFrom MSnbase impute exprs
 #' @importFrom missForest missForest
 impute <- function (se, fun = c("bpca", "knn", "QRILC", "MLE", "MinDet",
-                                "MinProb", "man", "min", "zero", "mixed", "nbavg","RF"), ...)
+                                "MinProb", "man", "min", "zero", "mixed", "nbavg","RF", "GSimp"), ...)
 {
   assertthat::assert_that(inherits(se, "SummarizedExperiment"),
                           is.character(fun))
@@ -407,8 +407,15 @@ impute <- function (se, fun = c("bpca", "knn", "QRILC", "MLE", "MinDet",
     if(!exists("ntree")) ntree = 60
     if(!exists("variables")) variables = "variables"
     assay(se) <- missForest::missForest(assay(se),ntree = 60, parallelize="variables",...)$ximp
+  }else if(fun == "GSimp"){
+    assay(se) <- GS_imp_wrapper(assay(se), ...)
+  # }else if(fun == "GMSimpute"){
+  #   impassay <- GMSimpute::GMS.Lasso(assay(se),log.scale=F,TS.Lasso=TRUE)
+  #   cat("finish")
+  #   se = se[match(rownames(impassay), rownames(se))]
+  #   assay(se) <- impassay
   }else{
-    MSnSet_data <- as(se, "MSnSet")
+    MSnSet_data <- as(se, "MSnSet") # transfer to MSnSet object
     MSnSet_imputed <- MSnbase::impute(MSnSet_data, method = fun,
                                       ...)
     assay(se) <- MSnbase::exprs(MSnSet_imputed)
