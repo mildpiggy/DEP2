@@ -399,14 +399,19 @@ impute <- function (se, fun = c("bpca", "knn", "QRILC", "MLE", "MinDet",
   }
   rowData(se)$imputed <- apply(is.na(assay(se)), 1, any)
   rowData(se)$num_NAs <- rowSums(is.na(assay(se)))
+
   if (fun == "man") {
     se <- manual_impute(se, ...)
   }else if(fun == "RF"){
-    doParallel::registerDoParallel(cores=4)
-    # assay_save <- assay(se)
-    if(!exists("ntree")) ntree = 60
-    if(!exists("variables")) variables = "variables"
-    assay(se) <- missForest::missForest(assay(se),ntree = 60, parallelize="variables",...)$ximp
+    args <- list(...)
+    if(! "ntree" %in% names(args))
+      args[["ntree"]] = 60
+    if(! "parallelize" %in% names(args) )
+      args[["parallelize"]] = "variables"
+    args$xmis = assay(se)
+    doParallel::registerDoParallel(cores=2)
+    assay(se) <- do.call(missForest::missForest, args)$ximp
+    doParallel::stopImplicitCluster()
   }else if(fun == "GSimp"){
     assay(se) <- GS_imp_wrapper(assay(se), ...)
   # }else if(fun == "GMSimpute"){
