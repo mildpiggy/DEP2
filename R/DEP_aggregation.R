@@ -88,7 +88,7 @@ make_pe <- function(Peptide, columns,
 
   QF[[assay_name]]@colData = as(expdesign, "DataFrame")
   colData(QF) = as(expdesign, "DataFrame")
-  QF <- zeroIsNA(QF, assay_name)
+  QF <- QFeatures::zeroIsNA(QF, assay_name)
   if(log2transform){ ## log2 Transform
     assay(QF[[1]]) = log2(assay(QF[[1]]))
   }
@@ -183,7 +183,7 @@ make_pe_parse <- function(Peptide,
 
   QF[[assay_name]]@colData = as(expdesign, "DataFrame")
   colData(QF) = as(expdesign, "DataFrame")
-  QF <- zeroIsNA(QF, assay_name)
+  QF <- QFeatures::zeroIsNA(QF, assay_name)
   if(log2transform){ ## log2 Transform
     assay(QF[[1]]) = log2(assay(QF[[1]]))
   }
