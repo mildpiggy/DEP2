@@ -23,10 +23,10 @@ Imports:
     DEP, ComplexHeatmap, dplyr, tidyr, tibble, data.table, ggplot2, MsCoreUtils, methods, assertthat,
     limma, MSnbase, missForest, purrr, QFeatures, DESeq2, readr, SummarizedExperiment (>= 1.11.5), 
     vsn, fdrtool, lazyeval, S4Vectors, clusterProfiler(>= 4.3.1.900), clusterProfiler.dplyr,
-    RColorBrewer, circlize, shiny, rmarkdown, DT, msigdbr, rlang,
+    RColorBrewer, circlize, shiny, rmarkdown, DT, msigdbr, rlang, glmnet,
     ggrepel,
     colourpicker,
-    shinyvalidate, shinyWidgets, shinythemes, shinyBS, shinyFeedback, shinydashboardPlus,
+    shinyvalidate, shinyWidgets, shinythemes, shinyBS, shinyFeedback, shinydashboardPlus, dndselectr,
     ggVennDiagram,
     TCseq,
     Rtsne,
@@ -35,7 +35,6 @@ Imports:
     visNetwork,
     msigdbr,
     ReactomePA,
-    dndselectr,
     IHW, ashr, apeglm
 Remotes:
     serenity-r/dndselectr,
