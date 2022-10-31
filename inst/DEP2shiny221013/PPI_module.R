@@ -519,7 +519,7 @@ PPI_server_module <- function(id, Omics_res) {
 
             # require(orgDbname, character.only = TRUE)
             # orgDB = get(orgDbname)
-            # geneID = map_to_entrezid(gene_name(), orgDB = orgDB)
+            # geneID = DEP2:::map_to_entrezid(gene_name(), orgDB = orgDB)
             # validate(need(nrow(geneID) > 1, "No genes (or less than 2) meet your requirements, and can not do the PPI(Protein-Protein Interaction Network) analysis!"))
 
             validate(

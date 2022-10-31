@@ -311,7 +311,7 @@ ORA_server_module2 <- function(id, Omics_res) {
         require(pkg, character.only = TRUE)
         print("loading species annotation data")
         orgDB <- get(pkg)
-        gene_id_table <- map_to_entrezid(as.character(gene_df$name), orgDB = orgDB)
+        gene_id_table <- DEP2:::map_to_entrezid(as.character(gene_df$name), orgDB = orgDB)
         ids <- gene_id_table %>% tibble::rownames_to_column() %>%
           dplyr::rename(., name = rowname, ENTREZID = id) %>% dplyr::select(name, ENTREZID) ## 2 cols table: name(from) & ENTREZID(to)
         # %>% filter(!is.na(ENTREZID)) %>% filter(!duplicated(ENTREZID))
