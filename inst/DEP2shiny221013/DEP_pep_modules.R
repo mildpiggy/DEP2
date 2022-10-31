@@ -1360,9 +1360,11 @@ DEP_pep_server_module <- function(id){
         # unique_names <- make_unique(proteins = filtered, names = ifelse(input$name == "", input$id, input$name), ids = ifelse(input$id == "", input$name, input$id), delim = input$delim)
         rowData(data) <- DEP2::make_unique(rowData(data) %>% as.data.frame(),
                                            names =  ifelse(input$name == "",
-                                                           ifelse(input$aggregate_Peptide_Type == "Unique + Razor", "smallestProteingroups", input$id),
+                                                           "smallestProteingroups",
+                                                           # ifelse(input$aggregate_Peptide_Type == "Unique + Razor", "smallestProteingroups", input$id),
                                                            input$name),
-                                           ids = ifelse(input$aggregate_Peptide_Type == "Unique + Razor", "smallestProteingroups", input$id),
+                                           ids = "smallestProteingroups",
+                                             # ifelse(input$aggregate_Peptide_Type == "Unique + Razor", "smallestProteingroups", input$id),
                                            delim = input$delim)
         rownames(data) <- rowData(data)$name
         cat("Make_unique finished")

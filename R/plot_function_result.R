@@ -357,7 +357,7 @@ setGeneric("plot_heatmap", function(object,
                                     split_order = NULL,
                                     label_few_peptide_rows = FALSE,
                                     chooseToshow = NULL,
-                                    plot = TRUE,
+                                    plot = TRUE, seed = 42,
                                     ...) {
   standardGeneric("plot_heatmap")
 })
@@ -408,6 +408,8 @@ setGeneric("plot_heatmap", function(object,
 #' If \code{TRUE} (default) the heatmap is produced.
 #' Otherwise (if \code{FALSE}), the data which the
 #' heatmap is based on are returned.
+#' @param seed Integer(1), the random seed that effect kmeans cluster in heatmap.
+#' Preset a seed could a repeatable cluster result.
 #' @param ... Other parameters to \code{\link[ComplexHeatmap]{Heatmap}}.
 #'
 #' @return
@@ -427,6 +429,7 @@ setMethod("plot_heatmap",
                              color = color, col_limit = col_limit, indicate = indicate, row_font_size = row_font_size,
                              col_font_size = col_font_size, clustering_distance = clustering_distance, split_order = split_order,
                              label_few_peptide_rows = label_few_peptide_rows, chooseToshow = chooseToshow, plot = plot,
+                             seed = seed,
                              ...)
           }
 )
@@ -444,7 +447,7 @@ setMethod("plot_heatmap",
                              label_few_peptide_rows = FALSE,
                              # if_chooseToshow = FALSE,
                              chooseToshow = NULL,
-                             plot = TRUE, ...)
+                             plot = TRUE, seed = 42,...)
 {
   # library(ComplexHeatmap)
   # library(tidyr)
@@ -564,7 +567,7 @@ setMethod("plot_heatmap",
     kmeans <- FALSE
   }
   if(kmeans & !obs_NA) {
-    set.seed(1)
+    set.seed(seed)
     df_kmeans <- kmeans(df, k)
     if(type == "centered") {
       # Order the k-means clusters according to the maximum fold change
@@ -704,7 +707,7 @@ setMethod("plot_heatmap",
                                   type = type, manual_contrast = manual_contrast, kmeans = kmeans, k = k,
                                   color = color, col_limit = col_limit, indicate = indicate, row_font_size = row_font_size,
                                   col_font_size = col_font_size, clustering_distance = clustering_distance, split_order = split_order,
-                                  chooseToshow = chooseToshow, plot = plot,
+                                  chooseToshow = chooseToshow, plot = plot, seed = seed,
                                   ...)
           }
 )
@@ -723,7 +726,7 @@ setMethod("plot_heatmap",
                                   # label_few_peptide_rows = FALSE,
                                   # if_chooseToshow = FALSE,
                                   chooseToshow = NULL,
-                                  plot = TRUE, ...
+                                  plot = TRUE, seed = 42, ...
                                   )
 {
 
@@ -849,7 +852,7 @@ setMethod("plot_heatmap",
     kmeans <- FALSE
   }
   if(kmeans & !obs_NA) {
-    set.seed(1)
+    set.seed(seed)
     df_kmeans <- kmeans(df, k)
     if(type == "centered") {
       # Order the k-means clusters according to the maximum fold change
@@ -1335,11 +1338,12 @@ plot_volcano <- function (object, contrast = get_contrast(object)[1],
     }
   }
   # df$change
-  df_save <<- df
   p <- ggplot(df, aes(x, y)) + geom_vline(xintercept = 0) +
     geom_point(aes(col = change),size = dot_size) +
-    geom_text(data = data.frame(), aes(x = c(Inf, -Inf), y = c(-Inf, -Inf), hjust = c(1,
-                                                                                      0), vjust = c(-1, -1), label = c(name1, name2), size = 5, fontface = "bold")) +
+    geom_text(data = data.frame(),
+              aes(x = c(Inf, -Inf), y = c(-Inf, -Inf),
+                  hjust = c(1,0), vjust = c(-1, -1),
+                  label = c(name1, name2), size = 5, fontface = "bold")) +
     #scale_x_continuous(limits = c(-xlimit, xlimit), breaks = seq(-15, 15, by = 5)) +
     labs(title = contrast,
          x = expression(log[2] ~ "Fold change")) + theme_DEP1() +
@@ -1383,23 +1387,34 @@ plot_volcano <- function (object, contrast = get_contrast(object)[1],
     p <- p + scale_x_continuous(limits = c(-xlimit, xlimit), breaks = breaks)
   }
 
+  ## plot the cutoff line and cutoff parameters.
   linetype = 4
   if(add_threshold_line == "curve"){
+    message("add curve threshold line." ," σ = ", σ, ", x0 = ", x0,", curvature = ", curvature )
+    y_max <- layer_scales(p)$y$range$range[2] # store the y scale
     p <- p + stat_function(fun=curve_fun1,
                            xlim=c(x0,xlimit),
                            colour=up_color,linetype=linetype,lwd=0.6)
     p <- p + stat_function(fun=curve_fun2,
                            xlim=c(-xlimit,-x0),
                            colour=down_color,linetype=linetype,lwd=0.6)
+    p <- p + ylim(0,y_max) # recover the y-axis scale
+    p <- p + labs(subtitle =
+                    bquote(
+                      italic(log[10](p) ) > frac(italic(c), abs(italic(lfc)) - italic(x[0])) ~ "&" ~ italic(abs(lfc) > x0)
+                      ~";"~italic(x[0]) == .(x0_fold) %*% .(round(σ,4))~italic(c) == .(round(curvature,3))
+                    )
+    ) + theme(plot.subtitle = element_text(hjust = 0.5))
+
   }else if(add_threshold_line == "intersect"){
-    cat("add_threshold_line")
+    message("add intersect threshold line." ," fcCutoff = ", fcCutoff, "pCutoff = ", pCutoff)
     p <- p + geom_vline(xintercept=c(-fcCutoff,fcCutoff),linetype=linetype, col=c(down_color, up_color),lwd=0.6)
     p <- p + geom_hline(yintercept=-log10(pCutoff),linetype=linetype, col=stable_color,lwd=0.6)
-    # if(adjusted){#for adjust pvalue
-    #   p <- p + geom_hline(yintercept=-log10(pCutoff),linetype=linetype, col=stable_color,lwd=0.6)
-    # }else {#for pvalue
-    #   p <- p + geom_hline(yintercept=min(test$y[!test$change == "stable"]),linetype=linetype, col=stable_color,lwd=0.6)
-    # }
+    p <- p + labs(subtitle = bquote(
+      fcCutoff==.(fcCutoff)~";"~pCutoff==.(pCutoff)
+    ))+
+                    # paste0("fcCutoff=", fcCutoff, "; pCutoff=", pCutoff)) +
+      theme(plot.subtitle = element_text(hjust = 0.5))
   }
 
   if (plot) {
@@ -1552,3 +1567,125 @@ plot_multi_venn <- function(omics_list, to_upper = F, plot = T){
 
 
 
+#' Fit a Gaussian distribution for L2FC of each contrast
+#'
+#' \code{plot_diff_hist} fit a Gaussian distribution for L2FC in each contrast.
+#' The L2FC value is firstly filter out outlier, and then fit to normal curve based on likelihood.
+#'
+#' @param object a SummarizedExperiment or DEGdata output from \code{test_diff} or \code{test_diff_deg}
+#' @param contrasts Character, the contrast in object
+#' @param plot Logical(1), if TRUE return histogram(s) of L2FC in each contras with fitted normal curve.
+#' if FALSE return the fitting result, mu and sigma of Gaussian distribution
+#' @export
+plot_diff_hist <- function(object, contrasts = NULL, plot = T){
+  assertthat::assert_that(class(object) %in% c("SummarizedExperiment",
+                                               "DEGdata"))
+  # statistic = unique(statistic)
+  col_data = colData(object)
+  row_data = rowData(object)
+  if (length(grep("_diff", colnames(row_data))) < 1) {
+    stop(paste0("'[contrast]_diff' columns are not present in '",
+                deparse(substitute(object)), "'.\nRun test_diff() or test_diff_deg() to obtain the required columns."),
+         call. = FALSE)
+  }
+
+  exist_contrasts = get_contrast(object)
+  if (is.null(contrasts)) {
+    contrasts = exist_contrasts
+  }else if (any(!contrasts %in% exist_contrasts)) {
+    if (all(!contrasts %in% exist_contrasts)) {
+      stop("Input contrasts: ", paste0(contrasts, collapse = ", "),
+           " don't exists. Contrasts should be: ", paste0(exist_contrasts,
+                                                          collapse = ", "))
+    }
+    else {
+      warning("Input contrasts: ", paste0(contrasts[which(!contrasts %in%
+                                                            exist_contrasts)], collapse = ", "), " don't exists. Only perform on: ",
+              paste0(intersect(contrasts, exist_contrasts),
+                     collapse = ", "))
+      contrasts = intersect(contrasts, exist_contrasts)
+    }
+  }
+
+  ## get l2fc data
+  statistics_df = row_data[,paste0(contrasts,"_diff"),drop = F] %>% data.frame()
+  ## fit sigma and mu of normal distribution for each contrast
+  fit_res <- apply(statistics_df, 2, function(x){
+    x = DEP2:::fun.outlier(as.vector(x),time.iqr = 1.5) %>% na.omit()
+    fit = DEP2:::fitnormal(x)
+    return(fit$theta)
+  })
+  fit_res = fit_res %>% t %>% data.frame %>% rownames_to_column(var = "contrast")
+
+  if(plot){ ## plot hist with gaussian curve
+    statistics_df <- statistics_df %>% rownames_to_column(var = "name") %>%
+      gather(., "contrasts",value = "diff", -name) %>%
+      mutate(contrasts = gsub("_diff$","",contrasts))
+
+    ps <- lapply(contrasts, function(thecontrasts){
+      the_statistics_df = statistics_df %>% filter(contrasts == thecontrasts)
+      the_fit_res = fit_res  %>% filter(contrasts == thecontrasts)
+      ggplot(the_statistics_df) +
+        geom_histogram(aes(x = diff, y = after_stat(density)), bins = 60)+
+        geom_function(fun = dnorm, args = list(mean = the_fit_res$mu, sd = sqrt(the_fit_res$sigma2)), colour = "blue3") +
+        labs(title = paste("L2FC", thecontrasts),
+             subtitle = bquote(italic(N)(mu == .(round(the_fit_res$mu,5)), sigma^2 == .(round(the_fit_res$sigma2,5)) ))) +
+        theme_DEP2() + theme(plot.subtitle = element_text(hjust=1))
+      # +xlim(quantile(the_statistics_df$diff,0.25) - 4*IQR(the_statistics_df$diff),
+      #        quantile(the_statistics_df$diff,0.75) + 4*IQR(the_statistics_df$diff))
+    })
+
+    if(length(ps) > 1){
+      return(multiplot(plotlist  = ps, cols=2))
+    }else{ ## one contrast
+      return(ps[[1]]) }
+  }else{
+    return(fit_res)
+  }
+}
+
+# Multiple plot function from cookbook-r
+#
+# ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
+# - cols:   Number of columns in layout
+# - layout: A matrix specifying the layout. If present, 'cols' is ignored.
+#
+# If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
+# then plot 1 will go in the upper left, 2 will go in the upper right, and
+# 3 will go all the way across the bottom.
+#
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                     ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+  if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}

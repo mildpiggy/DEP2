@@ -18,7 +18,8 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Suggests: 
     testthat (>= 3.0.0),
-    knitr
+    knitr,
+    ggridges
 Imports: 
     DEP, ComplexHeatmap, dplyr, tidyr, tibble, data.table, ggplot2, MsCoreUtils, methods, assertthat,
     limma, MSnbase, missForest, purrr, QFeatures, DESeq2, readr, SummarizedExperiment (>= 1.11.5), 

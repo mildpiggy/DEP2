@@ -33,8 +33,8 @@ The condition to which contrasts are generated if type = "control"
 
 \item{test}{Character,
 The contrasts that will be tested if type = "manual".
-These should be formatted as "SampleA_vs_SampleB" or
-c("SampleA_vs_SampleC", "SampleB_vs_SampleC").}
+These should be formatted as "conditionA_vs_conditionB" or
+c("conditionA_vs_conditionC", "conditionB_vs_conditionC").}
 
 \item{design_formula}{Formula,
 Used to create the design matrix.}

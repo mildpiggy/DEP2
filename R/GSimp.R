@@ -5,12 +5,11 @@
 #'
 #' @param data a assay
 #'
-GS_imp_wrapper <- function(data, log = F, iters_each=50, iters_all=10,
-                                      lo=-Inf, hi= 'min', n_cores=1) {
+GS_imp_wrapper <- function(data, log = F, iters_each=50, iters_all = 10,
+                           lo = -Inf, hi = NULL, hi_q = 0.15, n_cores = 1) {
   if(is.matrix(data)){
     data_raw <- as.data.frame(data)
   }else data_raw <- data
-
 
   ## log transformation ##
   if(log){
@@ -34,10 +33,16 @@ GS_imp_wrapper <- function(data, log = F, iters_each=50, iters_all=10,
   ## bala bala bala ##
   data_raw_log_sc <- data_raw_log_qrilc_sc_df
   data_raw_log_sc[NA_pos] <- NA
+
+  ## Give hi a value by hi_q
+  if(is.null(hi)){
+    hi = apply(data_raw_log_sc, 2, quantile, probs = hi_q, na.rm = T)  %>% as.vector()
+  }
+
   ## GSimp imputation with initialized data and missing data ##
   result <- data_raw_log_sc %>% GS_impute(., iters_each=iters_each, iters_all=iters_all,
                                           initial = data_raw_log_qrilc_sc_df,
-                                          lo=-Inf, hi= 'min', n_cores=1,
+                                          lo=lo, hi= hi, n_cores=1,  # notice that lo and hi is to scaled data, not input data
                                           imp_model='glmnet_pred')
   data_imp_log_sc <- result$data_imp
   ## Data recovery ##
@@ -83,6 +88,7 @@ scale_recover <- function(data, method='scale', param_df = NULL) {
 multi_impute <- function(data_miss, iters_each=50, iters_all=20, initial='qrilc', lo=-Inf, hi='min',
                          n_cores=1, imp_model='glmnet_pred', gibbs=data.frame(row=integer(), col=integer())) {
   ## Convert to data.frame ##
+  `%<>%` <- magrittr::`%<>%`
   data_miss %<>% data.frame()
 
   ## Make vector for iters_each ##
@@ -96,7 +102,7 @@ multi_impute <- function(data_miss, iters_each=50, iters_all=20, initial='qrilc'
   ## Missing count in each column ##
   miss_count <- data_miss %>% apply(., 2, function(x) sum(is.na(x)))
   ## Index of missing variables, sorted (increasing) by the number of missings
-  miss_col_idx <- order(miss_count, decreasing = T) %>% extract(1:sum(miss_count!=0)) %>% rev()
+  miss_col_idx <- order(miss_count, decreasing = T) %>% magrittr::extract(1:sum(miss_count!=0)) %>% rev()
 
   if (!all(gibbs$col %in% miss_col_idx)) {stop('improper argument: gibbs')}
   gibbs_sort <- gibbs
@@ -150,7 +156,7 @@ multi_impute <- function(data_miss, iters_each=50, iters_all=20, initial='qrilc'
       ## Parallel on missing variables
       cl <- makeCluster(n_cores)
       doParallel::registerDoParallel(cl)
-      core_res <- foreach (k=miss_col_idx, .combine='cbind_abind', .export=c('single_impute_iters', 'rnorm_trunc'), .packages=c('magrittr')) %dopar% {
+      core_res <- foreach::foreach (k=miss_col_idx, .combine='cbind_abind', .export=c('single_impute_iters', 'rnorm_trunc'), .packages=c('magrittr')) %dopar% {
         # source('Prediction_funcs.R')
         gibbs_sort_temp <- gibbs_sort[gibbs_sort$col==k, ]
         y_imp_res <- single_impute_iters(data_imp[, -k], data_imp[, k], data_miss[, k], imp_model=imp_model,
@@ -174,7 +180,7 @@ multi_impute <- function(data_miss, iters_each=50, iters_all=20, initial='qrilc'
         y_imp_res <- single_impute_iters(data_imp[, -j], data_imp[, j], y_miss, imp_model=imp_model, lo=lo_vec[j], hi=hi_vec[j],
                                          iters_each=iters_each[i], gibbs=gibbs_sort_temp$row)
         y_imp <- y_imp_res$y_imp
-        gibbs_res_j <- abind(gibbs_res_j, y_imp_res$gibbs_res, along=2)
+        gibbs_res_j <- abind::abind(gibbs_res_j, y_imp_res$gibbs_res, along=2)
         data_imp[is.na(y_miss), j] <- y_imp[is.na(y_miss)]
       }
       gibbs_res_final <- abind::abind(gibbs_res_final, gibbs_res_j, along=3)

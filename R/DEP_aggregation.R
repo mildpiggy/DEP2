@@ -214,19 +214,22 @@ make_pe_parse <- function(Peptide,
 filter_pe <- function(pe,
                       thr = NULL,
                       missnum = NULL,
+                      fraction = NULL,
                       filter_formula = NULL,
                       assay_name = "peptideRaw",
                       return_keeprows = F){
   if(is.character(filter_formula) & length(filter_formula) == 1) filter_formula = as.formula(filter_formula)
   assertthat::assert_that(class(pe) == "QFeatures", is.null(thr)|is.numeric(thr), is.null(missnum)|is.numeric(missnum),
-                          is.character(assay_name), length(assay_name) == 1, rlang::is_formula(filter_formula))
+                          is.character(assay_name), length(assay_name) == 1, rlang::is_formula(filter_formula),
+                          is.null(fraction)|is.numeric(fraction), is.null(fraction)|length(fraction) == 1)
 
   if(!assay_name %in% names(pe))
     stop("'assay_name' should be one of exist assay in ", deparse(substitute(pe)),": ", paste(names(pe),collapse = ", "))
     # stop("'assay_name' do not exist in pe, please validate")
 
   se <- pe[["peptideRaw"]]
-  keep_row = filter_se(se, thr = thr, missnum = missnum, filter_formula = filter_formula,return_keeprows = T)
+  keep_row = filter_se(se, thr = thr, missnum = missnum, fraction = fraction,
+                       filter_formula = filter_formula,return_keeprows = T)
   if(return_keeprows) return(keep_row)
   pe = pe[keep_row,]
   return(pe)
@@ -235,7 +238,7 @@ filter_pe <- function(pe,
 
 
 # aggregation functions
-## modified from QFeatures:::reduceDataFrame, add reserve.
+## modified from QFeatures:::reduceDataFrame, add reserve to trim the row DF.
 #' @import  QFeatures
 #' @importFrom S4Vectors split
 reducedataframe <- function (x, k, count = FALSE, simplify = TRUE, drop = FALSE, reserve)
@@ -321,14 +324,13 @@ invariant_cols2 <- function (x)
   ## If the input objects weren't SummarizedExperiments, then try to
   ## convert the merged assay into that class. If the conversion
   ## fails, keep the SummarizedExperiment, otherwise use the
-  ## converted object (see issue #78).
+  ## converted object .
   if (.class != "SummarizedExperiment")
     se <- tryCatch(as(se, .class),
                    error = function(e) se)
 
   return(se)
 }
-# environment(.aggregateSE) = asNamespace("QFeatures")
 
 
 ## distribute razor peptides
@@ -439,6 +441,7 @@ aggregateFeatures = function(object, i, fcol, name = "newAssay",
 #' @param i 	A numeric vector or a character vector giving the index or the name, respectively, of the assay(s) to be processed.
 #' @param name  Character(1) naming the new normalized assay name.
 #' @importFrom QFeatures normalize
+#' @export
 normalize_pe <- function(pe, method = c("diff.median", "quantiles", "quantiles.robust" ,"vsn"), i = "peptideRaw", name = "peptideNorm"){
   method = match.arg(method)
   if(is.character(i) && !i %in% names(pe)) stop("'i' should be one of exist assay in ", deparse(substitute(pe)),": ", paste(names(pe),collapse = ", "))
@@ -489,7 +492,7 @@ normalize_pe <- function(pe, method = c("diff.median", "quantiles", "quantiles.r
 #' @export
 #'
 #' @examples
-aggregate_pe <- function(pe, aggrefun = c("RobustSummary","medianPolish","totalMean"), aggregate_Peptide_Type = c("Unique + Razor", "unique"),
+aggregate_pe <- function(pe, aggrefun = c("RobustSummary","medianPolish","totalMean"), aggregate_Peptide_Type = c("Unique + Razor", "Unique"),
                          fcol, peptide_assay_name = "peptideNorm", reserve = "Gene.names"
 ){
   aggregate_Peptide_Type <- match.arg(aggregate_Peptide_Type)
@@ -507,13 +510,13 @@ aggregate_pe <- function(pe, aggrefun = c("RobustSummary","medianPolish","totalM
   if(!peptide_assay_name %in% names(pe))
     stop("'peptide_assay_name' should be one of exist assay in ", deparse(substitute(pe)),": ", paste(names(pe),collapse = ", "))
 
-  if(aggregate_Peptide_Type == "unique"){
+  if(aggregate_Peptide_Type == "Unique"){
     fil_formula <- as.formula( paste0("~",fcol," %in% smallestUniqueGroups(rowData(pe[['",peptide_assay_name ,"']])$",fcol,")") )
-    pe <- filter_pe(pe, fil_formula, assay_name =  peptide_assay_name )
+    pe <- filter_pe(pe, filter_formula = fil_formula, assay_name =  peptide_assay_name )
     print("aggregate by uniques peptides, filterFeatures finished")
 
     protein = suppressWarnings({DEP2:::aggregateFeatures(object = pe ,
-                                                  i = peptide_assay_name, fcol = "smallestProteingroups",
+                                                  i = peptide_assay_name, fcol = fcol,
                                                   name = "protein",
                                                   fun = aggrefun,
                                                   na.rm = T,

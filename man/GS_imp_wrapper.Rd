@@ -10,7 +10,8 @@ GS_imp_wrapper(
   iters_each = 50,
   iters_all = 10,
   lo = -Inf,
-  hi = "min",
+  hi = NULL,
+  hi_q = 0.15,
   n_cores = 1
 )
 }

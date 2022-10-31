@@ -534,8 +534,8 @@ manual_impute <- function(se, scale = 0.3, shift = 1.8) {
 #' (a control condition would be most appropriate).
 #' @param test Character,
 #' The contrasts that will be tested if type = "manual".
-#' These should be formatted as "SampleA_vs_SampleB" or
-#' c("SampleA_vs_SampleC", "SampleB_vs_SampleC").
+#' These should be formatted as "conditionA_vs_conditionB" or
+#' c("conditionA_vs_conditionC", "conditionB_vs_conditionC").
 #' @param design_formula Formula,
 #' Used to create the design matrix.
 #' @param fdr.type Character(1), the method to control false discovery rate,
@@ -951,6 +951,7 @@ fun.outlier <- function(x,time.iqr=1.5) {
   x
 }
 
+## fit Gaussian distribution for numeric vector x
 fitnormal <- function (x, exact = TRUE) {
   if (exact) {
     ################################################
@@ -1036,6 +1037,7 @@ Order_cols <- function(object, order, order_column = "condition"){
   object = object[,order(colData(object)[,order_column])]
   return(object)
 }
+
 
 
 
