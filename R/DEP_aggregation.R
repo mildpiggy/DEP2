@@ -116,6 +116,8 @@ make_pe <- function(Peptide, columns,
 #' (only for mode == "delim").
 #' @param remove_prefix Logical(1),
 #' whether remove the prefix of expression columns.
+#' @param remove_suffix Logical(1),
+#' whether remove the suffix of expression columns.
 #'
 #' @return
 #' An character(1) to name assay in the QFeatures object.
@@ -126,7 +128,8 @@ make_pe_parse <- function(Peptide,
                           columns,
                           fnames,
                           mode = c("char", "delim"),
-                          chars = 1, sep = "_", remove_prefix = T,
+                          chars = 1, sep = "_",
+                          remove_prefix = T, remove_suffix = F,
                           assay_name = "peptideRaw",
                           log2transform = T){
   assertthat::assert_that(is.data.frame(Peptide), is.numeric(columns)|is.integer(columns)| is.character(columns),
@@ -151,6 +154,9 @@ make_pe_parse <- function(Peptide,
 
   if(remove_prefix){
     colnames(Peptide)[columns] <- DEP2:::delete_prefix(colnames(Peptide)[columns]) %>% make.names()
+  }
+  if(remove_suffix){
+    colnames(raw) <- delete_suffix(colnames(raw)) %>% make.names()
   }
   if (mode == "char") {
     expdesign <- data.frame(label = colnames(Peptide)[columns], stringsAsFactors = FALSE) %>%
@@ -440,7 +446,9 @@ aggregateFeatures = function(object, i, fcol, name = "newAssay",
 #' @param method 	Character(1), normalisation method, one of "diff.median", "quantiles", "quantiles.robust" or "vsn".
 #' @param i 	A numeric vector or a character vector giving the index or the name, respectively, of the assay(s) to be processed.
 #' @param name  Character(1) naming the new normalized assay name.
+#'
 #' @importFrom QFeatures normalize
+#'
 #' @export
 normalize_pe <- function(pe, method = c("diff.median", "quantiles", "quantiles.robust" ,"vsn"), i = "peptideRaw", name = "peptideNorm"){
   method = match.arg(method)

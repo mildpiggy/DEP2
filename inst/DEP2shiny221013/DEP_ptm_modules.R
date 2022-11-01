@@ -26,12 +26,12 @@ DEP_ptm_sidebar_mod <-  function(id){
                           #              label = "", icon = icon("bell")
                           #      )),
                           column(width = 9,
-                                 fileInput(ns('file1_ptm'),width = "300px",
+                                 fileInput(ns('file1'),width = "300px",
                                            'PTM Sites.txt',
                                            accept=c('text/csv',
                                                     'text/comma-separated-values,text/plain',
                                                     '.csv')),
-                                 fileInput(ns('file2_ptm'),width = "300px",
+                                 fileInput(ns('file2'),width = "300px",
                                            'ExperimentalDesign.txt',
                                            accept=c('text/csv',
                                                     'text/comma-separated-values,text/plain',
@@ -52,7 +52,7 @@ DEP_ptm_sidebar_mod <-  function(id){
                               options = list(container = "body")
                             )
                           )),
-                        radioButtons(ns("anno_ptm"),
+                        radioButtons(ns("anno"),
                                      "Sample annotation",
                                      choices = list("Parse from columns" = "columns",
                                                     "Use Experimental Design" = "expdesign"),
@@ -67,7 +67,7 @@ DEP_ptm_sidebar_mod <-  function(id){
                         uiOutput(ns("amino_acid_ptm")),
                         uiOutput(ns("aa_position_ptm")),
                         selectizeInput(ns("delim_ptm"), "Delimiter", choices = c(";", "|"), selected = ";"),
-                        uiOutput(ns("intensitycols_ptm")),
+                        uiOutput(ns("intensitycols")),
                         uiOutput(ns("filt_ptm")),#input.peptidescol !== ''
                         uiOutput(ns("filt_num_cutoff_ptm")),
                         conditionalPanel(condition = paste0("input['",ns("filt_num_cutoff_ptm"),"']","!== ''"),#&& "input.filt_num_cutoff_ptm !== ''"
@@ -78,7 +78,7 @@ DEP_ptm_sidebar_mod <-  function(id){
                         ),
                         numericInput(ns("thr_ptm"), "Allowed max.miss.num at least one condition", min = 0, max = 20, value = 0),
                         uiOutput(ns("order")),
-                        uiOutput(ns("control_ptm")),
+                        uiOutput(ns("control")),
                         uiOutput(ns("test_manual_ptm"))
         ),
         bsCollapsePanel("Imputation options",
@@ -136,16 +136,16 @@ DEP_ptm_sidebar_mod <-  function(id){
         open = "Files"
       ),
 
-      shinyBS::bsTooltip(ns("anno_ptm"), "Sample annotation type", "top", options = list(container = "body")),
+      shinyBS::bsTooltip(ns("anno"), "Sample annotation type", "top", options = list(container = "body")),
       shinyBS::bsTooltip(ns("id_ptm"), "Name of the column containing feature IDs", "right", options = list(container = "body")),
       shinyBS::bsTooltip(ns("delim_ptm"), "Set the delimiter separating the name and id column", "right", options = list(container = "body")),
-      shinyBS::bsTooltip(ns("intensitycols_ptm"), "Choose the expression columns of your data", "right", options = list(container = "body")),
+      shinyBS::bsTooltip(ns("intensitycols"), "Choose the expression columns of your data", "right", options = list(container = "body")),
       # shinyBS::bsTooltip("peptidescol", "Choose the peptides column of your data. And this column should be numeric. It is only used to plot heatmap and custom volcano to color the peptides number 1 and 2 to help user check the accuracy of the quantification. Of course, if your data does not have this column, You can leave it blank", "right", options = list(container = "body")),
       shinyBS::bsTooltip(ns("filt_ptm"), "The filtered columns based on", "right", options = list(container = "body")),
       shinyBS::bsTooltip(ns("filt_num_cutoff_ptm"), "Set the column that cutoff based on (such as the location prosibility/score), and it should be numeric.", "right", options = list(container = "body")),
       shinyBS::bsTooltip(ns("filt_num_ptm"), "Set the cutoff [0 ~ 1], the rows that greater than or equal to it will be kept", "right", options = list(container = "body")),
       shinyBS::bsTooltip(ns("thr_ptm"), "Set the threshold for the allowed number of missing values in at least one condition", "right", options = list(container = "body")),
-      shinyBS::bsTooltip(ns("control_ptm"), "Choose your control condition", "right", options = list(container = "body")),
+      shinyBS::bsTooltip(ns("control"), "Choose your control condition", "right", options = list(container = "body")),
       shinyBS::bsTooltip(ns("test_manual_ptm"), "Choose the contrasts that you want to test", "right", options = list(container = "body")),
       actionButton(ns("analyze_ptm"), "Analyze"),
 
@@ -223,7 +223,7 @@ DEP_ptm_body_mod <- function(id){
                                  c("contrast", "centered"),
                                  selected = "centered"),
                     width = 2),
-                box(radioButtons(inputId = ns("contrasts_ptm"),
+                box(radioButtons(inputId = ns("contrasts"),
                                  label = "Contrasts",
                                  choices = c("control", "all", "manual"),
                                  selected = "control", inline = TRUE),
@@ -233,7 +233,7 @@ DEP_ptm_body_mod <- function(id){
                 shinyBS::bsTooltip(ns("curvature_ptm"), "Set the curvature threshold", "top", options = list(container = "body")),
                 shinyBS::bsTooltip(ns("x0_fold_ptm"), "Set the x0 fold threshold, it decides the x0 ratio to the standard deviations of L2FC", "top", options = list(container = "body")),
                 shinyBS::bsTooltip(ns("pres_ptm"), "The type of data scaling used for heatmap plotting. Either the fold change (contrast) or the centered log2-intensity (centered)", "top", options = list(container = "body")),
-                shinyBS::bsTooltip(ns("contrasts_ptm"), "The type of contrasts that will be tested. This can be all possible pairwise comparisons (all), limited to the comparisons versus the control (control), or manually defined contrasts (manual)", "top", options = list(container = "body"))
+                shinyBS::bsTooltip(ns("contrasts"), "The type of contrasts that will be tested. This can be all possible pairwise comparisons (all), limited to the comparisons versus the control (control), or manually defined contrasts (manual)", "top", options = list(container = "body"))
               ),
               fluidRow(
                 column(width = 7,
@@ -888,65 +888,73 @@ DEP_ptm_server_module <- function(id, Omics_res){
 
         ### UI functions ### --------------------------------------------------------
         output$name_ptm <- renderUI({
-          shiny::validate(need(!is.null(data_ptm()), " "))
+          shiny::validate(need(!is.null(data()), " "))
           selectizeInput(session$ns("name_ptm"),
                          "Gene name column",
-                         choices=colnames(data_ptm()),
+                         choices=colnames(data()),
                          selected = "Gene.names")
         })
 
         output$id_ptm <- renderUI({
-          shiny::validate(need(!is.null(data_ptm()), " "))
+          shiny::validate(need(!is.null(data()), " "))
           selectizeInput(session$ns("id_ptm"),
                          "Protin ID column",
-                         choices=colnames(data_ptm()),
+                         choices=colnames(data()),
                          selected = "Protein")
         })
 
         output$amino_acid_ptm <- renderUI({
           selectizeInput(session$ns("amino_acid_ptm"),
                          "Amino acid column",
-                         choices=colnames(data_ptm()),
+                         choices=colnames(data()),
                          selected = "Amino.acid")
         })
 
         output$aa_position_ptm <- renderUI({
           selectizeInput(session$ns("aa_position_ptm"),
                          "Amino acid position column",
-                         choices=colnames(data_ptm()),
+                         choices=colnames(data()),
                          selected = "Position")
         })
 
        # output$peptidescol_ptm <- renderUI({ input$peptidescol_input_ptm})
         # peptidescol_input_ptm
         # output$peptidescol_ptm <- renderUI({
-        #   if("Peptides" %in% colnames(data_ptm())){
+        #   if("Peptides" %in% colnames(data())){
         #     return(selectizeInput("peptidescol_ptm",
         #                    "peptide column",
-        #                    choices=c(colnames(data_ptm()), ""),
+        #                    choices=c(colnames(data()), ""),
         #                    selected = "Peptides"))
         #   }else{
         #     return(selectizeInput("peptidescol_ptm",
         #                    "peptide column",
-        #                    choices=c("", colnames(data_ptm())),
+        #                    choices=c("", colnames(data())),
         #                    selected = NULL))
         #   }
         # })
-        output$intensitycols_ptm <- renderUI({
-          # LFQcols = grep("^LFQ",colnames(data_ptm()),value = T)
-          # if(length(LFQcols)==0) grep("^Intensity",colnames(data_ptm()),value = T)
-          # if(length(LFQcols)==0) grep("^intensity",colnames(data_ptm()),value = T)
-          # if(length(LFQcols)==0) grep("^intensity",colnames(data_ptm()),value = T)
-          # selectizeInput("intensitycols_ptm",
+        output$intensitycols <- renderUI({
+          LFQcols = grep("^LFQ",colnames(data()),value = T)
+          if(length(LFQcols)==0) LFQcols = grep("^Intensity",colnames(data()),value = T)
+          if(length(LFQcols)==0) LFQcols = grep("^intensity",colnames(data()),value = T)
+          if(length(LFQcols)==0) LFQcols = grep(".Quantity",colnames(data()),value = T)
+          if(length(LFQcols) > 0) LFQcols = LFQcols[-grep("__",LFQcols)]
+
+          # selectizeInput("intensitycols",
           #                " ",#Expression columns
-          #                choices=colnames(data_ptm()),
+          #                choices=colnames(data()),
           #                multiple = TRUE,
           #                selected = grep("^LFQ",LFQcols,value = T), width = '100%')
-          shinydashboardPlus::box(selectizeInput(session$ns("intensitycols_ptm"),
-                                                 label = "Choose the expression columns",
-                                                 choices=colnames(data_ptm()),
-                                                 multiple = TRUE,
-                                                 selected = colnames(data_ptm())[grep("^Intensity. *",colnames(data_ptm()),value = F) %>% .[!.%in%grep("__",colnames(data_ptm()),value = F)]], width = '100%'), title = "Expression columns", width = 12, icon = icon("th"), collapsible = TRUE, collapsed = TRUE, background = "light-blue")
+          bsCollapse(id = session$ns("IntensityCols"), open = "Expression columns",
+                     bsCollapsePanel("Expression columns",
+                                     selectizeInput(session$ns("intensitycols"),
+                                                    label = "Choose the expression columns",
+                                                    choices=colnames(data()),
+                                                    multiple = TRUE,
+                                                    selected = colnames(data())[grep("^Intensity. *",colnames(data()),value = F) %>%
+                                                                                  .[!.%in%grep("__",colnames(data()),value = F)]], width = '100%'),
+                                     checkboxInput(inputId = session$ns("remove_prefix"),"remove prefix of label", value = T),
+                                     checkboxInput(inputId = session$ns("remove_suffix"),"remove suffix of label", value = T)
+                                     , style = "primary"))
         })
 
 
@@ -954,7 +962,7 @@ DEP_ptm_server_module <- function(id, Omics_res){
         output$filt_ptm <- renderUI({
           selectizeInput(session$ns("filt_ptm"),
                          "Filter on columns" ,
-                         colnames(data_ptm()),
+                         colnames(data()),
                          multiple = TRUE,
                          selected = c("Reverse","Potential.contaminant"))
         })
@@ -962,30 +970,21 @@ DEP_ptm_server_module <- function(id, Omics_res){
         output$filt_num_cutoff_ptm <- renderUI({
           selectizeInput(session$ns("filt_num_cutoff_ptm"),
                          "Cutoff based on" ,
-                         colnames(data_ptm()),
+                         colnames(data()),
                          multiple = FALSE,
                          selected = c("Localization.prob"))
         })
 
         output$order <- renderUI({
-          validate(need(!is.null(input$file1_ptm), "Please upload expression ProteinGroups in Files"))
-          validate(need(!is.null(input$intensitycols_ptm), "Please select the Expression columns"))
-          validate(need(length(input$intensitycols_ptm) > 1 , "More expression columns is required"))
+          validate(need(!is.null(input$file1), "Please upload expression ProteinGroups in Files"))
+          validate(need(!is.null(input$intensitycols), "Please select the Expression columns"))
+          validate(need(length(input$intensitycols) > 1 , "More expression columns is required"))
           # groups = exp_design()[,input$groupby]
-          if (input$anno_ptm == "columns" & !is.null(data_ptm()) & input$contrasts_ptm == "control") {
-            print("aaaa")
-            my_data <- data_ptm()
-            cols <- which(colnames(data_ptm()) %in% input$intensitycols_ptm)#according to intensitycols
-            # if(input$remove_prefix){
-              prefix <- DEP2::get_prefix(data_ptm()[,cols] %>% colnames())
-              label = colnames(data_ptm())[cols] %>% gsub(prefix,"",.)
-            # }else label = colnames(data_ptm())[cols]
-            # groups
-            condition = make.names(unlist(lapply(label %>% strsplit(., split = "_"), function(x){x[1]})))
+          if (input$anno == "columns" & !is.null(data()) ) {
+            condition = expdesign()$condition
           } else {
-            print("bbb")
-            if (input$anno_ptm == "expdesign" & !is.null(expdesign_ptm()) & input$contrasts_ptm == "control") {
-              condition = make.names(expdesign_ptm()$condition)
+            if (input$anno == "expdesign" & !is.null(expdesign()) ) {
+              condition = make.names(expdesign()$condition)
             }
           }
 
@@ -995,33 +994,34 @@ DEP_ptm_server_module <- function(id, Omics_res){
                          selected = NULL, width = '100%')
         })
 
-        output$control_ptm <- renderUI({
-          validate(need(!is.null(input$file1_ptm), ""))
-          if (input$anno_ptm == "columns" & !is.null(data_ptm()) & input$contrasts_ptm == "control") {
-            my_data <- data_ptm()
-            # cols <- grep("^LFQ", colnames(data_ptm()))
-            cols <- which(colnames(data_ptm()) %in% input$intensitycols_ptm)#according to intensitycols
-            temp <- data_ptm()[,cols] %>% colnames()
-            prefix <- DEP2::get_prefix(temp)
-            selectizeInput(session$ns("control_ptm"), "Control",
-                           choices=make.names(unlist(lapply(colnames(data_ptm())[cols] %>% gsub(prefix,"",.) %>% strsplit(., split = "_"), function(x){x[1]}))), selected = NULL)
-          } else {
-            if (input$anno_ptm == "expdesign" & !is.null(expdesign_ptm()) & input$contrasts_ptm == "control") {
-              selectizeInput(session$ns("control_ptm"),
-                             "Control",
-                             choices = make.names(expdesign_ptm()$condition))
+        output$control <- renderUI({
+          validate(need(!is.null(input$file1), ""))
+          # validate(need(!is.null(input$intensitycols), "Please select the Expression columns"))
+          # validate(need(length(input$intensitycols) > 1 , "More expression columns is required"))
+
+          if(input$contrasts == "control"){
+            if (input$anno == "columns" & !is.null(data()) ) {
+              condition = make.names(expdesign()$condition)
+            } else {
+              if (input$anno == "expdesign" & !is.null(expdesign()) ) {
+                condition = make.names(expdesign()$condition)
+              }
             }
+            selectizeInput(session$ns("control"),
+                           "Control",
+                           choices = condition,
+                           selected = NULL)
           }
         })
 
 
         output$test_manual_ptm <- renderUI({
-          validate(need(!is.null(input$file1_ptm), ""))
-          if(!is.null(data_ptm()) & input$contrasts_ptm == "manual"){
-            # cols <<- grep("^LFQ", colnames(data_ptm()))
-            cols <- which(colnames(data_ptm()) %in% input$intensitycols_ptm)#according to intensitycols
-            prefix <<- get_prefix(data_ptm()[,cols] %>% colnames())
-            test_manual_name <- unique(make.names(unlist(lapply(colnames(data_ptm())[cols] %>% gsub(prefix,"",.) %>% strsplit(., split = "_"), function(x){x[1]}))))
+          validate(need(!is.null(input$file1), ""))
+          if(!is.null(data()) & input$contrasts == "manual"){
+            # cols <<- grep("^LFQ", colnames(data()))
+            cols <- which(colnames(data()) %in% input$intensitycols)#according to intensitycols
+            prefix <<- get_prefix(data()[,cols] %>% colnames())
+            test_manual_name <- unique(make.names(unlist(lapply(colnames(data())[cols] %>% gsub(prefix,"",.) %>% strsplit(., split = "_"), function(x){x[1]}))))
             test_manual_name <- cbind(combn(test_manual_name,2),combn(test_manual_name,2, FUN = rev))
             test_manual_name <- apply(test_manual_name, 2, function(i){paste(i[1], i[2], sep = "_vs_")})
             selectizeInput(session$ns("test_manual_ptm"), "Manual test",
@@ -1238,17 +1238,29 @@ DEP_ptm_server_module <- function(id, Omics_res){
         iv$enable()
 
         ### Reactive functions ### --------------------------------------------------
-        expdesign_ptm <- reactive({
-          inFile <- input$file2_ptm
-          if (is.null(inFile))
-            return(NULL)
-          read.csv(inFile$datapath, header = TRUE,
-                   sep = "\t", stringsAsFactors = FALSE) %>%
-            mutate(id = row_number())
+        expdesign <- reactive({
+          inFile <- input$file2
+          if (is.null(inFile) & (!is.null(data())) ){
+            cols <- which(colnames(data()) %in% input$intensitycols)
+            if(length(cols) == 0){
+              return(NULL)
+            }else{
+              label <- colnames(data())[cols]
+              expdesign <- get_exdesign_parse(label, mode = "delim", sep = "_",
+                                              remove_prefix = input$remove_prefix, remove_suffix = input$remove_suffix)
+              # my_expdesign <<- expdesign
+            }
+          }else{
+            read.csv(inFile$datapath, header = TRUE,
+                     sep = "\t", stringsAsFactors = FALSE) %>%
+              mutate(id = row_number())
+          }
+
+
         })
 
-        data_ptm <- reactive({
-          inFile <- input$file1_ptm
+        data <- reactive({
+          inFile <- input$file1
           if (is.null(inFile))
             return(NULL)
           my_data <<- read.csv(inFile$datapath, header = TRUE,
@@ -1256,8 +1268,8 @@ DEP_ptm_server_module <- function(id, Omics_res){
             mutate(id = row_number())
         })
 
-      #   data_ptm <- reactive({
-      #     inFile <- input$file1_ptm
+      #   data <- reactive({
+      #     inFile <- input$file1
       #     if (is.null(inFile)){
       #       cat("infile1 is null /n")
       #       return(NULL)
@@ -1277,7 +1289,7 @@ DEP_ptm_server_module <- function(id, Omics_res){
 
 
         filt0_ptm <- reactive({
-          data <- data_ptm()
+          data <- data()
           # aaaa <<- data
           # order_save <<- the_order()
           # if(is.null(input$peptidescol_ptm)|input$peptidescol_ptm==""){
@@ -1286,7 +1298,7 @@ DEP_ptm_server_module <- function(id, Omics_res){
           #   data$Peptides = data[,input$peptidescol_ptm]
           # }
 
-          cols <- which(colnames(data) %in% input$intensitycols_ptm)
+          cols <- which(colnames(data) %in% input$intensitycols)
           data[,cols] = apply(data[,cols], 2, function(x){
               x[!(!grepl("[A-z]",x) & grepl("\\d",x))] = 0
               return(as.numeric(x))
@@ -1361,11 +1373,11 @@ DEP_ptm_server_module <- function(id, Omics_res){
             filtered = filtered[-ind_empty, ]
           }
 
-          if (input$anno_ptm == "columns") {
+          if (input$anno == "columns") {
             se <- DEP2::make_se_parse(filtered, cols, mode = "delim", sep = "_")
           }
-          if (input$anno_ptm == "expdesign") {
-            se <- DEP2::make_se(filtered, cols, expdesign_ptm())
+          if (input$anno == "expdesign") {
+            se <- DEP2::make_se(filtered, cols, expdesign())
             colData(se)$replicate = as.character(colData(se)$replicate)
           }
           se_save <<- se
@@ -1447,8 +1459,8 @@ DEP_ptm_server_module <- function(id, Omics_res){
                 MSnSet <- as(sample_specific_imputation, "MSnSet")
 
                 # Impute differently for two sets of samples
-                MSnSet_imputed1 <- MSnbase::impute(MSnSet[, which(gsub("_\\d$", "", colnames(assay(sample_specific_imputation))) %in% input$control_ptm)], method = "MinProb") # control samples that need not random (MNAR) left-censored imputation
-                MSnSet_imputed2 <- MSnbase::impute(MSnSet[, -which(gsub("_\\d$", "", colnames(assay(sample_specific_imputation))) %in% input$control_ptm)], method = "knn")# treatment samples that need random(MAR) imputation
+                MSnSet_imputed1 <- MSnbase::impute(MSnSet[, which(gsub("_\\d$", "", colnames(assay(sample_specific_imputation))) %in% input$control)], method = "MinProb") # control samples that need not random (MNAR) left-censored imputation
+                MSnSet_imputed2 <- MSnbase::impute(MSnSet[, -which(gsub("_\\d$", "", colnames(assay(sample_specific_imputation))) %in% input$control)], method = "knn")# treatment samples that need random(MAR) imputation
 
                 # Combine into the SummarizedExperiment object
                 assay(sample_specific_imputation) <- cbind(
@@ -1516,17 +1528,17 @@ DEP_ptm_server_module <- function(id, Omics_res){
         # })
 
         df_ptm <- reactive({
-          if(input$contrasts_ptm == "control") {
+          if(input$contrasts == "control") {
             validate(
-              need(input$control_ptm != "", "Please select a control condition under menuItem Columns in the DEP-PTM options of the sidebar"),
-              need(all(input$intensitycols_ptm %in% colnames(data_ptm())), "Please select the Expression columns in the sidebar")
+              need(input$control != "", "Please select a control condition under menuItem Columns in the DEP-PTM options of the sidebar"),
+              need(all(input$intensitycols %in% colnames(data())), "Please select the Expression columns in the sidebar")
             )
           }
 
-        if(input$contrasts_ptm == "manual") {
+        if(input$contrasts == "manual") {
           validate(
             need(input$test_manual_ptm != "", "Please select manual contrasts to test under menuItem Columns"),
-            need(all(input$intensitycols_ptm %in% colnames(data_ptm())), "Please select the Expression columns in the sidebar")
+            need(all(input$intensitycols %in% colnames(data())), "Please select the Expression columns in the sidebar")
           )
         }
 
@@ -1537,34 +1549,34 @@ DEP_ptm_server_module <- function(id, Omics_res){
           my_imp = imp_ptm()
         }
         if(is.null(inFile1)){
-          if(input$contrasts_ptm == "control"){
-            df <- test_diff(se = my_imp, type = input$contrasts_ptm, control = input$control_ptm,
+          if(input$contrasts == "control"){
+            df <- test_diff(se = my_imp, type = input$contrasts, control = input$control,
                              fdr.type = FDR_type_ptm())
           }
 
-          if(input$contrasts_ptm == "all") {
+          if(input$contrasts == "all") {
             df <- test_diff(se = my_imp, type = "all", fdr.type = FDR_type_ptm())
           }
 
-          if(input$contrasts_ptm == "manual") {
-            df <- test_diff(se = my_imp, type = input$contrasts_ptm, test = input$test_manual_ptm,
+          if(input$contrasts == "manual") {
+            df <- test_diff(se = my_imp, type = input$contrasts, test = input$test_manual_ptm,
                             fdr.type = FDR_type_ptm())
           }
         } else {
         # load your saved RData in order to get the same result (imp is the key of if result from two analysis being the same)
           load(file = inFile1$datapath)
           my_imp <- my_imp
-          if(input$contrasts_ptm == "control"){
-            df <- test_diff(se = my_imp, type = input$contrasts_ptm, control = input$control_ptm,
+          if(input$contrasts == "control"){
+            df <- test_diff(se = my_imp, type = input$contrasts, control = input$control,
                              fdr.type = FDR_type_ptm())
           }
 
-          if(input$contrasts_ptm == "all") {
+          if(input$contrasts == "all") {
             df <- test_diff(se = my_imp, type = "all", fdr.type = FDR_type_ptm())
           }
 
-          if(input$contrasts_ptm == "manual") {
-            df <- test_diff(se = my_imp, type = input$contrasts_ptm, test = input$test_manual_ptm,
+          if(input$contrasts == "manual") {
+            df <- test_diff(se = my_imp, type = input$contrasts, test = input$test_manual_ptm,
                              fdr.type = FDR_type_ptm())
           }
         }
@@ -1575,7 +1587,7 @@ DEP_ptm_server_module <- function(id, Omics_res){
         thedf <- df_ptm
 
         # dep_all_ptm <- reactive({
-        #   if(all( input$intensitycols_ptm %in% colnames(data_ptm())) ){
+        #   if(all( input$intensitycols %in% colnames(data())) ){
         #     req(input$threshold_method_ptm)
         #     if(input$threshold_method_ptm == "intersect") {
         #       req(input$p_ptm,input$lfc_ptm)

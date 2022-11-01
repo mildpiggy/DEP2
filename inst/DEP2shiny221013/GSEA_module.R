@@ -268,7 +268,15 @@ GSEA_server_module <- function(id, Omics_res) {
             return(NULL)
 
           genelist <- fread(text = temp, header = F) %>% as.data.frame()
-          if(ncol(genelist) < 2) return(NULL)
+          if(ncol(genelist) < 2){
+            sendSweetAlert(
+              session = shiny::getDefaultReactiveDomain(),
+              title = "warning !",
+              text = paste0("Please check! GSEA need text input with two columns. First column is name, the second is lf2c."),
+              type = "warning"
+            )
+            return(NULL)
+          }
           colnames(genelist)[1:2] = c("name","fc")
           genelist$name <-  sapply(genelist$name,the1stname)
           genelist$fc = as.numeric(genelist$fc)

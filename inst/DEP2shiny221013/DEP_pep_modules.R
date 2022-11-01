@@ -108,6 +108,11 @@ DEP_pep_sidebar_mod <-  function(id){
                                                "Imputation type",
                                                choices = c(c("man", "bpca", "knn", "QRILC", "MLE", "MinDet", "MinProb", "min", "zero"), "mixed on features"),
                                                selected = "MinDet"),
+                                  shinyBS::bsTooltip(ns("id"), "Name of the column containing feature IDs", "right", options = list(container = "body")),
+                                  shinyBS::bsTooltip(ns("delim"), "Set the delimiter separating the name and id column", "right", options = list(container = "body")),
+                                  shinyBS::bsTooltip(ns("intensitycols"), "Choose the expression columns of your data", "right", options = list(container = "body")),
+                                  shinyBS::bsTooltip(ns("remove_prefix"), "remove the prefix character of expression columns names, such as 'LFQ intensity' or 'intensity' in Maxquant result",
+                                                     "right", options = list(container = "body")),
                                   shinyBS::bsTooltip(ns("imputation"), "Choose an imputation method for peptide missing values", "right", options = list(container = "body"))
                                   ),
                   # bsCollapsePanel("Imputation options",
@@ -127,11 +132,6 @@ DEP_pep_sidebar_mod <-  function(id){
                                   selectizeInput(ns("aggregation_method"), "Proteingroups aggregation algorithm",
                                                  choices = c("totalSum", "totalMean", "medianPolish","RobustSummary"), selected = "RobustSummary"),
 
-                                  shinyBS::bsTooltip(ns("id"), "Name of the column containing feature IDs", "right", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("delim"), "Set the delimiter separating the name and id column", "right", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("intensitycols"), "Choose the expression columns of your data", "right", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("remove_prefix"), "remove the prefix character of expression columns names, such as 'LFQ intensity' or 'intensity' in Maxquant result",
-                                                     "right", options = list(container = "body")),
                                   shinyBS::bsTooltip(ns("thr"), "Set the threshold for the allowed number of missing values in at least one condition","right",
                                                      options = list(container = "body"))
                   )
@@ -1021,6 +1021,9 @@ DEP_pep_server_module <- function(id){
 
       output$control <- renderUI({
         validate(need(!is.null(input$file1), ""))
+        validate(need(!is.null(input$intensitycols), "Please select the Expression columns"))
+        validate(need(length(input$intensitycols) > 1 , "More expression columns is required"))
+        validate(need(!is.null(data()), "Please finish aggregate first."))
         if (input$anno == "columns" & !is.null(data()) & input$contrasts == "control") {
           my_data <- data()
           # my_data_save <<- data()
@@ -1038,11 +1041,11 @@ DEP_pep_server_module <- function(id){
       })
 
       output$order <- renderUI({
-        validate(need(!is.null(input$file1), "Please upload expression ProteinGroups in Files"))
+        validate(need(!is.null(input$file1), "Please upload expression data in Files"))
         validate(need(!is.null(input$intensitycols), "Please select the Expression columns"))
         validate(need(length(input$intensitycols) > 1 , "More expression columns is required"))
         shiny::validate(need(!is.null(peptide()), " "))
-        shiny::validate(need(!is.null(data()), " "))
+        shiny::validate(need(!is.null(data()), "Please finish aggregate first."))
 
         # rdataFile <- input$resultRData
         # if(is.null(rdataFile)){
@@ -1202,11 +1205,21 @@ DEP_pep_server_module <- function(id){
       ### Reactive functions of peptide ### --------------------------------------------------
       expdesign <- reactive({
         inFile <- input$file2
-        if (is.null(inFile))
-          return(NULL)
-        read.csv(inFile$datapath, header = TRUE,
-                 sep = "\t", stringsAsFactors = FALSE) %>%
-          mutate(id = row_number())
+        if (is.null(inFile) & (!is.null(data())) ){
+          cols <- which(colnames(data()) %in% input$intensitycols)
+          if(length(cols) == 0){
+            return(NULL)
+          }else{
+            label <- colnames(data())[cols]
+            expdesign <- get_exdesign_parse(label, mode = "delim", sep = "_",
+                                            remove_prefix = input$remove_prefix, remove_suffix = input$remove_suffix)
+            # my_expdesign <<- expdesign
+          }
+        }else{
+          read.csv(inFile$datapath, header = TRUE,
+                   sep = "\t", stringsAsFactors = FALSE) %>%
+            mutate(id = row_number())
+        }
       })
 
       peptide <- reactive({
@@ -1403,7 +1416,7 @@ DEP_pep_server_module <- function(id){
 
       norm <- reactive({
         my_norm <<- normalize_vsn(filt())
-        cat("VSN finished")
+        cat("VSN finished\n")
         return(my_norm)
       })
 
@@ -1435,7 +1448,6 @@ DEP_pep_server_module <- function(id){
           )
         }
 
-        # inFile1 <- input$resultRData
         inFile1 <- NULL
         if(is.null(inFile1)){
           if(input$contrasts == "control"){

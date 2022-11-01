@@ -223,6 +223,8 @@ make_se <- function (proteins_unique, columns, expdesign, log2transform = TRUE)
 #' (only for mode == "delim").
 #' @param remove_prefix Logical(1),
 #' whether remove the prefix of expression columns.
+#' @param remove_suffix Logical(1),
+#' whether remove the suffix of expression columns.
 #' @param log2transform Logical(1), whether log2 transform the assay, default TRUE.
 #' @return A SummarizedExperiment object
 #' with log2-transformed values.

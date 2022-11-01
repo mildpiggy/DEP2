@@ -923,6 +923,7 @@ DEP_pg_server_module <- function(id){
         LFQcols = grep("^LFQ",colnames(data()),value = T)
         if(length(LFQcols)==0) LFQcols = grep("^Intensity",colnames(data()),value = T)
         if(length(LFQcols)==0) LFQcols = grep("^intensity",colnames(data()),value = T)
+        if(length(LFQcols)==0) LFQcols = grep(".Quantity",colnames(data()),value = T)
         # if(length(LFQcols)==0) LFQcols = grep("^quantity|Quantity",colnames(data()),value = T)
         # selectizeInput("intensitycols",
         #                " ",#Expression columns
@@ -942,8 +943,9 @@ DEP_pg_server_module <- function(id){
                                                   label = "Choose the expression columns",
                                                   choices=colnames(data()),
                                                   multiple = TRUE,
-                                                  selected = grep("^LFQ",LFQcols,value = T), width = '100%'),
-                                   checkboxInput(inputId = session$ns("remove_prefix"),"remove prefix of label", value = T)
+                                                  selected = LFQcols, width = '100%'),
+                                   checkboxInput(inputId = session$ns("remove_prefix"),"remove prefix of label", value = T),
+                                   checkboxInput(inputId = session$ns("remove_suffix"),"remove suffix of label", value = T)
                                    , style = "primary"))
       })
 
@@ -961,14 +963,7 @@ DEP_pg_server_module <- function(id){
         validate(need(length(input$intensitycols) > 1 , "More expression columns is required"))
         # groups = exp_design()[,input$groupby]
         if (input$anno == "columns" & !is.null(data()) ) {
-          my_data <- data()
-          cols <- which(colnames(data()) %in% input$intensitycols)#according to intensitycols
-          if(input$remove_prefix){
-            prefix <- get_prefix(data()[,cols] %>% colnames())
-            label = colnames(data())[cols] %>% gsub(prefix,"",.)
-          }else label = colnames(data())[cols]
-          # groups
-          condition = make.names(unlist(lapply(label %>% strsplit(., split = "_"), function(x){x[1]})))
+          condition = expdesign()$condition
         } else {
           if (input$anno == "expdesign" & !is.null(expdesign()) ) {
             condition = make.names(expdesign()$condition)
@@ -986,25 +981,19 @@ DEP_pg_server_module <- function(id){
         validate(need(!is.null(input$intensitycols), "Please select the Expression columns"))
         validate(need(length(input$intensitycols) > 1 , "More expression columns is required"))
 
-        if (input$anno == "columns" & !is.null(data()) & input$contrasts == "control") {
-          my_data <- data()
-          # cols <- grep("^LFQ", colnames(data()))
-          cols <- which(colnames(data()) %in% input$intensitycols)#according to intensitycols
-          if(input$remove_prefix){
-            prefix <- get_prefix(data()[,cols] %>% colnames())
-            label = colnames(data())[cols] %>% gsub(prefix,"",.)
-          }else label = colnames(data())[cols]
-
-          selectizeInput(session$ns("control"), "Control",
-                         choices = make.names(unlist(lapply(label %>% strsplit(., split = "_"), function(x){x[1]}))),
-                         selected = NULL)
-        } else {
-          if (input$anno == "expdesign" & !is.null(expdesign()) & input$contrasts == "control") {
-            selectizeInput(session$ns("control"),
-                           "Control",
-                           choices = make.names(expdesign()$condition),
-                           selected = NULL)
+        if(input$contrasts == "control"){
+          if (input$anno == "columns" & !is.null(data()) ) {
+            condition = make.names(expdesign()$condition)
+          } else {
+            if (input$anno == "expdesign" & !is.null(expdesign()) ) {
+              condition = make.names(expdesign()$condition)
+            }
           }
+
+          selectizeInput(session$ns("control"),
+                         "Control",
+                         choices = condition,
+                         selected = NULL)
         }
       })
 
@@ -1165,13 +1154,24 @@ DEP_pg_server_module <- function(id){
       iv$enable()
 
       ### Reactive functions ### --------------------------------------------------
+      ## generate a experiement design table
       expdesign <- reactive({
         inFile <- input$file2
-        if (is.null(inFile))
-          return(NULL)
-        read.csv(inFile$datapath, header = TRUE,
-                 sep = "\t", stringsAsFactors = FALSE) %>%
-          mutate(id = row_number())
+        if (is.null(inFile) & (!is.null(data())) ){
+          cols <- which(colnames(data()) %in% input$intensitycols)
+          if(length(cols) == 0){
+            return(NULL)
+          }else{
+            label <- colnames(data())[cols]
+            expdesign <- get_exdesign_parse(label, mode = "delim", sep = "_",
+                                            remove_prefix = input$remove_prefix, remove_suffix = input$remove_suffix)
+            # my_expdesign <<- expdesign
+          }
+        }else{
+          read.csv(inFile$datapath, header = TRUE,
+                   sep = "\t", stringsAsFactors = FALSE) %>%
+            mutate(id = row_number())
+        }
       })
 
       data <- reactive({
@@ -1180,7 +1180,7 @@ DEP_pg_server_module <- function(id){
           cat("infile1 is null /n")
           return(NULL)
         }
-        cat("infile1 is not null /n")
+        cat("infile1 is not null \n")
         my_data <- data.table::fread(inFile$datapath, header = TRUE,
                                      sep = "\t", stringsAsFactors = FALSE, integer64 = "numeric") %>%
           mutate(id = row_number())
@@ -1191,8 +1191,10 @@ DEP_pg_server_module <- function(id){
         ## replace the [xxx] characters in colnames
         colnames(my_data) = gsub("^\\[(.*)\\] ","",colnames(my_data))
         colnames(my_data) = make.names(colnames(my_data))
-        my_data <- my_data
+        my_data <<- my_data
       })
+
+
 
       filt0 <- reactive({
         data <- data()
@@ -1234,19 +1236,20 @@ DEP_pg_server_module <- function(id){
         }
 
         if (input$anno == "columns") {
-          se <- DEP2::make_se_parse(unique_names, cols, mode = "delim", sep = "_", remove_prefix = input$remove_prefix)
+          se <- DEP2::make_se_parse(unique_names, cols, mode = "delim", sep = "_",
+                                    remove_prefix = input$remove_prefix, remove_suffix = input$remove_suffix)
         }
         if (input$anno == "expdesign") {
           se <- DEP2::make_se(unique_names, cols, expdesign())
           colData(se)$replicate = as.character(colData(se)$replicate)
         }
 
-
+        se_save <<- se
         filtered <- se
         # filtered_save1 <<- filtered
         # filt_save <<- input$filt
         if(is.null(input$filt)){
-          cat("the filter column is empty! Do not filter with column")
+          message("the filter column is empty! Do not filter with column")
           # filtered <- se
         }else{
           for(i in input$filt){
@@ -1262,7 +1265,7 @@ DEP_pg_server_module <- function(id){
         thr <- ifelse(is.na(input$thr), 0, input$thr)
         # my_filt <- filter_missval(se, thr = thr)
         my_filt <- filter_se(filtered, thr = thr)
-        # my_filt_save <<- my_filt
+        my_filt_save <<- my_filt
         # order_save <<- input$order
         # if(is.null(input$order) || length(input$order) != length(my_filt@colData$conditon %>% unique)){
         #   return(my_filt)
@@ -1271,7 +1274,7 @@ DEP_pg_server_module <- function(id){
         #   my_filt@colData$condition = factor(my_filt@colData$condition, levels = input$order)
         #   my_filt@colData = my_filt@colData %>% arrange(., condition)
         # }
-        # return(my_filt)
+        return(my_filt)
       })
 
       iv1 <- InputValidator$new()

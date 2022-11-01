@@ -133,8 +133,16 @@ setMethod("[", "DEGdata",
 #' @export
 #' @examples
 get_exdesign_parse <- function(label, mode = c("delim", "char"),
-                               chars = 1, sep = "_"){
+                               chars = 1, sep = "_", remove_prefix = T, remove_suffix = F){
   mode = match.arg(mode)
+
+  if(remove_prefix){
+    label <- delete_prefix(label) %>% make.names()
+  }
+  if(remove_suffix){
+    label <- delete_suffix(label) %>% make.names()
+  }
+
   if (mode == "char") {
     col_data <- data.frame(label = label, stringsAsFactors = FALSE) %>%
       mutate(condition = substr(label, 1, nchar(label) -
@@ -143,11 +151,14 @@ get_exdesign_parse <- function(label, mode = c("delim", "char"),
                                                                                                    replicate, remove = FALSE)
   }
   if (mode == "delim") {
+    # colnames(raw) = gsub(get_suffix(colnames(raw)),"", colnames(raw))
     col_data <- data.frame(label = label, stringsAsFactors = FALSE) %>%
       separate(label, c("condition", "replicate"), sep = sep,
                remove = FALSE, extra = "merge") %>% unite(ID,
                                                           condition, replicate, remove = FALSE)
   }
+  rownames(col_data) <- col_data$ID
+
   return(col_data)
 }
 

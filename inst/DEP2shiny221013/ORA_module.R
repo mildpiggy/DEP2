@@ -308,7 +308,16 @@ ORA_server_module2 <- function(id, Omics_res) {
         #   need(nrow(gene_df) != 0, message = "No genes meet your requirements, and can not do the GO analysis")
         # )
         pkg = annoSpecies_df$pkg[annoSpecies_df$species == ORA_organism()]
-        require(pkg, character.only = TRUE)
+        if(!require(pkg, character.only = TRUE)){
+          sendSweetAlert(
+            session = shiny::getDefaultReactiveDomain(),
+            title = "warning !",
+            text = paste0("It needs the annotation data package ",pkg," for the species '", ORA_organism(),"'. But it is not installed!",
+                          "Please install it first."),
+            type = "warning"
+          )
+          return(NULL)
+        }
         print("loading species annotation data")
         orgDB <- get(pkg)
         gene_id_table <- DEP2:::map_to_entrezid(as.character(gene_df$name), orgDB = orgDB)
