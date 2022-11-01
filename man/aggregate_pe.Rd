@@ -7,7 +7,7 @@
 aggregate_pe(
   pe,
   aggrefun = c("RobustSummary", "medianPolish", "totalMean"),
-  aggregate_Peptide_Type = c("Unique + Razor", "unique"),
+  aggregate_Peptide_Type = c("Unique + Razor", "Unique"),
   fcol,
   peptide_assay_name = "peptideNorm",
   reserve = "Gene.names"

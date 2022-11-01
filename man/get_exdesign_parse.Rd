@@ -4,7 +4,14 @@
 \alias{get_exdesign_parse}
 \title{Construct experiment design basic on colnames parse}
 \usage{
-get_exdesign_parse(label, mode = c("delim", "char"), chars = 1, sep = "_")
+get_exdesign_parse(
+  label,
+  mode = c("delim", "char"),
+  chars = 1,
+  sep = "_",
+  remove_prefix = T,
+  remove_suffix = F
+)
 }
 \arguments{
 \item{label}{Characters, label names(column names) of assay}

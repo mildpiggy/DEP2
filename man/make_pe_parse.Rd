@@ -12,6 +12,7 @@ make_pe_parse(
   chars = 1,
   sep = "_",
   remove_prefix = T,
+  remove_suffix = F,
   assay_name = "peptideRaw",
   log2transform = T
 )
@@ -41,6 +42,9 @@ The separator used to parse the column header
 
 \item{remove_prefix}{Logical(1),
 whether remove the prefix of expression columns.}
+
+\item{remove_suffix}{Logical(1),
+whether remove the suffix of expression columns.}
 
 \item{assay_name}{An character(1) to name assay in the QFeatures object.}
 

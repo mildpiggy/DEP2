@@ -8,6 +8,7 @@ filter_pe(
   pe,
   thr = NULL,
   missnum = NULL,
+  fraction = NULL,
   filter_formula = NULL,
   assay_name = "peptideRaw",
   return_keeprows = F
@@ -25,6 +26,8 @@ in at least one condition. At least in one condition, missing values number < or
 \item{missnum}{Integer(1),
 Sets the threshold for the allowed max number among all samples,
 missing values number < or = 'missnum' in each row.}
+
+\item{fraction}{A numeric from 0 to 1, threshold of missing occupancy of each row}
 
 \item{filter_formula}{Formula or character(1).
 A filter expression, written as a formula.}

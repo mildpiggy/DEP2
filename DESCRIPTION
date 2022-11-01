@@ -23,7 +23,7 @@ Suggests:
 Imports: 
     DEP, ComplexHeatmap, dplyr, tidyr, tibble, data.table, ggplot2, MsCoreUtils, methods, assertthat,
     limma, MSnbase, missForest, purrr, QFeatures, DESeq2, readr, SummarizedExperiment (>= 1.11.5), 
-    vsn, fdrtool, lazyeval, S4Vectors, clusterProfiler(>= 4.3.1.900), clusterProfiler.dplyr,
+    vsn, fdrtool, lazyeval, S4Vectors, clusterProfiler(>= 4.3.1.900), clusterProfiler.dplyr, dbplyr,
     RColorBrewer, circlize, shiny, rmarkdown, DT, msigdbr, rlang, glmnet,
     ggrepel,
     colourpicker,
