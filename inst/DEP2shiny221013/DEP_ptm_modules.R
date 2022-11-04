@@ -266,11 +266,11 @@ DEP_ptm_body_mod <- function(id){
                                           ),
                                           tabPanel(title = "Heatmap",
                                                    fluidRow(
-                                                     column(width = 6,
-                                                            box(checkboxInput(ns("manual_heatmap_ptm"),
-                                                                              "Manual heatmap",
-                                                                              value = FALSE), width = 12)
-                                                     ),
+                                                     # column(width = 6,
+                                                     #        box(checkboxInput(ns("manual_heatmap_ptm"),
+                                                     #                          "Manual heatmap",
+                                                     #                          value = FALSE), width = 12)
+                                                     # ),
                                                      column(width = 6,
                                                             box(selectizeInput(ns("colorbar_ptm"),
                                                                                "colorbar",
@@ -361,7 +361,7 @@ DEP_ptm_body_mod <- function(id){
                                                      uiOutput(ns("plot_ptm")),
                                                      downloadButton(ns('downloadHeatmap_ptm'), 'Save heatmap')),
                                                    shinyBS::bsTooltip(ns("colorbar_ptm"), "Choose the color palette of the colorbar", "top", options = list(container = "body")),
-                                                   shinyBS::bsTooltip(ns("manual_heatmap_ptm"), "Whether plot the manual heatmap", "top", options = list(container = "body")),
+                                                   # shinyBS::bsTooltip(ns("manual_heatmap_ptm"), "Whether plot the manual heatmap", "top", options = list(container = "body")),
                                                    shinyBS::bsTooltip(ns("heatmap_cntrst_ptm"), "Choose the contrasts that you want to show, act when [Manual heatmap] is TRUE, can be one or more contrasts", "top", options = list(container = "body")),
                                                    shinyBS::bsTooltip(ns("k_ptm"), "Set the number of k-means clusters", "top", options = list(container = "body")),
                                                    shinyBS::bsTooltip(ns("limit_ptm"), "Set the outer limits of the color scale", "top", options = list(container = "body")),
@@ -1845,7 +1845,8 @@ DEP_ptm_server_module <- function(id, Omics_res){
 
     ### Reactive functions ### ------------------------------------------------
     name_for_choose_ptm <- reactive({
-      heatmap_name(dep = selected_ptm(), manual = input$manual_heatmap_ptm, manual_name = input$heatmap_cntrst_ptm)
+      # heatmap_name(dep = selected_ptm(), manual = input$manual_heatmap_ptm, manual_name = input$heatmap_cntrst_ptm)
+      DEP2::get_signicant(selected_ptm(), contrasts = input$heatmap_cntrst_ptm, return_type = "names")
       })
 
     excluded_ptm <- reactive({

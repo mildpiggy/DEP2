@@ -414,7 +414,7 @@ DEP_pep_body_mod <- function(id){
                                              uiOutput(ns("plot")),
                                              downloadButton(ns('downloadHeatmap'), 'Save heatmap')),
                                            shinyBS::bsTooltip(ns("colorbar"), "Choose the color palette of the colorbar", "top", options = list(container = "body")),
-                                           shinyBS::bsTooltip(ns("manual_heatmap"), "Whether plot the manual heatmap", "top", options = list(container = "body")),
+                                           # shinyBS::bsTooltip(ns("manual_heatmap"), "Whether plot the manual heatmap", "top", options = list(container = "body")),
                                            shinyBS::bsTooltip(ns("heatmap_cntrst"), "Choose the contrasts that you want to show, act when [Manual heatmap] is TRUE, can be one or more contrasts", "top", options = list(container = "body")),
                                            shinyBS::bsTooltip(ns("k"), "Set the number of k-means clusters", "top", options = list(container = "body")),
                                            shinyBS::bsTooltip(ns("limit"), "Set the outer limits of the color scale", "top", options = list(container = "body")),
