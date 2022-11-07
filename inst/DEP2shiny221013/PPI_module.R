@@ -465,7 +465,7 @@ PPI_server_module <- function(id, Omics_res) {
           })
           links2 <- reactive({
             print("Filter links.")
-            links2 <<- dplyr::filter(links(), combined_score >= input$scorecutoff)
+            links2 <- dplyr::filter(links(), combined_score >= input$scorecutoff)
             links2_save <<- links2
           })
 

@@ -374,7 +374,7 @@ load_PPIdata <- function(speciesname, STRING.version = "11.5", STRINGdata_path =
                file.path(STRINGdata_path,speciesname),sep = ""))
   }
 
-  message("load STRING data from ",paste0(STRINGdata_path,"/",speciesname,"/"))
+  message("load STRING data from ",paste0(STRINGdata_path,"/"))
   message("lood protein.info")
   assign("proteinsDf",data.table::fread(proteinsDffile, sep = "\t", header=TRUE, stringsAsFactors=FALSE, fill = TRUE, quote=""),envir = strEnv)
   message("lood protein.aliases")

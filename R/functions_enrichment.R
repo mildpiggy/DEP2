@@ -142,7 +142,7 @@ map_to_entrezid <- function(gene, orgDB = org.Hs.eg.db) {
     # my_ids1 <- as.data.frame(do.call(cbind, my_ids), stringsAsFactors = F)
     from_cols = my_ids1 %>% apply(., 1, function(x){which(!is.na(x))[1] } ) %>% table(.,useNA =("ifany"))
     names(from_cols) = colnames(my_ids1)[as.numeric(names(from_cols))]
-    from_cols1 = from_cols[-which(is.na(names(from_cols)))]
+    from_cols1 = from_cols[!(is.na(names(from_cols)))]
     for(i in 1:length(from_cols1)){
       cat(paste0(from_cols1[i]," gene(s) transfrom to ENTREZID ", names(from_cols1)[i] %>% gsub("_"," ",.), ". "))
     }
