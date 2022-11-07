@@ -302,7 +302,7 @@ Check_STRINGdata <- function(speciesID, STRING.version = "11.5", STRINGdata_path
     # paste(speciesID, ".protein.links.detailed.v", version, ".txt.gz", sep="")
 
   if(is.null(STRINGdata_path)){
-    STRINGdata_path <-  paste0(system.file("PPIdata",package = "DEP2"),"/", speciesname)
+    STRINGdata_path <-  file.path(system.file(package = "DEP2"),"PPIdata",speciesname)
   }
 
   if(!dir.exists(STRINGdata_path)){
@@ -329,7 +329,7 @@ trimSTRINGdata <- function(links_detailfilename, oD = NULL)  {
   ## just save links_detailed which combined_score >= 400
   links_detail = links_detail %>% filter(combined_score >= 400)
   message("Trime ", links_detailfilename, " by combined score > 400.")
-  fwrite(links_detail, file = links_detailfile)
+  data.table::fwrite(links_detail, file = links_detailfile)
 }
 
 
@@ -356,7 +356,7 @@ load_PPIdata <- function(speciesname, STRING.version = "11.5", STRINGdata_path =
   }
 
   if(is.null(STRINGdata_path)){
-    STRINGdata_path <- file.path(system.file("PPIdata",package = "DEP2"),speciesname)
+    STRINGdata_path <- file.path(system.file(package = "DEP2"),"PPIdata",speciesname)
   }
 
   cat(paste("Input species is ",speciesname ,"\t", "The species ID is ",speciesID,"\n",sep=""))
