@@ -18,17 +18,17 @@ aggregate_pe(
 contains the normalized peptide assay}
 
 \item{aggrefun}{A function used for quantitative feature aggregation.
-It can be a character in "RobustSummary","medianPolish","totalMean" or a function.
+It can be a character in "RobustSummary","medianPolish","totalMean" or other function.
 Details see \code{\link[QFeatures]{aggregateFeatures}}}
 
-\item{aggregate_Peptide_Type}{Character in "Unique + Razor" or "unique".
-Use what kind of peptides to summarise proteins.}
+\item{aggregate_Peptide_Type}{Character in "Unique + Razor" or "Unique".
+Use what kind of peptides to summarise proteins. If choose "Unique", return output just save unique peptides in smallest proteingroups.}
 
 \item{fcol}{Character(1), defining how to summarise the features. Exist in \code{rowData(pe)}.}
 
 \item{peptide_assay_name}{Character(1), the name of aggregation result assay}
 
-\item{reserve}{Character, the column(s) which will reserve after aggregate.}
+\item{reserve}{Character, the column(s) which will reserve after aggregate, such as the columns store protein information can.}
 }
 \value{
 a QFeatures object with a new protein aggregation assay.

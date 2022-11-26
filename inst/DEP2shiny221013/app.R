@@ -65,7 +65,7 @@ ui <- navbarPage(
   title = "DEP2",
   theme = shinythemes::shinytheme("spacelab"),
   id = "DEPnavbar",
-  selected = "welcome",
+  selected = "Welcome",
   useShinyjs() ,
   tabPanel(
     title = "Welcome",
@@ -240,7 +240,7 @@ server <- function(input, output,session = session) {
           inputId = "DEPnavbar",
           tabPanel(
             ID,
-            DEP_pg_UI(id = ID)
+            DEP_pg_UI(id = ID, labelname = input$OmicsName)
           ),
           # target = "Welcome",
           select = T
@@ -277,7 +277,7 @@ server <- function(input, output,session = session) {
             sidebarLayout(
               DEG_sidebar_mod(id = ID, labelname = input$OmicsName), ## DEG sidebar module
               # mainPanel()
-              DEG_body_mod(id = ID, labelname = input$OmicsName) ## DEG pagebody module
+              DEG_body_mod(id = ID) ## DEG pagebody module
             ),
           ),
           # target = "Welcome",
@@ -305,7 +305,7 @@ server <- function(input, output,session = session) {
           inputId = "DEPnavbar",
           tabPanel(
             ID,
-            DEP_pep_UI(ID),
+            DEP_pep_UI(ID, labelname = input$OmicsName),
           ),
           # target = "Welcome",
           select = T
@@ -329,7 +329,7 @@ server <- function(input, output,session = session) {
       }else if (input$OmicsType == "PTM") { ## import DEP_ptm test module
         appendTab(inputId = "DEPnavbar",
                   tabPanel(ID,
-                           DEP_ptm_UI(id = ID)
+                           DEP_ptm_UI(id = ID,labelname = input$OmicsName)
                   ),
                   # target = "Welcome",
                   select = T

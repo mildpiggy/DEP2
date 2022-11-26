@@ -88,7 +88,6 @@ scale_recover <- function(data, method='scale', param_df = NULL) {
 multi_impute <- function(data_miss, iters_each=50, iters_all=20, initial='qrilc', lo=-Inf, hi='min',
                          n_cores=1, imp_model='glmnet_pred', gibbs=data.frame(row=integer(), col=integer())) {
   ## Convert to data.frame ##
-  `%<>%` <- magrittr::`%<>%`
   data_miss %<>% data.frame()
 
   ## Make vector for iters_each ##

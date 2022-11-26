@@ -8,6 +8,8 @@ get_signicant(
   object,
   contrasts = NULL,
   thresholdmethod = NULL,
+  diff = diff,
+  alpha = alpha,
   curvature = 1,
   x0_fold = 2,
   return_type = c("subset", "table", "names")
@@ -21,6 +23,9 @@ get_signicant(
 \item{thresholdmethod}{NULL or 'intersect' or 'curve'. The thresholdmethod to decide significant.
 If is NULL, used existing rejections. Otherwise filter new rejections via
 \code{\link{add_rejections}}().}
+
+\item{alpha}{Numeric(1),
+Sets the threshold for the adjusted P value.}
 
 \item{curvature}{Numeric(1), Sets the curvature for the curve cutoff lines}
 

@@ -6,6 +6,7 @@
 \usage{
 test_ORA(
   x,
+  contrasts = NULL,
   type = c("GO", "KEGG", "REACTOME"),
   species = "Human",
   by_contrast = FALSE,
@@ -17,6 +18,8 @@ test_ORA(
 \arguments{
 \item{x}{A SummarizedExperiment/DEGdata output from add_adjections or
 a charachter vector containing candidate identifier(SYMBOL, EntrezID, UniprotID or ENSEMBL).}
+
+\item{contrasts}{Character, analyse results in which contrasts.}
 
 \item{type}{Character, one of "GO","KEGG","REACTOME". The datasets for enrichment analysis.}
 

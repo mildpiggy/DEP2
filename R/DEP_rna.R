@@ -327,15 +327,12 @@ get_res <- function (dds, type = c("all", "control",  "manual"), control = NULL,
   return(test_res)
 }
 
-#/**' @rdname DEP2_add_rejections
-##' @exportMethod add_rejections
+#' @rdname DEP2_add_rejections
+#' @exportMethod add_rejections
 setMethod("add_rejections",
           "DEGdata",
-          function(diff, ...){
-            add_rejections.DEGdata(diff = diff,
-                                   alpha = alpha, lfc = lfc, thresholdmethod = thresholdmethod, curvature = curvature, x0_fold = x0_fold
-                                   # ...
-                                   )
+          function(diff,alpha,lfc,thresholdmethod,curvature,x0_fold){
+            add_rejections.DEGdata(diff,alpha,lfc,thresholdmethod,curvature,x0_fold)
           }
 )
 

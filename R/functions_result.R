@@ -13,6 +13,7 @@
 #' @param return_type One of "subset", "table", "names". "subset" return a subset object, "table" return a result data.frame,
 #' names return name vector of object.
 #'
+#' @inheritParams add_rejections
 #' @return
 #' A object in the same class of input or a data.frame or a names vector, designed by return_type.
 #'
@@ -22,6 +23,7 @@
 get_signicant <- function(object,
                           contrasts = NULL,
                           thresholdmethod = NULL,
+                          diff = diff, alpha = alpha,
                           curvature = 1,
                           x0_fold = 2,
                           return_type = c("subset", "table", "names")
@@ -49,8 +51,10 @@ get_signicant <- function(object,
     de = add_rejections(object,
                         # contrasts = contrasts,
                         thresholdmethod = thresholdmethod,
-                        curvature = 1,
-                        x0_fold = 2)
+                        curvature = curvature,
+                        x0_fold = x0_fold,
+                        diff = diff,
+                        alpha = alpha)
     de_save <<- de
   }
 

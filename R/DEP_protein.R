@@ -828,11 +828,8 @@ NULL
 ##' @rdname DEP2_add_rejections
 setMethod("add_rejections",
           "SummarizedExperiment",
-          function(diff, ...){
-            add_rejections.SummarizedExperiment(diff = diff,
-                                                alpha = alpha, lfc = lfc, thresholdmethod = thresholdmethod, curvature = curvature, x0_fold = x0_fold
-                                                # ...
-                                                )
+          function(diff,alpha,lfc,thresholdmethod,curvature,x0_fold){
+            add_rejections.SummarizedExperiment(diff,alpha,lfc,thresholdmethod,curvature,x0_fold)
           }
 )
 # add_rejections(my_dep_save)

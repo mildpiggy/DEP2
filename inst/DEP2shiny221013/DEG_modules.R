@@ -52,7 +52,7 @@ DEG_sidebar_mod <- function(id,labelname = "DEP-pg_sidabar"){
   tagList(
     sidebarPanel(
       width = 3,
-      h3(id),
+      h3(labelname),
       tags$hr(),
       bsCollapse(
         bsCollapsePanel("Files",
@@ -164,7 +164,7 @@ DEG_sidebar_mod <- function(id,labelname = "DEP-pg_sidabar"){
   )
 }
 
-DEG_body_mod <- function(id,labelname = "DEP-pg_body"){
+DEG_body_mod <- function(id){
   ns = NS(id)
   tagList(
     mainPanel(

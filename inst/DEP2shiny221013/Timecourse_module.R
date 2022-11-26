@@ -148,8 +148,9 @@ Timecourse_server_module <- function(id, Omics_res) {
       })
 
       selected_omics_result <- reactive({
-        Omics_res_save <<- Omics_res
-        selected_omics_result_save <<- Omics_res[[selected_omics()]]()
+        # Omics_res_save <<- Omics_res
+        # selected_omics_result_save <<- Omics_res[[selected_omics()]]()
+        Omics_res[[selected_omics()]]()
       })
 
       ht_mat <- reactive({

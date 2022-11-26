@@ -21,7 +21,7 @@ Suggests:
     knitr,
     ggridges
 Imports: 
-    DEP, ComplexHeatmap, dplyr, tidyr, tibble, data.table, ggplot2, MsCoreUtils, methods, assertthat,
+    DEP, ComplexHeatmap, dplyr, tidyr, tibble, data.table, ggplot2, MsCoreUtils, methods, assertthat, R.utils,
     limma, MSnbase, missForest, purrr, QFeatures, DESeq2, readr, SummarizedExperiment (>= 1.11.5), 
     vsn, fdrtool, lazyeval, S4Vectors, clusterProfiler(>= 4.3.1.900), clusterProfiler.dplyr,
     RColorBrewer, circlize, shiny, rmarkdown, DT, msigdbr, rlang, glmnet,

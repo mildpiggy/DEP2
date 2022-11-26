@@ -4,14 +4,17 @@
 \alias{plot_multi_venn}
 \title{Plot venn plot of specified genes/proteins across multiple omics results}
 \usage{
-plot_multi_venn(omics_list, to_upper = F, plot = T)
+plot_multi_venn(omics_list, to_upper = F, plot = T, background = NULL)
 }
 \arguments{
-\item{omics_list}{A list composed of SummarizedExperiment or DEGdata objects.}
+\item{omics_list}{A list composed of SummarizedExperiment or DEGdata objects or.}
 
 \item{to_upper}{Logical, whether transform all identifiers to upper}
 
 \item{plot}{Logical(1), return a venn plot or a table.}
+
+\item{background}{NULL or character vector of names of background protein/gene pool.
+If background is provided, plot_multi_venn only consider candidates in background.}
 }
 \value{
 A venn plot by ggVennDiagram or a table.

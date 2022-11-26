@@ -8,9 +8,13 @@ plot_multi_heatmap(
   omics_list,
   choose_name,
   to_upper = FALSE,
+  color = c("RdBu", "RdYlBu", "RdYlGn", "BrBG", "PiYG", "PRGn", "PuOr", "RdGy",
+    "Spectral"),
+  col_limit = 6,
   width = 7,
   height = 10,
-  row_font_size
+  row_font_size = 5,
+  ...
 )
 }
 \arguments{
@@ -20,11 +24,19 @@ plot_multi_heatmap(
 
 \item{to_upper}{Logical, whether transform all identifiers to upper}
 
+\item{color}{Character(1), sets the color panel (from \pkg{RColorBrewer}).
+It can be a palette name in "RdBu", "RdYlBu", "RdYlGn", "BrBG", "PiYG", "PRGn", "PuOr", "RdGy", "Spectral".}
+
+\item{col_limit}{Integer(1),
+Sets the outer limits of the color scale.}
+
 \item{width}{Numeric, the width of heatmap}
 
 \item{height}{Numeric, the height of heatmap}
 
 \item{row_font_size}{Numeric, the size of row label.}
+
+\item{...}{other parameters to \code{\link[ComplexHeatmap]{Heatmap}}}
 }
 \value{
 A HeatmapList from \code{ComplexHeatmap} package

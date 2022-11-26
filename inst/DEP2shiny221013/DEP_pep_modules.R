@@ -1,17 +1,17 @@
 library(QFeatures)
 
-DEP_pep_UI <- function(id){
+DEP_pep_UI <- function(id, labelname){
   tagList(
     sidebarLayout(
       # sidebarPanel = sidebarPanel(),
-      DEP_pep_sidebar_mod(id = id), ## DEP sidebar module
+      DEP_pep_sidebar_mod(id = id,labelname=labelname), ## DEP sidebar module
       DEP_pep_body_mod(id = id)  ## DEP pagebody module
       # mainPanel = mainPanel()
     ))
 }
 
 
-DEP_pep_sidebar_mod <-  function(id){
+DEP_pep_sidebar_mod <-  function(id, labelname){
   ns = NS(id)
   cat(paste0("DEP_pep_sidebar ns is",ns(""),"\n"))
 
@@ -19,7 +19,7 @@ DEP_pep_sidebar_mod <-  function(id){
     # sidebarLayout(
     sidebarPanel(
       width = 3,
-      h3(id),
+      h3(labelname),
       # tags$style(HTML(glue::glue(.open = "@{", .close = "}@",
       #                            '
       #     #pep_sidebar div[value^="Files"] .panel-title {

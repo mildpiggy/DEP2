@@ -1,3 +1,4 @@
+`%<>%` <- magrittr::`%<>%`
 
 annoSpecies_df <- function(){
   annoSpecies_df <-
@@ -118,12 +119,12 @@ ID_transform <- function(x, from_columns = "rownames", fromtype = "ENSEMBL", spe
 }
 
 
-# /**
+#  **
 #  * [description]
 #  * @param  {[type]} orgDB [eg: org.Hs.eg.db]
 #  * @param  {[character]} gene  the gene name, can be SYMBOL, ENSEMBL, UNIPROT,ALIAS name or mixed of them, note that: when both SYMBOL and ALIAS have a  ENTREZID, will select the SYMBOL mapped ENTREZID]
 #  * @return {data.frame table}       [description]
-#  */
+#  *
 map_to_entrezid <- function(gene, orgDB = org.Hs.eg.db) {
   try_key = intersect(c("SYMBOL", "ENSEMBL", "UNIPROT", "ALIAS"),columns(orgDB))
 
@@ -146,7 +147,9 @@ map_to_entrezid <- function(gene, orgDB = org.Hs.eg.db) {
     for(i in 1:length(from_cols1)){
       cat(paste0(from_cols1[i]," gene(s) transfrom to ENTREZID ", names(from_cols1)[i] %>% gsub("_"," ",.), ". "))
     }
-    cat(from_cols[which(is.na(names(from_cols)))] ,"gene(s) do not match in database.\n")
+    cat("\n")
+    if(any(is.na(names(from_cols))))
+      cat(from_cols[which(is.na(names(from_cols)))] ,"gene(s) do not match in database.\n")
   }
 
   my_ids1$id <- apply(my_ids1, 1, function(i){
@@ -171,6 +174,7 @@ map_to_entrezid <- function(gene, orgDB = org.Hs.eg.db) {
 #'
 #' @param x A SummarizedExperiment/DEGdata output from add_adjections or
 #' a charachter vector containing candidate identifier(SYMBOL, EntrezID, UniprotID or ENSEMBL).
+#' @param contrasts Character, analyse results in which contrasts.
 #' @param type Character, one of "GO","KEGG","REACTOME". The datasets for enrichment analysis.
 #' @param species The species name.
 #' @param by_contrast Logical(1). If true, draw enrichment on each contrast, else draw on the total significant candidates.
@@ -183,8 +187,8 @@ map_to_entrezid <- function(gene, orgDB = org.Hs.eg.db) {
 #'
 #' @examples
 test_ORA <- function(x,
+                     contrasts = NULL,
                      type = c(
-                       # "GOBP", "GOCC", "GOMF",
                        "GO", "KEGG", "REACTOME"),
                      species = "Human",
                      by_contrast = FALSE,
@@ -192,6 +196,7 @@ test_ORA <- function(x,
                      ...
 ){
   assertthat::assert_that(class(x) == "SummarizedExperiment"|class(x) == "DEGdata",
+                          is.null(contrasts)|is.character(contrasts),
                           is.character(species) && length(species) ==1,
                           is.logical(by_contrast) && length(by_contrast) == 1,
                           is.character(pAdjustMethod))
@@ -201,7 +206,9 @@ test_ORA <- function(x,
 
   the_annoSpecies_df = annoSpecies_df()
 
-  contrasts = get_contrast(x)
+  if(is.null(contrasts)){
+    contrasts = get_contrast(x)
+  }
   if(by_contrast && length(contrasts) == 1){
     message("Only contain one contrasts, 'by_contrast' is meanless.")
     by_contrast = F
@@ -280,19 +287,18 @@ test_ORA <- function(x,
 #'
 #' Enrich biological functions on significant candidate via a over representation analysis.
 #'
-#' @param x
-#' @param type
-#' @param species
-#' @param contrasts
-#' @param by_contrast
-#' @param topn
-#' @param pAdjustMethod
-#' @param ...
-#'
+#' @param type Character, one of "GO","KEGG","REACTOME" and "MSigDB". The database for enrichment analysis.
+#' @param topn Integer(1), only use topn list with most significant foldchange
+#' @param category,subcategory Character. Work when \code{type} is "MSigDB". Use which subset of MSigDB.
+#' You can run \code{msigdbr::msigdbr_collections()} to get options.
+#' @param ... Other parameters in \code{\link[clusterProfiler]{GSEA}()} except the cutoff setting
+#' @inheritParams test_ORA
 #' @return
+#' A gseaResult object of
 #' @export
 #'
 #' @examples
+#'
 test_GSEA <- function(x,
                       type = c("GO", "KEGG", "REACTOME",
                                "MSigDB"),
@@ -301,12 +307,15 @@ test_GSEA <- function(x,
                       by_contrast = FALSE,
                       topn= NULL,
                       pAdjustMethod = "BH",
+                      category = NULL, subcategory = NULL,
                       # pvalueCutoff = 0.05,  qvalueCutoff = 0.2,
                       ...
 ){
-  assertthat::assert_that(class(x) == "SummarizedExperiment"|class(x) == "DEGdata"
-                          # , i
-                          )
+  assertthat::assert_that(class(x) == "SummarizedExperiment"|class(x) == "DEGdata",
+                          is.null(contrasts)|(is.character(contrasts)&length(contrasts) ==1),
+                          is.character(species) && length(species) ==1,
+                          is.logical(by_contrast) && length(by_contrast) == 1,
+                          is.character(pAdjustMethod))
   type = match.arg(type)
 
   the_annoSpecies_df = annoSpecies_df()
@@ -414,7 +423,7 @@ test_GSEA <- function(x,
   }
 
   if(type == "GO"){
-    enrich_res <- gsegoAnalysis(genelist, ids_table = ids,
+    enrich_res <- gsegoAnalysis(genelist, organism = species, pAdjustMethod = pAdjustMethod, ids_table = ids,
                              eps = 1e-12)
 
   }else if(type == "KEGG"){
@@ -591,9 +600,9 @@ goAnalysis <- function( gene_id, organism="Human", species_df,
     gene_clusters <- gene_id_list %>% lapply(., function(x){
       set_names(x$ENTREZID, x$name)
     })
-    reat_ALL <- try(compareCluster(gene_clusters, fun = "enrichGO",
-                                   OrgDb = orgDB, ont = "ALL",
-                                   pvalueCutoff = pvalueCutoff, qvalueCutoff = qvalueCutoff, readable = F))
+    reat_ALL <- try(clusterProfiler::compareCluster(gene_clusters, fun = "enrichGO",
+                                                    OrgDb = orgDB, ont = "ALL",
+                                                    pvalueCutoff = pvalueCutoff, qvalueCutoff = qvalueCutoff, readable = F))
     if(class(reat_ALL) == "try-error") return(reat_ALL)
     gene_id = do.call(rbind, gene_id_list) %>% .[!duplicated(.$ENTREZID),]
     reat_ALL@compareClusterResult$geneID %<>% set_readable(., ids_table = gene_id)
@@ -624,7 +633,7 @@ keggAnalysis <- function(gene_id,
     gene_clusters <- gene_id_list %>% lapply(., function(x){
       set_names(x$ENTREZID, x$name)
     })
-    reat <- try(compareCluster(geneClusters = gene_clusters, fun = "enrichKEGG",
+    reat <- try(clusterProfiler::compareCluster(geneClusters = gene_clusters, fun = "enrichKEGG",
                                OrgDb = organism, pAdjustMethod = pAdjustMethod, pvalueCutoff = pvalueCutoff,
                                qvalueCutoff = qvalueCutoff, readable = F,
                                ...), silent = T)
@@ -657,11 +666,11 @@ reactAnalysis <- function(gene_id, organism="Human", pAdjustMethod, species_df,
     gene_clusters <- gene_id_list %>% lapply(., function(x){
       set_names(x$ENTREZID, x$name)
     })
-    reat <- try(compareCluster(geneClusters = gene_clusters, fun = "enrichPathway",
-                               organism = organism,
-                               pAdjustMethod = pAdjustMethod, pvalueCutoff = pvalueCutoff, qvalueCutoff = qvalueCutoff,
-                               readable = F,
-                               ...), silent = T)
+    reat <- try(clusterProfiler::compareCluster(geneClusters = gene_clusters, fun = "enrichPathway",
+                                                organism = organism,
+                                                pAdjustMethod = pAdjustMethod, pvalueCutoff = pvalueCutoff, qvalueCutoff = qvalueCutoff,
+                                                readable = F,
+                                                ...), silent = T)
     if(class(reat) == "try-error") return(reat)
     gene_id = do.call(rbind, gene_id_list) %>% .[!duplicated(.$ENTREZID),]
     reat@compareClusterResult$geneID %<>% set_readable(., ids_table = gene_id)
@@ -692,7 +701,7 @@ gsegoAnalysis <- function(
 
   if(!is.list(gene_list) && is.vector(gene_list)){
     cat("ww")
-    reat_ALL <- try(gseGO(gene = gene_list, OrgDb = orgDB, ont = "ALL",
+    reat_ALL <- try(clusterProfiler::gseGO(gene = gene_list, OrgDb = orgDB, ont = "ALL",
                           pAdjustMethod = pAdjustMethod, pvalueCutoff = pvalueCutoff,
                           minGSSize = minGSSize, verbose = verbose, seed = seed, eps = eps,
                           ...), silent = TRUE)
@@ -701,11 +710,11 @@ gsegoAnalysis <- function(
     reat_ALL@result$core_enrichment %<>% set_readable(., ids_table = ids_table)
   }else if(is.list(gene_list)){
     cat("wdw")
-    reat_ALL <- try(compareCluster(gene_list, fun = "gseGO",  OrgDb = orgDB, ont = "ALL",
-                                   pAdjustMethod = pAdjustMethod, pvalueCutoff = 1,
-                                   minGSSize = minGSSize, verbose = verbose, seed = seed, eps = eps,
-                                   ...
-                                   ), silent = TRUE)
+    reat_ALL <- try(clusterProfiler::compareCluster(gene_list, fun = "gseGO",  OrgDb = orgDB, ont = "ALL",
+                                                    pAdjustMethod = pAdjustMethod, pvalueCutoff = 1,
+                                                    minGSSize = minGSSize, verbose = verbose, seed = seed, eps = eps,
+                                                    ...
+    ), silent = TRUE)
     if(class(reat_ALL) == "try-error")
       return(reat_ALL)
     reat_ALL@compareClusterResult$core_enrichment %<>% set_readable(., ids_table = ids_table)
@@ -716,7 +725,7 @@ gsegoAnalysis <- function(
   return(reat_ALL)
 }
 
-#' @import ReactomePA
+
 gsereactAnalysis <- function(gene_list,
                              organism="Human",
                              # species_df,
@@ -733,7 +742,7 @@ gsereactAnalysis <- function(gene_list,
 
 
   if(!is.list(gene_list) && is.vector(gene_list)){
-    reat <- try(gsePathway(gene = gene_list, organism  = organism,
+    reat <- try(ReactomePA::gsePathway(gene = gene_list, organism  = organism,
                            pAdjustMethod = pAdjustMethod, pvalueCutoff = pvalueCutoff,
                            minGSSize = minGSSize, verbose = verbose, seed = seed, eps = eps,
                            ...), silent = TRUE)
@@ -741,11 +750,11 @@ gsereactAnalysis <- function(gene_list,
       return(reat)
     reat@result$core_enrichment %<>% set_readable(., ids_table = ids_table)
   }else if(is.list(gene_list)){
-    reat <- try(compareCluster(geneClusters = gene_list, fun = "gsePathway",
-                               organism  = organism,
-                               pAdjustMethod = pAdjustMethod, pvalueCutoff = pvalueCutoff,
-                               minGSSize = minGSSize, verbose = verbose, seed = seed, eps = eps,
-                               ...), silent = TRUE)
+    reat <- try(clusterProfiler::compareCluster(geneClusters = gene_list, fun = "gsePathway",
+                                                organism  = organism,
+                                                pAdjustMethod = pAdjustMethod, pvalueCutoff = pvalueCutoff,
+                                                minGSSize = minGSSize, verbose = verbose, seed = seed, eps = eps,
+                                                ...), silent = TRUE)
     if(class(reat) == "try-error")
       return(reat)
     reat@compareClusterResult$core_enrichment %<>% set_readable(., ids_table = ids_table)
@@ -773,20 +782,20 @@ gsekeggAnalysis <- function(gene_list, organism="Human",
   cat(organism)
   if(!is.list(gene_list) && is.vector(gene_list)){
     cat("bbb")
-    reat <- try(gseKEGG(gene = gene_list, organism = organism,
-                        pAdjustMethod = pAdjustMethod, pvalueCutoff = pvalueCutoff,
-                        minGSSize = minGSSize, verbose = verbose, seed = seed, eps = eps,
-                        ...), silent = TRUE)
+    reat <- try(clusterProfiler::gseKEGG(gene = gene_list, organism = organism,
+                                         pAdjustMethod = pAdjustMethod, pvalueCutoff = pvalueCutoff,
+                                         minGSSize = minGSSize, verbose = verbose, seed = seed, eps = eps,
+                                         ...), silent = TRUE)
     if(class(reat) == "try-error")
       return(reat)
     reat@result$core_enrichment %<>% set_readable(., ids_table = ids_table)
   }else if(is.list(gene_list)){
     cat("aaa")
-    reat <- try(compareCluster(geneClusters = gene_list, fun = "gseKEGG",
-                               organism  = organism,
-                               pAdjustMethod = pAdjustMethod, pvalueCutoff = pvalueCutoff,
-                               minGSSize = minGSSize, verbose = verbose, seed = seed, eps = eps,
-                               ...), silent = TRUE)
+    reat <- try(clusterProfiler::compareCluster(geneClusters = gene_list, fun = "gseKEGG",
+                                                organism  = organism,
+                                                pAdjustMethod = pAdjustMethod, pvalueCutoff = pvalueCutoff,
+                                                minGSSize = minGSSize, verbose = verbose, seed = seed, eps = eps,
+                                                ...), silent = TRUE)
     if(class(reat) == "try-error")
       return(reat)
     reat@compareClusterResult$core_enrichment %<>% set_readable(., ids_table = ids_table)
@@ -840,10 +849,10 @@ gsemsigdbAnalysis <- function(gene_list, organism="Human",
 
   if(!is.list(gene_list) && is.vector(gene_list)){
     cat("bbb")
-    reat <- try(GSEA(gene = gene_list, TERM2GENE = m_t2g,
-                        pAdjustMethod = pAdjustMethod, pvalueCutoff = pvalueCutoff,
-                        minGSSize = minGSSize, verbose = verbose, seed = seed, eps = eps,
-                        ...), silent = TRUE)
+    reat <- try(clusterProfiler::GSEA(gene = gene_list, TERM2GENE = m_t2g,
+                                      pAdjustMethod = pAdjustMethod, pvalueCutoff = pvalueCutoff,
+                                      minGSSize = minGSSize, verbose = verbose, seed = seed, eps = eps,
+                                      ...), silent = TRUE)
     if(class(reat) == "try-error")
       return(reat)
     reat@result$core_enrichment %<>% set_readable(., ids_table = ids_table)
@@ -851,11 +860,11 @@ gsemsigdbAnalysis <- function(gene_list, organism="Human",
     reat@compareClusterResult %<>% cbind(m_t2)
   }else if(is.list(gene_list)){
     cat("aaa")
-    reat <- try(compareCluster(geneClusters = gene_list, fun = "GSEA",
-                               TERM2GENE = m_t2g,
-                               pAdjustMethod = pAdjustMethod, pvalueCutoff = pvalueCutoff,
-                               minGSSize = minGSSize, verbose = verbose, seed = seed, eps = eps,
-                               ...), silent = TRUE)
+    reat <- try(clusterProfiler::compareCluster(geneClusters = gene_list, fun = "GSEA",
+                                                TERM2GENE = m_t2g,
+                                                pAdjustMethod = pAdjustMethod, pvalueCutoff = pvalueCutoff,
+                                                minGSSize = minGSSize, verbose = verbose, seed = seed, eps = eps,
+                                                ...), silent = TRUE)
     if(class(reat) == "try-error")
       return(reat)
     reat@compareClusterResult$core_enrichment %<>% set_readable(., ids_table = ids_table)

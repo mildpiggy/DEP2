@@ -12,15 +12,38 @@ test_GSEA(
   by_contrast = FALSE,
   topn = NULL,
   pAdjustMethod = "BH",
+  category = NULL,
+  subcategory = NULL,
   ...
 )
 }
 \arguments{
-\item{...}{}
+\item{x}{A SummarizedExperiment/DEGdata output from add_adjections or
+a charachter vector containing candidate identifier(SYMBOL, EntrezID, UniprotID or ENSEMBL).}
+
+\item{type}{Character, one of "GO","KEGG","REACTOME" and "MSigDB". The database for enrichment analysis.}
+
+\item{species}{The species name.}
+
+\item{contrasts}{Character, analyse results in which contrasts.}
+
+\item{by_contrast}{Logical(1). If true, draw enrichment on each contrast, else draw on the total significant candidates.}
+
+\item{topn}{Integer(1), only use topn list with most significant foldchange}
+
+\item{pAdjustMethod}{Character, one of "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none".}
+
+\item{category, subcategory}{Character. Work when \code{type} is "MSigDB". Use which subset of MSigDB.
+You can run \code{msigdbr::msigdbr_collections()} to get options.}
+
+\item{...}{Other parameters in \code{\link[clusterProfiler]{GSEA}()} except the cutoff setting}
 }
 \value{
-
+A gseaResult object of
 }
 \description{
 Enrich biological functions on significant candidate via a over representation analysis.
+}
+\examples{
+
 }

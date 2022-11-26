@@ -440,29 +440,45 @@ genelist_tool_UI <- function(id,labelname = "GenelisttoolUI"){
     fluidRow(
       column(width = 4,
              h4("Venn plotly"),
-             plotlyOutput(ns("venn_plotly"),height = "600px")
+             plotlyOutput(ns("venn_plotly"),height = "600px"),
+             downloadButton(ns('downloadlist'), 'Save list')
       ),
       column(width = 8,
              # verbatimTextOutput(ns("venn_selected")), ## to show selected venn_click()
              # verbatimTextOutput(ns("venn_selected2")), ## to show selected venn_click2()
              h4("Subset Heatmap"),
              fluidRow(
-               column(width = 3,
+               column(width = 1,
+                      numericInput(ns("k"),
+                                   "kmanes",
+                                   min = 1, max = 20, value = 5)),
+               column(width = 2,
+                      selectizeInput(ns("heatmap_color"),
+                                     "color panel",
+                                     choices = c("BrBG", "PiYG", "PRGn", "PuOr", "RdBu", "RdGy", "RdYlBu", "RdYlGn", "Spectral"),
+                                     selected = c("RdBu"), multiple = FALSE),
+                      ),
+               column(width = 2,
+                      numericInput(ns("heatmap_color_limit"),
+                                   "color limit",
+                                   min = 0, max = 16, value = 4),
+                      ),
+               column(width = 2,
                       numericInput(ns("row_font_size"),
                                    "row font size",
                                    min = 0, max = 15, value = 6)),
-               column(width = 3,
+               column(width = 2,
                       numericInput(ns("col_font_size"),
                                    "col font size",
                                    min = 0, max = 16, value = 10)),
-               column(width = 3,
+               column(width = 2,
                       numericInput(ns("heatmap_width"),
                                    "heatmap width",
-                                   min = 1, max = 30, value = 7)),
-               column(width = 3,
+                                   min = 1, max = 30, value = 5)),
+               column(width = 2,
                       numericInput(ns("heatmap_height"),
                                    "heatmap height",
-                                   min = 1, max = 30, value = 10)),
+                                   min = 1, max = 30, value = 8)),
              ),
              uiOutput(ns("Venn_heatmap")),
              downloadButton(ns('downloadHeatmap'), 'Save heatmap')
@@ -587,6 +603,17 @@ genelist_tool_Server <- function(id, Omics_res){
           return(NULL)
         }
 
+      })
+
+      venn_output_df <- reactive({
+        data <- venn_data()
+        venn_list = data@region$item
+        region_names = data@region$name
+        df <- data.frame(sapply(venn_list, "[", i = 1:max(sapply(venn_list, length))))
+        df[is.na(df)] <- ""
+        colnames(df) <- region_names
+        df_save <<- df
+        return(df)
       })
 
       venn_items <- reactive({
@@ -1020,77 +1047,22 @@ genelist_tool_Server <- function(id, Omics_res){
 
         items = venn_items()
         data = venn_data()
-        # data_save <<- data
         validate(need(!is.null(venn_data()), "At least need two list"))
         selected_proteins <- data@region$item[which(data@region$id %in% venn_click2)] %>% unlist() %>% unique()
 
         print(input$dropzone1)
-        # Omics_res_saved <<- Omics_res
         dropzone_selected_omics <- c(input$dropzone1, input$dropzone2, input$dropzone3, input$dropzone4)
         dropzone_selected_omics2 <- dropzone_selected_omics %>% sapply(., function(x){strsplit(x,"-ds-")[[1]][1]}) %>% unique
-        ht_list <- map(dropzone_selected_omics2,function(x){
-          the_res <- Omics_res[[x]]()
-          omics_type = strsplit(x,"_")[[1]][1]
-          if(omics_type == "Timecourse"){
-            ht_mat = Omics_res[[x]]()$mat
-          }else{
-            ht_mat = assay(the_res)
-          }
-          if(input$to_upper) rownames(ht_mat) = rownames(ht_mat) %>% toupper() %>% make.names()
-          return(ht_mat)
-        })
 
-        names(ht_list) = dropzone_selected_omics2
-        ht_list_save <<- ht_list
+        # omics_list <- Omics_res %>% reactiveValuesToList() %>% .[dropzone_selected_omics2] %>% lapply(function(x) x())
+        omics_list <- Omics_res_list() %>% .[dropzone_selected_omics2] %>% lapply(function(x) x())
+        multi_ht <- plot_multi_heatmap(omics_list = omics_list, choose_name = selected_proteins, to_upper = input$to_upper,
+                                       color = input$heatmap_color,col_limit = input$heatmap_color_limit,
+                                       width = input$heatmap_width,
+                                       height = input$heatmap_height,
+                                       km = input$k)
 
-        ht_list2 <- lapply(ht_list, function(x){
-          # cat(class(x))
-          x = x - rowMeans(x)
-          x = as.data.frame(x)
-          x = x[selected_proteins,]
-          rownames(x) = selected_proteins
-          x = as.matrix(x)
-          return(x)
-        })
-        names(ht_list2) = dropzone_selected_omics2
-        ht_list2_save <<- ht_list2
-
-        col_width = input$heatmap_width/(map_int(ht_list2,ncol) %>% sum)
-        col_width_save <<- col_width
-        heatmap_list <- lapply(1:length(ht_list2), function(x){
-          mat = ht_list2[[x]]
-          if(all(is.na(mat))){
-            return(NULL)
-          }else{
-            ht = ComplexHeatmap::Heatmap(mat,
-                                         heatmap_width = unit(col_width * ncol(mat) * 5, "cm"),
-                                         # heatmap_height = unit(heatmap_height * 5, "cm"),
-                                         na_col = "grey80",
-                                         cluster_rows = F,
-                                         cluster_columns = F,
-                                         column_title = names(ht_list2)[x],
-                                         row_names_gp = gpar(fontsize = input$row_font_size),
-                                         name = names(ht_list2)[x],
-                                         heatmap_legend_param = list(title = names(ht_list2)[x] ))
-            return(ht)
-          }
-        })
-
-        # heatmap_list[[1]] + heatmap_list[[2]] + heatmap_list[[3]] + heatmap_list[[4]]
-
-        for (i in 1:length(heatmap_list)) {
-          if(i == 1){
-            heatmap_list2 = heatmap_list[[i]]
-          }else{
-            heatmap_list2 = heatmap_list2 + heatmap_list[[i]]
-          }
-
-        }
-        heatmap_list2_save <<- heatmap_list2
-        heatmap_list2
-        heatmap_height_save <<- input$heatmap_height
-        draw(heatmap_list2,height = unit(input$heatmap_height * 5, "cm"))
-
+        multi_ht
       })
 
       output$Venn_heatmap <- renderUI({
@@ -1109,6 +1081,15 @@ genelist_tool_Server <- function(id, Omics_res){
           pdf(file, width = input$heatmap_width *2.5, height = input$heatmap_height*2.5)
           print(heatmap_plot())
           dev.off()
+        }
+      )
+
+      output$downloadlist <- downloadHandler(
+        filename = 'Venn_lists.txt',
+        content = function(file) {
+          write.table(venn_output_df(),file,sep = "\t",
+                      col.names = TRUE,
+                      row.names = FALSE)
         }
       )
 

@@ -187,6 +187,7 @@ make_pe_parse <- function(Peptide,
   rowData(QF[[assay_name]])$nNonZero <- rowSums(assay(QF[[assay_name]]) > 0)
   # if(!is.null(NAnum))   QF <- filterFeatures(QF, ~ nNonZero >= (ncol(assay(QF[["peptideRaw"]])) - NAnum))
 
+  expdesign$replicate = as.integer(expdesign$replicate)
   QF[[assay_name]]@colData = as(expdesign, "DataFrame")
   colData(QF) = as(expdesign, "DataFrame")
   QF <- QFeatures::zeroIsNA(QF, assay_name)
@@ -377,7 +378,9 @@ Peptide_distribution <- function(pe_norm, i = "peptideNorm", fcol = "Proteins"){
 }
 
 
-## The function from msqrob2, design the smallestUniqueGroups.
+## The function from msqrob2, design the smallestUniqueGroups. Example below.
+#> DEP2:::smallestUniqueGroups(c("A;B;C","D","B;C","A;B","B;C;D"))
+#> [1] "D"   "B;C" "A;B"
 smallestUniqueGroups <- function(proteins,
                                  split = ";") {
   b <- strsplit(x = as.character(unique(proteins)), split = split, fixed = TRUE)
@@ -437,7 +440,6 @@ aggregateFeatures = function(object, i, fcol, name = "newAssay",
                varFrom = fcol,
                varTo = fcol)
 }
-
 #' Normalize a QFeatures object
 #'
 #' Normalize a QFeatures object though [QFeatures::normalize] function
@@ -487,13 +489,13 @@ normalize_pe <- function(pe, method = c("diff.median", "quantiles", "quantiles.r
 #' @param pe A QFeatures object,
 #' contains the normalized peptide assay
 #' @param aggrefun 	A function used for quantitative feature aggregation.
-#' It can be a character in "RobustSummary","medianPolish","totalMean" or a function.
+#' It can be a character in "RobustSummary","medianPolish","totalMean" or other function.
 #' Details see \code{\link[QFeatures]{aggregateFeatures}}
-#' @param aggregate_Peptide_Type Character in "Unique + Razor" or "unique".
-#' Use what kind of peptides to summarise proteins.
+#' @param aggregate_Peptide_Type Character in "Unique + Razor" or "Unique".
+#' Use what kind of peptides to summarise proteins. If choose "Unique", return output just save unique peptides in smallest proteingroups.
 #' @param fcol Character(1), defining how to summarise the features. Exist in \code{rowData(pe)}.
 #' @param peptide_assay_name Character(1), the name of aggregation result assay
-#' @param reserve Character, the column(s) which will reserve after aggregate.
+#' @param reserve Character, the column(s) which will reserve after aggregate, such as the columns store protein information can.
 #'
 #' @return
 #' a QFeatures object with a new protein aggregation assay.
@@ -519,28 +521,29 @@ aggregate_pe <- function(pe, aggrefun = c("RobustSummary","medianPolish","totalM
     stop("'peptide_assay_name' should be one of exist assay in ", deparse(substitute(pe)),": ", paste(names(pe),collapse = ", "))
 
   if(aggregate_Peptide_Type == "Unique"){
+    ## just use the features in smallestUniqueGroups.
     fil_formula <- as.formula( paste0("~",fcol," %in% smallestUniqueGroups(rowData(pe[['",peptide_assay_name ,"']])$",fcol,")") )
     pe <- filter_pe(pe, filter_formula = fil_formula, assay_name =  peptide_assay_name )
     print("aggregate by uniques peptides, filterFeatures finished")
-
-    protein = suppressWarnings({DEP2:::aggregateFeatures(object = pe ,
-                                                  i = peptide_assay_name, fcol = fcol,
-                                                  name = "protein",
-                                                  fun = aggrefun,
-                                                  na.rm = T,
-                                                  reserve = reserve)} )
+    rowData(pe)$smallestProteingroups <- rowData(pe)[,fcol]
+    protein <- suppressWarnings({DEP2:::aggregateFeatures(object = pe ,
+                                                          i = peptide_assay_name, fcol = fcol,
+                                                          name = "protein",
+                                                          fun = aggrefun,
+                                                          na.rm = T,
+                                                          reserve = reserve)} )
 
 
   }else if(aggregate_Peptide_Type == "Unique + Razor"){
     print("aggregate by Unique + Razor peptides")
     pe <- Peptide_distribution(pe, i = peptide_assay_name,fcol = fcol)
     print("peptides distribution finished")
-    protein = suppressWarnings({DEP2:::aggregateFeatures(object = pe ,
-                                                         i = peptide_assay_name, fcol = "smallestProteingroups",
-                                                         name = "protein",
-                                                         fun = aggrefun,
-                                                         na.rm = T,
-                                                         reserve = reserve)} ) ## function from QFeatures
+    protein <- suppressWarnings({DEP2:::aggregateFeatures(object = pe ,
+                                                          i = peptide_assay_name, fcol = "smallestProteingroups",
+                                                          name = "protein",
+                                                          fun = aggrefun,
+                                                          na.rm = T,
+                                                          reserve = reserve)} ) ## function from QFeatures
   }
   print("aggregation finished")
   colData(protein[["protein"]]) = colData(protein)
@@ -548,4 +551,36 @@ aggregate_pe <- function(pe, aggrefun = c("RobustSummary","medianPolish","totalM
 }
 
 
+
+#' Extract the proteins SummarizedExperiment object from a QFeatures container
+#'
+#' This function accept a result from \link{aggregate_pe}(),
+#' tidy features identifiers and return a SE object for following analyze
+#'
+#' @param pe_aggregated A QFeatures object output from \code{aggregate_pe()}, which contain a "protein" quantative assay.
+#' @param names The column of gene names, which serve as feature identifier and is transmitted to \link{make_unique}
+#' @param ids   The column of protein ID, transmitted to \link{make_unique}. aggregate_pe automatically generate a "smallestProteingroups" column
+#' to store ids in proteingroups.
+#' @param delim Character. The separator in names of ids.
+#'
+#' @return
+#' A SummarizedExperiment object.
+#' @export
+#'
+#' @examples
+pe2se <- function(pe_aggregated, names = "Gene.names", ids = "smallestProteingroups", delim = ";"){
+  SE_pep <- pe_aggregated[["protein"]]
+
+  ## make names for features
+  rd <- DEP2::make_unique(rowData(SE_pep) %>% as.data.frame(),
+                          names = names,           # The gene names
+                          ids = ids,  # The protien ID translated to Proteingroups.
+                          delim = ";")
+  rownames(rd) <- rd$name
+  rowData(SE_pep) <- rd
+  rownames(SE_pep) <- rd$name
+
+  colData(SE_pep)$replicate <- as.integer(colData(SE_pep)$replicate)
+  return(SE_pep)
+}
 

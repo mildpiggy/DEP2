@@ -1,14 +1,14 @@
 ## the sidebar_mod body_mod and server mod of DEP-ptm analysis from Phospho (STY)Sites quantification
 
-DEP_ptm_UI <- function(id){
+DEP_ptm_UI <- function(id,labelname){
   tagList(
     sidebarLayout(
-      DEP_ptm_sidebar_mod(id = id), ## DEP-ptm sidebar module
+      DEP_ptm_sidebar_mod(id = id,labelname=labelname), ## DEP-ptm sidebar module
       DEP_ptm_body_mod(id = id)  ## DEP-ptm pagebody module
     ))
 }
 
-DEP_ptm_sidebar_mod <-  function(id){
+DEP_ptm_sidebar_mod <-  function(id,labelname){
   ns = NS(id)
   cat(paste0("DEP_ptm_sidebar ns is",ns(""),"\n"))
 
@@ -16,7 +16,7 @@ DEP_ptm_sidebar_mod <-  function(id){
     # sidebarLayout(
     sidebarPanel(
       width = 3,
-      h3(id),
+      h3(labelname),
       bsCollapse(
         bsCollapsePanel("Files",
                         style = "primary",
@@ -878,7 +878,10 @@ DEP_ptm_server_module <- function(id, Omics_res){
     id,
     function(input,output,session){
 
-      Omics_res_list <- reactive({Omics_res_list_save <<- reactiveValuesToList(Omics_res)})
+      Omics_res_list <- reactive({
+        # Omics_res_list_save <<- reactiveValuesToList(Omics_res)
+        reactiveValuesToList(Omics_res)
+        })
 
       # observeEvent(input$threshold_method,{
 

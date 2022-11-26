@@ -630,7 +630,7 @@ setMethod("plot_heatmap",
   ht_df <- df
 
   # Heatmap
-  cat(color)
+  # cat(color)
   # if(is.null(chooseToshow)) {
     ht1 = ComplexHeatmap::Heatmap(df,
                                   col = circlize::colorRamp2(
@@ -915,7 +915,7 @@ setMethod("plot_heatmap",
   ht_df <- df
 
   # Heatmap
-  cat(color)
+  # cat(color)
   ht1 = ComplexHeatmap::Heatmap(df,
                                 col = circlize::colorRamp2(
                                   seq(-col_limit, col_limit, (col_limit/5)),
@@ -1439,11 +1439,15 @@ plot_volcano <- function (object, contrast = get_contrast(object)[1],
 #'
 #' @param omics_list A list composed of SummarizedExperiment or DEGdata objects.
 #' @param choose_name Character, the vector of specified identifiers.
+#' @param color Character(1), sets the color panel (from \pkg{RColorBrewer}).
+#' It can be a palette name in "RdBu", "RdYlBu", "RdYlGn", "BrBG", "PiYG", "PRGn", "PuOr", "RdGy", "Spectral".
+#' @param col_limit  Integer(1),
+#' Sets the outer limits of the color scale.
 #' @param to_upper Logical, whether transform all identifiers to upper
 #' @param width Numeric, the width of heatmap
 #' @param height Numeric, the height of heatmap
 #' @param row_font_size Numeric, the size of row label.
-#'
+#' @param ... other parameters to \code{\link[ComplexHeatmap]{Heatmap}}
 #' @return
 #' A HeatmapList from \code{ComplexHeatmap} package
 #'
@@ -1451,14 +1455,17 @@ plot_volcano <- function (object, contrast = get_contrast(object)[1],
 #'
 #' @examples
 plot_multi_heatmap <- function(omics_list, choose_name, to_upper = FALSE,
-                               width = 7, height = 10, row_font_size){
+                               color = c("RdBu", "RdYlBu", "RdYlGn", "BrBG", "PiYG", "PRGn", "PuOr", "RdGy", "Spectral"),
+                               col_limit = 6,
+                               width = 7, height = 10, row_font_size = 5,
+                               ...){
   assertthat::assert_that(class(omics_list) == "list", length(omics_list) > 0,
                           is.character(choose_name),
                           is.logical(to_upper), length(to_upper) == 1
                           )
-
-  ht_list <- map(omics_list,function(x){
-    ht_mat = assay(the_res)
+  color <- match.arg(color)
+  ht_list <- lapply(omics_list,function(x){
+    ht_mat = assay(x)
     if(to_upper)
       rownames(ht_mat) = rownames(ht_mat) %>% toupper() %>% make.names()
     return(ht_mat)
@@ -1467,14 +1474,14 @@ plot_multi_heatmap <- function(omics_list, choose_name, to_upper = FALSE,
   ht_list2 <- lapply(ht_list, function(x){
     x = x - rowMeans(x)
     x = as.data.frame(x)
-    x = x[selected_proteins,]
-    rownames(x) = selected_proteins
+    x = x[choose_name,]
+    rownames(x) = choose_name
     x = as.matrix(x)
     return(x)
   })
 
   names(ht_list2) = names(omics_list)
-  col_width = width/(map_int(ht_list2,ncol) %>% sum)
+  col_width = width/(sapply(ht_list2,ncol) %>% unlist %>% sum)
 
   heatmap_list <- lapply(1:length(ht_list2), function(x){
     mat = ht_list2[[x]]
@@ -1484,13 +1491,17 @@ plot_multi_heatmap <- function(omics_list, choose_name, to_upper = FALSE,
       ht = ComplexHeatmap::Heatmap(mat,
                                    heatmap_width = unit(col_width * ncol(mat) * 5, "cm"),
                                    # heatmap_height = unit(heatmap_height * 5, "cm"),
+                                   col = circlize::colorRamp2(
+                                     seq(-col_limit, col_limit, (col_limit/5)),
+                                     rev(RColorBrewer::brewer.pal(11, color))),
                                    na_col = "grey80",
                                    cluster_rows = F,
                                    cluster_columns = F,
                                    column_title = names(ht_list2)[x],
-                                   row_names_gp = gpar(fontsize = input$row_font_size),
+                                   row_names_gp = gpar(fontsize = row_font_size),
                                    name = names(ht_list2)[x],
-                                   heatmap_legend_param = list(title = names(ht_list2)[x] ))
+                                   heatmap_legend_param = list(title = names(ht_list2)[x] ),
+                                   ...)
       return(ht)
     }
   })
@@ -1506,7 +1517,7 @@ plot_multi_heatmap <- function(omics_list, choose_name, to_upper = FALSE,
   }
 
   heatmap_list2
-  draw(heatmap_list2,height = unit(height * 5, "cm"))
+  # draw(heatmap_list2,height = unit(height * 5, "cm"))
 }
 
 
@@ -1514,8 +1525,10 @@ plot_multi_heatmap <- function(omics_list, choose_name, to_upper = FALSE,
 #'
 #' Plot a venn plot for significant candidate in muitiple omics results, based on identifiers('name')
 #'
-#' @param omics_list A list composed of SummarizedExperiment or DEGdata objects.
+#' @param omics_list A list composed of SummarizedExperiment or DEGdata objects or.
 #' @param to_upper Logical, whether transform all identifiers to upper
+#' @param background NULL or character vector of names of background protein/gene pool.
+#' If background is provided, plot_multi_venn only consider candidates in background.
 #' @param plot  Logical(1), return a venn plot or a table.
 #'
 #' @return
@@ -1524,7 +1537,7 @@ plot_multi_heatmap <- function(omics_list, choose_name, to_upper = FALSE,
 #' @export
 #'
 #' @examples
-plot_multi_venn <- function(omics_list, to_upper = F, plot = T){
+plot_multi_venn <- function(omics_list, to_upper = F, plot = T, background = NULL){
   assertthat::assert_that(class(omics_list) == "list", length(omics_list) > 0,
                           is.logical(to_upper), length(to_upper) == 1,
                           is.logical(plot), length(plot) == 1
@@ -1534,6 +1547,10 @@ plot_multi_venn <- function(omics_list, to_upper = F, plot = T){
   if(!all(classes %in% c("SummarizedExperiment","DEGdata")))
     get_signicant()
   gene_list <- lapply(omics_list, get_signicant, return_type = "names")
+
+  if(!is.null(background)){
+    gene_list <- lapply(gene_list, function(x){intersect(x,background)})
+  }
 
   venn <- RVenn::Venn(gene_list)
   data <- ggVennDiagram::process_data(venn)
@@ -1551,7 +1568,9 @@ plot_multi_venn <- function(omics_list, to_upper = F, plot = T){
   ggp <- ggplot(items) +
     geom_sf(aes_string(fill = "count"),lwd=0.5,color ="grey80") +
     geom_sf_text(aes_string(label = "name"), data = data@setLabel,inherit.aes = F) +
-    geom_text(aes_string(label = "count2", text = "text", x = "textx", y = "texty"), show.legend = FALSE,size=4) +
+    geom_text(aes_string(label = "count2",
+                         # text = "text",
+                         x = "textx", y = "texty"), show.legend = FALSE,size=4) +
     scale_fill_gradient(low = "#F4FAFE", high = "#4981BF") +
     theme_void()
 

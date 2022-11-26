@@ -9,15 +9,15 @@ get_DEPglobal_env <- function () {
   get(".DEPglobal_data_Env", envir = .GlobalEnv)
 }
 
-DEP_pg_UI <- function(id){
+DEP_pg_UI <- function(id, labelname){
   tagList(
     sidebarLayout(
-      DEP_pg_sidebar_mod(id = id), ## DEP sidebar module
+      DEP_pg_sidebar_mod(id = id,labelname=labelname), ## DEP sidebar module
       DEP_pg_body_mod(id = id)  ## DEP pagebody module
     ))
 }
 
-DEP_pg_sidebar_mod <-  function(id){
+DEP_pg_sidebar_mod <-  function(id,labelname){
   ns = NS(id)
   cat(paste0("DEP_pg_sidebar ns is",ns(""),"\n"))
 
@@ -25,7 +25,7 @@ DEP_pg_sidebar_mod <-  function(id){
     # sidebarLayout(
       sidebarPanel(
         width = 3,
-        h3(id),
+        h3(labelname),
         bsCollapse(
           id = ns("DEPpg_sidebar"),
           bsCollapsePanel("Files",
