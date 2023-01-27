@@ -40,7 +40,7 @@ DEP2::run_app()
 
 ## Check the suggested packages required in analysis
 
-Check the required packages in functionality
+Some depend packages are required in some functionalities.
 
 ``` r
 library(DEP2)
@@ -58,6 +58,10 @@ DEP2::check_PPI_depends(install = TRUE)
 DEP2::check_RNAseq_depends(install = TRUE)
 ```
 
-## Vignettes
+## Vignette
 
-View the Vignettes for more information …
+View the Vignette for more information
+
+``` r
+vignette("DEP2_analysis")
+```

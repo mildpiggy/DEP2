@@ -4,7 +4,6 @@
 .httr-oauth
 .DS_Store
 example
-inst/doc
 GOdata
 /doc/
 /Meta/
