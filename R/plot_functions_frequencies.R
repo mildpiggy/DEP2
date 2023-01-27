@@ -120,20 +120,5 @@ plot_coverage <- function (se, plot = TRUE, features_type = "features")
 }
 
 
-#' @importFrom DEP plot_frequency
-#' @export
-plot_frequency = DEP::plot_frequency
 
-
-#' @importFrom DEP plot_cond_freq
-#' @export
-plot_cond_freq = DEP::plot_cond_freq
-
-#' @importFrom DEP plot_cond_overlap
-#' @export
-plot_cond_overlap = DEP::plot_cond_overlap
-
-#' @importFrom DEP plot_cond
-#' @export
-plot_cond = DEP::plot_cond
 

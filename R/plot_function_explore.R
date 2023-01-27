@@ -603,6 +603,7 @@ plot_pca <- function(object, x = 1, y = 2, indicate = c("condition", "replicate"
 #' @export
 #'
 #' @examples
+#'
 plot_Tsne <- function (object, indicate = c("condition",
                                          "replicate"), label = FALSE,
                        n = nrow(object),
@@ -873,7 +874,7 @@ plot_umap <- function (object, indicate = c("condition",
 #'
 #' @examples
 #' @export
-#' @importFrom ggrepel geom_label_repel
+#\' @importFrom ggrepel geom_label_repel
 plot_ma_RNA <- function(x,
                         contrast = get_contrast(x)[1],
                         point_alpha = 0.2,
@@ -956,7 +957,7 @@ plot_ma_RNA <- function(x,
 #' @export
 #'
 #' @examples
-#' @importFrom ggrepel geom_label_repel
+#\' @importFrom ggrepel geom_label_repel
 plot_ma_pro <- function(x,
                         contrast,
                         point_alpha = 0.2,
@@ -1128,7 +1129,7 @@ plot_norm_distribution <- function(object, contrast = get_contrast(object)) {
   x = row_data[, cols_diff]
   x = fun.outlier(x) %>% na.omit()
   fit <- fitnormal(x)
-  σ = sqrt(fit$theta[2])
+  Sigma = sqrt(fit$theta[2])
   mu = fit$theta[1]
 
   df <- as.data.frame(x)
@@ -1140,10 +1141,10 @@ plot_norm_distribution <- function(object, contrast = get_contrast(object)) {
                    bins = 100,
                    colour ="black",
                    fill ="grey") +
-    stat_function(fun = dnorm, args = list(mean = mu, sd = σ), color ="darkred") +
+    stat_function(fun = dnorm, args = list(mean = mu, sd = Sigma), color ="darkred") +
     # annotate("text", x = Inf, y = Inf, label = "Upper left", hjust = 2,
     # vjust = 2) +
-    geom_text(data = data.frame(), aes(x = Inf, y = Inf,label = paste("Mean = ", round(mu, 2), "\nStd.Dev. =", round(σ, 2), sep = "")), hjust = 1.2, vjust = 1.2, size = 4) +
+    geom_text(data = data.frame(), aes(x = Inf, y = Inf,label = paste("Mean = ", round(mu, 2), "\nStd.Dev. =", round(Sigma, 2), sep = "")), hjust = 1.2, vjust = 1.2, size = 4) +
     labs(x = "log2 fold change") +
     theme_DEP2() +
     theme(legend.position = "none") +

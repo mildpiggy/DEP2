@@ -22,6 +22,15 @@
 #' @export
 #'
 #' @examples
+#' # Load a peptides
+#' data(Silicosis_peptide)
+#' # Exctract Intensity columns
+#' (ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T))
+#' (expDesign = Silicosis_ExpDesign)
+#' # Construct a QFeatures object, with a 'peptideRaw' assay
+#' pe_peptides <- make_pe(Silicosis_peptide, columns = ecols,   # columns is the abundance columns
+#'                        expdesign = expDesign) # log2transform
+#' pe_peptides # a QFeatures object, with a peptideRaw assay
 make_pe <- function(Peptide, columns,
                     expdesign,
                     fnames,
@@ -124,6 +133,14 @@ make_pe <- function(Peptide, columns,
 #' @export
 #'
 #' @examples
+#' # Load a peptides
+#' data(Silicosis_peptide)
+#' ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T)
+#' # Construct a QFeatures object, with a 'peptideRaw' assay
+#' pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols,   # columns is the abundance columns
+#'                              mode = "delim", sep = "_",
+#'                              remove_prefix = T, log2transform = T)
+#' pe_peptides
 make_pe_parse <- function(Peptide,
                           columns,
                           fnames,
@@ -153,7 +170,7 @@ make_pe_parse <- function(Peptide,
     Peptide <- as.data.frame(Peptide)
 
   if(remove_prefix){
-    colnames(Peptide)[columns] <- DEP2:::delete_prefix(colnames(Peptide)[columns]) %>% make.names()
+    colnames(Peptide)[columns] <- delete_prefix(colnames(Peptide)[columns]) %>% make.names()
   }
   if(remove_suffix){
     colnames(raw) <- delete_suffix(colnames(raw)) %>% make.names()
@@ -214,7 +231,13 @@ make_pe_parse <- function(Peptide,
 #' @inheritParams filter_se
 #' @return A filtered Qfeatures object,
 #' or a vector of keep rows if \code{return_keeprows} is TRUE
+#'
 #' @examples
+#' data <- Silicosis_peptide
+#' ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = TRUE)
+#' # Construct a QFeatures object, with a 'peptideRaw' assay
+#' pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = TRUE, log2transform = TRUE,mode = "delim")
+#' filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
 #'
 #' @export
 #' @importFrom rlang is_formula
@@ -247,7 +270,7 @@ filter_pe <- function(pe,
 # aggregation functions
 ## modified from QFeatures:::reduceDataFrame, add reserve to trim the row DF.
 #' @import  QFeatures
-#' @importFrom S4Vectors split
+#' @importFrom S4Vectors split DataFrame isEmpty
 reducedataframe <- function (x, k, count = FALSE, simplify = TRUE, drop = FALSE, reserve)
 {
   res <- S4Vectors::split(x, k)
@@ -256,7 +279,7 @@ reducedataframe <- function (x, k, count = FALSE, simplify = TRUE, drop = FALSE,
 
   if (simplify | drop)
     invars <- invariant_cols2(res)
-  res <- DataFrame(res)
+  res <- S4Vectors::DataFrame(res)
 
   if(!is.null(reserve)){
     invars <- c(invars,which(colnames(res) %in% reserve)) %>% unique
@@ -285,7 +308,7 @@ invariant_cols2 <- function (x)
   which(res)
 }
 
-## modified from QFeatures:::.aggregateQFeatures, add reserve for reducedataframe
+## modified from QFeatures:::.aggregateQFeatures, add reserve argument for reducedataframe
 #' @importFrom MsCoreUtils aggregate_by_vector robustSummary colCounts
 .aggregateSE <- function(object, fcol, fun, reserve,...) {
   if (missing(fcol))
@@ -318,15 +341,15 @@ invariant_cols2 <- function (x)
   aggregated_assay <- MsCoreUtils::aggregate_by_vector(m, groupBy, fun, ...)
   aggcount_assay <- MsCoreUtils::aggregate_by_vector(m, groupBy, colCounts)
   print("begin reducedataframe")
-  aggregated_rowdata <- DEP2:::reducedataframe(rd, rd[[fcol]],
+  aggregated_rowdata <- reducedataframe(rd, rd[[fcol]],
                                         simplify = T,
                                         drop = T,
                                         count = TRUE,
                                         reserve = reserve)
 
   print("reducedataframe finiched")
-  se <- SummarizedExperiment(assays = SimpleList(assay = aggregated_assay,
-                                                 aggcounts = aggcount_assay),
+  se <- SummarizedExperiment(assays = S4Vectors::SimpleList(assay = aggregated_assay,
+                                                            aggcounts = aggcount_assay),
                              rowData = aggregated_rowdata[rownames(aggregated_assay), ])
   ## If the input objects weren't SummarizedExperiments, then try to
   ## convert the merged assay into that class. If the conversion
@@ -340,7 +363,7 @@ invariant_cols2 <- function (x)
 }
 
 
-## distribute razor peptides
+## distribute razor peptides to proteingroups
 Peptide_distribution <- function(pe_norm, i = "peptideNorm", fcol = "Proteins"){
   rd <- rowData(pe_norm[[i]]) %>% as.data.frame()
   allpgs <- rd[,fcol]
@@ -378,7 +401,7 @@ Peptide_distribution <- function(pe_norm, i = "peptideNorm", fcol = "Proteins"){
 }
 
 
-## The function from msqrob2, design the smallestUniqueGroups. Example below.
+## The function from msqrob2, design the smallestUniqueGroups. See example below.
 #> DEP2:::smallestUniqueGroups(c("A;B;C","D","B;C","A;B","B;C;D"))
 #> [1] "D"   "B;C" "A;B"
 smallestUniqueGroups <- function(proteins,
@@ -419,7 +442,7 @@ smallestUniqueGroups <- function(proteins,
 
 aggregateFeatures = function(object, i, fcol, name = "newAssay",
                            fun = MsCoreUtils::robustSummary, ...) {
-  if (isEmpty(object))
+  if (S4Vectors::isEmpty(object))
     return(object)
   if (name %in% names(object))
     stop("There's already an assay named '", name, "'.")
@@ -427,7 +450,7 @@ aggregateFeatures = function(object, i, fcol, name = "newAssay",
     i <- QFeatures:::main_assay(object)
   print("begin assay aggregate")
   ## Create the aggregated assay
-  aggAssay <- DEP2:::.aggregateSE(object[[i]], fcol, fun, ...)
+  aggAssay <- .aggregateSE(object[[i]], fcol, fun, ...)
   print("assay aggregate finished")
   ## Add the assay to the QFeatures object
   object <- QFeatures::addAssay(object,
@@ -440,17 +463,30 @@ aggregateFeatures = function(object, i, fcol, name = "newAssay",
                varFrom = fcol,
                varTo = fcol)
 }
+
+
 #' Normalize a QFeatures object
 #'
 #' Normalize a QFeatures object though [QFeatures::normalize] function
 #'
 #' @param pe A QFeature object
 #' @param method 	Character(1), normalisation method, one of "diff.median", "quantiles", "quantiles.robust" or "vsn".
+#' See \link[QFeatures]{normalize}.
 #' @param i 	A numeric vector or a character vector giving the index or the name, respectively, of the assay(s) to be processed.
 #' @param name  Character(1) naming the new normalized assay name.
 #'
 #' @importFrom QFeatures normalize
 #'
+#' @examples
+#' \dontrun{
+#' #' data <- Silicosis_peptide
+#' ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T)
+#' pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = T, log2transform = T,mode = "delim")
+#' filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
+#' imp_pe <- QFeatures::addAssay(filt_pe, DEP2::impute(filt_pe[["peptideRaw"]], fun = "MinDet"), name = "peptideImp")
+#'
+#' norm_pe <- normalize_pe(imp_pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
+#' }
 #' @export
 normalize_pe <- function(pe, method = c("diff.median", "quantiles", "quantiles.robust" ,"vsn"), i = "peptideRaw", name = "peptideNorm"){
   method = match.arg(method)
@@ -478,9 +514,6 @@ normalize_pe <- function(pe, method = c("diff.median", "quantiles", "quantiles.r
   return(pe_norm)
 }
 
-# aggregate_pe(pe_save, aggrefun = "RobustSummary", aggregate_Peptide_Type = "Unique + Razor",fcol = "Proteins",
-#              peptide_assay_name = "peptideNorm", reserve = "Gene.names")
-
 
 #' Summarize peptide quantity to protein quantity
 #'
@@ -498,10 +531,19 @@ normalize_pe <- function(pe, method = c("diff.median", "quantiles", "quantiles.r
 #' @param reserve Character, the column(s) which will reserve after aggregate, such as the columns store protein information can.
 #'
 #' @return
-#' a QFeatures object with a new protein aggregation assay.
+#' A QFeatures object with a new protein aggregation assay.
+#' @examples
+#' \dontrun{
+#' data <- Silicosis_peptide
+#' ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T)
+#' pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = T, log2transform = T,mode = "delim")
+#' filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
+#' imp_pe <- QFeatures::addAssay(filt_pe, DEP2::impute(filt_pe[["peptideRaw"]], fun = "MinDet"), name = "peptideImp")
+#' norm_pe <- normalize_pe(imp_pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
+#' protein_pe <- aggregate_pe(norm_pe, fcol = "Proteins", peptide_assay_name = "peptideNorm")
+#' }
 #' @export
 #'
-#' @examples
 aggregate_pe <- function(pe, aggrefun = c("RobustSummary","medianPolish","totalMean"), aggregate_Peptide_Type = c("Unique + Razor", "Unique"),
                          fcol, peptide_assay_name = "peptideNorm", reserve = "Gene.names"
 ){
@@ -526,24 +568,38 @@ aggregate_pe <- function(pe, aggrefun = c("RobustSummary","medianPolish","totalM
     pe <- filter_pe(pe, filter_formula = fil_formula, assay_name =  peptide_assay_name )
     print("aggregate by uniques peptides, filterFeatures finished")
     rowData(pe)$smallestProteingroups <- rowData(pe)[,fcol]
-    protein <- suppressWarnings({DEP2:::aggregateFeatures(object = pe ,
-                                                          i = peptide_assay_name, fcol = fcol,
-                                                          name = "protein",
-                                                          fun = aggrefun,
-                                                          na.rm = T,
-                                                          reserve = reserve)} )
+    protein <- suppressWarnings(
+      {aggregateFeatures(object = pe ,
+                         i = peptide_assay_name, fcol = fcol,
+                         name = "protein",
+                         fun = aggrefun,
+                         na.rm = T,
+                         reserve = reserve)}
+      # QFeatures::aggregateFeatures(object = pe ,
+      #                              i = peptide_assay_name, fcol = fcol,
+      #                              name = "protein",
+      #                              fun = aggrefun,
+      #                              na.rm = T)
+    )
 
 
   }else if(aggregate_Peptide_Type == "Unique + Razor"){
     print("aggregate by Unique + Razor peptides")
     pe <- Peptide_distribution(pe, i = peptide_assay_name,fcol = fcol)
     print("peptides distribution finished")
-    protein <- suppressWarnings({DEP2:::aggregateFeatures(object = pe ,
-                                                          i = peptide_assay_name, fcol = "smallestProteingroups",
-                                                          name = "protein",
-                                                          fun = aggrefun,
-                                                          na.rm = T,
-                                                          reserve = reserve)} ) ## function from QFeatures
+    protein <- suppressWarnings({
+      aggregateFeatures(object = pe ,
+                        i = peptide_assay_name, fcol = "smallestProteingroups",
+                        name = "protein",
+                        fun = aggrefun,
+                        na.rm = T,
+                        reserve = reserve)
+      # QFeatures::aggregateFeatures(object = pe ,
+      #                              i = peptide_assay_name, fcol = "smallestProteingroups",
+      #                              name = "protein",
+      #                              fun = aggrefun,
+      #                              na.rm = T)
+    } ) ## function from QFeatures
   }
   print("aggregation finished")
   colData(protein[["protein"]]) = colData(protein)
@@ -568,6 +624,18 @@ aggregate_pe <- function(pe, aggrefun = c("RobustSummary","medianPolish","totalM
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' data <- Silicosis_peptide
+#' ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T)
+#' pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = T, log2transform = T,mode = "delim")
+#' filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
+#' imp_pe <- QFeatures::addAssay(filt_pe, DEP2::impute(filt_pe[["peptideRaw"]], fun = "MinDet"), name = "peptideImp")
+#' norm_pe <- DEP2:::normalize_pe(imp_pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
+#' protein_pe <- DEP2::aggregate_pe(norm_pe, fcol = "Proteins", peptide_assay_name = "peptideNorm")
+#' class(protein_pe)
+#' se <- pe2se(protein_pe)
+#' class(se)
+#' }
 pe2se <- function(pe_aggregated, names = "Gene.names", ids = "smallestProteingroups", delim = ";"){
   SE_pep <- pe_aggregated[["protein"]]
 

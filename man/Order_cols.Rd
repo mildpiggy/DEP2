@@ -19,3 +19,15 @@ A object sorted by giving order
 \description{
 \code{Order_cols} can re-set the order of a SummarizedExperiment object according  colData()
 }
+\examples{
+# Load example
+data <- Silicosis_pg
+data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
+# Make SummarizedExperiment
+ecols <- grep("LFQ.", colnames(data_unique))
+se <- make_se_parse(data_unique, ecols, mode = "delim", sep = "_")
+colnames(se)
+se <- Order_cols(se,c("PBS","W2","W4","W6","W9","W10"))
+colnames(se)
+
+}

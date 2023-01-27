@@ -18,7 +18,9 @@ Sets the threshold for the adjusted P value.}
 Sets the threshold for the log2 fold change.}
 
 \item{thresholdmethod}{Character(1),
-The thresholdmethod to decide significant.should be one of "intersect" ,"curve". If thresholdmethod = "curve", cutoff lines is the curves with function y = c/(x-x0). c is the curvature, and x0 is the minimum fold change}
+The thresholdmethod to decide significant.should be one of "intersect" ,"curve".
+If thresholdmethod = "curve", cutoff lines is the curves with function y = c/(x-x0).
+c is the curvature, and x0 is the minimum fold change which relatived to the standard deviations of L2FC distribution}
 
 \item{curvature}{Numeric(1),
 Sets the curvature for the curve cutoff lines}
@@ -34,22 +36,39 @@ annotated with logical columns indicating significant proteins.
 \code{add_rejections} marks significant proteins based on defined cutoffs.
 }
 \examples{
-# Load example
-data <- UbiLength
-data <- data[data$Reverse != "+" & data$Potential.contaminant != "+",]
+\dontrun{
+# For proteomics data -----
+data <- Silicosis_pg
 data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 
 # Make SummarizedExperiment
-columns <- grep("LFQ.", colnames(data_unique))
-exp_design <- UbiLength_ExpDesign
-se <- make_se(data_unique, columns, exp_design)
+ecols <- grep("LFQ.", colnames(data_unique))\
+se <- make_se_parse(data_unique, ecols, mode = "delim", sep = "_")
 
-# Filter, normalize and impute missing values
-filt <- filter_missval(se, thr = 0)
+filt <- filter_se(se, thr = 0, fraction = 0.3, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
 norm <- normalize_vsn(filt)
-imputed <- impute(norm, fun = "MinProb", q = 0.01)
+imputed <- impute(norm, fun = "MinDet", q = 0.01)
 
 # Test for differentially expressed proteins
-diff <- test_diff(imputed, "control", "Ctrl")
+diff <- test_diff(imputed, "control", "PBS")
 dep <- add_rejections(diff, alpha = 0.05, lfc = 1)
+# the curve method
+dep <- add_rejections(diff, me)
+
+# For peptide workflow -----
+data <- Silicosis_peptide
+ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T)
+pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = T, log2transform = T)
+filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
+imp_pe <- QFeatures::addAssay(filt_pe, DEP2::impute(filt_pe[["peptideRaw"]], fun = "MinDet"), name = "peptideImp")
+
+norm_pe <- DEP2:::normalize_pe(imp_pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
+protein_pe <- DEP2::aggregate_pe(norm_pe, fcol = "Proteins", peptide_assay_name = "peptideNorm")
+
+SE_pep <- pe2se(protein_pe)
+# Test for differentially expressed proteins
+diff_pep <- DEP2::test_diff(SE_pep,type = "control", control = "PBS", fdr.type = "Strimmer's qvalue(t)")
+dep_pep <- add_rejections(diff_pep)
+}
+
 }

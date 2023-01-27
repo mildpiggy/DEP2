@@ -15,7 +15,7 @@ impute(
 \item{se}{SummarizedExperiment,
 Proteomics data (output from \code{\link{make_se}()} or
 \code{\link{make_se_parse}()}). It is adviced to first remove
-proteins with too many missing values using \code{\link{filter_missval}()}
+proteins with too many missing values using \code{\link{filter_se}()}
 and normalize the data using \code{\link{normalize_vsn}()}.}
 
 \item{fun}{"bpca", "knn", "QRILC", "MLE", "MinDet",
@@ -34,25 +34,27 @@ An imputed SummarizedExperiment object.
 }
 \examples{
 # Load example
-data <- UbiLength
-data <- data[data$Reverse != "+" & data$Potential.contaminant != "+",]
+data <- Silicosis_pg
 data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 
 # Make SummarizedExperiment
-columns <- grep("LFQ.", colnames(data_unique))
-exp_design <- UbiLength_ExpDesign
-se <- make_se(data_unique, columns, exp_design)
+ecols <- grep("LFQ.", colnames(data_unique))
+se <- make_se_parse(data_unique, ecols, mode = "delim", sep = "_")
 
 # Filter and normalize
-filt <- filter_missval(se, thr = 0)
+filt <- filter_se(se, thr = 0, fraction = 0.4, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
 norm <- normalize_vsn(filt)
 
 # Impute missing values using different functions
 imputed_MinProb <- impute(norm, fun = "MinProb", q = 0.05)
-imputed_QRILC <- impute(norm, fun = "QRILC")
+imputed_manual <- impute(norm, fun = "man", shift = 1.8, scale = 0.3)
 
+imputed_QRILC <- impute(norm, fun = "QRILC")
 imputed_knn <- impute(norm, fun = "knn", k = 10, rowmax = 0.9)
+
+\dontrun{
 imputed_MLE <- impute(norm, fun = "MLE")
 
-imputed_manual <- impute(norm, fun = "man", shift = 1.8, scale = 0.3)
+imputed_RF <- impute(norm, fun = "RF") # may take several minutes.
+}
 }

@@ -28,3 +28,17 @@ A SummarizedExperiment object.
 This function accept a result from \link{aggregate_pe}(),
 tidy features identifiers and return a SE object for following analyze
 }
+\examples{
+\dontrun{
+data <- Silicosis_peptide
+ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T)
+pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = T, log2transform = T,mode = "delim")
+filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
+imp_pe <- QFeatures::addAssay(filt_pe, DEP2::impute(filt_pe[["peptideRaw"]], fun = "MinDet"), name = "peptideImp")
+norm_pe <- DEP2:::normalize_pe(imp_pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
+protein_pe <- DEP2::aggregate_pe(norm_pe, fcol = "Proteins", peptide_assay_name = "peptideNorm")
+class(protein_pe)
+se <- pe2se(protein_pe)
+class(se)
+}
+}

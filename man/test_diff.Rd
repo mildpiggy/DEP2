@@ -44,14 +44,6 @@ one of "Strimmer's qvalue(t)","Strimmer's qvalue(p)","BH","Storey's qvalue".
 "Strimmer's qvalue" calculate fdr vis \code{\link[fdrtool]{fdrtool}()} using t-statistic or p values from limma.
 "BH" calculate fdr vis \code{\link[stats]{p.adjust}()} using "BH" method .
 "Storey's qvalue"  calculate fdr vis \code{\link{stats::qvalue}()}.}
-
-\item{contrast_upon}{C the contrast to bulid upon which column in experimentdesign}
-
-\item{filter_ihw}{logical(1),Whether to use ihw to perform independent filtering and p-value adjustment, default FALSE}
-
-\item{independentFiltering}{logical(1), whether independent filtering should be applied automatically, default TRUE}
-
-\item{lfcshark}{logical(1),whether to use lfcshark, default FALSE}
 }
 \value{
 A SummarizedExperiment object or a DEGdata
@@ -65,26 +57,24 @@ using \code{"Strimmer's qvalue"}, \code{"Benjamini-Hochberg fdr"} or \code{"Stor
 }
 \examples{
 # Load example
-data <- UbiLength
-data <- data[data$Reverse != "+" & data$Potential.contaminant != "+",]
+data <- Silicosis_pg
 data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 
 # Make SummarizedExperiment
-columns <- grep("LFQ.", colnames(data_unique))
-exp_design <- UbiLength_ExpDesign
-se <- make_se(data_unique, columns, exp_design)
+ecols <- grep("LFQ.", colnames(data_unique))
+exp_design <- Silicosis_ExpDesign
+se <- make_se(data_unique, ecols, exp_design)
 
-# Filter, normalize and impute missing values
-filt <- filter_missval(se, thr = 0)
+# Filter and normalize
+filt <- filter_se(se, thr = 0, fraction = 0.4, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
 norm <- normalize_vsn(filt)
-imputed <- impute(norm, fun = "MinProb", q = 0.01)
+
+# Impute missing values using different functions
+imputed <- impute(norm, fun = "MinProb", q = 0.05)
 
 # Test for differentially expressed proteins
-diff <- test_diff(imputed, "control", "Ctrl")
-diff <- test_diff(imputed, "manual",
-    test = c("Ubi4_vs_Ctrl", "Ubi6_vs_Ctrl"))
+diff <- test_diff(imputed, "control", "PBS")
+diff <- test_diff(imputed, "manual", test = "PBS_vs_W6")
+diff <- test_diff(imputed, "manual", test = "PBS_vs_W6", fdr.type = "Storey's qvalue")
 
-# Test for differentially expressed proteins with a custom design formula
-diff <- test_diff(imputed, "control", "Ctrl",
-    design_formula = formula(~ 0 + condition + replicate))
 }

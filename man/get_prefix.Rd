@@ -19,10 +19,9 @@ of the supplied words.
 }
 \examples{
 # Load example
-data <- UbiLength
-columns <- grep("LFQ.", colnames(data))
+data <- Silicosis_pg
+names <- grep("LFQ.", colnames(data), value = TRUE)
 
 # Get prefix
-names <- colnames(data[, columns])
 get_prefix(names)
 }

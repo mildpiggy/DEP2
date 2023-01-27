@@ -7,7 +7,7 @@
 NAiszero(se)
 }
 \arguments{
-\item{se}{A SummarizedExperiment object}
+\item{se}{A SummarizedExperiment object which contain NAs in assay.}
 }
 \value{
 A SummarizedExperiment object

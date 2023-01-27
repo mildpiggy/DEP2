@@ -14,24 +14,6 @@ get_string_Env <- function () {
   get(".string_Env", envir = .GlobalEnv)
 }
 
-# PPI_table = test_PPI(my_dep_save)
-# PPI_networl = stringNetwork(PPI_table, changesize = F, nodeshape ="circle",changewidth = T,nodesize = 8,linewidth = 2,fontsize = 12.5)
-# PPI_networl
-# plot(net_save)
-# net = net_save
-# V(net)$color <- ifelse(igraph::degree(net)>=6,"#B54434",nodecolor)
-# V(net)$size <- 50
-# V(net)$shape <- "raster"
-# V(net)$label.cex <- 0.5
-# V(net)$label.size = 50
-#
-# E(net)$width = 5
-# graph_attr(net, "layout") <- layout_components
-# plot(net)
-# visIgraph(net) -> temp
-# temp$x$nodes$size = temp$x$nodes$size
-# temp$x$edges$weight = temp$x$edges$weight
-# temp$width = NULL
 
 # stringNetwork
 ## PPI analysis on candidates proteins/genes according the
@@ -71,6 +53,11 @@ test_PPI <- function(x,
                      choose_scores = NULL,
                      score_cutoff = 400
                      ){
+  check_pak <- check_PPI_depends()
+  if(!isTRUE(check_pak)){
+    stop("Packages ",paste0(check_pak,collapse = ", ")," are required for PPI function, but not found")
+  }
+
   assertthat::assert_that(class(x) == "SummarizedExperiment"|class(x) == "DEGdata"|class(x) == "character",
                           is.null(contrasts)| is.character(contrasts),
                           is.character(species) && length(species) ==1,
@@ -180,10 +167,10 @@ test_PPI <- function(x,
 #' @return
 #' A visNetwork plot or a igraph obejct according \code{returntype}.
 #' @export
-#' @importFrom  igraph graph_from_data_frame graph_attr degree V E
-#' @import visNetwork
 #' @examples
 #/. stringNetwork
+#/' @importFrom  igraph graph_from_data_frame graph_attr degree V E
+#/' @import visNetwork
 PPInetwork <- function(PPIlinks, layoutway = "layout_components",nodecolor = "#2EA9DF",nodeshape = c("circle","square"),linecolor = "#ADD8E6",
                           nodesize = 20,changesize=FALSE,
                           fontsize=25,changewidth=FALSE,linewidth = 5, smoothline=FALSE,smoothtype="continous",highlightkey=TRUE,
@@ -237,19 +224,19 @@ PPInetwork <- function(PPIlinks, layoutway = "layout_components",nodecolor = "#2
 
   # links4 <<- links3;nodes4 <<-nodes
   # nodes_save <<- nodes
-  nwplot <- visNetwork(nodes,links3,width = "170%",height = "500px") %>%
-    visIgraphLayout(layout = layoutway ) %>%
-    visNodes(size=nodes$size,
+  nwplot <- visNetwork::visNetwork(nodes,links3,width = "170%",height = "500px") %>%
+    visNetwork::visIgraphLayout(layout = layoutway ) %>%
+    visNetwork::visNodes(size=nodes$size,
              # color = nodecolor ,
              font= list(size= fontsize,align = "left"),
              shadow = list(enabled = TRUE, size = 10)) %>%
-    visEdges(shadow = F,
+    visNetwork::visEdges(shadow = F,
              color = list(color = linecolor, highlight = "red"),
              smooth = list(enabled=smoothline,type=smoothtype)
     ) %>%
-    visOptions(highlightNearest = list(enabled = T, hover = T),
+    visNetwork::visOptions(highlightNearest = list(enabled = T, hover = T),
                nodesIdSelection = T)%>%
-    visPhysics(solver = "forceAtlas2Based",
+    visNetwork::visPhysics(solver = "forceAtlas2Based",
                forceAtlas2Based = list(gravitationalConstant = -500))
 
   if(returntype == "visNetwork"){

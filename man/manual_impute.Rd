@@ -28,21 +28,3 @@ An imputed SummarizedExperiment object.
 \code{manual_impute} imputes missing values in a proteomics dataset
 by random draws from a manually defined distribution.
 }
-\examples{
-# Load example
-data <- UbiLength
-data <- data[data$Reverse != "+" & data$Potential.contaminant != "+",]
-data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
-
-# Make SummarizedExperiment
-columns <- grep("LFQ.", colnames(data_unique))
-exp_design <- UbiLength_ExpDesign
-se <- make_se(data_unique, columns, exp_design)
-
-# Filter and normalize
-filt <- filter_missval(se, thr = 0)
-norm <- normalize_vsn(filt)
-
-# Impute missing values manually
-imputed_manual <- impute(norm, fun = "man", shift = 1.8, scale = 0.3)
-}

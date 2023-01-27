@@ -43,7 +43,7 @@ clean_character <- function(express_assay){
 #' "name" and "ID" containing unique names and identifiers, respectively.
 #' @examples
 #' # Load example
-#' data <- UbiLength
+#' data <- Silicosis_pg
 #'
 #' # Check colnames and pick the appropriate columns
 #' colnames(data)
@@ -118,19 +118,17 @@ make_unique <- function(proteins, names, ids, delim = ";") {
 #' @param expdesign Data.frame,
 #' Experimental design with 'label', 'condition'
 #' and 'replicate' information.
-#' See \code{\link{UbiLength_ExpDesign}} for an example experimental design.
 #' @param log2transform Logical(1), whether log2 transform the assay, default TRUE.
 #' @return A SummarizedExperiment object
 #' with log2-transformed values.
 #' @examples
 #' # Load example
-#' data <- UbiLength
-#' data <- data[data$Reverse != "+" & data$Potential.contaminant != "+",]
+#' data <- Silicosis_pg
 #' data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 #'
 #' # Make SummarizedExperiment
 #' columns <- grep("LFQ.", colnames(data_unique))
-#' exp_design <- UbiLength_ExpDesign
+#' exp_design <- Silicosis_ExpDesign
 #' se <- make_se(data_unique, columns, exp_design)
 #' @export
 make_se <- function (proteins_unique, columns, expdesign, log2transform = TRUE)
@@ -230,14 +228,15 @@ make_se <- function (proteins_unique, columns, expdesign, log2transform = TRUE)
 #' with log2-transformed values.
 #' @examples
 #' # Load example
-#' data <- UbiLength
-#' data <- data[data$Reverse != "+" & data$Potential.contaminant != "+",]
+#' data <- Silicosis_pg
 #' data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 #'
 #' # Make SummarizedExperiment
 #' columns <- grep("LFQ.", colnames(data_unique))
-#' se <- make_se_parse(data_unique, columns, mode = "char", chars = 1)
-#' se <- make_se_parse(data_unique, columns, mode = "delim", sep = "_")
+#' se <- make_se_parse(data_unique, columns, mode = "char", chars = 1, remove_prefix = TRUE)
+#' colnames(se)
+#' se <- make_se_parse(data_unique, columns, mode = "delim", remove_prefix = FALSE)
+#' colnames(se)
 #' @export
 make_se_parse <- function (proteins_unique, columns, mode = c("char", "delim"),
                           chars = 1, sep = "_", remove_prefix = T, remove_suffix = F, log2transform = T)
@@ -314,21 +313,21 @@ make_se_parse <- function (proteins_unique, columns, mode = c("char", "delim"),
 #' @param se SummarizedExperiment,
 #' Proteomics data (output from \code{\link{make_se}()} or
 #' \code{\link{make_se_parse}()}). It is adviced to first remove
-#' proteins with too many missing values using \code{\link{filter_missval}()}.
+#' proteins with too many missing values using \code{\link{filter_se}()}.
 #' @return A normalized SummarizedExperiment object.
 #' @examples
 #' # Load example
-#' data <- UbiLength
-#' data <- data[data$Reverse != "+" & data$Potential.contaminant != "+",]
+#' data <- Silicosis_pg
 #' data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 #'
 #' # Make SummarizedExperiment
-#' columns <- grep("LFQ.", colnames(data_unique))
-#' exp_design <- UbiLength_ExpDesign
-#' se <- make_se(data_unique, columns, exp_design)
+#' ecols <- grep("LFQ.", colnames(data_unique))
+#' exp_design <- Silicosis_ExpDesign
+#' se <- make_se(data_unique, ecols, exp_design)
+#' se <- make_se_parse(data_unique, ecols, mode = "delim", sep = "_")
 #'
 #' # Filter and normalize
-#' filt <- filter_missval(se, thr = 0)
+#' filt <- filter_se(se, thr = 0, fraction = 0.4, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
 #' norm <- normalize_vsn(filt)
 #' @export
 normalize_vsn <- function (se)
@@ -348,7 +347,7 @@ normalize_vsn <- function (se)
 #' @param se SummarizedExperiment,
 #' Proteomics data (output from \code{\link{make_se}()} or
 #' \code{\link{make_se_parse}()}). It is adviced to first remove
-#' proteins with too many missing values using \code{\link{filter_missval}()}
+#' proteins with too many missing values using \code{\link{filter_se}()}
 #' and normalize the data using \code{\link{normalize_vsn}()}.
 #' @param fun "bpca", "knn", "QRILC", "MLE", "MinDet",
 #' "MinProb", "man", "min", "zero", "mixed", "nbavg", "GSimp" or "RF",
@@ -359,27 +358,29 @@ normalize_vsn <- function (se)
 #' @return An imputed SummarizedExperiment object.
 #' @examples
 #' # Load example
-#' data <- UbiLength
-#' data <- data[data$Reverse != "+" & data$Potential.contaminant != "+",]
+#' data <- Silicosis_pg
 #' data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 #'
 #' # Make SummarizedExperiment
-#' columns <- grep("LFQ.", colnames(data_unique))
-#' exp_design <- UbiLength_ExpDesign
-#' se <- make_se(data_unique, columns, exp_design)
+#' ecols <- grep("LFQ.", colnames(data_unique))
+#' se <- make_se_parse(data_unique, ecols, mode = "delim", sep = "_")
 #'
 #' # Filter and normalize
-#' filt <- filter_missval(se, thr = 0)
+#' filt <- filter_se(se, thr = 0, fraction = 0.4, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
 #' norm <- normalize_vsn(filt)
 #'
 #' # Impute missing values using different functions
 #' imputed_MinProb <- impute(norm, fun = "MinProb", q = 0.05)
-#' imputed_QRILC <- impute(norm, fun = "QRILC")
+#' imputed_manual <- impute(norm, fun = "man", shift = 1.8, scale = 0.3)
 #'
+#' imputed_QRILC <- impute(norm, fun = "QRILC")
 #' imputed_knn <- impute(norm, fun = "knn", k = 10, rowmax = 0.9)
+#'
+#' \dontrun{
 #' imputed_MLE <- impute(norm, fun = "MLE")
 #'
-#' imputed_manual <- impute(norm, fun = "man", shift = 1.8, scale = 0.3)
+#' imputed_RF <- impute(norm, fun = "RF") # may take several minutes.
+#' }
 #' @export
 #' @importFrom MSnbase impute exprs
 #' @importFrom missForest missForest
@@ -411,7 +412,7 @@ impute <- function (se, fun = c("bpca", "knn", "QRILC", "MLE", "MinDet",
     if(! "parallelize" %in% names(args) )
       args[["parallelize"]] = "variables"
     args$xmis = assay(se)
-    doParallel::registerDoParallel(cores=2)
+    doParallel::registerDoParallel(cores=min(4,parallel::detectCores()-2)) ## Used 4 cores
     assay(se) <- do.call(missForest::missForest, args)$ximp
     doParallel::stopImplicitCluster()
   }else if(fun == "GSimp"){
@@ -448,23 +449,6 @@ impute <- function (se, fun = c("bpca", "knn", "QRILC", "MLE", "MinDet",
 #' Sets the width of the distribution relative to the
 #' standard deviation of the original distribution.
 #' @return An imputed SummarizedExperiment object.
-#' @examples
-#' # Load example
-#' data <- UbiLength
-#' data <- data[data$Reverse != "+" & data$Potential.contaminant != "+",]
-#' data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
-#'
-#' # Make SummarizedExperiment
-#' columns <- grep("LFQ.", colnames(data_unique))
-#' exp_design <- UbiLength_ExpDesign
-#' se <- make_se(data_unique, columns, exp_design)
-#'
-#' # Filter and normalize
-#' filt <- filter_missval(se, thr = 0)
-#' norm <- normalize_vsn(filt)
-#'
-#' # Impute missing values manually
-#' imputed_manual <- impute(norm, fun = "man", shift = 1.8, scale = 0.3)
 #' @export
 manual_impute <- function(se, scale = 0.3, shift = 1.8) {
   if(is.integer(scale)) scale <- is.numeric(scale)
@@ -508,10 +492,6 @@ manual_impute <- function(se, scale = 0.3, shift = 1.8) {
 }
 
 
-# setGeneric("add_rejections", function(diff, alpha = 0.05, lfc = 1,thresholdmethod="intersect",curvature=1,x0_fold = 2,...) {
-#   standardGeneric("add_rejections")
-# })
-
 #' Differential enrichment/expression test
 #'
 #' \code{test_diff} performs a differential enrichment/expression test based on
@@ -545,38 +525,32 @@ manual_impute <- function(se, scale = 0.3, shift = 1.8) {
 #' "Strimmer's qvalue" calculate fdr vis \code{\link[fdrtool]{fdrtool}()} using t-statistic or p values from limma.
 #' "BH" calculate fdr vis \code{\link[stats]{p.adjust}()} using "BH" method .
 #' "Storey's qvalue"  calculate fdr vis \code{\link{stats::qvalue}()}.
-#' @param contrast_upon C the contrast to bulid upon which column in experimentdesign
-#' @param filter_ihw logical(1),Whether to use ihw to perform independent filtering and p-value adjustment, default FALSE
-#' @param independentFiltering logical(1), whether independent filtering should be applied automatically, default TRUE
-#' @param lfcshark logical(1),whether to use lfcshark, default FALSE
 #'
 #' @return A SummarizedExperiment object or a DEGdata
 #' containing diff, test result from limma and fdr estimates of differential expression.
+#' @importFrom fdrtool fdrtool
 #' @examples
 #' # Load example
-#' data <- UbiLength
-#' data <- data[data$Reverse != "+" & data$Potential.contaminant != "+",]
+#' data <- Silicosis_pg
 #' data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 #'
 #' # Make SummarizedExperiment
-#' columns <- grep("LFQ.", colnames(data_unique))
-#' exp_design <- UbiLength_ExpDesign
-#' se <- make_se(data_unique, columns, exp_design)
+#' ecols <- grep("LFQ.", colnames(data_unique))
+#' exp_design <- Silicosis_ExpDesign
+#' se <- make_se(data_unique, ecols, exp_design)
 #'
-#' # Filter, normalize and impute missing values
-#' filt <- filter_missval(se, thr = 0)
+#' # Filter and normalize
+#' filt <- filter_se(se, thr = 0, fraction = 0.4, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
 #' norm <- normalize_vsn(filt)
-#' imputed <- impute(norm, fun = "MinProb", q = 0.01)
+#'
+#' # Impute missing values using different functions
+#' imputed <- impute(norm, fun = "MinProb", q = 0.05)
 #'
 #' # Test for differentially expressed proteins
-#' diff <- test_diff(imputed, "control", "Ctrl")
-#' diff <- test_diff(imputed, "manual",
-#'     test = c("Ubi4_vs_Ctrl", "Ubi6_vs_Ctrl"))
+#' diff <- test_diff(imputed, "control", "PBS")
+#' diff <- test_diff(imputed, "manual", test = "PBS_vs_W6")
+#' diff <- test_diff(imputed, "manual", test = "PBS_vs_W6", fdr.type = "Storey's qvalue")
 #'
-#' # Test for differentially expressed proteins with a custom design formula
-#' diff <- test_diff(imputed, "control", "Ctrl",
-#'     design_formula = formula(~ 0 + condition + replicate))
-#' @importFrom fdrtool fdrtool
 #' @export
 test_diff <- function(se, type = c("all", "control", "manual"),
                       control = NULL, test = NULL,
@@ -794,7 +768,9 @@ setGeneric("add_rejections", function(diff, alpha = 0.05, lfc = 1,thresholdmetho
 #' @param lfc Numeric(1),
 #' Sets the threshold for the log2 fold change.
 #' @param thresholdmethod Character(1),
-#' The thresholdmethod to decide significant.should be one of "intersect" ,"curve". If thresholdmethod = "curve", cutoff lines is the curves with function y = c/(x-x0). c is the curvature, and x0 is the minimum fold change
+#' The thresholdmethod to decide significant.should be one of "intersect" ,"curve".
+#' If thresholdmethod = "curve", cutoff lines is the curves with function y = c/(x-x0).
+#' c is the curvature, and x0 is the minimum fold change which relatived to the standard deviations of L2FC distribution
 #' @param curvature Numeric(1),
 #' Sets the curvature for the curve cutoff lines
 #' @param x0_fold Numeric(1),
@@ -802,24 +778,41 @@ setGeneric("add_rejections", function(diff, alpha = 0.05, lfc = 1,thresholdmetho
 #' @return A SummarizedExperiment object
 #' annotated with logical columns indicating significant proteins.
 #' @examples
-#' # Load example
-#' data <- UbiLength
-#' data <- data[data$Reverse != "+" & data$Potential.contaminant != "+",]
+#' \dontrun{
+#' # For proteomics data -----
+#' data <- Silicosis_pg
 #' data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 #'
 #' # Make SummarizedExperiment
-#' columns <- grep("LFQ.", colnames(data_unique))
-#' exp_design <- UbiLength_ExpDesign
-#' se <- make_se(data_unique, columns, exp_design)
+#' ecols <- grep("LFQ.", colnames(data_unique))\
+#' se <- make_se_parse(data_unique, ecols, mode = "delim", sep = "_")
 #'
-#' # Filter, normalize and impute missing values
-#' filt <- filter_missval(se, thr = 0)
+#' filt <- filter_se(se, thr = 0, fraction = 0.3, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
 #' norm <- normalize_vsn(filt)
-#' imputed <- impute(norm, fun = "MinProb", q = 0.01)
+#' imputed <- impute(norm, fun = "MinDet", q = 0.01)
 #'
 #' # Test for differentially expressed proteins
-#' diff <- test_diff(imputed, "control", "Ctrl")
+#' diff <- test_diff(imputed, "control", "PBS")
 #' dep <- add_rejections(diff, alpha = 0.05, lfc = 1)
+#' # the curve method
+#' dep <- add_rejections(diff, me)
+#'
+#' # For peptide workflow -----
+#' data <- Silicosis_peptide
+#' ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T)
+#' pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = T, log2transform = T)
+#' filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
+#' imp_pe <- QFeatures::addAssay(filt_pe, DEP2::impute(filt_pe[["peptideRaw"]], fun = "MinDet"), name = "peptideImp")
+#'
+#' norm_pe <- DEP2:::normalize_pe(imp_pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
+#' protein_pe <- DEP2::aggregate_pe(norm_pe, fcol = "Proteins", peptide_assay_name = "peptideNorm")
+#'
+#' SE_pep <- pe2se(protein_pe)
+#' # Test for differentially expressed proteins
+#' diff_pep <- DEP2::test_diff(SE_pep,type = "control", control = "PBS", fdr.type = "Strimmer's qvalue(t)")
+#' dep_pep <- add_rejections(diff_pep)
+#' }
+#'
 #' @name add_rejections
 #' @rdname DEP2_add_rejections
 NULL
@@ -907,8 +900,8 @@ add_rejections.SummarizedExperiment <- function (diff, alpha = 0.05, lfc = 1,thr
       x = row_data[, cols_diff]
       x = fun.outlier(x) %>% stats::na.omit()
       fit <- fitnormal(x)
-      σ = sqrt(fit$theta[2])
-      x0 = x0_fold*σ
+      Sigma = sqrt(fit$theta[2])
+      x0 = x0_fold*Sigma
       polar = ifelse((rowData(diff)[,cols_diff] > 0),1,-1)
       rowData(diff)$significant <- ( -log10(rowData(diff)[,cols_p]) > curvature/abs(rowData(diff)[,cols_diff] - polar*x0) &
                                        ifelse((row_data[,cols_diff] >= 0),row_data[,cols_diff]>x0,row_data[,cols_diff] < -x0) )
@@ -921,8 +914,8 @@ add_rejections.SummarizedExperiment <- function (diff, alpha = 0.05, lfc = 1,thr
         x = row_data[, cols_diff[i]]
         x = fun.outlier(x) %>% na.omit()
         fit <- fitnormal(x)
-        σ = sqrt(fit$theta[2])
-        x0 = x0_fold*σ
+        Sigma = sqrt(fit$theta[2])
+        x0 = x0_fold*Sigma
         polar = ifelse((rowData(diff)[,cols_diff[i]] > 0),1,-1)
         contrast_significant <- ( -log10(rowData(diff)[,cols_p[i]]) > curvature/abs(rowData(diff)[,cols_diff[i]] - polar*x0) &
                                     ifelse((row_data[,cols_diff[i]] >= 0),row_data[,cols_diff[i]]>x0,row_data[,cols_diff[i]] < -x0) )
@@ -942,7 +935,7 @@ add_rejections.SummarizedExperiment <- function (diff, alpha = 0.05, lfc = 1,thr
 
 
 
-## rm outlier
+## rm outlier which outside time.iqr
 fun.outlier <- function(x,time.iqr=1.5) {
   outlier.low <- quantile(x,probs=c(0.25))-IQR(x)*time.iqr
   outlier.high <- quantile(x,probs=c(0.75))+IQR(x)*time.iqr
@@ -950,56 +943,23 @@ fun.outlier <- function(x,time.iqr=1.5) {
   x
 }
 
-## fit Gaussian distribution for numeric vector x
-fitnormal <- function (x, exact = TRUE) {
-  if (exact) {
-    ################################################
-    ## Exact inference based on likelihood theory ##
-    ################################################
-    ## minimum negative log-likelihood (maximum log-likelihood) estimator of `mu` and `phi = sigma ^ 2`
-    n <- length(x)
-    mu <- sum(x) / n
-    phi <- crossprod(x - mu)[1L] / n  # (a bised estimator, though)
-    ## inverse of Fisher information matrix evaluated at MLE
-    invI <- matrix(c(phi, 0, 0, phi * phi), 2L,
-                   dimnames = list(c("mu", "sigma2"), c("mu", "sigma2")))
-    ## log-likelihood at MLE
-    loglik <- -(n / 2) * (log(2 * pi * phi) + 1)
-    ## return
-    return(list(theta = c(mu = mu, sigma2 = phi), vcov = invI, loglik = loglik, n = n))
-  }
-  else {
-    ##################################################################
-    ## Numerical optimization by minimizing negative log-likelihood ##
-    ##################################################################
-    ## negative log-likelihood function
-    ## define `theta = c(mu, phi)` in order to use `optim`
-    nllik <- function (theta, x) {
-      (length(x) / 2) * log(2 * pi * theta[2]) + crossprod(x - theta[1])[1] / (2 * theta[2])
-    }
-    ## gradient function (remember to flip the sign when using partial derivative result of log-likelihood)
-    ## define `theta = c(mu, phi)` in order to use `optim`
-    gradient <- function (theta, x) {
-      pl2pmu <- -sum(x - theta[1]) / theta[2]
-      pl2pphi <- -crossprod(x - theta[1])[1] / (2 * theta[2] ^ 2) + length(x) / (2 * theta[2])
-      c(pl2pmu, pl2pphi)
-    }
-    ## ask `optim` to return Hessian matrix by `hessian = TRUE`
-    ## use "..." part to pass `x` as additional / further argument to "fn" and "gn"
-    ## note, we want `phi` as positive so box constraint is used, with "L-BFGS-B" method chosen
-    init <- c(sample(x, 1), sample(abs(x) + 0.1, 1))  ## arbitrary valid starting values
-    z <- optim(par = init, fn = nllik, gr = gradient, x = x, lower = c(-Inf, 0), method = "L-BFGS-B", hessian = TRUE)
-    ## post processing ##
-    theta <- z$par
-    loglik <- -z$value  ## flip the sign to get log-likelihood
-    n <- length(x)
-    ## Fisher information matrix (don't flip the sign as this is the Hessian for negative log-likelihood)
-    I <- z$hessian / n  ## remember to take average to get mean
-    invI <- solve(I, diag(2L))  ## numerical inverse
-    dimnames(invI) <- list(c("mu", "sigma2"), c("mu", "sigma2"))
-    ## return
-    return(list(theta = theta, vcov = invI, loglik = loglik, n = n))
-  }
+## Fit Gaussian distribution for numeric vector x
+fitnormal <- function (x) {
+  ################################################
+  ## Exact inference based on likelihood theory ##
+  ################################################
+  ## minimum negative log-likelihood (maximum log-likelihood) estimator of `mu` and `phi = sigma ^ 2`
+  n <- length(x)
+  mu <- sum(x) / n
+  phi <- crossprod(x - mu)[1L] / n  # (a bised estimator, though)
+  ## inverse of Fisher information matrix evaluated at MLE
+  invI <- matrix(c(phi, 0, 0, phi * phi), 2L,
+                 dimnames = list(c("mu", "sigma2"), c("mu", "sigma2")))
+  ## log-likelihood at MLE
+  loglik <- -(n / 2) * (log(2 * pi * phi) + 1)
+  ## return
+  return(list(theta = c(mu = mu, sigma2 = phi), vcov = invI, loglik = loglik, n = n))
+
 }
 
 
@@ -1019,6 +979,16 @@ fitnormal <- function (x, exact = TRUE) {
 #' @export
 #'
 #' @examples
+#' # Load example
+#' data <- Silicosis_pg
+#' data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
+#' # Make SummarizedExperiment
+#' ecols <- grep("LFQ.", colnames(data_unique))
+#' se <- make_se_parse(data_unique, ecols, mode = "delim", sep = "_")
+#' colnames(se)
+#' se <- Order_cols(se,c("PBS","W2","W4","W6","W9","W10"))
+#' colnames(se)
+#'
 Order_cols <- function(object, order, order_column = "condition"){
   assertthat::assert_that(is.character(order), is.character(order_column) && length(order_column) == 1,
                           inherits(object, "SummarizedExperiment"))

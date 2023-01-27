@@ -53,6 +53,10 @@ The number of plot name. Defalut NULL, label all significant names.}
 \item{label_trend}{Character(1).
 one of c("all","up","down"), plot all significant, up-regulated ones or down-regulated ones.}
 
+\item{up_color}{The color of upregulated points}
+
+\item{down_color}{The color of}
+
 \item{chooseTolabel}{Character, Specify names to plot,
 no matter whether they are significant.}
 
@@ -81,7 +85,7 @@ Cutoff of p or p adjusted value}
 Curvature of curve cutoff line}
 
 \item{x0_fold}{numeric(1),
-#' The fold of x0 to σ.}
+The fold of x0 to Sigma.}
 
 \item{breaks}{Numeric vector, the position of x-axis label.
 eg: seq(-10,10,by = 5), c(-2, -1, 0, 1, 2).}

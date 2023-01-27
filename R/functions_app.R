@@ -2,13 +2,21 @@
 
 #' Run shiny application in DEP2
 #'
+#' Run the shiny application in DEP2
 #' @export
-#' @import shiny
 #' @examples
+#' library(DEP2)
+#' DEP2::run_app
 run_app <- function() {
-  # Launch the app
-  appDir <- system.file("DEP2shiny221013", package = "DEP2")
-  suppressWarnings(shiny::runApp(appDir, display.mode = "normal"))
+  check_depends <- check_shiny_depends()
+
+  if(isTRUE(check_depends)){
+    # Launch the app
+    appDir <- system.file("DEP2shiny221013", package = "DEP2")
+    suppressWarnings(shiny::runApp(appDir, display.mode = "normal"))
+  }else{
+    stop("Packages ",paste0(check_depends,collapse = ", ")," are required but not found")
+  }
 }
 
 

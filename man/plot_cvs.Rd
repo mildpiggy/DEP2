@@ -15,6 +15,3 @@ a histogram plot of row coefficient of variation (standard deviation / mean) in 
 \description{
 Plot sample coefficient of variation whitin group
 }
-\examples{
-
-}

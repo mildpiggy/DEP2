@@ -1,4 +1,6 @@
 
+`%||%` <- function(a, b) if (is.null(a)) b else a
+
 #' Plot values for a protein/gene of interest
 #'
 #' \code{plot_single} generates a barplot of a protein/gene of interest.
@@ -1170,9 +1172,9 @@ statistics_plot <- function(dep,x = c("-log10.padj", "-log10.pval","padj","pval"
 #' @param curvature numeric(1),
 #' Curvature of curve cutoff line
 #' @param x0_fold numeric(1),
-#' #' The fold of x0 to σ.
-#' @param up_color
-#' @param down_color
+#' The fold of x0 to Sigma.
+#' @param up_color The color of upregulated points
+#' @param down_color The color of
 #' @param stable_color
 #' @param highlight_PGs_with_few_peptides
 #' @param peptide_1_color
@@ -1292,8 +1294,8 @@ plot_volcano <- function (object, contrast = get_contrast(object)[1],
     y = -log10(row_data[, p_values])
     x1 = fun.outlier(x) %>% na.omit()
     fit <- fitnormal(x1)
-    σ = sqrt(fit$theta[2])
-    x0 = x0_fold*σ
+    Sigma = sqrt(fit$theta[2])
+    x0 = x0_fold*Sigma
 
     curve_fun1 = function(x){
       y=abs(curvature/(x-x0))
@@ -1390,7 +1392,7 @@ plot_volcano <- function (object, contrast = get_contrast(object)[1],
   ## plot the cutoff line and cutoff parameters.
   linetype = 4
   if(add_threshold_line == "curve"){
-    message("add curve threshold line." ," σ = ", σ, ", x0 = ", x0,", curvature = ", curvature )
+    message("add curve threshold line." ," Sigma = ", Sigma, ", x0 = ", x0,", curvature = ", curvature )
     y_max <- layer_scales(p)$y$range$range[2] # store the y scale
     p <- p + stat_function(fun=curve_fun1,
                            xlim=c(x0,xlimit),
@@ -1402,7 +1404,7 @@ plot_volcano <- function (object, contrast = get_contrast(object)[1],
     p <- p + labs(subtitle =
                     bquote(
                       italic(log[10](p) ) > frac(italic(c), abs(italic(lfc)) - italic(x[0])) ~ "&" ~ italic(abs(lfc) > x0)
-                      ~";"~italic(x[0]) == .(x0_fold) %*% .(round(σ,4))~italic(c) == .(round(curvature,3))
+                      ~";"~italic(x[0]) == .(x0_fold) %*% .(round(Sigma,4))~italic(c) == .(round(curvature,3))
                     )
     ) + theme(plot.subtitle = element_text(hjust = 0.5))
 
@@ -1630,8 +1632,8 @@ plot_diff_hist <- function(object, contrasts = NULL, plot = T){
   statistics_df = row_data[,paste0(contrasts,"_diff"),drop = F] %>% data.frame()
   ## fit sigma and mu of normal distribution for each contrast
   fit_res <- apply(statistics_df, 2, function(x){
-    x = DEP2:::fun.outlier(as.vector(x),time.iqr = 1.5) %>% na.omit()
-    fit = DEP2:::fitnormal(x)
+    x = fun.outlier(as.vector(x),time.iqr = 1.5) %>% na.omit()
+    fit = fitnormal(x)
     return(fit$theta)
   })
   fit_res = fit_res %>% t %>% data.frame %>% rownames_to_column(var = "contrast")

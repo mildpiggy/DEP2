@@ -8,6 +8,7 @@
 #' @slot ntf matrix. Log2 transform assay
 #' @slot rlg matrix. rlog transform assay
 #' @slot test_result DataFrame. Test result from DESeq2
+#' @importClassesFrom DESeq2 DESeqDataSet
 #' @exportClass DEGdata
 setClass("DEGdata",
          contains = "DESeqDataSet",
@@ -58,61 +59,7 @@ setMethod("[", "DEGdata",
           }
 )
 
-# filter_missval <- function (se, thr = 0)
-# {
-#   if (is.integer(thr))
-#     thr <- as.numeric(thr)
-#   assertthat::assert_that(inherits(se, "SummarizedExperiment"),
-#                           is.numeric(thr), length(thr) == 1)
-#   if (any(!c("name", "ID") %in% colnames(rowData(se, use.names = FALSE)))) {
-#     stop("'name' and/or 'ID' columns are not present in '",
-#          deparse(substitute(se)), "'\nRun make_unique() and make_se() to obtain the required columns",
-#          call. = FALSE)
-#   }
-#   if (any(!c("label", "condition", "replicate") %in% colnames(colData(se)))) {
-#     stop("'label', 'condition' and/or 'replicate' columns are not present in '",
-#          deparse(substitute(se)), "'\nRun make_se() or make_se_parse() to obtain the required columns",
-#          call. = FALSE)
-#   }
-#   max_repl <- max(colData(se)$replicate)
-#   if (thr < 0 | thr > max_repl) {
-#     stop("invalid filter threshold applied", "\nRun filter_missval() with a threshold ranging from 0 to ",
-#          max_repl)
-#   }
-#   bin_data <- assay(se)
-#   idx <- is.na(assay(se))
-#   bin_data[!idx] <- 1
-#   bin_data[idx] <- 0
-#   keep <- bin_data %>% data.frame() %>% rownames_to_column() %>%
-#     gather(ID, value, -rowname) %>% left_join(., data.frame(colData(se)),
-#                                               by = "ID") %>% group_by(rowname, condition) %>% summarize(miss_val = n() -
-#                                                                                                           sum(value)) %>% filter(miss_val <= thr) %>% spread(condition,
-#                                                                                                                                                              miss_val)
-#   se_fltrd <- se[keep$rowname, ]
-#   return(se_fltrd)
-# }
-#
-# filter_dds <- function(dds,
-#                        thr = NULL,
-#                        missnum = NULL,
-#                        rowsum = NULL){
-#   if(!is.null(rowsum)){
-#     message("filter base on counts sum >=",rowsum,"\n")
-#     dds = dds[rowSums(counts(dds)) >= rowsum, ]
-#   }
-#   dds <- zeroIsNA(dds)
-#   if(!is.null(missnum)){
-#     message("filter base on missing numbers <=",missnum,"\n")
-#     dds = dds[rowSums(is.na(counts(dds))) <= missnum, ]
-#   }
-#   if(!is.null(thr)){
-#     message("filter base on missing numbers in at least one coniditon <=",thr,"\n")
-#     dds_save <<- dds
-#     dds <- filter_missval(dds, thr)
-#   }
-#   dds <- NAiszero(dds)
-#   return(dds)
-# }
+
 
 
 
@@ -132,6 +79,17 @@ setMethod("[", "DEGdata",
 #'  A data.frame contain four columns: label,ID,condition,replicate
 #' @export
 #' @examples
+#' ## Parse on delim
+#' samples = c("Quantity.A_1","Quantity.A_2","Quantity.A_3","Quantity.B_1","Quantity.B_2","Quantity.B_3",
+#'             "Quantity.C_1","Quantity.C_2")
+#' get_exdesign_parse(samples, mode = "delim", sep = "_")
+#'
+#' ## Parse on certain character
+#' samples = c("Quantity.A1","Quantity.A2","Quantity.A3","Quantity.B1","Quantity.B2","Quantity.B3",
+#'             "Quantity.C1","Quantity.C2")
+#' get_exdesign_parse(samples, mode = "char", chars = 1)
+#' # Reserve prefix
+#' get_exdesign_parse(samples, mode = "char", chars = 1, remove_prefix = F)
 get_exdesign_parse <- function(label, mode = c("delim", "char"),
                                chars = 1, sep = "_", remove_prefix = T, remove_suffix = F){
   mode = match.arg(mode)
@@ -157,31 +115,12 @@ get_exdesign_parse <- function(label, mode = c("delim", "char"),
                remove = FALSE, extra = "merge") %>% unite(ID,
                                                           condition, replicate, remove = FALSE)
   }
-  rownames(col_data) <- col_data$ID
-
+  # rownames(col_data) <- col_data$ID
+  rownames(col_data) <- seq(nrow(col_data))
   return(col_data)
 }
 
-# /**
-#  * [get differential analysis result of a specified contrast]
-#  * @param  {[type]} dds                  [the dds object returned from function DEseq]
-#  * @param  {[type]} coldata                  [the exdesign]
-#  * @param  {[type]} type             ["control", "all" or "manual", The type of contrasts that will be tested. This can be all possible pairwise comparisons ("all"), limited to the comparisons versus the control ("control"), or manually defined contrasts ("manual").]
-#  * @param  {[type]} control                  [The condition to which contrasts are generated if type = "control" (a control condition would be most appropriate)]
-#  * @param  {[type]} test                  [The contrasts that will be tested if type = "manual". These should be formatted as "SampleA_vs_SampleB" or c("SampleA_vs_SampleC", "SampleB_vs_SampleC")]
-#  * @param  {[type]} contrast_upon                  [the contrast to bulid upon]
-#  * @param  {[type]} filter_ihw           [whether to use ihw to perform independent filtering and p-value adjustment, default FALSE]
-#  * @param  {[type]} independentFiltering [logical, whether independent filtering should be applied automatically, default TRUE]
-#  * @param  {[type]} lfcshark             [whether to use lfcshark, default FALSE]
-#  * @return {[type]}                      [description]
-#  */
 
-# setMethod("test_diff",
-#           "DEGdata",
-#           function(se, ...){
-#             .get_res(dds = se,...)
-#           }
-# )
 
 #' Differential expression test on a DESeqDataSet
 #'
@@ -208,7 +147,7 @@ get_exdesign_parse <- function(label, mode = c("delim", "char"),
 #' @param lfcshark logical(1),whether to use lfcshark, default FALSE. See \link[DESeq2]{results}
 #' @param ... Parameters transmitted to \link[DESeq2]{DESeq2}
 #' @export
-#' @example
+#'
 test_diff_deg <- function(dds, type = c("all", "control", "manual"), control = NULL,
                     test_contrasts = NULL, contrast_upon = "condition",
                     filter_ihw = FALSE, independentFiltering = TRUE, lfcshark = FALSE,
@@ -412,8 +351,8 @@ add_rejections.DEGdata <- function (diff, alpha = 0.05, lfc = 1,thresholdmethod=
       x = test_result[, cols_diff]
       x = fun.outlier(x) %>% na.omit()
       fit <- fitnormal(x)
-      σ = sqrt(fit$theta[2])
-      x0 = x0_fold*σ
+      Sigma = sqrt(fit$theta[2])
+      x0 = x0_fold*Sigma
       polar = ifelse((test_result[,cols_diff] > 0),1,-1)
       contrast_significant = ( -log10(test_result[,cols_p]) > curvature/abs(test_result[,cols_diff] - polar*x0) &
                    ifelse((test_result[,cols_diff] >= 0),test_result[,cols_diff]>x0,test_result[,cols_diff] < -x0) )
@@ -430,8 +369,8 @@ add_rejections.DEGdata <- function (diff, alpha = 0.05, lfc = 1,thresholdmethod=
         x = test_result[, cols_diff[i]]
         x = fun.outlier(x) %>% na.omit()
         fit <- fitnormal(x)
-        σ = sqrt(fit$theta[2])
-        x0 = x0_fold*σ
+        Sigma = sqrt(fit$theta[2])
+        x0 = x0_fold*Sigma
         polar = ifelse((test_result[,cols_diff[i]] > 0),1,-1)
         contrast_significant <- ( -log10(test_result[,cols_p[i]]) > curvature/abs(test_result[,cols_diff[i]] - polar*x0) &
                                     ifelse((test_result[,cols_diff[i]] >= 0),test_result[,cols_diff[i]]>x0,test_result[,cols_diff[i]] < -x0) )
@@ -470,7 +409,7 @@ add_rejections.DEGdata <- function (diff, alpha = 0.05, lfc = 1,thresholdmethod=
 #' @examples
 ntf_deg <- function(DEGdata, f = log2, pc = 1){
   assertthat::assert_that(inherits(DEGdata,"DEGdata"))
-  DEGdata@ntf = assay(normTransform(DEGdata))
+  DEGdata@ntf = assay(normTransform(DEGdata, f = f, pc = pc))
   return(DEGdata)
 }
 

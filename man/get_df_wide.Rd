@@ -19,25 +19,18 @@ where each row represents a protein/gene.
 }
 \examples{
 # Load example
-data <- UbiLength
-data <- data[data$Reverse != "+" & data$Potential.contaminant != "+",]
+data <- Silicosis_pg
 data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 
 # Make SummarizedExperiment
-columns <- grep("LFQ.", colnames(data_unique))
-exp_design <- UbiLength_ExpDesign
-se <- make_se(data_unique, columns, exp_design)
-
-# Filter, normalize and impute missing values
-filt <- filter_missval(se, thr = 0)
+ecols <- grep("LFQ.", colnames(data_unique))
+se <- make_se_parse(data_unique, ecols, mode = "delim", sep = "_")
+# Filter and normalize
+filt <- filter_se(se, thr = 0, fraction = 0.4, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
 norm <- normalize_vsn(filt)
-imputed <- impute(norm, fun = "MinProb", q = 0.01)
+imputed <- impute(norm, fun = "MinDet")
+diff <- DEP2::test_diff(imputed,type = "control", control = "PBS")
+dep <- add_rejections(diff)
+get_df_wide(dep)
 
-# Test for differentially expressed proteins
-diff <- test_diff(imputed, "control", "Ctrl")
-dep <- add_rejections(diff, alpha = 0.05, lfc = 1)
-
-# Get a wide data.frame
-wide <- get_df_wide(dep)
-colnames(wide)
 }

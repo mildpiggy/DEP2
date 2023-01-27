@@ -37,3 +37,14 @@ A QFeatures object with a peptide assay.
 \code{make_pe} creates a QFeatures object
 based on two data.frames: the peptide table and experimental design.
 }
+\examples{
+# Load a peptides
+data(Silicosis_peptide)
+# Exctract Intensity columns
+(ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T))
+(expDesign = Silicosis_ExpDesign)
+# Construct a QFeatures object, with a 'peptideRaw' assay
+pe_peptides <- make_pe(Silicosis_peptide, columns = ecols,   # columns is the abundance columns
+                       expdesign = expDesign) # log2transform
+pe_peptides # a QFeatures object, with a peptideRaw assay
+}

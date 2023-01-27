@@ -27,9 +27,29 @@
 #' - the output of \code{\link[TCseq]{timeclust}} and the seed.
 #' @export
 #'
-#' @import TCseq
+#' @importFrom  TCseq timeclust clustCluster clustData clustMembership
 #'
 #' @examples
+#' # Load sample
+#' data <- Silicosis_pg
+#' data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
+#' # Make SummarizedExperiment
+#' ecols <- grep("LFQ.", colnames(data_unique))
+#' se <- make_se_parse(data_unique, ecols, mode = "delim", sep = "_")
+#'
+#' filt <- filter_se(se, thr = 0, fraction = 0.3, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
+#' norm <- normalize_vsn(filt)
+#' imputed <- impute(norm, fun = "MinProb", q = 0.05)
+#' diff <- test_diff(imputed,type = "control", control = "PBS")
+#' dep <- add_rejections(diff)
+#'
+#' # Expression pattern cluster
+#' TC <- get_tc_cluster(get_signicant(dep),
+#'                      group_order = c("PBS","W2","W4","W6","W9","W10"), # set the group order
+#'                      heatmap_width = 2.5, heatmap_height = 5
+#' )
+#' TC$ht # Heatmap
+#' head(TC$res)
 get_tc_cluster <- function(x, ht_mat, exp_design, groupby = "condition",
                            group_order = NULL,
                            # algo = "cm",
@@ -37,8 +57,9 @@ get_tc_cluster <- function(x, ht_mat, exp_design, groupby = "condition",
                            color = c("RdBu", "RdYlBu", "RdYlGn", "BrBG", "PiYG", "PRGn", "PuOr", "RdGy", "Spectral"),
                            col_limit = 4, row_font_size = 5,
                            col_font_size = 5, heatmap_width = 3, heatmap_height = 5,
-                           seed = NULL,
-                           ...){
+                           seed = NULL
+                           # ,...
+                           ){
   algo = "cm"
   color <- match.arg(color)
   cat("aa")

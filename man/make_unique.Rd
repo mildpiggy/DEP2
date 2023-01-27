@@ -29,7 +29,7 @@ for a proteomics dataset based on "name" and "id" columns.
 }
 \examples{
 # Load example
-data <- UbiLength
+data <- Silicosis_pg
 
 # Check colnames and pick the appropriate columns
 colnames(data)

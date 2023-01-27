@@ -13,7 +13,7 @@ correct_PTM_by_Protein(
 )
 }
 \arguments{
-\item{enriched_peptide}{The SummarizedExperiment object of modified-relative proteomics}
+\item{enriched_peptide}{The SummarizedExperiment object of modified-relative proteomics.}
 
 \item{relative_protein}{The SummarizedExperiment object of the relative global proteomics}
 

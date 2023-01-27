@@ -726,13 +726,13 @@ library(tibble)
 library(ggplot2)
 library(RColorBrewer)
 library(BiocParallel)
-library(apeglm) ## shrink
+# library(apeglm) ## shrink
 library(DESeq2)
 # library(org.Hs.eg.db)
-library(AnnotationDbi)
+# library(AnnotationDbi)
 library(dplyr)
-library(IHW)
-library(ashr)
+## library(IHW)
+# library(ashr)
 # /**
 #  * [pca plot]
 #  * @param  {[type]} data       [row gene , column sample]
@@ -2102,157 +2102,157 @@ plot_pro_rna_heatmap_for_whole <- function(rna, pro, manual = FALSE, contrast = 
   }
 
 
-## speed up the speed of GO analysis
-kegg_list <- function (db) {
-  url <- paste0("http://rest.kegg.jp/list/", db, collapse = "")
-  clusterProfiler:::kegg_rest(url)
-}
-
-ko2name <- function (ko) {
-  p <- clusterProfiler:::kegg_list("pathway")
-  ko2 <- gsub("^ko", "path:map", ko)
-  ko.df <- data.frame(ko = ko, from = ko2)
-  res <- merge(ko.df, p, by = "from", all.x = TRUE)
-  res <- res[, c("ko", "to")]
-  colnames(res) <- c("ko", "name")
-  return(res)
-}
-
-
-get_GOdata_Env <- function () {
-  if (!exists(".GO_data_Env", envir = .GlobalEnv)) {
-    pos <- 1
-    envir <- as.environment(pos)
-    assign(".GO_data_Env", new.env(), envir=envir)
-  }
-  get(".GO_data_Env", envir = .GlobalEnv)
-}
-
-enrichGO <- function(gene,
-                     OrgDb,
-                     keyType = "ENTREZID",
-                     ont="MF",
-                     pvalueCutoff=0.05,
-                     pAdjustMethod="BH",
-                     universe,
-                     qvalueCutoff = 0.2,
-                     minGSSize = 10,
-                     maxGSSize = 500,
-                     readable=FALSE, pool=FALSE) {
-  ont %<>% toupper
-  ont <- match.arg(ont, c("BP", "MF", "CC", "ALL"))
-
-  OrgDb_name = OrgDb$packageName
-  OrgDb_version = package.version(OrgDb$packageName)
-  GO_DATAfolder = paste(system.file(package = "DEP2"),"/GOdata",sep="")
-  if (!file.exists(GO_DATAfolder)){
-    dir.create(file.path(GO_DATAfolder))
-  }
-  exist_GOdata =  list.files(file.path(GO_DATAfolder))
-  GO_DATAfile = paste(OrgDb_name,"_",OrgDb_version,"_",keyType,".RDS",sep = "")
-
-  GO_DATA_environment = get_GOdata_Env()
-
-  if(GO_DATAfile %in% exist_GOdata){
-    use_cashed = F  ## load a exiting RDS
-    if(exists("GO_DATAfile",envir = GO_DATA_environment) & exists("GO_DATA",envir = GO_DATA_environment)){
-      GO_DATAfile2 = get("GO_DATAfile",envir = GO_DATA_environment)
-      if(GO_DATAfile2 == GO_DATAfile)
-        use_cashed = T  ## a correct RDS was loaded
-      # GO_DATA = get("GO_DATA",envir = GO_DATA_environment)
-    }
-
-    if(use_cashed){
-      GO_DATA = get("GO_DATA",envir = GO_DATA_environment)
-    }else{
-      GO_DATA = readRDS(paste(GO_DATAfolder,"/",GO_DATAfile,sep = ""))
-      assign("GO_DATA",GO_DATA,envir = GO_DATA_environment)
-      assign("GO_DATAfile",GO_DATAfile,envir = GO_DATA_environment)
-
-      cat("loaded a existing GOdata\n")
-    }
-
-  }else{
-    ## creat a GO_DATA for particular GO options: OrgDb,ont,keyType
-    GO_DATA <- list(ALL = as.list(get_GO_data(OrgDb, "ALL", keyType)),
-                    BP = as.list(get_GO_data(OrgDb, "BP", keyType)),
-                    MF = as.list(get_GO_data(OrgDb, "MF", keyType)),
-                    CC = as.list(get_GO_data(OrgDb, "CC", keyType)))
-    ## save the GO_DATA as an rds file
-    saveRDS(GO_DATA,file = paste(GO_DATAfolder,"/",GO_DATAfile,sep = ""))
-
-    assign("GO_DATA",GO_DATA,envir = GO_DATA_environment)
-    assign("GO_DATAfile",GO_DATAfile,envir = GO_DATA_environment)
-
-    cat(paste("saved a new GOdata"))
-  }
-
-  GO_DATA = as.environment(GO_DATA[[ont]])
-  # cat(ont)
-  # cat("GO_DATA finished\n\n")
-  # GO_DATA <- get_GO_data(OrgDb, ont, keyType)
-
-  if (missing(universe))
-    universe <- NULL
-
-  if (ont == "ALL" && !pool) {
-    lres <- lapply(c("BP", "CC", "MF"), function(ont)
-      suppressMessages(enrichGO(gene, OrgDb, keyType, ont,
-                                pvalueCutoff, pAdjustMethod, universe,
-                                qvalueCutoff, minGSSize, maxGSSize
-      ))
-    )
-
-    lres <- lres[!vapply(lres, is.null, logical(1))]
-    if (length(lres) == 0)
-      return(NULL)
-
-    df <- do.call('rbind', lapply(lres, as.data.frame))
-    geneSets <- lres[[1]]@geneSets
-    if (length(lres) > 1) {
-      for (i in 2:length(lres)) {
-        geneSets <- append(geneSets, lres[[i]]@geneSets)
-      }
-    }
-    res <- lres[[1]]
-    res@result <- df
-    res@geneSets <- geneSets
-  } else {
-    res <- enricher_internal(gene,
-                             pvalueCutoff=pvalueCutoff,
-                             pAdjustMethod=pAdjustMethod,
-                             universe = universe,
-                             qvalueCutoff = qvalueCutoff,
-                             minGSSize = minGSSize,
-                             maxGSSize = maxGSSize,
-                             USER_DATA = GO_DATA
-    )
-
-    if (is.null(res))
-      return(res)
-  }
-
-  res@keytype <- keyType
-  res@organism <- get_organism(OrgDb)
-  if(readable) {
-    res <- setReadable(res, OrgDb)
-  }
-  res@ontology <- ont
-
-  if (ont == "ALL") {
-    res <- add_GO_Ontology(res, GO_DATA)
-  }
-  return(res)
-}
-
-environment(enrichGO) = asNamespace("clusterProfiler")
-assignInNamespace("enrichGO", value = enrichGO, ns = "clusterProfiler")
+# ## speed up the speed of GO analysis
+# kegg_list <- function (db) {
+#   url <- paste0("http://rest.kegg.jp/list/", db, collapse = "")
+#   clusterProfiler:::kegg_rest(url)
+# }
+#
+# ko2name <- function (ko) {
+#   p <- clusterProfiler:::kegg_list("pathway")
+#   ko2 <- gsub("^ko", "path:map", ko)
+#   ko.df <- data.frame(ko = ko, from = ko2)
+#   res <- merge(ko.df, p, by = "from", all.x = TRUE)
+#   res <- res[, c("ko", "to")]
+#   colnames(res) <- c("ko", "name")
+#   return(res)
+# }
+#
+#
+# get_GOdata_Env <- function () {
+#   if (!exists(".GO_data_Env", envir = .GlobalEnv)) {
+#     pos <- 1
+#     envir <- as.environment(pos)
+#     assign(".GO_data_Env", new.env(), envir=envir)
+#   }
+#   get(".GO_data_Env", envir = .GlobalEnv)
+# }
+#
+# enrichGO <- function(gene,
+#                      OrgDb,
+#                      keyType = "ENTREZID",
+#                      ont="MF",
+#                      pvalueCutoff=0.05,
+#                      pAdjustMethod="BH",
+#                      universe,
+#                      qvalueCutoff = 0.2,
+#                      minGSSize = 10,
+#                      maxGSSize = 500,
+#                      readable=FALSE, pool=FALSE) {
+#   ont %<>% toupper
+#   ont <- match.arg(ont, c("BP", "MF", "CC", "ALL"))
+#
+#   OrgDb_name = OrgDb$packageName
+#   OrgDb_version = package.version(OrgDb$packageName)
+#   GO_DATAfolder = paste(system.file(package = "DEP2"),"/GOdata",sep="")
+#   if (!file.exists(GO_DATAfolder)){
+#     dir.create(file.path(GO_DATAfolder))
+#   }
+#   exist_GOdata =  list.files(file.path(GO_DATAfolder))
+#   GO_DATAfile = paste(OrgDb_name,"_",OrgDb_version,"_",keyType,".RDS",sep = "")
+#
+#   GO_DATA_environment = get_GOdata_Env()
+#
+#   if(GO_DATAfile %in% exist_GOdata){
+#     use_cashed = F  ## load a exiting RDS
+#     if(exists("GO_DATAfile",envir = GO_DATA_environment) & exists("GO_DATA",envir = GO_DATA_environment)){
+#       GO_DATAfile2 = get("GO_DATAfile",envir = GO_DATA_environment)
+#       if(GO_DATAfile2 == GO_DATAfile)
+#         use_cashed = T  ## a correct RDS was loaded
+#       # GO_DATA = get("GO_DATA",envir = GO_DATA_environment)
+#     }
+#
+#     if(use_cashed){
+#       GO_DATA = get("GO_DATA",envir = GO_DATA_environment)
+#     }else{
+#       GO_DATA = readRDS(paste(GO_DATAfolder,"/",GO_DATAfile,sep = ""))
+#       assign("GO_DATA",GO_DATA,envir = GO_DATA_environment)
+#       assign("GO_DATAfile",GO_DATAfile,envir = GO_DATA_environment)
+#
+#       cat("loaded a existing GOdata\n")
+#     }
+#
+#   }else{
+#     ## creat a GO_DATA for particular GO options: OrgDb,ont,keyType
+#     GO_DATA <- list(ALL = as.list(get_GO_data(OrgDb, "ALL", keyType)),
+#                     BP = as.list(get_GO_data(OrgDb, "BP", keyType)),
+#                     MF = as.list(get_GO_data(OrgDb, "MF", keyType)),
+#                     CC = as.list(get_GO_data(OrgDb, "CC", keyType)))
+#     ## save the GO_DATA as an rds file
+#     saveRDS(GO_DATA,file = paste(GO_DATAfolder,"/",GO_DATAfile,sep = ""))
+#
+#     assign("GO_DATA",GO_DATA,envir = GO_DATA_environment)
+#     assign("GO_DATAfile",GO_DATAfile,envir = GO_DATA_environment)
+#
+#     cat(paste("saved a new GOdata"))
+#   }
+#
+#   GO_DATA = as.environment(GO_DATA[[ont]])
+#   # cat(ont)
+#   # cat("GO_DATA finished\n\n")
+#   # GO_DATA <- get_GO_data(OrgDb, ont, keyType)
+#
+#   if (missing(universe))
+#     universe <- NULL
+#
+#   if (ont == "ALL" && !pool) {
+#     lres <- lapply(c("BP", "CC", "MF"), function(ont)
+#       suppressMessages(enrichGO(gene, OrgDb, keyType, ont,
+#                                 pvalueCutoff, pAdjustMethod, universe,
+#                                 qvalueCutoff, minGSSize, maxGSSize
+#       ))
+#     )
+#
+#     lres <- lres[!vapply(lres, is.null, logical(1))]
+#     if (length(lres) == 0)
+#       return(NULL)
+#
+#     df <- do.call('rbind', lapply(lres, as.data.frame))
+#     geneSets <- lres[[1]]@geneSets
+#     if (length(lres) > 1) {
+#       for (i in 2:length(lres)) {
+#         geneSets <- append(geneSets, lres[[i]]@geneSets)
+#       }
+#     }
+#     res <- lres[[1]]
+#     res@result <- df
+#     res@geneSets <- geneSets
+#   } else {
+#     res <- enricher_internal(gene,
+#                              pvalueCutoff=pvalueCutoff,
+#                              pAdjustMethod=pAdjustMethod,
+#                              universe = universe,
+#                              qvalueCutoff = qvalueCutoff,
+#                              minGSSize = minGSSize,
+#                              maxGSSize = maxGSSize,
+#                              USER_DATA = GO_DATA
+#     )
+#
+#     if (is.null(res))
+#       return(res)
+#   }
+#
+#   res@keytype <- keyType
+#   res@organism <- get_organism(OrgDb)
+#   if(readable) {
+#     res <- setReadable(res, OrgDb)
+#   }
+#   res@ontology <- ont
+#
+#   if (ont == "ALL") {
+#     res <- add_GO_Ontology(res, GO_DATA)
+#   }
+#   return(res)
+# }
+#
+# environment(enrichGO) = asNamespace("clusterProfiler")
+# assignInNamespace("enrichGO", value = enrichGO, ns = "clusterProfiler")
 
 
 
 ############# PPI function #############
 library(data.table)
-library(visNetwork)
+# library(visNetwork)
 library(igraph)
 library(htmlwidgets)
 get_string_Env <- function () {
@@ -2520,7 +2520,7 @@ stringNetwork <- function(linksTable,layoutway,nodecolor ,nodeshape,linecolor,no
   # nodes$size =200
   colnames(nodes)[1] <- "id"
   links4 <<- links3;nodes4 <<-nodes
-  nwplot <- visNetwork(nodes,links3,width = "170%",height = "500px") %>%
+  nwplot <- visNetwork::visNetwork(nodes,links3,width = "170%",height = "500px") %>%
     visIgraphLayout(layout = layoutway ) %>%
     visNodes(size=nodes$size,
              # color = nodecolor ,
@@ -4977,51 +4977,51 @@ make_se <- function (proteins_unique, columns, expdesign)
 }
 environment(make_se) = asNamespace("DEP2")
 
-impute <- function (se, fun = c("bpca", "knn", "QRILC", "MLE", "MinDet",
-                                "MinProb", "man", "min", "zero", "mixed", "nbavg","RF"), ...)
-{
-  assertthat::assert_that(inherits(se, "SummarizedExperiment"),
-                          is.character(fun))
-  fun <- match.arg(fun)
-  if (any(!c("name", "ID") %in% colnames(rowData(se, use.names = FALSE)))) {
-    stop("'name' and/or 'ID' columns are not present in '",
-         deparse(substitute(se)), "'\nRun make_unique() and make_se() to obtain the required columns",
-         call. = FALSE)
-  }
-  if (!any(is.na(assay(se)))) {
-    warning("No missing values in '", deparse(substitute(se)),
-            "'. ", "Returning the unchanged object.", call. = FALSE)
-    return(se)
-  }
-  rowData(se)$imputed <- apply(is.na(assay(se)), 1, any)
-  rowData(se)$num_NAs <- rowSums(is.na(assay(se)))
-  if (fun == "man") {
-    se <- manual_impute(se, ...)
-  }else if(fun == "RF"){
-    doParallel::registerDoParallel(cores=4)
-    assay_save <<- assay(se)
-    assay(se) <- missForest::missForest(assay(se),ntree = 60,parallelize="variables")$ximp
-    library(microbenchmark)
-    # microbenchmark({
-    #   missForest::missForest(assay_save,parallelize="variables")
-    # },times = 8)
-    # microbenchmark({
-    #   missForest::missForest(assay_save,parallelize="forests")
-    # },times = 8)
-    # microbenchmark({
-    #   missForest::missForest(assay_save,ntree = 50,parallelize="variables")
-    # },times = 8)
-
-  }
-  else {
-    MSnSet_data <- as(se, "MSnSet")
-    MSnSet_imputed <- MSnbase::impute(MSnSet_data, method = fun,
-                                      ...)
-    assay(se) <- MSnbase::exprs(MSnSet_imputed)
-  }
-  return(se)
-}
-environment(fun  = .GlobalEnv$impute) = asNamespace("DEP2")
+# impute <- function (se, fun = c("bpca", "knn", "QRILC", "MLE", "MinDet",
+#                                 "MinProb", "man", "min", "zero", "mixed", "nbavg","RF"), ...)
+# {
+#   assertthat::assert_that(inherits(se, "SummarizedExperiment"),
+#                           is.character(fun))
+#   fun <- match.arg(fun)
+#   if (any(!c("name", "ID") %in% colnames(rowData(se, use.names = FALSE)))) {
+#     stop("'name' and/or 'ID' columns are not present in '",
+#          deparse(substitute(se)), "'\nRun make_unique() and make_se() to obtain the required columns",
+#          call. = FALSE)
+#   }
+#   if (!any(is.na(assay(se)))) {
+#     warning("No missing values in '", deparse(substitute(se)),
+#             "'. ", "Returning the unchanged object.", call. = FALSE)
+#     return(se)
+#   }
+#   rowData(se)$imputed <- apply(is.na(assay(se)), 1, any)
+#   rowData(se)$num_NAs <- rowSums(is.na(assay(se)))
+#   if (fun == "man") {
+#     se <- manual_impute(se, ...)
+#   }else if(fun == "RF"){
+#     doParallel::registerDoParallel(cores=4)
+#     assay_save <<- assay(se)
+#     assay(se) <- missForest::missForest(assay(se),ntree = 60,parallelize="variables")$ximp
+#     library(microbenchmark)
+#     # microbenchmark({
+#     #   missForest::missForest(assay_save,parallelize="variables")
+#     # },times = 8)
+#     # microbenchmark({
+#     #   missForest::missForest(assay_save,parallelize="forests")
+#     # },times = 8)
+#     # microbenchmark({
+#     #   missForest::missForest(assay_save,ntree = 50,parallelize="variables")
+#     # },times = 8)
+#
+#   }
+#   else {
+#     MSnSet_data <- as(se, "MSnSet")
+#     MSnSet_imputed <- MSnbase::impute(MSnSet_data, method = fun,
+#                                       ...)
+#     assay(se) <- MSnbase::exprs(MSnSet_imputed)
+#   }
+#   return(se)
+# }
+# environment(fun  = .GlobalEnv$impute) = asNamespace("DEP2")
 
 
 # ##### $add  for directly upload peptide.txt, and use it assemble to proteingroup.txt, and then do the differential analysis
@@ -5364,53 +5364,53 @@ smallestUniqueGroups <- function(proteins,
   # QF <- zeroIsNA(QF, "peptideRaw")
 # }
 
-filter_pe <- function(pe,
-                      thr = NULL,
-                      NAnum = NULL,
-                      filter_column_names = NULL){
-  assertthat::assert_that(class(pe) == "QFeatures", is.null(thr)||is.numeric(thr), is.null(NAnum)||is.numeric(NAnum),
-                          is.null(filter_column_names)||is.character(filter_column_names))
-
-  rowData(pe[["peptideRaw"]])$nNonZero <- rowSums(assay(pe[["peptideRaw"]]) > 0)
-  if(!is.null(NAnum))   pe <- filterFeatures(pe, ~ nNonZero >= (ncol(assay(pe[["peptideRaw"]])) - NAnum))
-
-  if(!is.null(thr)){
-    filter_thr = function(se,thr){
-      if (any(!c("label", "condition", "replicate") %in%
-              colnames(colData(se)))) {
-        stop("'label', 'condition' and/or 'replicate' columns are not present in '",
-             deparse(substitute(se)), "'\nRun make_pe() or make_pe_parse() to obtain the required columns",
-             call. = FALSE)
-      }
-      max_repl <- max(colData(se)$replicate)
-      if (thr < 0 | thr > max_repl) {
-        stop("invalid filter threshold applied", "\nRun filter_missval() with a threshold ranging from 0 to ",
-             max_repl)
-      }
-      bin_data <- assay(se)
-      idx <- (is.na(assay(se)))
-      bin_data[!idx] <- 1
-      bin_data[idx] <- 0
-      keep <- bin_data %>% data.frame() %>% rownames_to_column() %>%
-        gather(ID, value, -rowname) %>% left_join(., data.frame(colData(se)),
-                                                  by = "ID") %>% group_by(rowname, condition) %>%
-        summarize(miss_val = n() - sum(value)) %>% filter(miss_val <=
-                                                            thr) %>% spread(condition, miss_val)
-      se_fltrd <- se[keep$rowname, ]
-      return(se_fltrd)
-    }
-    # pe[["peptideRaw"]] = filter_thr(pe[["peptideRaw"]], thr = thr)
-    pe = filter_thr(pe, thr = thr)
-  }
-
-  if(!is.null(filter_column_names)){
-    for(i in filter_column_names){
-      pe <- filterFeatures(pe, as.formula(paste0("~ ", i ,"== ''")))
-    }
-  }
-
-  return(pe)
-}
+# filter_pe <- function(pe,
+#                       thr = NULL,
+#                       NAnum = NULL,
+#                       filter_column_names = NULL){
+#   assertthat::assert_that(class(pe) == "QFeatures", is.null(thr)||is.numeric(thr), is.null(NAnum)||is.numeric(NAnum),
+#                           is.null(filter_column_names)||is.character(filter_column_names))
+#
+#   rowData(pe[["peptideRaw"]])$nNonZero <- rowSums(assay(pe[["peptideRaw"]]) > 0)
+#   if(!is.null(NAnum))   pe <- filterFeatures(pe, ~ nNonZero >= (ncol(assay(pe[["peptideRaw"]])) - NAnum))
+#
+#   if(!is.null(thr)){
+#     filter_thr = function(se,thr){
+#       if (any(!c("label", "condition", "replicate") %in%
+#               colnames(colData(se)))) {
+#         stop("'label', 'condition' and/or 'replicate' columns are not present in '",
+#              deparse(substitute(se)), "'\nRun make_pe() or make_pe_parse() to obtain the required columns",
+#              call. = FALSE)
+#       }
+#       max_repl <- max(colData(se)$replicate)
+#       if (thr < 0 | thr > max_repl) {
+#         stop("invalid filter threshold applied", "\nRun filter_missval() with a threshold ranging from 0 to ",
+#              max_repl)
+#       }
+#       bin_data <- assay(se)
+#       idx <- (is.na(assay(se)))
+#       bin_data[!idx] <- 1
+#       bin_data[idx] <- 0
+#       keep <- bin_data %>% data.frame() %>% rownames_to_column() %>%
+#         gather(ID, value, -rowname) %>% left_join(., data.frame(colData(se)),
+#                                                   by = "ID") %>% group_by(rowname, condition) %>%
+#         summarize(miss_val = n() - sum(value)) %>% filter(miss_val <=
+#                                                             thr) %>% spread(condition, miss_val)
+#       se_fltrd <- se[keep$rowname, ]
+#       return(se_fltrd)
+#     }
+#     # pe[["peptideRaw"]] = filter_thr(pe[["peptideRaw"]], thr = thr)
+#     pe = filter_thr(pe, thr = thr)
+#   }
+#
+#   if(!is.null(filter_column_names)){
+#     for(i in filter_column_names){
+#       pe <- filterFeatures(pe, as.formula(paste0("~ ", i ,"== ''")))
+#     }
+#   }
+#
+#   return(pe)
+# }
 
 ## Distinguish smallest unique proteingroups and respective unique peptides. Distribute razor peptides to proteingroups
 # Peptide_distribution <- function(pe_norm, i = "peptideNorm", fcol = "Proteins"){

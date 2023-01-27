@@ -112,6 +112,15 @@ GSEA_server_module <- function(id, Omics_res) {
   moduleServer(
     ID,
     function(input, output, session) {
+      library(enrichplot)
+      library(ggplot2)
+
+      library(DOSE)
+      library(GO.db)
+      library(dplyr)
+      library(clusterProfiler.dplyr)
+      library(ReactomePA)
+
       ns = session$ns
 
       annoSpecies_df <- DEP2:::annoSpecies_df()

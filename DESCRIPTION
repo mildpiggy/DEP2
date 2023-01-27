@@ -4,7 +4,8 @@ Version: 0.0.1.1013
 Authors@R: 
     c(
     person("Zhenhuan", "Feng", email = "feng_zhenhuan@gibh.ac.cn", role = c("cre", "aut")),
-    person("Xiaofei", "Zhang", email = "zhang_xiaofei@gibh.ac.cn", role = "aut"))
+    person("Xiaofei", "Zhang", email = "zhang_xiaofei@gibh.ac.cn", role = "aut")
+    )
 Description: DEP2 provides an comprehensive analysis workflow for mass spectrometry based proteomics data, 
     developed from the previous package DEP. This package provided differential expression/enrichment analysis pipelines for various data 
     including protein-level quantity(e.g. proteingroup), peptide-level quantity data and modification-specific proteomics (quantities of modified peptides). I
@@ -14,33 +15,29 @@ Description: DEP2 provides an comprehensive analysis workflow for mass spectrome
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
+LazyDataCompression: xz
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.3
 Suggests: 
     testthat (>= 3.0.0),
     knitr,
-    ggridges
+    IHW, ashr, apeglm,
+    shinyvalidate, shinyWidgets, shinythemes, shinyBS, shinyFeedback, markdown, dndselectr,
+    rmarkdown, shiny, colourpicker,
+    clusterProfiler, clusterProfiler.dplyr, ReactomePA, msigdbr,
+    igraph, visNetwork, R.utils
 Imports: 
-    DEP, ComplexHeatmap, dplyr, tidyr, tibble, data.table, ggplot2, MsCoreUtils, methods, assertthat, R.utils,
-    limma, MSnbase, missForest, purrr, QFeatures, DESeq2, readr, SummarizedExperiment (>= 1.11.5), 
-    vsn, fdrtool, lazyeval, S4Vectors, clusterProfiler(>= 4.3.1.900), clusterProfiler.dplyr,
-    RColorBrewer, circlize, shiny, rmarkdown, DT, msigdbr, rlang, glmnet,
-    ggrepel,
-    colourpicker,
-    shinyvalidate, shinyWidgets, shinythemes, shinyBS, shinyFeedback, shinydashboardPlus, dndselectr, dbplyr,
-    ggVennDiagram,
-    TCseq,
-    Rtsne,
-    umap,
-    igraph,
-    visNetwork,
-    msigdbr,
-    ReactomePA,
-    IHW, ashr, apeglm
+    limma, MSnbase, imputeLCMD ,QFeatures, MsCoreUtils, DESeq2,
+    rlang, pak, methods, assertthat, S4Vectors, 
+    purrr,  readr, dplyr, tidyr, tibble, data.table,
+    missForest, vsn, fdrtool, lazyeval, ComplexHeatmap,
+    RColorBrewer, circlize, DT,  glmnet, ggplot2, 
+    ggVennDiagram, TCseq, Rtsne, umap, abind
 Remotes:
     serenity-r/dndselectr,
     YuLab-SMU/clusterProfiler.dplyr
 biocViews: Proteomics, MassSpectrometry, DifferentialExpression, DataRepresentation
 VignetteBuilder: knitr
 Depends: 
-    R (>= 2.10)
+    R (>= 4.1.0),
+    SummarizedExperiment (>= 1.11.5)

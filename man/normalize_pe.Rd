@@ -14,7 +14,8 @@ normalize_pe(
 \arguments{
 \item{pe}{A QFeature object}
 
-\item{method}{Character(1), normalisation method, one of "diff.median", "quantiles", "quantiles.robust" or "vsn".}
+\item{method}{Character(1), normalisation method, one of "diff.median", "quantiles", "quantiles.robust" or "vsn".
+See \link[QFeatures]{normalize}.}
 
 \item{i}{A numeric vector or a character vector giving the index or the name, respectively, of the assay(s) to be processed.}
 
@@ -22,4 +23,15 @@ normalize_pe(
 }
 \description{
 Normalize a QFeatures object though \link[QFeatures:QFeatures-processing]{QFeatures::normalize} function
+}
+\examples{
+\dontrun{
+#' data <- Silicosis_peptide
+ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T)
+pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = T, log2transform = T,mode = "delim")
+filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
+imp_pe <- QFeatures::addAssay(filt_pe, DEP2::impute(filt_pe[["peptideRaw"]], fun = "MinDet"), name = "peptideImp")
+
+norm_pe <- normalize_pe(imp_pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
+}
 }

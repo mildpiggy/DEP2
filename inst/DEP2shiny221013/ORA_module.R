@@ -1,13 +1,13 @@
 source("ORA_submodule.R")
 source("source_enrich_ana.R")
-library(enrichplot)
-library(ggplot2)
+# library(enrichplot)
+# library(ggplot2)
 
-library(DOSE)
-library(GO.db)
-library(dplyr)
-library(clusterProfiler.dplyr)
-library(ReactomePA)
+# library(DOSE)
+# library(GO.db)
+# library(dplyr)
+# library(clusterProfiler.dplyr)
+# library(ReactomePA)
 
 #* ORA UI ----
 ORA_UI <- function(id){
@@ -116,6 +116,15 @@ ORA_server_module2 <- function(id, Omics_res) {
   moduleServer(
     ID,
     function(input, output, session) {
+      library(enrichplot)
+      library(ggplot2)
+
+      library(DOSE)
+      library(GO.db)
+      library(dplyr)
+      library(clusterProfiler.dplyr)
+      library(ReactomePA)
+
       ns = session$ns
       session_save2 <<- session
 

@@ -108,6 +108,19 @@ get_signicant <- function(object,
 #' @export
 #'
 #' @examples
+#' data <- Silicosis_pg
+#' data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
+#' # Make SummarizedExperiment
+#' ecols <- grep("LFQ.", colnames(data_unique))
+#' se <- make_se_parse(data_unique, ecols, mode = "delim", sep = "_")
+#'
+#' filt <- filter_se(se, thr = 0, fraction = 0.3, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
+#' norm <- normalize_vsn(filt)
+#' imputed <- impute(norm, fun = "MinDet")
+#' diff <- test_diff(imputed,type = "control", control = "PBS")
+#' get_contrast(diff)
+#' diff <- test_diff(imputed,type = "manual", test = c("W9_vs_PBS","W6_vs_PBS"))
+#' get_contrast(diff)
 get_contrast = function(object){
   row_data = rowData(object)
   if (length(grep("_diff$", colnames(row_data))) < 1) {
@@ -242,7 +255,6 @@ select_contrasts <- function(object, contrasts) {
 #' colnames(results)
 #'
 #' significant_proteins <- results[results$significant,]
-#' nrow(significant_proteins)
 #' head(significant_proteins)
 #' @export
 get_results <- function(object) {

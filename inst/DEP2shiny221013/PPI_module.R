@@ -573,9 +573,9 @@ PPI_server_module <- function(id, Omics_res) {
             #   )
             # )
             print("a6")
-            visNetworkOutput(ns("network"),height=input$plothigh*10)
+            visNetwork::visNetworkOutput(ns("network"),height=input$plothigh*10)
           })
-          output$network <- renderVisNetwork({
+          output$network <-  visNetwork::renderVisNetwork({
             # validate(need(nrow(links2()) != 0, "There is no Protein-Protein Interaction Network"))
             aplot()
           })

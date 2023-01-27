@@ -415,17 +415,19 @@ protein_pe <- DEP2::aggregate_pe(norm_pe,
                            reserve = "Gene.names"              # reserve the Gene.names in row data.
                            )
 protein_pe ## protein result is in the protein assay
-SE_pep <- protein_pe[["protein"]]
-colnames(rowData(SE_pep))
+# SE_pep <- protein_pe[["protein"]]
+# colnames(rowData(SE_pep))
+# 
+# ## make names for features
+# rd <- DEP2::make_unique(rowData(SE_pep) %>% as.data.frame(),
+#                                      names = "Gene.names",           # The gene names
+#                                      ids = "smallestProteingroups",  # The protien ID translated to Proteingroups.
+#                                      delim = ";")
+# rownames(rd) <- rd$name
+# rowData(SE_pep) <- rd
+# rownames(SE_pep) <- rd$name
 
-## make names for features
-rd <- DEP2::make_unique(rowData(SE_pep) %>% as.data.frame(),
-                                     names = "Gene.names",           # The gene names
-                                     ids = "smallestProteingroups",  # The protien ID translated to Proteingroups.
-                                     delim = ";")
-rownames(rd) <- rd$name
-rowData(SE_pep) <- rd
-rownames(SE_pep) <- rd$name
+SE_pep <- pe2se(SE_pep)
 rm(list = c("filt_pe", "imp_pe","norm_pe")) # rm intermediate variables
 ```
 

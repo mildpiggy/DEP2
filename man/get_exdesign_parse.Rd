@@ -28,3 +28,16 @@ A data.frame contain four columns: label,ID,condition,replicate
 \description{
 Construct experiment design basic on colnames parse
 }
+\examples{
+## Parse on delim
+samples = c("Quantity.A_1","Quantity.A_2","Quantity.A_3","Quantity.B_1","Quantity.B_2","Quantity.B_3",
+            "Quantity.C_1","Quantity.C_2")
+get_exdesign_parse(samples, mode = "delim", sep = "_")
+
+## Parse on certain character
+samples = c("Quantity.A1","Quantity.A2","Quantity.A3","Quantity.B1","Quantity.B2","Quantity.B3",
+            "Quantity.C1","Quantity.C2")
+get_exdesign_parse(samples, mode = "char", chars = 1)
+# Reserve prefix
+get_exdesign_parse(samples, mode = "char", chars = 1, remove_prefix = F)
+}

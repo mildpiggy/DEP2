@@ -17,8 +17,7 @@ Column numbers indicating the columns containing the assay data.}
 
 \item{expdesign}{Data.frame,
 Experimental design with 'label', 'condition'
-and 'replicate' information.
-See \code{\link{UbiLength_ExpDesign}} for an example experimental design.}
+and 'replicate' information.}
 
 \item{log2transform}{Logical(1), whether log2 transform the assay, default TRUE.}
 }
@@ -32,12 +31,11 @@ based on two data.frames: the protein table and experimental design.
 }
 \examples{
 # Load example
-data <- UbiLength
-data <- data[data$Reverse != "+" & data$Potential.contaminant != "+",]
+data <- Silicosis_pg
 data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 
 # Make SummarizedExperiment
 columns <- grep("LFQ.", colnames(data_unique))
-exp_design <- UbiLength_ExpDesign
+exp_design <- Silicosis_ExpDesign
 se <- make_se(data_unique, columns, exp_design)
 }

@@ -31,8 +31,19 @@ Use what kind of peptides to summarise proteins. If choose "Unique", return outp
 \item{reserve}{Character, the column(s) which will reserve after aggregate, such as the columns store protein information can.}
 }
 \value{
-a QFeatures object with a new protein aggregation assay.
+A QFeatures object with a new protein aggregation assay.
 }
 \description{
 Aggregation peptide to protein vis 'aggrefun'.
+}
+\examples{
+\dontrun{
+data <- Silicosis_peptide
+ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T)
+pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = T, log2transform = T,mode = "delim")
+filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
+imp_pe <- QFeatures::addAssay(filt_pe, DEP2::impute(filt_pe[["peptideRaw"]], fun = "MinDet"), name = "peptideImp")
+norm_pe <- normalize_pe(imp_pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
+protein_pe <- aggregate_pe(norm_pe, fcol = "Proteins", peptide_assay_name = "peptideNorm")
+}
 }

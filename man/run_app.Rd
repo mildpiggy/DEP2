@@ -7,5 +7,9 @@
 run_app()
 }
 \description{
-Run shiny application in DEP2
+Run the shiny application in DEP2
+}
+\examples{
+library(DEP2)
+DEP2::run_app
 }

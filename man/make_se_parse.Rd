@@ -56,12 +56,13 @@ based on a single data.frame.
 }
 \examples{
 # Load example
-data <- UbiLength
-data <- data[data$Reverse != "+" & data$Potential.contaminant != "+",]
+data <- Silicosis_pg
 data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 
 # Make SummarizedExperiment
 columns <- grep("LFQ.", colnames(data_unique))
-se <- make_se_parse(data_unique, columns, mode = "char", chars = 1)
-se <- make_se_parse(data_unique, columns, mode = "delim", sep = "_")
+se <- make_se_parse(data_unique, columns, mode = "char", chars = 1, remove_prefix = T)
+colnames(se)
+se <- make_se_parse(data_unique, columns, mode = "delim", remove_prefix = F)
+colnames(se)
 }

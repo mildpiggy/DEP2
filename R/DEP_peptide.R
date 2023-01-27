@@ -37,6 +37,14 @@
 #' @export
 #'
 #' @examples
+#' ## phosphorylated peptides table of the silicosis mouse model.
+#' data(Silicosis_phos)
+#' ## Format the modification information and generated modified-peptides identifier.
+#' unique_pho <- make_unique_ptm(Silicosis_phos, gene_name = "Gene.names",
+#'                               protein_ID = "Protein", aa = "Amino.acid",
+#'                               pos = "Position")
+#' head(unique_pho[, c("name","ID")], 10)
+#'
 make_unique_ptm <- function(PTMdata, gene_name = "Gene.names", protein_ID = "Protein",
                             aa = "Amino.acid", pos = "Position",
                             modified_name = NULL,
@@ -86,7 +94,7 @@ make_unique_ptm <- function(PTMdata, gene_name = "Gene.names", protein_ID = "Pro
 #' Adjust modified-enrich peptide quantities (PTM relative proteomics) by a relative global proteomics data via matching
 #' \code{correct_key} and \code{correct_level}
 #'
-#' @param enriched_peptide The SummarizedExperiment object of modified-relative proteomics
+#' @param enriched_peptide The SummarizedExperiment object of modified-relative proteomics.
 #' @param relative_protein The SummarizedExperiment object of the relative global proteomics
 #' @param correct_key The key identifier column to match PTM peptides and proteins, one of "name", "ID"
 #' @param correct_level Character(1), how to match experiment design, should be one of "condition" or "replicate"
@@ -166,15 +174,7 @@ correct_PTM_by_Protein = function(enriched_peptide , relative_protein, correct_k
 }
 
 
-# # need packages: UniprotR, trackViewer.
-# plot_lolliplot <- function(se_ptm, gene_name, protein_ID){
-#
-#
-#   # Uniport_FD <- GetFamily_Domains(protein_ID)
-#   # Uniport_FD[Uniport_FD,]
-#
-#
-# }
+
 
 
 

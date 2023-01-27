@@ -1,6 +1,6 @@
 #' Transform NA to 0 in assay of a SummarizedExperiment
 #'
-#' @param se A SummarizedExperiment object
+#' @param se A SummarizedExperiment object which contain NAs in assay.
 #'
 #' @return
 #' A SummarizedExperiment object
@@ -42,14 +42,12 @@ NAiszero <- function(se){
 #' or a vector of keep rows if \code{return_keeprows} is TRUE
 #' @examples
 #' # Load example
-#' data <- UbiLength
-#' data <- data[data$Reverse != "+" & data$Potential.contaminant != "+",]
+#' data <- Silicosis_pg
 #' data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 #'
 #' # Make SummarizedExperiment
-#' columns <- grep("LFQ.", colnames(data_unique))
-#' exp_design <- UbiLength_ExpDesign
-#' se <- make_se(data_unique, columns, exp_design)
+#' ecols <- grep("LFQ.", colnames(data_unique))
+#' se <- make_se_parse(data_unique, ecols, mode = "delim", sep = "_")
 #'
 #' # Filter
 #' stringent_filter <- filter_se(se, thr = 0, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
@@ -84,6 +82,7 @@ filter_se <- function(se,
   }
 
   if(!is.null(fraction)){
+    message("filter base on missing number fraction < ",fraction," in each column\n")
     if(fraction < 0 | fraction > 1) {
       warning("invalid filter threshold 'fraction' applied",
               "Run filter_se() with a percent ranging from 0 to 1.\n",
@@ -93,8 +92,10 @@ filter_se <- function(se,
     }
   }
 
-  if(!is.null(filter_formula))
+  if(!is.null(filter_formula)){
+    message("filter base on giving formula \n")
     se <- filterSummarizedExperimentWithFormula(object = se, filter = filter_formula)
+  }
 
   if(!is.null(rowsum_threshold)){
     message("filter base on counts sum >=",rowsum_threshold,"\n")
@@ -112,6 +113,7 @@ filter_se <- function(se,
 }
 
 
+# filter on the missing number threashold in one condition
 filter_missval <- function(se, thr = 0) {
   # Show error if inputs are not the required classes
   if(is.integer(thr)) thr <- as.numeric(thr)

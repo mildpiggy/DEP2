@@ -43,6 +43,5 @@ results <- get_results(dep)
 colnames(results)
 
 significant_proteins <- results[results$significant,]
-nrow(significant_proteins)
 head(significant_proteins)
 }

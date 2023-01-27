@@ -1,13 +1,13 @@
 #### for gene annotation -------
 
-library(clusterProfiler)
-library(dplyr)
-library(parallel)
+# library(clusterProfiler)
+# library(dplyr)
+# library(parallel)
 # library(PFAM.db)
-library(GO.db)
-library(AnnotationDbi)
-library(reactome.db)
-library(stringr)
+# library(GO.db)
+# library(AnnotationDbi)
+# library(reactome.db)
+# library(stringr)
 # library(shinyTree)
 # library(org.Hs.eg.db)
 # library(org.Mm.eg.db)
@@ -178,8 +178,10 @@ enrichGO <- function(gene,
   }
   return(res)
 }
-environment(enrichGO) = asNamespace("clusterProfiler")
-assignInNamespace("enrichGO", value = enrichGO, ns = "clusterProfiler")
+if(rlang::is_installed("clusterProfiler")){
+  environment(enrichGO) = asNamespace("clusterProfiler")
+  assignInNamespace("enrichGO", value = enrichGO, ns = "clusterProfiler")
+}
 
 # library(org.Hs.eg.db)
 # clusterProfiler:::get_GO_data(OrgDb = org.Hs.eg.db, ont = "ALL",keytype = "ENTREZID")
@@ -482,7 +484,9 @@ Heatplot <-  function (x, showCategory = 30, foldChange = NULL) {
   p + xlab(NULL) + ylab(NULL) + theme_minimal() + theme(panel.grid.major = element_blank(),
                                                         axis.text.x = element_text(angle = 60, hjust = 1))
 }
-environment(Heatplot) = asNamespace("enrichplot")
+if(rlang::is_installed("enrichplot")){
+  environment(Heatplot) = asNamespace("enrichplot")
+}
 
 
 Cnetplot <- function (x, showCategory = 5, foldChange = NULL, layout = "kk",
@@ -564,10 +568,10 @@ fc_palette <- function (fc)
   }
   return(palette)
 }
-
-environment(Cnetplot) = asNamespace("enrichplot")
-environment(fc_palette) = asNamespace("enrichplot")
-
+if(rlang::is_installed("enrichplot")){
+  environment(Cnetplot) = asNamespace("enrichplot")
+  environment(fc_palette) = asNamespace("enrichplot")
+}
 # emapplot
 Emapplot <- function (x, showCategory = 30, color = "p.adjust", layout = "kk",
                       ...)
@@ -628,7 +632,9 @@ Emapplot <- function (x, showCategory = 30, color = "p.adjust", layout = "kk",
                            name = color, guide = guide_colorbar(reverse = TRUE)) +
     scale_size(range = c(3, 8))
 }
-environment(Emapplot) = asNamespace("enrichplot")
+if(rlang::is_installed("enrichplot")){
+  environment(Emapplot) = asNamespace("enrichplot")
+}
 
 #plot_type: barplot, dotplot,emaplot, cnetplot, plotGOgraph, goplot(based on your significant limit)
 
@@ -823,16 +829,16 @@ my_heatplot <- function(res, ShowCategory = 30, df_with_lg2fc = FALSE, ont = "BP
 
 
 ########## kegg and reactome analysis function for DEP
-library(clusterProfiler)
+# library(clusterProfiler)
 library(ggplot2)
 # library(org.Mm.eg.db)
 # library(org.Hs.eg.db)
 # library(org.Rn.eg.db)
-library(DOSE)
+# library(DOSE)
 # library(openxlsx)
-library(GO.db)
+# library(GO.db)
 library(dplyr)
-library(ReactomePA)
+# library(ReactomePA)
 
 #df: left gene right fc or log2fc (colnames is always fc), the output legend is awlays fold change
 #organism: "Human", "mouse" or "rat", ...

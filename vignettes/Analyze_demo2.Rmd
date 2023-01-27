@@ -39,6 +39,7 @@ suppressPackageStartupMessages({
   library(dplyr)
   library(ggplot2)
   library(missForest)
+  library(patchwork)
 })
 # writeLines(capture.output(sessionInfo()), "sessionInfo.txt")
 ```

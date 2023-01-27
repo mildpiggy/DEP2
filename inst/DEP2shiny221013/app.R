@@ -135,6 +135,20 @@ server <- function(input, output,session = session) {
   #   HTML("./test2.html")
   # })
 
+  Post_analysis_choice = c(
+    "Timecourse cluster" = "Timecourse",
+    "Integrated analysis" = "Instegrated"
+  )
+  if(isTRUE(DEP2:::check_PPI_depends(install = F))){
+    Post_analysis_choice = c("Protein-protein interaction" = "PPI",
+                             Post_analysis_choice)
+  }
+  if(isTRUE(DEP2:::check_enrichment_depends(install = F))){
+    Post_analysis_choice = c("Over-representation analysis" = "ORA",
+                             "GSEA" = "GSEA",
+                             Post_analysis_choice)
+  }
+
   observeEvent(input$addmod, {
     # id <- paste0("Dropdown", input$append, "a")
     showModal(modalDialog(
@@ -178,13 +192,14 @@ server <- function(input, output,session = session) {
                 inputId = "PostanalysisType",
                 label = "Select post-analysis type",
                 width = "100%",
-                choices = c(
-                  "Over-representation analysis" = "ORA",
-                  "GSEA" = "GSEA",
-                  "Protein-protein interaction" = "PPI",
-                  "Timecourse cluster" = "Timecourse",
-                  "Integrated analysis" = "Instegrated"
-                )
+                choices = Post_analysis_choice
+                # choices = c(
+                #   "Over-representation analysis" = "ORA",
+                #   "GSEA" = "GSEA",
+                #   "Protein-protein interaction" = "PPI",
+                #   "Timecourse cluster" = "Timecourse",
+                #   "Integrated analysis" = "Instegrated"
+                # )
               )
             )
           ),

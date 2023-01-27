@@ -44,6 +44,3 @@ A gseaResult object of
 \description{
 Enrich biological functions on significant candidate via a over representation analysis.
 }
-\examples{
-
-}

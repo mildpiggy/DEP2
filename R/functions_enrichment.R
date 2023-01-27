@@ -1,5 +1,6 @@
 `%<>%` <- magrittr::`%<>%`
 
+
 annoSpecies_df <- function(){
   annoSpecies_df <-
     data.frame(
@@ -67,8 +68,16 @@ annoSpecies_df <- function(){
 #' @export
 #'
 #' @examples
+#'
+#'
 ID_transform <- function(x, from_columns = "rownames", fromtype = "ENSEMBL", species = "Human", replace_rowname = "SYMBOL")
 {
+  ## check org db
+  check_pak <- check_organismDB_depends(organism = species, install = T)
+  if(!isTRUE(check_pak)){
+    stop("Packages ",paste0(check_pak,collapse = ", ")," are required for ID transform but not found")
+  }
+
   if(from_columns == "rownames"){
     ids = rownames(x)
   }else{
@@ -126,6 +135,7 @@ ID_transform <- function(x, from_columns = "rownames", fromtype = "ENSEMBL", spe
 #  * @return {data.frame table}       [description]
 #  *
 map_to_entrezid <- function(gene, orgDB = org.Hs.eg.db) {
+
   try_key = intersect(c("SYMBOL", "ENSEMBL", "UNIPROT", "ALIAS"),columns(orgDB))
 
   ids_lis = try_key %>% lapply(., function(x){
@@ -195,6 +205,12 @@ test_ORA <- function(x,
                      pAdjustMethod = c("BH","holm", "hochberg", "hommel", "bonferroni", "BY", "fdr", "none"),
                      ...
 ){
+  check_pak <- check_enrichment_depends()
+  if(!isTRUE(check_pak)){
+    stop("Packages ",paste0(check_pak,collapse = ", ")," are required for test_ORA, but not found")
+  }
+
+
   assertthat::assert_that(class(x) == "SummarizedExperiment"|class(x) == "DEGdata",
                           is.null(contrasts)|is.character(contrasts),
                           is.character(species) && length(species) ==1,
@@ -311,6 +327,11 @@ test_GSEA <- function(x,
                       # pvalueCutoff = 0.05,  qvalueCutoff = 0.2,
                       ...
 ){
+  check_pak <- check_enrichment_depends()
+  if(!isTRUE(check_pak)){
+    stop("Packages ",paste0(check_pak,collapse = ", ")," are required for test_GSEA, but not found")
+  }
+
   assertthat::assert_that(class(x) == "SummarizedExperiment"|class(x) == "DEGdata",
                           is.null(contrasts)|(is.character(contrasts)&length(contrasts) ==1),
                           is.character(species) && length(species) ==1,
@@ -476,7 +497,6 @@ get_ORA_result <- function(ORA_enrichment, ont = NULL,
                            simplify.measure = c("Wang","Resnik", "Lin", "Rel", "Jiang"),
                            simplify.semData = NULL,
                            return_table = F){
-
   assertthat::assert_that(class(ORA_enrichment) %in% c("enrichResult", "gseaResult", "compareClusterResult"),
                           is.null(ont) || ont%in% c("GOALL","BP","CC","MF"),
                           is.numeric(pvalueCutoff) && length(pvalueCutoff) == 1,
@@ -649,7 +669,7 @@ keggAnalysis <- function(gene_id,
 
 
 
-#' @import ReactomePA
+# @import ReactomePA
 reactAnalysis <- function(gene_id, organism="Human", pAdjustMethod, species_df,
                           pvalueCutoff = 1, qvalueCutoff = 1, ...){
   organism <- species_df$reactome_organism[species_df$species == organism]
@@ -807,7 +827,7 @@ gsekeggAnalysis <- function(gene_list, organism="Human",
 }
 
 
-#' @import msigdbr
+# @import msigdbr
 gsemsigdbAnalysis <- function(gene_list, organism="Human",
                               category = NULL, subcategory = NULL,
                               pAdjustMethod = "BH", pvalueCutoff = 1,
