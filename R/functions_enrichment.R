@@ -720,7 +720,6 @@ gsegoAnalysis <- function(
   orgDB <- get(pkg)
 
   if(!is.list(gene_list) && is.vector(gene_list)){
-    cat("ww")
     reat_ALL <- try(clusterProfiler::gseGO(gene = gene_list, OrgDb = orgDB, ont = "ALL",
                           pAdjustMethod = pAdjustMethod, pvalueCutoff = pvalueCutoff,
                           minGSSize = minGSSize, verbose = verbose, seed = seed, eps = eps,

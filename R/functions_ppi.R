@@ -216,7 +216,7 @@ PPInetwork <- function(PPIlinks, layoutway = "layout_components",nodecolor = "#2
     igraph::V(net)$color <- nodecolor
   }
   igraph::V(net)$label.cex <- fontsize/50
-  igraph::V(net)$label.dist <- -0.17*V(net)$size
+  igraph::V(net)$label.dist <- -0.17*igraph::V(net)$size
   # net_save <<- net
 
   # nodes$size =200

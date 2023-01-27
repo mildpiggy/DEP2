@@ -1,6 +1,6 @@
 Package: DEP2
 Title: What the Package Does (One Line, Title Case)
-Version: 0.0.1.1013
+Version: 0.0.2.0127
 Authors@R: 
     c(
     person("Zhenhuan", "Feng", email = "feng_zhenhuan@gibh.ac.cn", role = c("cre", "aut")),
@@ -20,7 +20,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Suggests: 
     testthat (>= 3.0.0),
-    knitr,
+    knitr, BiocStyle, ggridges, magick,
     IHW, ashr, apeglm,
     shinyvalidate, shinyWidgets, shinythemes, shinyBS, shinyFeedback, markdown, dndselectr,
     rmarkdown, shiny, colourpicker,

@@ -61,8 +61,8 @@ data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 
 # Make SummarizedExperiment
 columns <- grep("LFQ.", colnames(data_unique))
-se <- make_se_parse(data_unique, columns, mode = "char", chars = 1, remove_prefix = T)
+se <- make_se_parse(data_unique, columns, mode = "char", chars = 1, remove_prefix = TRUE)
 colnames(se)
-se <- make_se_parse(data_unique, columns, mode = "delim", remove_prefix = F)
+se <- make_se_parse(data_unique, columns, mode = "delim", remove_prefix = FALSE)
 colnames(se)
 }

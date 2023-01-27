@@ -99,7 +99,7 @@ check_enrichment_depends = function(install = T){
 #'
 #' @param organism Character(1), the organism name, could be one of c(
 #' "Chicken", "Human", "Mouse", "Fly", "Rat", "Yeast"). Other species with
-#' \href{bioconductor.org/packages/release/BiocViews.html#___OrgDb}{OrgDb} are also optional.
+#' \href{http://bioconductor.org/packages/release/BiocViews.html#___OrgDb}{OrgDb} are also optional.
 #' @param install logic(1). Whether install if organism annotation db package is missed.
 #'
 #' @export

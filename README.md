@@ -38,6 +38,26 @@ library(DEP2)
 DEP2::run_app()
 ```
 
+## Check the suggested packages required in analysis
+
+Check the required packages in functionality
+
+``` r
+library(DEP2)
+
+# required packages for enrichment analysis
+DEP2::check_enrichment_depends(install = TRUE)
+
+# Anotation OrgDb for human
+DEP2::check_organismDB_depends(organism = "Human",install = TRUE)
+
+# required packages for PPI analysis
+DEP2::check_PPI_depends(install = TRUE)
+
+# required packages for RNA-seq analysis
+DEP2::check_RNAseq_depends(install = TRUE)
+```
+
 ## Vignettes
 
 View the Vignettes for more information …
