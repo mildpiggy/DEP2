@@ -170,7 +170,6 @@ correct_PTM_by_Protein = function(enriched_peptide , relative_protein, correct_k
   assay(enriched_peptide2) = PTM_assay4
 
   return(enriched_peptide2)
-
 }
 
 

@@ -27,6 +27,7 @@
 #' # Exctract Intensity columns
 #' (ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T))
 #' (expDesign = Silicosis_ExpDesign)
+#'
 #' # Construct a QFeatures object, with a 'peptideRaw' assay
 #' pe_peptides <- make_pe(Silicosis_peptide, columns = ecols,   # columns is the abundance columns
 #'                        expdesign = expDesign) # log2transform
@@ -233,8 +234,10 @@ make_pe_parse <- function(Peptide,
 #' or a vector of keep rows if \code{return_keeprows} is TRUE
 #'
 #' @examples
-#' data <- Silicosis_peptide
+#' # Load example peptide data
+#' data(Silicosis_peptide)
 #' ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = TRUE)
+#'
 #' # Construct a QFeatures object, with a 'peptideRaw' assay
 #' pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = TRUE, log2transform = TRUE,mode = "delim")
 #' filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
@@ -479,12 +482,18 @@ aggregateFeatures = function(object, i, fcol, name = "newAssay",
 #'
 #' @examples
 #' \dontrun{
-#' #' data <- Silicosis_peptide
+#' # Load example peptide data
+#' data(Silicosis_peptide)
 #' ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T)
+#'
+#' # Construct QFeature object
 #' pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = T, log2transform = T,mode = "delim")
+#'
+#' # Filter, imputation
 #' filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
 #' imp_pe <- QFeatures::addAssay(filt_pe, DEP2::impute(filt_pe[["peptideRaw"]], fun = "MinDet"), name = "peptideImp")
 #'
+#' # Normalization
 #' norm_pe <- normalize_pe(imp_pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
 #' }
 #' @export
@@ -534,13 +543,20 @@ normalize_pe <- function(pe, method = c("diff.median", "quantiles", "quantiles.r
 #' A QFeatures object with a new protein aggregation assay.
 #' @examples
 #' \dontrun{
-#' data <- Silicosis_peptide
+#' # Load example peptide data
+#' data(Silicosis_peptide)
 #' ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T)
+#'
+#' # construct QFeatures object
 #' pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = T, log2transform = T,mode = "delim")
 #' filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
 #' imp_pe <- QFeatures::addAssay(filt_pe, DEP2::impute(filt_pe[["peptideRaw"]], fun = "MinDet"), name = "peptideImp")
-#' norm_pe <- normalize_pe(imp_pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
-#' protein_pe <- aggregate_pe(norm_pe, fcol = "Proteins", peptide_assay_name = "peptideNorm")
+#' norm_pe <- DEP2:::normalize_pe(imp_pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
+#'
+#' # Summarize peptide value to protein quantity
+#' protein_pe <- DEP2::aggregate_pe(norm_pe, fcol = "Proteins", peptide_assay_name = "peptideNorm")
+#' class(protein_pe)
+#'
 #' }
 #' @export
 #'
@@ -625,14 +641,21 @@ aggregate_pe <- function(pe, aggrefun = c("RobustSummary","medianPolish","totalM
 #'
 #' @examples
 #' \dontrun{
-#' data <- Silicosis_peptide
+#' # Load example peptide data
+#' data(Silicosis_peptide)
 #' ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T)
+#'
+#' # construct QFeatures object
 #' pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = T, log2transform = T,mode = "delim")
 #' filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
 #' imp_pe <- QFeatures::addAssay(filt_pe, DEP2::impute(filt_pe[["peptideRaw"]], fun = "MinDet"), name = "peptideImp")
 #' norm_pe <- DEP2:::normalize_pe(imp_pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
+#'
+#' # Summarize peptide value to protein quantity
 #' protein_pe <- DEP2::aggregate_pe(norm_pe, fcol = "Proteins", peptide_assay_name = "peptideNorm")
 #' class(protein_pe)
+#'
+#' # Construct a SE object
 #' se <- pe2se(protein_pe)
 #' class(se)
 #' }

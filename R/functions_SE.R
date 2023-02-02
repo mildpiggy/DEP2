@@ -42,6 +42,7 @@ NAiszero <- function(se){
 #' or a vector of keep rows if \code{return_keeprows} is TRUE
 #' @examples
 #' # Load example
+#' data(Silicosis_pg)
 #' data <- Silicosis_pg
 #' data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 #'

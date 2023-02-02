@@ -1,6 +1,5 @@
 `%<>%` <- magrittr::`%<>%`
 
-
 annoSpecies_df <- function(){
   annoSpecies_df <-
     data.frame(
@@ -52,8 +51,9 @@ annoSpecies_df <- function(){
 #' The annotation package of certain species must be installed. Using \code{annoSpecies_df}
 #' to check species names and
 #'
-#' @param x SummarizedExperiment object from \code{\link{make_se}()}) or \code{\link{make_pe}()}), or a DEGdata object from \code{\link{test_diff_deg}()}).
-#' @param from_columns Character(), the origin ID from one of "rownames" or colnames of \code{rowData(x)}
+#' @param x SummarizedExperiment object from \code{\link{make_se}()}) or \code{\link{make_pe}()}),
+#' or a DEGdata object from \code{\link{test_diff_deg}()}).
+#' @param from_columns Character(), the origin ID from one of "rownames" or column of \code{rowData(x)}
 #' @param fromtype Character(1), the type of origin ID, e.g. "ENSEMBEL", "SYMBOL", "UNIPROT", "ENTREZID".
 #' @param species Character(1), the species name.
 #' @param replace_rowname NULL or character. Should be one of NULL, "SYMBOL", "ENTREZID", "UNIPROT", "ENSEMBL".
@@ -68,8 +68,20 @@ annoSpecies_df <- function(){
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' data(Silicosis_pg)
+#' data <- Silicosis_pg
+#' data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
+#' ecols <- grep("LFQ.", colnames(data_unique))
+#' se <- make_se_parse(data_unique, ecols,mode = "delim")
 #'
-#'
+#' ## transform uniport ID
+#' check_organismDB_depends(organism = "Mouse") # check annotation package of Mouse
+#' head(rowData(se)$ID)
+#' se2 <- ID_transform(se,from_columns = "ID",fromtype = "UNIPROT",species = "Mouse")
+#' head(rowData(se2)$SYMBOL)
+#' head(rownames(se2))
+#' }
 ID_transform <- function(x, from_columns = "rownames", fromtype = "ENSEMBL", species = "Human", replace_rowname = "SYMBOL")
 {
   ## check org db
@@ -81,13 +93,14 @@ ID_transform <- function(x, from_columns = "rownames", fromtype = "ENSEMBL", spe
   if(from_columns == "rownames"){
     ids = rownames(x)
   }else{
-    ids = x[, from_columns]
+    rd = rowData(x)
+    ids = rd[, from_columns]
   }
 
-  Species_df = DEP2::annoSpecies_df()
+  Species_df = DEP2:::annoSpecies_df()
 
   anno_db = Species_df[species, ]$pkg
-  cat(anno_db)
+  cat(anno_db,"\n")
   require(anno_db, character.only = TRUE)
   anno_db = get(anno_db)
   # anno_db = eval(parse(text = paste0(anno_db,"::",anno_db)))
@@ -96,19 +109,11 @@ ID_transform <- function(x, from_columns = "rownames", fromtype = "ENSEMBL", spe
   columns <- intersect(c("SYMBOL", "ENTREZID", "UNIPROT", "ENSEMBL"), columns)
   # columns <- columns[which(columns != input$idtype)]
   ann <- AnnotationDbi::select(anno_db, keys = ids, column = columns, keytype = fromtype, multiVals = "first")
-  # ann_save <<- ann
-  # ann <- ann[!duplicated(ann[,input$idtype]), ]
-  # ann_saved <<- ann
+
   ann = ann[!duplicated(ann[, fromtype]), ]
   ann2 = ann[match(ids,ann[, fromtype]),]
 
-  # for (i in 1:ncol(ann2)) { ##
-  #   ann2[which(is.na(ann2[,i])),i] = ann2[which(is.na(ann2[,i])),1]
-  # }
-  # if(!is.null(replace_rowname) || replace_rowname == "NULL"){
-  #
-  # }
-    rownames(x) = ifelse(!is.na(ann2[,replace_rowname]),make.unique(ann2[,replace_rowname]),rownames(x))
+  rownames(x) = ifelse(!is.na(ann2[,replace_rowname]),make.unique(ann2[,replace_rowname]),rownames(x))
 
   if(class(x) == "DEGdata"){
     x@geneinfo = ann2
@@ -119,11 +124,10 @@ ID_transform <- function(x, from_columns = "rownames", fromtype = "ENSEMBL", spe
         select(symbol, everything()) %>% DataFrame()
     }
   }
-  # else{
-    rd = rowData(x)
-    rd[,colnames(ann2)] = ann2
-    rowData(x) = rd
-  # }
+
+  rd = rowData(x)
+  rd[,colnames(ann2)] = ann2
+  rowData(x) = rd
   return(x)
 }
 
@@ -173,10 +177,6 @@ map_to_entrezid <- function(gene, orgDB = org.Hs.eg.db) {
   return(my_ids1)
 }
 
-# ORA_cluster_res = test_ORA(x,by_contrast = T)
-# get_ORA_result(ORA_cluster_res, simplify = T)
-
-
 
 #' ORA for differenatial test result
 #'
@@ -196,6 +196,32 @@ map_to_entrezid <- function(gene, orgDB = org.Hs.eg.db) {
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' # Load example
+#' data(Silicosis_pg)
+#' data <- Silicosis_pg
+#' data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
+#'
+#' # Make SummarizedExperiment
+#' ecols <- grep("LFQ.", colnames(data_unique))
+#' se <- make_se_parse(data_unique, ecols,mode = "delim")
+#'
+#' # Filter and normalize
+#' filt <- filter_se(se, thr = 0, fraction = 0.4, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
+#' norm <- normalize_vsn(filt)
+#'
+#' # Impute missing values using different functions
+#' imputed <- impute(norm, fun = "MinProb", q = 0.05)
+#'
+#' # Test for differentially expressed proteins
+#' diff <- test_diff(imputed, type = "control", control  = c("PBS"), fdr.type = "Storey's qvalue")
+#' dep <- add_rejections(diff, alpha = 0.01,lfc = 2)
+#'
+#' # GO enrichment
+#' check_organismDB_depends(organism = "Mouse") # check annotation package of Mouse
+#' res_ora <- test_ORA(dep, contrasts = "W4_vs_PBS", species = "Mouse",type = "GO")
+#' enrichplot::dotplot(res_ora)
+#' }
 test_ORA <- function(x,
                      contrasts = NULL,
                      type = c(
@@ -298,7 +324,6 @@ test_ORA <- function(x,
 }
 
 
-
 #' GSEA data
 #'
 #' Enrich biological functions on significant candidate via a over representation analysis.
@@ -314,7 +339,23 @@ test_ORA <- function(x,
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' # Load example
+#' data(Silicosis_pg)
+#' data <- Silicosis_pg
+#' data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 #'
+#' # Differential test
+#' ecols <- grep("LFQ.", colnames(data_unique))
+#' se <- make_se_parse(data_unique, ecols,mode = "delim")
+#' filt <- filter_se(se, thr = 0, fraction = 0.4, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
+#' norm <- normalize_vsn(filt)
+#' imputed <- impute(norm, fun = "MinProb", q = 0.05)
+#' diff <- test_diff(imputed, type = "control", control  = c("PBS"), fdr.type = "Storey's qvalue")
+#' # GSEA
+#' check_organismDB_depends(organism = "Mouse") # check annotation package of Mouse
+#' res_gsea <- test_GSEA(diff, contrasts = "W4_vs_PBS", species = "Mouse",type = "GO")
+#' }
 test_GSEA <- function(x,
                       type = c("GO", "KEGG", "REACTOME",
                                "MSigDB"),
@@ -464,26 +505,18 @@ test_GSEA <- function(x,
   return(enrich_res)
 }
 
-# x = my_dep_save
-# ora_res <- test_ORA(x)
-#
-# GSEA_res <- test_GSEA(x)
-# class(GSEA_res)
-# GSEA_res2 <- test_GSEA(x, by_contrast = T)
-# class(GSEA_res2)
-# get_ORA_result(GSEA_res, ont = "BP")
 
-
-#' Extract significant enrichment base on giving threshold
+#' Extract significant enrichment terms base on giving threshold
 #'
-#' \code{get_ORA_result} perform a
+#' \code{get_ORA_result} filter the enrichment result
+#' from \code{test_ORA} though certain threshold.
 #'
 #' @param reat The output from test_ORA
 #' @param ont One of "ALL", "BP", "MF", "CC"
 #' @param pvalueCutoff Numeric(1), the p.value cutoff on enrichment result
-#' @param qvalueCutoff Numeric(1), The qvalue cutoff on enrichment tests
-#' @param simplify Logical(1), if simplify GO terms by
-#' @param simplify.cutoff
+#' @param qvalueCutoff Numeric(1), the qvalue cutoff on enrichment tests
+#' @param simplify Logical(1), if simplify GO terms by \code{\link[clusterProfiler]{simplify}}
+#' @param simplify.cutoff Numeric(1), the cutoff value transmitted to  \code{\link[clusterProfiler]{simplify}}
 #' @param return_table Logical(1), if true return a enrichResult or a result table
 #' @return
 #' A enrichResult/compareClusterResult of significant enrichment,
@@ -491,6 +524,23 @@ test_GSEA <- function(x,
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' # Load example
+#' data(Silicosis_pg)
+#' data <- Silicosis_pg
+#' data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
+#'
+#' # Differential test
+#' ecols <- grep("LFQ.", colnames(data_unique))
+#' se <- make_se_parse(data_unique, ecols,mode = "delim")
+#' filt <- filter_se(se, thr = 0, fraction = 0.4, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
+#' norm <- normalize_vsn(filt)
+#' imputed <- impute(norm, fun = "MinProb", q = 0.05)
+#' diff <- test_diff(imputed, type = "control", control  = c("PBS"), fdr.type = "Storey's qvalue")
+#'
+#' res_ora <- test_ORA(dep, contrasts = "W4_vs_PBS", species = "Mouse",type = "GO")
+#' res_ora2 <- get_ORA_result(res_ora)
+#' }
 get_ORA_result <- function(ORA_enrichment, ont = NULL,
                            pvalueCutoff = 0.05, qvalueCutoff = 0.2,
                            simplify = FALSE, simplify.cutoff = 0.7,
@@ -546,12 +596,6 @@ get_ORA_result <- function(ORA_enrichment, ont = NULL,
     message("No result under threashold.")
     return(sig_res)
   }
-
-  # if(class(sig_res) == "enrichResult"){
-  #   exist_onts = sig_res@result$ONTOLOGY  %>% unique()
-  # }else if(class(sig_res) == "compareClusterResult"){
-  #   exist_onts = sig_res@compareClusterResult$ONTOLOGY %>% unique()
-  # }
 
   if(simplify) {
     if(enrich_type == "GO"){

@@ -46,6 +46,32 @@ get_string_Env <- function () {
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' # Load example
+#' data(Silicosis_pg)
+#' data <- Silicosis_pg
+#' data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
+#'
+#' # Differential test
+#' ecols <- grep("LFQ.", colnames(data_unique))
+#' se <- make_se_parse(data_unique, ecols,mode = "delim")
+#' filt <- filter_se(se, thr = 0, fraction = 0.4, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
+#' norm <- normalize_vsn(filt)
+#' imputed <- impute(norm, fun = "MinProb", q = 0.05)
+#' diff <- test_diff(imputed, type = "control", control  = c("PBS"), fdr.type = "Storey's qvalue")
+#' dep <- add_rejections(diff, alpha = 0.01,lfc = 2)
+#'
+#' # PPI construct
+#' if(check_PPI_depends()){
+#'
+#'   # Load STRING data. If local STRING is missing, PPI_res will download to system.file("PPIdata", "Mouse",package = "DEP2")
+#'   load_PPIdata(speciesname = "Mouse")
+#'
+#'   PPI_res <- test_PPI(dep, contrasts = "W4_vs_PBS", species = "Mouse",
+#'                       STRING.version = "11.5",score_cutoff = 400)
+#'   head(PPI_res)
+#' }
+#' }
 test_PPI <- function(x,
                      contrasts = NULL,
                      species = "Human",
@@ -166,11 +192,41 @@ test_PPI <- function(x,
 #'
 #' @return
 #' A visNetwork plot or a igraph obejct according \code{returntype}.
-#' @export
 #' @examples
-#/. stringNetwork
-#/' @importFrom  igraph graph_from_data_frame graph_attr degree V E
-#/' @import visNetwork
+#' \dontrun{
+#' # Load example
+#' data(Silicosis_pg)
+#' data <- Silicosis_pg
+#' data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
+#'
+#' # Differential test
+#' ecols <- grep("LFQ.", colnames(data_unique))
+#' se <- make_se_parse(data_unique, ecols,mode = "delim")
+#' filt <- filter_se(se, thr = 0, fraction = 0.4, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
+#' norm <- normalize_vsn(filt)
+#' imputed <- impute(norm, fun = "MinProb", q = 0.05)
+#' diff <- test_diff(imputed, type = "control", control  = c("PBS"), fdr.type = "Storey's qvalue")
+#' dep <- add_rejections(diff, alpha = 0.01,lfc = 2)
+#'
+#' # PPI construct
+#' if(check_PPI_depends()){
+#'
+#'   # Load STRING data. If local STRING is missing, PPI_res will download to system.file("PPIdata", "Mouse",package = "DEP2")
+#'   load_PPIdata(speciesname = "Mouse")
+#'
+#'   PPI_res <- test_PPI(dep, contrasts = "W4_vs_PBS", species = "Mouse",
+#'                       STRING.version = "11.5",score_cutoff = 400)
+#'
+#'   ## igraph network
+#'   PPI_ig <- PPInetwork(PPI_res, returntype = "igraph")
+#'   igraph::plot.igraph(PPI_ig)
+#'
+#'   ## visNetwork network
+#'   PPInetwork(PPI_res, returntype = "visNetwork")
+#' }
+#' }
+#'
+#' @export
 PPInetwork <- function(PPIlinks, layoutway = "layout_components",nodecolor = "#2EA9DF",nodeshape = c("circle","square"),linecolor = "#ADD8E6",
                           nodesize = 20,changesize=FALSE,
                           fontsize=25,changewidth=FALSE,linewidth = 5, smoothline=FALSE,smoothtype="continous",highlightkey=TRUE,
@@ -197,16 +253,14 @@ PPInetwork <- function(PPIlinks, layoutway = "layout_components",nodecolor = "#2
     links3$width =linewidth
     igraph::E(net)$width = linewidth/4
   }
-  cat(changesize)
+
   if(changesize){
     nodes$size <- igraph::degree(net)*nodesize/2
     igraph::V(net)$size <- igraph::degree(net)*nodesize/2/6
-    # cat(111)
     # cat(changesize)
   }else{
     nodes$size = nodesize
     igraph::V(net)$size <- nodesize/6
-    # cat(222)
   }
   if(highlightkey){
     nodes$color <- ifelse(igraph::degree(net)>=6,"#B54434",nodecolor)
@@ -240,14 +294,10 @@ PPInetwork <- function(PPIlinks, layoutway = "layout_components",nodecolor = "#2
                forceAtlas2Based = list(gravitationalConstant = -500))
 
   if(returntype == "visNetwork"){
-    # cat("111")
     return(nwplot)
   }else if(returntype == "igraph"){
-    # cat("222")
     return(net)
   }
-  # cat("333")
-  # return(nwplot)
 }
 
 
@@ -324,15 +374,18 @@ trimSTRINGdata <- function(links_detailfilename, oD = NULL)  {
 #'
 #' Check and load a local STRING data. If local file do not exist, will try to download from \href{http://stringdb-static.org/download/}{STRING}.
 #' @param speciesname Species name.
-#' @param STRING.version
+#' @param STRING.version character(1), STRING dataset version, default is "11.5".
 #' @param STRINGdata_path NULL or a selected path. Recommend NULL.
 #'
 #' @importFrom data.table fread
 #' @export
+#' @examples
+#' # Load STRING data. If local STRING is missing, PPI_res will download to system.file("PPIdata", "Mouse",package = "DEP2")
+#' load_PPIdata(speciesname = "Mouse")
 load_PPIdata <- function(speciesname, STRING.version = "11.5", STRINGdata_path = NULL){
   strEnv <- get_string_Env()
 
-  the_annoSpecies_df = annoSpecies_df()
+  the_annoSpecies_df <- annoSpecies_df()
   speciesID = the_annoSpecies_df$speciesID[which(the_annoSpecies_df$species == speciesname)]
   STRING.version <- as.character(STRING.version)
 

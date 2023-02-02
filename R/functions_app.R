@@ -12,7 +12,7 @@ run_app <- function() {
 
   if(isTRUE(check_depends)){
     # Launch the app
-    appDir <- system.file("DEP2shiny221013", package = "DEP2")
+    appDir <- system.file("DEP2shiny230202", package = "DEP2")
     suppressWarnings(shiny::runApp(appDir, display.mode = "normal"))
   }else{
     stop("Packages ",paste0(check_depends,collapse = ", ")," are required but not found")

@@ -43,6 +43,7 @@ clean_character <- function(express_assay){
 #' "name" and "ID" containing unique names and identifiers, respectively.
 #' @examples
 #' # Load example
+#' data(Silicosis_pg)
 #' data <- Silicosis_pg
 #'
 #' # Check colnames and pick the appropriate columns
@@ -123,6 +124,7 @@ make_unique <- function(proteins, names, ids, delim = ";") {
 #' with log2-transformed values.
 #' @examples
 #' # Load example
+#' data(Silicosis_pg)
 #' data <- Silicosis_pg
 #' data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 #'
@@ -228,6 +230,7 @@ make_se <- function (proteins_unique, columns, expdesign, log2transform = TRUE)
 #' with log2-transformed values.
 #' @examples
 #' # Load example
+#' data(Silicosis_pg)
 #' data <- Silicosis_pg
 #' data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 #'
@@ -317,6 +320,7 @@ make_se_parse <- function (proteins_unique, columns, mode = c("char", "delim"),
 #' @return A normalized SummarizedExperiment object.
 #' @examples
 #' # Load example
+#' data(Silicosis_pg)
 #' data <- Silicosis_pg
 #' data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 #'
@@ -358,6 +362,7 @@ normalize_vsn <- function (se)
 #' @return An imputed SummarizedExperiment object.
 #' @examples
 #' # Load example
+#' data(Silicosis_pg)
 #' data <- Silicosis_pg
 #' data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 #'
@@ -440,7 +445,7 @@ impute <- function (se, fun = c("bpca", "knn", "QRILC", "MLE", "MinDet",
 #' @param se SummarizedExperiment,
 #' Proteomics data (output from \code{\link{make_se}()} or
 #' \code{\link{make_se_parse}()}). It is adviced to first remove
-#' proteins with too many missing values using \code{\link{filter_missval}()}
+#' proteins with too many missing values using \code{\link{filter_se}()}
 #' and normalize the data using \code{\link{normalize_vsn}()}.
 #' @param shift Numeric(1),
 #' Sets the left-shift of the distribution (in standard deviations) from
@@ -531,6 +536,7 @@ manual_impute <- function(se, scale = 0.3, shift = 1.8) {
 #' @importFrom fdrtool fdrtool
 #' @examples
 #' # Load example
+#' data(Silicosis_pg)
 #' data <- Silicosis_pg
 #' data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 #'
@@ -780,6 +786,7 @@ setGeneric("add_rejections", function(diff, alpha = 0.05, lfc = 1,thresholdmetho
 #' @examples
 #' \dontrun{
 #' # For proteomics data -----
+#' data(Silicosis_pg)
 #' data <- Silicosis_pg
 #' data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 #'
@@ -798,17 +805,23 @@ setGeneric("add_rejections", function(diff, alpha = 0.05, lfc = 1,thresholdmetho
 #' dep <- add_rejections(diff, me)
 #'
 #' # For peptide workflow -----
-#' data <- Silicosis_peptide
+#' ## Load example peptide data
+#' data(Silicosis_peptide)
 #' ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T)
-#' pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = T, log2transform = T)
+#'
+#' ## construct QFeatures object
+#' pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = T, log2transform = T,mode = "delim")
 #' filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
 #' imp_pe <- QFeatures::addAssay(filt_pe, DEP2::impute(filt_pe[["peptideRaw"]], fun = "MinDet"), name = "peptideImp")
-#'
 #' norm_pe <- DEP2:::normalize_pe(imp_pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
-#' protein_pe <- DEP2::aggregate_pe(norm_pe, fcol = "Proteins", peptide_assay_name = "peptideNorm")
 #'
+#' ## Summarize peptide value to protein quantity
+#' protein_pe <- DEP2::aggregate_pe(norm_pe, fcol = "Proteins", peptide_assay_name = "peptideNorm")
+#' class(protein_pe)
+#'
+#' ## Construct a SE object
 #' SE_pep <- pe2se(protein_pe)
-#' # Test for differentially expressed proteins
+#' ## Test for differentially expressed proteins
 #' diff_pep <- DEP2::test_diff(SE_pep,type = "control", control = "PBS", fdr.type = "Strimmer's qvalue(t)")
 #' dep_pep <- add_rejections(diff_pep)
 #' }
@@ -980,6 +993,7 @@ fitnormal <- function (x) {
 #'
 #' @examples
 #' # Load example
+#' data(Silicosis_pg)
 #' data <- Silicosis_pg
 #' data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 #' # Make SummarizedExperiment

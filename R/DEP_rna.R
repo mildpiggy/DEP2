@@ -406,7 +406,6 @@ add_rejections.DEGdata <- function (diff, alpha = 0.05, lfc = 1,thresholdmethod=
 #' @export
 #'
 #' @importFrom DESeq2 normTransform
-#' @examples
 ntf_deg <- function(DEGdata, f = log2, pc = 1){
   assertthat::assert_that(inherits(DEGdata,"DEGdata"))
   DEGdata@ntf = assay(normTransform(DEGdata, f = f, pc = pc))
@@ -426,7 +425,6 @@ ntf_deg <- function(DEGdata, f = log2, pc = 1){
 #' A DEGdata with a rlog transform assay in rlg slot
 #' @export
 #'
-#' @examples
 rlg_deg <- function(DEGdata, blind = FALSE, ...){
   DEGdata@rlg <- rlog(DEGdata,blind, ...) %>% assay
   return(DEGdata)
@@ -462,7 +460,7 @@ dds_res@test_result$trt_vs_untrt_diff %>% summary
 plot_heatmap(normTransform(dds_res), label_few_peptide_rows = T)
 plot_heatmap.DEGdata(dds_res)
 plot_volcano(normTransform(dds_res) , contrast = get_contrast(dds_res)[1])
-temp = ID_transform(dds_res)
-temp@geneinfo
+dds_res2 = ID_transform(dds_res)
+dds_res2@geneinfo
 '
 
