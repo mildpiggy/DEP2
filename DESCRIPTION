@@ -12,7 +12,7 @@ Description: DEP2 provides an comprehensive analysis workflow for mass spectrome
     nherited from DEP, DEP2 provides functions for data processing, hypothesis testing (via limma) and visualization. The peptide to protein aggregation strategy
     is integrated into workflows. To reduced the barrier in omics analysis, downstream functional exploration are packaged as suites including functional enrichment,
     timecourse cluster and protein-protein interaction network. DEP2 also contains an easy-used shiny application designed under modularization.
-License: GPL (>= 3)
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: false
 Roxygen: list(markdown = TRUE)
