@@ -1,52 +1,3 @@
-## creact a class to store DEseq2 result
-# setClass("DEGdata",
-#          contains = "DESeqDataSet",
-#          slots = representation(
-#            geneinfo = "data.frame",
-#            ntf = "matrix",
-#            rlg = "matrix",
-#            test_result = "DataFrame")
-# )
-# setMethod("[", "DEGdata",
-#           function(x, i, j, drop=TRUE) {
-#             geneinfo <- x@geneinfo
-#             ntf <- x@ntf
-#             rlg <- x@rlg
-#             test_result <- x@test_result
-#
-#             if (!missing(i)) {
-#               if (is.character(i)) {
-#                 fmt <- paste0("<", class(x), ">[i,] index out of bounds: %s")
-#                 i <- SummarizedExperiment:::.SummarizedExperiment.charbound(
-#                   i, rownames(x), fmt
-#                 )
-#               }
-#               i <- as.vector(i)
-#               if(nrow(geneinfo) == nrow(x)) geneinfo <- geneinfo[i,,drop=FALSE]
-#               if(nrow(ntf) == nrow(x)) ntf <- ntf[i,]
-#               if(nrow(rlg) == nrow(x)) rlg <- rlg[i,]
-#               if(nrow(test_result) == nrow(x)) test_result <- test_result[i,,drop=FALSE]
-#             }
-#
-#             if (!missing(j)) {
-#               if (is.character(j)) {
-#                 fmt <- paste0("<", class(x), ">[,j] index out of bounds: %s")
-#                 j <- SummarizedExperiment:::.SummarizedExperiment.charbound(
-#                   j, colnames(x), fmt
-#                 )
-#               }
-#               j <- as.vector(j)
-#               if(ncol(ntf) == ncol(x)) ntf <- ntf[,j,drop=FALSE]
-#               if(ncol(rlg) == ncol(x)) rlg <- rlg[,j,drop=FALSE]
-#             }
-#
-#             out <- callNextMethod()
-#             BiocGenerics:::replaceSlots(out, geneinfo=geneinfo, ntf=ntf,
-#                                         rlg=rlg, test_result=test_result,check=FALSE)
-#           }
-# )
-
-
 DEG_sidebar_mod <- function(id,labelname = "DEP-pg_sidabar"){
   ns = NS(id)
   tagList(
@@ -91,7 +42,7 @@ DEG_sidebar_mod <- function(id,labelname = "DEP-pg_sidabar"){
                             conditionalPanel(paste0("input['",ns("transid_for_RNAseq"),"']"),
                                              selectInput(ns("speciesSelect"),
                                                          label = "Select species",
-                                                         choices = annoSpecies_df$species, selected = ""
+                                                         choices = DEP2:::annoSpecies_df()$species, selected = ""
                                              )),
                             conditionalPanel(paste0("input['",ns("transid_for_RNAseq"),"']"),
                                              checkboxInput(ns("set_no_map_to_rowname"), "No-mapping to rowname", value = TRUE)),
@@ -678,6 +629,9 @@ DEG_server_module <- function(id){
     id,
     function(input,output,session){
       ns = session$ns
+
+      annoSpecies_df <- DEP2:::annoSpecies_df()
+
       ## analysis for DEG-RNAseq
       #### UI functions output ui### --------------------------------------------------------
       output$for_loadcount <- renderUI({
@@ -808,40 +762,6 @@ DEG_server_module <- function(id){
         )
       })
 
-
-      # output$ui_ID_transformation <- renderUI({
-      #   bsCollapsePanel("ID Transformation", style = "primary",
-      #                   checkboxInput(ns("transid_for_RNAseq"), "ID transformation", value = FALSE),
-      #                   # conditionalPanel(input$transid_for_RNAseq, selectInput(ns("speciesSelect"),
-      #                   #                                                        label = "Select species",
-      #                   #                                                        choices = annoSpecies_df$species, selected = ""
-      #                   # )),
-      #                   # uiOutput(ns("ui_set_no_map_to_rowname")),
-      #                   # uiOutput(ns("ui_selectspecies")),
-      #                   # uiOutput(ns("ui_idtype"))
-      #   )
-      # })
-
-      # output$ui_selectspecies <- renderUI({
-      #   codit
-      #   if ((!is.null(input$transid_for_RNAseq)) && input$transid_for_RNAseq) {
-      #     selectInput(ns("speciesSelect"),
-      #                 label = "Select species",
-      #                 choices = annoSpecies_df$species, selected = ""
-      #     )
-      #   } else {
-      #     return(NULL)
-      #   }
-      # })
-
-      # output$ui_set_no_map_to_rowname <- renderUI({
-      #   if ((!is.null(input$transid_for_RNAseq)) && input$transid_for_RNAseq) {
-      #     checkboxInput(ns("set_no_map_to_rowname"), "No-mapping to rowname", value = TRUE)
-      #   } else {
-      #     return(NULL)
-      #   }
-      # })
-      #
       output$ui_idtype <- renderUI({
         if ((!is.null(input$transid_for_RNAseq)) && input$transid_for_RNAseq) {
           shiny::validate(
@@ -907,7 +827,7 @@ DEG_server_module <- function(id){
             return(NULL)
           }else{
             countData <- countData()
-            countData_save <<- countData
+            # countData_save <<- countData
             label_names = colnames(countData)
             # if()
             exdesign = DEP2::get_exdesign_parse(label_names)
@@ -1106,7 +1026,8 @@ DEG_server_module <- function(id){
 
 
         dds_1 <- reactive({
-          dds_1_save <<- DESeqDataSetFromMatrix(countData = countData(),colData = exdesign(), design = as.formula(paste0("~", paste(input$dds_design, collapse = " + "))))
+          dds_1 <- DESeqDataSetFromMatrix(countData = countData(),colData = exdesign(), design = as.formula(paste0("~", paste(input$dds_design, collapse = " + "))))
+          # dds_1_save <<- dds_1
         })
 
         dds_filter <- reactive({
@@ -1116,7 +1037,7 @@ DEG_server_module <- function(id){
             filter_missnum =ncol(dds_1)
             warning("input filter missing number is to large, and reset to ",filter_missnum)
           }
-          dds_filter_save <<- filter_se(dds_1, rowsum_threshold = input$filter_rowsum, missnum = input$filter_missnum)
+          dds_filter <- filter_se(dds_1, rowsum_threshold = input$filter_rowsum, missnum = input$filter_missnum)
         })
 
         dds <- reactive({
@@ -1148,12 +1069,8 @@ DEG_server_module <- function(id){
         })
 
         transformit <- reactive({
-          cat("check transform options... ")
-          # a1 <<- input$transid_for_RNAseq
-          # b2 <<- input$speciesSelect
-          # c3 <<- input$idtype
+          cat("check transform options...  ")
           transformit <- (input$transid_for_RNAseq && !is.null(input$speciesSelect) && input$speciesSelect != "" && !is.null(input$idtype))
-          transformit_1 <<- transformit
           if(transformit) cat("transform ID\n")
           return(transformit)
         })
@@ -1175,27 +1092,9 @@ DEG_server_module <- function(id){
             diff <- DEP2::ntf_deg(diff)
             # diff_deg_save2 <<- diff
             message("rlg & ntf finished.")
-            ## put the if into the get_res
-            # diff <- get_res(dds = dds(), coldata = exdesign(),
-            #                 type = input$contrasts_for_RNAseq,
-            #                 control = input$control_for_RNAseq,
-            #                 test = input$test_manual_for_RNAseq,
-            #                 contrast_upon = input$choose_expfac,
-            #                 filter_ihw = input$Use_IHW,
-            #                 independentFiltering = input$independent_filtering,
-            #                 lfcshark = input$Shrink_lfc)
-
-            # diff@rlg <- rlog(dds(),blind=FALSE) %>% assay
-            #
-            # # data for plot pca, cor, dist
-            # ntd = normTransform(dds())
-            # if(!(all(rownames(assay(dds())) == rownames(assay(ntd))) & all(rownames(assay(dds())) == rownames(diff)))) {
-            #   stop("the order is disrupted")
-            # }
-            # diff@ntf = assay(ntd)
 
             isolate({transformit_it <- transformit()})
-            transformit_it2 <<- transformit_it
+            # transformit_it2 <<- transformit_it
             input$analyze_for_DERNAseq
             if(transformit_it){
               # incProgress(2/3,message = "Transforming ID")
@@ -1203,48 +1102,21 @@ DEG_server_module <- function(id){
               withProgress(message = "Transforming ID, please wait!",value = 0.5,{
                 diff <- DEP2::ID_transform(diff, from_columns = "rownames", fromtype = input$idtype, species = "Human", replace_rowname = "SYMBOL")
               })
-              # diff_deg_save3 <<- diff
-              # cat("transforming \n")
-              # # tem = diff()
-              # res_for_RNAseq = diff@test_result
-              # columns <- keytypes(get(annoSpecies_df[input$speciesSelect, ]$pkg))
-              # columns <- intersect(c("SYMBOL", "ENTREZID", "UNIPROT", "ENSEMBL"), columns)
-              # columns <- columns[which(columns != input$idtype)]
-              # ann <- AnnotationDbi::select(get(annoSpecies_df[input$speciesSelect, ]$pkg), keys = rownames(res_for_RNAseq), column = columns, keytype = input$idtype, multiVals = "first")
-              # ann <- ann[!duplicated(ann[,input$idtype]), ]
-              # ann_saved <<- ann
-              # res_for_RNAseq$symbol = ann$SYMBOL
-              #
-              # res_for_RNAseq$symbol[which(is.na(res_for_RNAseq$symbol))] = rownames(res_for_RNAseq)[which(is.na(res_for_RNAseq$symbol))]
-              # # if(input$set_no_map_to_rowname) {
-              # #   res_for_RNAseq$symbol[which(is.na(res_for_RNAseq$symbol))] = rownames(res_for_RNAseq)[which(is.na(res_for_RNAseq$symbol))]
-              # # }
-              #
-              # diff@test_result = res_for_RNAseq
-              # diff@geneinfo = ann
               # cat("finished \n")
             }
-            diff_deg_save <<- diff
+            # diff_deg_save <<- diff
             message("diff finished.")
             return(diff)
 
           })
         })
 
-        ### transform ID in diff
-        # observeEvent(input$transformeID_butt,{
-        #   # withProgress(message = 'Transforming', value = 0.66, {
-        #   cat("transform ID")
-        #   transformit(TRUE)
-        # })
-
         ### add_rejection to exctract significant genes
-
         deg <- reactive({
           deg <- DEP2::add_rejections(diff = diff(), alpha = input$p_for_DERNAseq, lfc = input$lfc_for_DERNAseq)
           returnval <- returnval(deg)
           cat("deg")
-          my_deg_save <<- deg
+          # my_deg_save <<- deg
           return(deg)
         })
         deg_df <- reactive(deg()@test_result)
@@ -1289,10 +1161,10 @@ DEG_server_module <- function(id){
 
         data_forRNAseq_heatmap <- reactive({
           if(input$transid_for_RNAseq) {
-            data_1 <<- deg()@ntf
-            rownames(data_1) <<- diff()@test_result$symbol
+            data_1 <- deg()@ntf
+            rownames(data_1) <- diff()@test_result$symbol
           } else {
-            data_1 <<- deg()@ntf
+            data_1 <- deg()@ntf
           }
           return(data_1)
         })
@@ -1308,31 +1180,7 @@ DEG_server_module <- function(id){
               thedeg <- thedeg[,cols]
               # DEP2::Order_cols(deg(), input$Custom_columns_order_for_RNAseq)
             }
-            # thedeg_save <<- thedeg
-            # type2 <<- input$pres_for_RNAseq
-            # manual_contrast <<- input$heatmap_cntrst_for_RNAseq
-            # kmeans2 <<- TRUE
-            # k2 <<- input$k_for_RNAseq
-            # color2 <<- input$colorbar_for_RNAseq
-            # col_limit <<- input$limit_for_RNAseq
-            # row_font_size <<- input$row_font_size_for_RNAseq
-            # col_font_size <<- input$col_font_size_for_RNAseq
-            # cluster_columns <<- input$cluster_columns_for_RNAseq
-            # split_order <<- input$mysplit_for_RNAseq
-            # chooseToshow <<- input$chooseToshow_for_RNAseq
-            # DEP2::.plot_heatmap.DEGdata(object = thedeg_save,
-            #                    type = type2,
-            #                    manual_contrast = manual_contrast,
-            #                    kmeans = kmeans2,
-            #                    k = k2,
-            #                    color = color2,
-            #                    col_limit = col_limit,
-            #                    row_font_size = row_font_size,
-            #                    col_font_size = col_font_size,
-            #                    cluster_columns = cluster_columns,
-            #                    split_order = split_order,
-            #                    chooseToshow = chooseToshow
-            # )
+
             DEP2::plot_heatmap(object = thedeg,
                                type = input$pres_for_RNAseq,
                                manual_contrast = input$heatmap_cntrst_for_RNAseq,
@@ -1347,34 +1195,10 @@ DEG_server_module <- function(id){
                                chooseToshow = input$chooseToshow_for_RNAseq
                                )
 
-            # plot_heatmap_rnaseq(data = data_forRNAseq_heatmap(),
-            #                     row_data = deg_df(),
-            #                     type = input$pres_for_RNAseq,
-            #                     manual = input$manual_heatmap_for_RNAseq,
-            #                     manual_name = input$heatmap_cntrst_for_RNAseq,
-            #                     kmeans = TRUE,
-            #                     k = input$k_for_RNAseq,
-            #                     color = input$colorbar_for_RNAseq,
-            #                     col_limit = input$limit_for_RNAseq,
-            #                     row_font_size = input$row_font_size_for_RNAseq,
-            #                     col_font_size = input$col_font_size_for_RNAseq,
-            #                     # cluster_columns = input$cluster_columns_for_RNAseq,
-            #                     # if_mysplit = input$if_mysplit_for_RNAseq,
-            #                     # mysplit = input$mysplit_for_RNAseq,
-            #                     # column_order = if(input$cluster_columns_for_RNAseq) {NULL} else {input$Custom_columns_order_for_RNAseq},
-            #                     # if_chooseToshow = input$if_chooseToshow_for_RNAseq,
-            #                     # chooseToshow = input$chooseToshow_for_RNAseq
-            #                     )
-
           # })
         })
 
         name_for_ht_choose <- reactive({
-          # heatmap_name_rnaseq(data = data_forRNAseq_heatmap(), row_data = deg_df(),
-          #                     manual = input$manual_heatmap_for_RNAseq,
-          #                     manual_name = input$heatmap_cntrst_for_RNAseq)
-          # heatmap_name(data = deg(),
-          #              manual_name = input$heatmap_cntrst_for_RNAseq)
           ht_data <- DEP2::get_signicant(deg(), contrasts = manual_name)
           heatmap_rownames = rownames(ht_data)
           return(heatmap_rownames)
@@ -1388,27 +1212,7 @@ DEG_server_module <- function(id){
 
         custom_volcano_input_for_RNAseq <- reactive({
           withProgress(message = 'Plotting', value = 0.66, {
-            # plot_volcano_rnaseq(res = deg_df(),
-            #                     contrast = input$contrast_for_RNAseq_customvolcano,
-            #                     adjusted = input$P_adj_for_RNAseq,
-            #                     labelWay = switch (input$labelWay_for_RNAseq,
-            #                                        "all significant" = "all significant",
-            #                                        "up" = "up",
-            #                                        "down" = "down",
-            #                                        "selected genes" = "selected proteins"),
-            #                     showNum = input$showNum_for_RNAseq,
-            #                     chooseTolabel = input$selected_proteins_for_RNAseq,
-            #                     fontSize = input$fontSize_for_RNAseq,
-            #                     dotsize = input$dotsize_for_RNAseq,
-            #                     same_width = input$Same_width_for_RNAseq,
-            #                     fcCutoff = input$lfc_for_DERNAseq,
-            #                     adjpCutoff = input$p_for_DERNAseq,
-            #                     label.rectangle = input$if_label_rectangle_for_RNAseq,
-            #                     stroke = input$stroke_for_RNAseq,
-            #                     down_color = input$down_color_for_RNAseq,
-            #                     stable_color = input$stable_color_for_RNAseq,
-            #                     up_color = input$up_color_for_RNAseq
-            # )
+
             DEP2::plot_volcano(object = deg(),
                                contrast = input$contrast_for_RNAseq_customvolcano,
                                adjusted = input$P_adj_for_RNAseq,
@@ -1450,14 +1254,13 @@ DEG_server_module <- function(id){
         Pearson_correlation_input_for_RNAseq <- reactive({
           DEP2::plot_cor(deg(), pal = input$Pearson_pal_for_RNAseq, pal_rev = input$Pearson_pal_rev_for_RNAseq,
                          lower = input$Pearson_lower_for_RNAseq, upper = input$Pearson_upper_for_RNAseq,
-                         add_values = input$add_values_for_RNAseq_person, value_size = input$value_size_for_RNAseq_person, digits = input$value_digits_for_RNAseq_person)
-          # plot_my_cor(data = deg()@rlg, coldata = exdesign(), pal = input$Pearson_pal_for_RNAseq, pal_rev = input$Pearson_pal_rev_for_RNAseq, lower = input$Pearson_lower_for_RNAseq, upper = input$Pearson_upper_for_RNAseq, add_values = input$add_values_for_RNAseq_person, value_size = input$value_size_for_RNAseq_person, digits = input$value_digits_for_RNAseq_person)
+                         add_values = input$add_values_for_RNAseq_person, value_size = input$value_size_for_RNAseq_person,
+                         digits = input$value_digits_for_RNAseq_person)
         })
 
         Gowers_distance_input_for_RNAseq <- reactive({
-
-          # plot_my_dist(data = deg()@rlg, coldata = exdesign(), pal = input$Gower_pal_for_RNAseq, pal_rev = input$Gower_pal_rev_for_RNAseq, add_values = input$add_values_for_RNAseq_gower, value_size = input$value_size_for_RNAseq_gower, digits = input$value_digits_for_RNAseq_gower)
-        DEP2::plot_dist(x = deg(), pal = input$Gower_pal_for_RNAseq, pal_rev = input$Gower_pal_rev_for_RNAseq, add_values = input$add_values_for_RNAseq_gower,
+        DEP2::plot_dist(x = deg(), pal = input$Gower_pal_for_RNAseq, pal_rev = input$Gower_pal_rev_for_RNAseq,
+                        add_values = input$add_values_for_RNAseq_gower,
                         value_size = input$value_size_for_RNAseq_gower, digits = input$value_digits_for_RNAseq_gower)
         })
 
@@ -1471,7 +1274,7 @@ DEG_server_module <- function(id){
           progress$set(message = "Plotting", value = 0.66)
           # Close the progress when this reactive exits (even if there's an error)
           on.exit(progress$close())
-          # plot_ma(res = deg_df(), contrast = input$contrast_for_RNAseq_MA, FDR = input$p_for_DERNAseq, log2fc = input$lfc_for_DERNAseq, hlines = input$lfc_for_DERNAseq, intgenes = if(input$labeled_for_RNAseq_MAplot & input$selected_genes_for_RNAseq_MAplot) {input$selected_proteins_for_RNAseq_MAplot} else {NULL}, add_rug = input$add_rug_for_RNAseq)
+
           DEP2::plot_ma_RNA(deg(), contrast = input$contrast_for_RNAseq_MA, hlines = input$lfc_for_DERNAseq,
                             intgenes = if(input$labeled_for_RNAseq_MAplot & input$selected_genes_for_RNAseq_MAplot) {input$selected_proteins_for_RNAseq_MAplot} else {NULL},
                             add_rug = input$add_rug_for_RNAseq

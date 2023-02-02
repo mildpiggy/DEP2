@@ -35,10 +35,6 @@ DEP_pep_sidebar_mod <-  function(id, labelname){
                   bsCollapsePanel("Peptides Files", selected = TRUE,
                                   style = "primary",
                                   fluidRow(
-                                    #column(width = 2,
-                                    #actionButton("help_format_DEP",width = 12,
-                                    #              label = "", icon = icon("bell")
-                                    #      )),
                                     column(width = 9,
                                            fileInput(ns('file1'),width = "300px",
                                                      'Peptides.txt',
@@ -50,22 +46,22 @@ DEP_pep_sidebar_mod <-  function(id, labelname){
                                                      accept=c('text/csv',
                                                               'text/comma-separated-values,text/plain',
                                                               '.csv')),
-                                           fileInput(ns('resultRData'),'load saved result RData',width = "300px")
+                                           fileInput(ns('resultRData'),'Load saved aggregated result RData',width = "300px")
                                     ),
-                                    # column(
-                                    #   width = 1, h4(),
-                                    #   br(),
-                                    #   actionButton(ns("help_format_DEP"),
-                                    #                label = "", icon = icon("question-circle"),
-                                    #                style = "color: #f6f6f6; background-color: #2c3b41; border-color: #2c3b41"
-                                    #   ),
-                                    #   shinyBS::bsTooltip(
-                                    #     ns("help_format_DEP"),
-                                    #     "How to provide your input data",
-                                    #     "top",
-                                    #     options = list(container = "body")
-                                    #   )
-                                    # )
+                                    column(
+                                      width = 1, h4(),
+                                      br(),
+                                      actionButton(ns("help_format_pep"),
+                                                   label = "", icon = icon("question-circle"),
+                                                   style = "color: #f6f6f6; background-color: #2c3b41; border-color: #2c3b41"
+                                      ),
+                                      shinyBS::bsTooltip(
+                                        ns("help_format_pep"),
+                                        "How to provide your input data",
+                                        "top",
+                                        options = list(container = "body")
+                                      )
+                                    )
                                   ),
                                   radioButtons(ns("anno"),
                                                "Sample annotation",
@@ -80,13 +76,8 @@ DEP_pep_sidebar_mod <-  function(id, labelname){
                                   uiOutput(ns("id")),
                                   selectizeInput(ns("delim"), "Delimiter", choices = c(";", "|", ","), selected = ";"),
                                   uiOutput(ns("filt")),
-                                  numericInput(ns("thr"), "allowed max.miss.num at least one condition", min = 0, max = 20, value = 0),
-                                  # prettySwitch(
-                                  #   inputId = ns("norm_filt_order"),
-                                  #   label = "Normalization before filter peptide",
-                                  #   status = "success",
-                                  #   fill = F
-                                  # ),
+                                  numericInput(ns("thr"), "Allowed max.miss.num at least one condition", min = 0, max = 20, value = 0),
+
                                   uiOutput(ns("intensitycols")),
 
                                   prettySwitch(
@@ -114,15 +105,7 @@ DEP_pep_sidebar_mod <-  function(id, labelname){
                                   shinyBS::bsTooltip(ns("remove_prefix"), "remove the prefix character of expression columns names, such as 'LFQ intensity' or 'intensity' in Maxquant result",
                                                      "right", options = list(container = "body")),
                                   shinyBS::bsTooltip(ns("imputation"), "Choose an imputation method for peptide missing values", "right", options = list(container = "body"))
-                                  ),
-                  # bsCollapsePanel("Imputation options",
-                  #                 style = "primary",
-                  #                 radioButtons(ns("imputation"),
-                  #                              "Imputation type",
-                  #                              choices = c(c("man", "bpca", "knn", "QRILC", "MLE", "MinDet", "MinProb", "min", "zero"), "mixed on features"),
-                  #                              selected = "MinDet"),
-                  #                 shinyBS::bsTooltip(ns("imputation"), "Choose an imputation method for peptide missing values", "right", options = list(container = "body"))
-                  # ),
+                  ),
                   bsCollapsePanel("Aggregation",
                                   style = "primary",
                                   # uiOutput(ns("fname")),
@@ -132,7 +115,9 @@ DEP_pep_sidebar_mod <-  function(id, labelname){
                                   selectizeInput(ns("aggregation_method"), "Proteingroups aggregation algorithm",
                                                  choices = c("totalSum", "totalMean", "medianPolish","RobustSummary"), selected = "RobustSummary"),
 
-                                  shinyBS::bsTooltip(ns("thr"), "Set the threshold for the allowed number of missing values in at least one condition","right",
+                                  shinyBS::bsTooltip(ns("aggregate_Peptide_Type"), "Summarize proteingroups only using unique peptides or including Razor peptide","right",
+                                                     options = list(container = "body")),
+                                  shinyBS::bsTooltip(ns("aggregation_method"), "The aggregation algorithm to summarize peptide quantity values","right",
                                                      options = list(container = "body"))
                   )
       ),
@@ -144,7 +129,7 @@ DEP_pep_sidebar_mod <-  function(id, labelname){
       uiOutput(ns("aggregation_check")),
       br(),
 
-      h4("Differetial test options"),
+      h4("Differential test options"),
       bsCollapse( id = "pro_sidebar",
                   open = "Columns",
                   multiple = F,
@@ -196,10 +181,10 @@ DEP_pep_sidebar_mod <-  function(id, labelname){
       uiOutput(ns("downloadButton")),
       h6(),
       tags$style(type="text/css", "#Save_RData {background-color:white;color: black;font-family: Source Sans Pro}"),
-      # uiOutput(ns("downloadButton_for_save_RData")),
+      uiOutput(ns("downloadButton_for_save_RData")),
       shinyBS::bsTooltip(ns("downloadTable"), "Choose a dataset to save, and here we offer four forms of datasets for downloading including results.txt, significant_proteins.txt, displayed_subset.txt, full_dataset.txt", "right", options = list(container = "body")),
       shinyBS::bsTooltip(ns("downloadButton"), "Click on it to download the selected dataset", "right", options = list(container = "body")),
-      # shinyBS::bsTooltip(ns("downloadButton_for_save_RData"), "Click on it to Save the RData, and when you upload the results.RData in the menuItem [Files] next time, you can get the same result as this time", "right", options = list(container = "body"))
+      shinyBS::bsTooltip(ns("downloadButton_for_save_RData"), "Click on it to Save the RData, and when you upload the results.RData in the menuItem [Files] next time, you can get the same result as this time", "right", options = list(container = "body"))
 
     )
   )
@@ -209,11 +194,7 @@ DEP_pep_sidebar_mod <-  function(id, labelname){
 DEP_pep_body_mod <- function(id){
   ns = NS(id)
   cat(paste0("DEP_pep_body_mod ns is",ns(""),"\n"))
-  # cat(ls(envir = parent.frame()))
-  # # cat(parent.frame()$modid)
-  # modid = get("modid",envir = parent.frame())
-  # assign(modid(id),"modid",envir = parent.frame())
-  # parent.frame()$modid = modid(id)
+
   tagList(
     mainPanel(
       #** DEP tabItem----
@@ -939,15 +920,15 @@ DEP_pep_server_module <- function(id){
         cat("Check aggregate input... pass\n")
         # shinyjs::enable("aggregate_button") ## check all input for aggregation is ready. is exist
         req(input$peptidescol)
-        req(data())
+        req(data_QF())
         cat("Check anlyze input... pass\n")
         shinyjs::enable("analyze") ## check all input for Analyze is ready. and aggregation is finish
       })
 
       ### UI functions of aggregation or analyze options --------------------------------------------------------
       output$aggregation_check <- renderUI({
-        if(!is.null(data())){
-          HTML("Aggregation finished! please perform differetial analysis in the below pannels")
+        if(!is.null(data_QF())){
+          HTML("Aggregation finished! please perform differential analysis in the below pannels")
         }else{
           HTML("Please perform aggregation first in the above panels!")
         }
@@ -955,8 +936,8 @@ DEP_pep_server_module <- function(id){
 
 
       output$name <- renderUI({
-        shiny::validate(need(!is.null(peptide()), " "))#& !is.null(data())
-        # shiny::validate(need(!is.null(data()), " "))
+        shiny::validate(need(!is.null(peptide()), " "))#& !is.null(data_QF())
+        # shiny::validate(need(!is.null(data_QF()), " "))
 
         selectizeInput(inputId = ns("name"),
                        label = "Protein name column",
@@ -966,7 +947,7 @@ DEP_pep_server_module <- function(id){
 
       output$id <- renderUI({
         shiny::validate(need(!is.null(peptide()), " "))
-        # shiny::validate(need(!is.null(data()), " "))
+        # shiny::validate(need(!is.null(data_QF()), " "))
         selectizeInput(inputId = ns("id"),
                        label = "Protein ID column",
                        choices = colnames(peptide()),
@@ -975,16 +956,17 @@ DEP_pep_server_module <- function(id){
 
       output$peptidescol <- renderUI({
         shiny::validate(need(!is.null(peptide()), " "))
-        shiny::validate(need(!is.null(data()), " "))
-        if(".n" %in% colnames(rowData(data()[["protein"]]))){
+        shiny::validate(need(!is.null(data_QF()), " "))
+        # data_save22 <<- data_QF()
+        if(".n" %in% colnames(rowData(data_QF()[["protein"]]))){
           return(selectizeInput(inputId = ns("peptidescol"),
                                 label = "peptide column",
-                                choices=c(colnames(rowData(data()[["protein"]])), ""),
+                                choices=c(colnames(rowData(data_QF()[["protein"]])), ""),
                                 selected = ".n"))
         }else{
           return(selectizeInput(inputId = ns("peptidescol"),
                                 label = "peptide column",
-                                choices=c("", colnames(rowData(data()[["protein"]]))),
+                                choices=c("", colnames(rowData(data_QF()[["protein"]]))),
                                 selected = NULL))
         }
       })
@@ -1010,7 +992,7 @@ DEP_pep_server_module <- function(id){
 
       output$filt <- renderUI({
         shiny::validate(need(!is.null(peptide()), " "))
-        # shiny::validate(need(!is.null(data()), " "))
+        # shiny::validate(need(!is.null(data_QF()), " "))
         selectizeInput(inputId = ns("filt"),
                        label = "Filter on columns" ,
                        choices = c("", colnames(peptide())),
@@ -1020,13 +1002,13 @@ DEP_pep_server_module <- function(id){
 
 
       output$control <- renderUI({
-        validate(need(!is.null(input$file1), ""))
+        validate(need(!(is.null(input$file1) && is.null(input$resultRData)), ""))
         validate(need(!is.null(input$intensitycols), "Please select the Expression columns"))
         validate(need(length(input$intensitycols) > 1 , "More expression columns is required"))
-        validate(need(!is.null(data()), "Please finish aggregate first."))
-        if (input$anno == "columns" & !is.null(data()) & input$contrasts == "control") {
-          my_data <- data()
-          # my_data_save <<- data()
+        validate(need(!(is.null(data_QF()) && is.null(input$resultRData)), "Please finish aggregate first."))
+        if (input$anno == "columns" & !is.null(data_QF()) & input$contrasts == "control") {
+          my_data <- data_QF()
+          # my_data_save <<- data_QF()
 
           selectizeInput(ns("control"), "Control",
                          choices = colData(my_data[["protein"]])$condition %>% unique,
@@ -1041,18 +1023,18 @@ DEP_pep_server_module <- function(id){
       })
 
       output$order <- renderUI({
-        validate(need(!is.null(input$file1), "Please upload expression data in Files"))
+        validate(need(!(is.null(input$file1) && is.null(input$resultRData)) , "Please upload expression data in Files"))
         validate(need(!is.null(input$intensitycols), "Please select the Expression columns"))
         validate(need(length(input$intensitycols) > 1 , "More expression columns is required"))
         shiny::validate(need(!is.null(peptide()), " "))
-        shiny::validate(need(!is.null(data()), "Please finish aggregate first."))
+        shiny::validate(need(!(is.null(data_QF()) && is.null(input$resultRData)), "Please finish aggregate first."))
 
         # rdataFile <- input$resultRData
         # if(is.null(rdataFile)){
-        #   data <- data()[["protein"]]
+        #   data <- data_QF()[["protein"]]
         # }else{
         #   load(rdataFile)
-        #   data <- data(data)
+        #   data <- data_QF(data)
         # }
         # condition = colData(data)$condition
         condition = filt0()@colData$condition
@@ -1064,12 +1046,12 @@ DEP_pep_server_module <- function(id){
 
       output$test_manual <- renderUI({
         validate(need(!is.null(input$file1), ""))
-        if(!is.null(data()) & input$contrasts == "manual"){
-          # cols <- which(colnames(rowData(data()[["protein"]])) %in% input$intensitycols)#according to intensitycols
-          # prefix <<- get_prefix(data()[,cols] %>% colnames())
-          # test_manual_name <- unique(make.names(unlist(lapply(colnames(rowData(data()[["protein"]]))[cols] %>% gsub(prefix,"",.) %>% strsplit(., split = "_"), function(x){x[1]}))))
+        if(!is.null(data_QF()) & input$contrasts == "manual"){
+          # cols <- which(colnames(rowData(data_QF()[["protein"]])) %in% input$intensitycols)#according to intensitycols
+          # prefix <<- get_prefix(data_QF()[,cols] %>% colnames())
+          # test_manual_name <- unique(make.names(unlist(lapply(colnames(rowData(data_QF()[["protein"]]))[cols] %>% gsub(prefix,"",.) %>% strsplit(., split = "_"), function(x){x[1]}))))
 
-          test_manual_name <- colData(data()[["protein"]])$condition %>% unique
+          test_manual_name <- colData(data_QF()[["protein"]])$condition %>% unique
           test_manual_name <- cbind(combn(test_manual_name,2),combn(test_manual_name,2, FUN = rev))
           test_manual_name <- apply(test_manual_name, 2, function(i){paste(i[1], i[2], sep = "_vs_")})
           selectizeInput(ns("test_manual"), "Manual test",
@@ -1080,10 +1062,10 @@ DEP_pep_server_module <- function(id){
       output$Peptides1 <- renderUI({
         if(input$if_peptide_color) {
           colourpicker::colourInput(inputId = ns("Peptides_1"),
-                      label = "Peptides1",
-                      showColour = "both",
-                      palette = "square",
-                      value = "#A020F0")
+                                    label = "Peptides1",
+                                    showColour = "both",
+                                    palette = "square",
+                                    value = "#A020F0")
         }
       })
 
@@ -1096,68 +1078,6 @@ DEP_pep_server_module <- function(id){
                                     value = "#0000FF")#
         }
       })
-
-      # observe( ## move volcano tab
-      #   if(input$threshold_method == "intersect") {
-      #     # removeTab(inputId = "DEP_results_tabs", target = "DEP curve 1")
-      #     insertTab(inputId = ns("DEP_results_tabs"),
-      #               tabPanel(title = "Volcano plot",
-      #                        fluidRow(
-      #                          box(uiOutput(ns("volcano_cntrst")), width = 9),
-      #                          box(numericInput(ns("fontsize"),
-      #                                           "Font size",
-      #                                           min = 0, max = 8, value = 4),
-      #
-      #                              width = 3)
-      #                        ),
-      #                        fluidRow(
-      #                          box(checkboxInput(ns("my_breaks"),
-      #                                            "My breaks",
-      #                                            value = FALSE),
-      #                              multiInput(ns("mybreaks"),"Mybreaks",choices = seq(-40, 40, 0.5)),
-      #                              numericInput(ns("Volcano_Width"),
-      #                                           "width",
-      #                                           min = 1, max = 30, value = 7),
-      #                              numericInput(ns("Volcano_Height"),
-      #                                           "height",
-      #                                           min = 1, max = 30, value = 7),
-      #                              #selectizeInput("mybreaks","Mybreaks",choices = seq(-40, 40, 1), multiple = TRUE, size = 10),
-      #                              width = 8, collapsible = TRUE, collapsed = TRUE),
-      #                          box(checkboxInput(ns("check_names"),
-      #                                            "Display names",
-      #                                            value = FALSE),
-      #                              checkboxInput(ns("p_adj"),
-      #                                            "Adjusted p values",
-      #                                            value = FALSE),
-      #                              checkboxInput(ns("same_width"),
-      #                                            "Same width",
-      #                                            value = FALSE),
-      #                              width = 4)),
-      #                        fluidRow(
-      #                          plotOutput(ns("volcano"), height = 600),
-      #                          downloadButton(ns('downloadVolcano'), 'Save volcano')
-      #                        ),
-      #                        shinyBS::bsTooltip(ns("volcano_cntrst"), "Choose the contrast to plot", "top", options = list(container = "body")),
-      #                        shinyBS::bsTooltip(ns("fontsize"), "Set the size of name labels", "top", options = list(container = "body")),
-      #                        shinyBS::bsTooltip(ns("my_breaks"), "Whether set the breaks of x axis by yourself", "top", options = list(container = "body")),
-      #                        shinyBS::bsTooltip(ns("mybreaks"), "Choose the breaks of x axis, act when [My breaks] is TRUE", "top", options = list(container = "body")),
-      #                        shinyBS::bsTooltip(ns("Volcano_Width"), "Width of the figure to export", "top", options = list(container = "body")),
-      #                        shinyBS::bsTooltip(ns("Volcano_Height"), "Height of the figure to export", "top", options = list(container = "body")),
-      #                        shinyBS::bsTooltip(ns("check_names"), "Whether or not to plot names", "top", options = list(container = "body")),
-      #                        shinyBS::bsTooltip(ns("p_adj"), "Whether or not to use adjusted p values", "top", options = list(container = "body")),
-      #                        shinyBS::bsTooltip(ns("same_width"), "Whether the x axis to have the same width from 0", "top", options = list(container = "body"))
-      #               ),
-      #               target = "Heatmap", position = "after"
-      #     )
-      #
-      #   }
-      # )
-
-      # observe( ## move volcano tab
-      #   if(input$threshold_method == "curve") {
-      #     removeTab(inputId = ns("DEP_results_tabs"), target = "Volcano plot")
-      #   }
-      # )
 
       observe(
         if(input$threshold_method == "curve") {
@@ -1205,17 +1125,19 @@ DEP_pep_server_module <- function(id){
       ### Reactive functions of peptide ### --------------------------------------------------
       expdesign <- reactive({
         inFile <- input$file2
-        if (is.null(inFile) & (!is.null(data())) ){
-          cols <- which(colnames(data()) %in% input$intensitycols)
+        if (is.null(inFile) & (!is.null(data_QF())) ){
+          cols <- which(colnames(data_QF()) %in% input$intensitycols)
           if(length(cols) == 0){
             return(NULL)
           }else{
-            label <- colnames(data())[cols]
+            label <- colnames(data_QF())[cols]
             expdesign <- get_exdesign_parse(label, mode = "delim", sep = "_",
                                             remove_prefix = input$remove_prefix, remove_suffix = input$remove_suffix)
             # my_expdesign <<- expdesign
           }
         }else{
+          print(inFile)
+          print(data_QF)
           read.csv(inFile$datapath, header = TRUE,
                    sep = "\t", stringsAsFactors = FALSE) %>%
             mutate(id = row_number())
@@ -1224,6 +1146,8 @@ DEP_pep_server_module <- function(id){
 
       peptide <- reactive({
         rdataFile <- input$resultRData
+        # cat("111 \n")
+        # print(rdataFile)
         if(is.null(rdataFile)){
           inFile <- input$file1 ## the peptides file input
           if (is.null(inFile))
@@ -1237,10 +1161,11 @@ DEP_pep_server_module <- function(id){
           my_data = as.data.frame(my_data)
           colnames(my_data) = gsub("^\\[(.*)\\] ","",colnames(my_data))
           colnames(my_data) = make.names(colnames(my_data))
-          my_data <<- my_data
+          # my_data <<- my_data
           return(my_data)
         }else{
-          load(file = rdataFile)
+          base::load(file = rdataFile$datapath)
+          # cat("read 'peptide' from rdataFile \n")
           return(peptide)
         }
 
@@ -1269,7 +1194,7 @@ DEP_pep_server_module <- function(id){
           }
           return(pe)
         }else{
-          load(file = rdataFile)
+          load(file = rdataFile$datapath)
           return(pe)
         }
       })
@@ -1293,10 +1218,10 @@ DEP_pep_server_module <- function(id){
           }
           filter_formula = as.formula(filter_formula)
         }
-        filter_formula_save <<- filter_formula
+        # filter_formula_save <<- filter_formula
         pe_filt <- DEP2::filter_pe(pe, thr = input$thr,
                                    filter_formula = filter_formula)
-        pe_filt_save <<- pe_filt
+        # pe_filt_save <<- pe_filt
         cat("Filter finished.\n")
         return(pe_filt)
       })
@@ -1322,8 +1247,8 @@ DEP_pep_server_module <- function(id){
               cat("Impute after normalize \n")
               pe_norm <- normalize_pe(pe_filt, method = input$norm_method, i = "peptideRaw", name = "peptideNorm")
               message("Normalize finished")
-              imputation_save <<- input$imputation
-              pe_norm_save0 <<- pe_norm
+              # imputation_save <<- input$imputation
+              # pe_norm_save0 <<- pe_norm
               pe_norm <- addAssay(pe_norm,
                                   DEP2::impute(pe_norm[["peptideNorm"]], fun = input$imputation),
                                   name = "peptideImp")
@@ -1331,10 +1256,10 @@ DEP_pep_server_module <- function(id){
               message("Impute finished")
             })
           }
-          pe_norm_save <<- pe_norm
+          # pe_norm_save <<- pe_norm
           return(pe_norm)
         }else{
-          load(rdataFile)
+          load(rdataFile$datapath)
           return(pe_norm)
         }
       })
@@ -1347,18 +1272,24 @@ DEP_pep_server_module <- function(id){
       #   return(pe_imp)
       # })
 
-      data <- reactiveVal(NULL) ## data store the aggregated QF object.
+      data_QF <- reactiveVal(NULL) ## data store the aggregated QF object.
 
       filt0 <- reactive({
         rdataFile <- input$resultRData
         if(is.null(rdataFile)){
-          data <- data()[["protein"]]
+          data <- data_QF()[["protein"]]
         }else{
-          load(rdataFile)
-          data <- data(data)
+          data_QF <- data_QF({
+            rdataFile <- input$resultRData
+            load(rdataFile$datapath)
+            cat("load rdataFile in filt0 \n")
+            # data_1111 <<- data
+            data
+          })
+          data <- data_QF()[["protein"]]
         }
 
-        data_save2 <<- data
+        # data_save2 <<- data
         # req(input$id, input$name)
         validate(need(!(input$name == "" & input$id == ""), "Please ensure that: at least one of your name column and id column is non-empty!"))
         if(input$name == "" & input$id == "") {
@@ -1377,11 +1308,12 @@ DEP_pep_server_module <- function(id){
                                                            # ifelse(input$aggregate_Peptide_Type == "Unique + Razor", "smallestProteingroups", input$id),
                                                            input$name),
                                            ids = "smallestProteingroups",
-                                             # ifelse(input$aggregate_Peptide_Type == "Unique + Razor", "smallestProteingroups", input$id),
+                                           # ifelse(input$aggregate_Peptide_Type == "Unique + Razor", "smallestProteingroups", input$id),
                                            delim = input$delim)
         rownames(data) <- rowData(data)$name
         cat("Make_unique finished")
-        filt_save <<- data
+        # filt_save <<- data
+        data
       })
 
       iv1 <- InputValidator$new()
@@ -1394,7 +1326,7 @@ DEP_pep_server_module <- function(id){
 
       the_order <- reactive({
         req(iv1$is_valid())
-        order_save1 <<- input$order
+        # order_save1 <<- input$order
         if(length(input$order) == length(filt0()@colData$condition %>% unique))
           return(input$order)
         return(NULL)
@@ -1406,18 +1338,19 @@ DEP_pep_server_module <- function(id){
         if(is.null(the_order())){
           return(filt)
         }else{
-          order_save2 <<- the_order()
+          # order_save2 <<- the_order()
           filt@colData$condition = factor(filt@colData$condition, levels = the_order())
           filt = filt[,order(filt@colData$condition)]
-          filt_save2 <<- filt
+          # filt_save2 <<- filt
           return(filt)
         }
       })
 
       norm <- reactive({
-        my_norm <<- normalize_vsn(filt())
+        norm <- normalize_vsn(filt())
+        # my_norm <<- norm
         cat("VSN finished\n")
-        return(my_norm)
+        return(norm)
       })
 
 
@@ -1437,14 +1370,14 @@ DEP_pep_server_module <- function(id){
         if(input$contrasts == "control") {
           validate(
             need(input$control != "", "Please select a control condition under menuItem Columns in the DEP-LFQ options of the sidebar")
-            # need(all(input$intensitycols %in% colnames(rowData(data()[["protein"]]))), "Please select the Expression columns in the sidebar")
+            # need(all(input$intensitycols %in% colnames(rowData(data_QF()[["protein"]]))), "Please select the Expression columns in the sidebar")
           )
         }
 
         if(input$contrasts == "manual") {
           validate(
             need(input$test_manual != "", "Please select manual contrasts to test under menuItem Columns")
-            # need(all(input$intensitycols %in% colnames(rowData(data()[["protein"]]))), "Please select the Expression columns in the sidebar")
+            # need(all(input$intensitycols %in% colnames(rowData(data_QF()[["protein"]]))), "Please select the Expression columns in the sidebar")
           )
         }
 
@@ -1482,17 +1415,17 @@ DEP_pep_server_module <- function(id){
                                   fdr.type = FDR_type())
           }
         }
-        my_df <<- df
+        # my_df <<- df
         df
       })
 
       dep <- reactive({
-        aaa <<- input$curvature
+        # aaa <<- input$curvature
         if(input$threshold_method == "intersect") {
-          my_dep <<- add_rejections(diff = df(), alpha = input$p, lfc = input$lfc, thresholdmethod = input$threshold_method)
+          my_dep <- add_rejections(diff = df(), alpha = input$p, lfc = input$lfc, thresholdmethod = input$threshold_method)
         }
         if(input$threshold_method == "curve") {
-          my_dep <<- add_rejections(diff = df(), thresholdmethod = input$threshold_method, curvature = input$curvature, x0_fold = input$x0_fold)
+          my_dep <- add_rejections(diff = df(), thresholdmethod = input$threshold_method, curvature = input$curvature, x0_fold = input$x0_fold)
         }
 
         if(is.null(input$peptidescol)|input$peptidescol==""){
@@ -1556,11 +1489,11 @@ DEP_pep_server_module <- function(id){
           )
         }
 
-        data <- data({
+        data_QF <- data_QF({
           input$aggregate_button
           isolate({
             pe_norm = pe_norm()
-            pe_norm_save2 <<- pe_norm
+            # pe_norm_save2 <<- pe_norm
             fcol = input$id
             aggrefun = switch(input$aggregation_method,
                               totalSum = base::colSums,
@@ -1568,42 +1501,12 @@ DEP_pep_server_module <- function(id){
                               medianPolish = MsCoreUtils::medianPolish,
                               RobustSummary = MsCoreUtils::robustSummary)
             i = ifelse(input$imp_norm_order, "peptideNorm","peptideImp")
-            # temp11 <<- input$imp_norm_order
-            # i_save <<- i
+
             withProgress(message = 'Aggregeting, please wait for a while', {
               protein <- DEP2::aggregate_pe(pe_norm, aggrefun = aggrefun, aggregate_Peptide_Type = input$aggregate_Peptide_Type,
                                             fcol = fcol, peptide_assay_name = i, reserve = input$name)
             })
-            # if(input$aggregate_Peptide_Type == "Unique"){
-            #   # formula("~y")
-            #   fil_formula <- as.formula( paste0("~",fcol," %in% smallestUniqueGroups(rowData(pe_norm[['peptideNorm']])$",fcol,")") )
-            #   pe_norm <- filterFeatures(pe_norm, fil_formula)
-            #   print("aggregate by uniques peptides, filterFeatures finished")
-            #   protein = try({aggregateFeatures(pe_norm,
-            #                                    i = i, fcol = fcol,
-            #                                    name = "protein",
-            #                                    # fun = aggrefun,
-            #                                    na.rm = T,
-            #                                    reserve = input$name)} )
-            #   protein_save <<- protein
-            # }else if(input$aggregate_Peptide_Type == "Unique + Razor"){
-            #   print("aggregate by Unique + Razor peptides")
-            #   # pe_norm_save3 <<- pe_norm(); i <<- "peptideNorm"; fcol <<- fcol
-            #   pe_norm <- Peptide_distribution(pe_norm, i = i,fcol = fcol)
-            #   print("peptides assignment finished")
-            #   # object <<- pe_norm; i <<- "peptideNorm"; fcol <<- "smallestProteingroups"; name <<- "protein"
-            #   # fun <<- aggrefun ; na.rm <<- T; reserve <<- input$name;aggrefun <<- aggrefun
-            #   protein = try({aggregateFeatures(object = pe_norm ,
-            #                                    i = i, fcol = "smallestProteingroups",
-            #                                    name = "protein",
-            #                                    fun = aggrefun,
-            #                                    na.rm = T,
-            #                                    reserve = input$name)} )
-            #   # protein_save <<- protein
-            # }
-            # print("aggregation finished")
-            # colData(protein[["protein"]]) = colData(protein) ## transfer the experiementdesign to aggregation result
-            protein_save2 <<- protein
+            protein
           })
         })
 
@@ -1621,9 +1524,21 @@ DEP_pep_server_module <- function(id){
           peptide = peptide()
           pe = pe()
           pe_norm = pe_norm()
-          data = data()
+          data = data_QF()
           save(peptide, pe, pe_norm, data,file = file)
         }
+      )
+
+      output$Save_RData <- downloadHandler(
+        filename = function() { paste("results", ".RData", sep = "") },
+        content = function(file) {
+          withProgress(message = 'Please wait ...', value = 0.66, {
+            peptide = peptide()
+            pe = pe()
+            pe_norm = pe_norm()
+            data = data_QF()
+            filt = filt(); norm = norm();imp = imp(); dep = dep()
+            save(peptide, pe, pe_norm, data, filt = filt, norm, imp, dep, file=file)})}
       )
 
       ## All object and functions upon 'Analyze' button input ----------------------
@@ -1641,9 +1556,9 @@ DEP_pep_server_module <- function(id){
           downloadButton(ns('downloadData'), 'Save', class = "downloadData")
         })
 
-        # output$downloadButton_for_save_RData <- renderUI({
-        #   downloadButton(ns("Save_RData"), "save result RData", class = "Save_RData")
-        # })
+        output$downloadButton_for_save_RData <- renderUI({
+          downloadButton(ns("Save_RData"), "save result RData", class = "Save_RData")
+        })
 
         output$significantBox <- renderInfoBox({
           num_total <- dep() %>%
@@ -1983,7 +1898,7 @@ DEP_pep_server_module <- function(id){
 
 
         norm_input <- reactive({
-          protein <- data()
+          protein <- data_QF()
           thenorm = which(names(protein) == "peptideNorm")
           Peptide_before = protein[[thenorm-1]]
           Peptide_normalized = protein[[thenorm-1]]
@@ -2002,14 +1917,14 @@ DEP_pep_server_module <- function(id){
         # })
 
         detect_input <- reactive({
-          DEP2::plot_detect(data()[["peptideRaw"]])
+          DEP2::plot_detect(data_QF()[["peptideRaw"]])
         })
 
         imputation_input <- reactive({
           if(input$imp_norm_order){
-            peptide_raw <- data()[["peptideRaw"]]
-            peptide_norm <- data()[["peptideNorm"]]
-            peptide_imp <- data()[["peptideImp"]]
+            peptide_raw <- data_QF()[["peptideRaw"]]
+            peptide_norm <- data_QF()[["peptideNorm"]]
+            peptide_imp <- data_QF()[["peptideImp"]]
           }
           DEP2::plot_imputation(peptide_raw,
                                 peptide_norm,
@@ -2317,9 +2232,20 @@ DEP_pep_server_module <- function(id){
         )
       }) ## end of analyze event
 
+      ###"question for ptm"
+      observeEvent(input$help_format_pep, {
+        showModal(modalDialog(
+          title = "Format specifications",
+          # includeMarkdown(system.file("extdata", "DEP_LFQ.md", package = "DEP2")),
+          includeMarkdown("www/DEP_pep.md"),
+          br(),
+          easyClose = TRUE,
+          footer = NULL,
+          size = "l"
+        ))
+      })
 
       return(df)
 
-    }
-  )
+    })
 }

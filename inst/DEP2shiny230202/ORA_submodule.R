@@ -281,7 +281,7 @@ ORA_GO_server_module <- function(id, gene_id, organism_for_ORA, annoSpecies_df) 
         # df_test <<- gene_df
         # organism <<- organism_for_ORA
         # species_df <<- annoSpecies_df
-        gene_id_save <<- gene_id
+        # gene_id_save <<- gene_id
         try(goAnalysis(gene_id = gene_id,
                        # df_with_lg2fc = F,
                        organism = organism_for_ORA, species_df = annoSpecies_df),
@@ -789,11 +789,11 @@ ORA_other_server_module <- function(id,
   moduleServer(
     id,
     function(input, output, session,id=id) {
-      organism_for_ORA_save <<- organism_for_ORA
+      # organism_for_ORA_save <<- organism_for_ORA
       print(organism_for_ORA)
       pkg_for_ORA <- annoSpecies_df$pkg[annoSpecies_df$species == organism_for_ORA]
 
-      type_save <<- type
+      # type_save <<- type
       print(type)
       print(pkg_for_ORA)
 
@@ -1138,13 +1138,13 @@ ORA_Msigdb_server_module <- function(id, gene_df, gene_id, organism_for_ORA, ann
               # subcategory = ifelse(is.na(subcategory), NULL, ifelse(subcategory == "TFT","TFT:GTRD", subcategory))
               if(is.na(subcategory)) {subcategory =NULL
               }else if(subcategory == "TFT") { subcategory == "TFT:GTRD"}
-              ORA_other_server_module(id = Msigdb_selection[i], gene_id = gene_id, organism_for_ORA = organism_for_ORA, annoSpecies_df = annoSpecies_df,
+              ORA_other_server_module(id = Msigdb_selection[i], gene_id = gene_id, organism_for_ORA = organism_for_ORA, annoSpecies_df = DEP2:::annoSpecies_df(),
                                       type = "Msigdb", Msigdb_category = category , Msigdb_subcategory =subcategory )
               print("ee")
             }else if(!is.null(Msigdb_selection2)){
               Msigdb_selection2_saved2 <<- Msigdb_selection2
               Msigdb_select2 <- Msigdb_selection2 %>% sapply(.,function(x) strsplit(x," \\(")[[1]][1]) %>% unname()
-              ORA_other_server_module(id = Msigdb_selection[i], gene_id = gene_id, organism_for_ORA = organism_for_ORA, annoSpecies_df = annoSpecies_df,
+              ORA_other_server_module(id = Msigdb_selection[i], gene_id = gene_id, organism_for_ORA = organism_for_ORA, annoSpecies_df = DEP2:::annoSpecies_df(),
                                       type = "Msigdb", Msigdb_category = NULL , Msigdb_subcategory = Msigdb_select2 )
               print("FF")
             }

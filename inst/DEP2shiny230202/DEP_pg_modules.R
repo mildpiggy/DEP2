@@ -45,8 +45,9 @@ DEP_pg_sidebar_mod <-  function(id,labelname){
                                              'ExperimentalDesign.txt',
                                              accept=c('text/csv',
                                                       'text/comma-separated-values,text/plain',
-                                                      '.csv')),
-                                   fileInput(ns('resultRData'),'Load saved result RData',width = "300px")
+                                                      '.csv'))
+                                   # ,
+                                   # fileInput(ns('resultRData'),'Load saved result RData',width = "300px")
                             ),
                             column(
                               width = 1, h4(),
@@ -904,7 +905,7 @@ DEP_pg_server_module <- function(id){
       })
 
       output$peptidescol <- renderUI({
-        cat("peptidescol")
+        # cat("peptidescol")
         if("Peptides" %in% colnames(data())){
           return(selectizeInput(session$ns("peptidescol"),
                                 "Peptide column",
@@ -1177,10 +1178,10 @@ DEP_pg_server_module <- function(id){
       data <- reactive({
         inFile <- input$file1
         if (is.null(inFile)){
-          cat("infile1 is null /n")
+          cat("Initiate: infile1 is null \n")
           return(NULL)
         }
-        cat("infile1 is not null \n")
+        cat("infile1 is not null now \n")
         my_data <- data.table::fread(inFile$datapath, header = TRUE,
                                      sep = "\t", stringsAsFactors = FALSE, integer64 = "numeric") %>%
           mutate(id = row_number())
@@ -1191,31 +1192,18 @@ DEP_pg_server_module <- function(id){
         ## replace the [xxx] characters in colnames
         colnames(my_data) = gsub("^\\[(.*)\\] ","",colnames(my_data))
         colnames(my_data) = make.names(colnames(my_data))
-        my_data <<- my_data
+        # my_data <<- my_data
+        my_data
       })
 
 
 
       filt0 <- reactive({
         data <- data()
-        # aaaa <<- data
-        # if(is.null(input$peptidescol)|input$peptidescol==""){
-        #   data$Peptides = 3
-        # }else{
-        #   data$Peptides = data[,input$peptidescol]
-        # }
 
         cols <- which(colnames(data) %in% input$intensitycols)
         data[,cols] = DEP2::clean_character(data[,cols])
 
-        # data[,cols] = apply(data[,cols], 2, function(x){
-        #   return(as.numeric(x))
-        # })
-
-
-
-        # a122 <<- input$name
-        # req(input$id, input$name)
         validate(need(!(input$name == "" && input$id == ""), "Please ensure that: at least one of your name column and id column is non-empty!"))
 
         if(input$name == "" & input$id == "") {
@@ -1244,7 +1232,7 @@ DEP_pg_server_module <- function(id){
           colData(se)$replicate = as.character(colData(se)$replicate)
         }
 
-        se_save <<- se
+        # se_save <<- se
         filtered <- se
         # filtered_save1 <<- filtered
         # filt_save <<- input$filt
@@ -1265,7 +1253,7 @@ DEP_pg_server_module <- function(id){
         thr <- ifelse(is.na(input$thr), 0, input$thr)
         # my_filt <- filter_missval(se, thr = thr)
         my_filt <- filter_se(filtered, thr = thr)
-        my_filt_save <<- my_filt
+        # my_filt_save <<- my_filt
         # order_save <<- input$order
         # if(is.null(input$order) || length(input$order) != length(my_filt@colData$conditon %>% unique)){
         #   return(my_filt)
@@ -1287,7 +1275,7 @@ DEP_pg_server_module <- function(id){
 
       the_order <- reactive({
         req(iv1$is_valid())
-        order_save1 <<- input$order
+        # order_save1 <<- input$order
         if(length(input$order) == length(filt0()@colData$condition %>% unique))
           return(input$order)
         return(NULL)
@@ -1295,8 +1283,8 @@ DEP_pg_server_module <- function(id){
 
       filt <- reactive({
         filt = filt0()
-        order_save <<- the_order()
-        my_filt_save <<- filt
+        # order_save <<- the_order()
+        # my_filt_save <<- filt
         if(is.null(the_order())){
           return(filt)
         }else{
@@ -1310,7 +1298,7 @@ DEP_pg_server_module <- function(id){
       })
 
       norm <- reactive({
-        my_filt_save2 <<- filt()
+        # my_filt_save2 <<- filt()
         my_norm <- try({normalize_vsn(filt())})
         if(class(my_norm) == "try-error"){
           ## if vsn failed for a small matrix, skip vsn normalization
@@ -1384,27 +1372,6 @@ DEP_pg_server_module <- function(id){
         # FDR_type <- ifelse(length(grep(FDR_type,"qval"))>1,"qval","lfdr")
       })
 
-      # df_all = reactive({
-      #   inFile1 <- input$resultRData
-      #   # if(is.null(inFile1)){
-      #   #   df_all <- DEP2::test_diff(se = imp(), type = "all",FDRmethod=input$fdr_correction)
-      #   # }else{
-      #   #   load(file = inFile1$datapath)
-      #   #   df_all <- DEP2::test_diff(se = my_imp, type = "all",FDRmethod=input$fdr_correction)
-      #   # }
-      #
-      #   if(is.null(inFile1)){
-      #     df_all <- DEP2::test_diff(se = imp(), type = "all",
-      #                               fdr.type = FDR_type())
-      #   }else{
-      #     load(file = inFile1$datapath)
-      #     df_all <- DEP2::test_diff(se = my_imp, type = "all",
-      #                               fdr.type = FDR_type())
-      #   }
-      #   # df_all2 <<- df_all
-      #   df_all
-      # })
-
       df <- reactive({
         if(input$contrasts == "control") {
           validate(
@@ -1457,7 +1424,7 @@ DEP_pg_server_module <- function(id){
                             fdr.type = FDR_type())
           }
         }
-        my_df <<- df
+        # my_df <<- df
         df
       })
 
@@ -1477,7 +1444,7 @@ DEP_pg_server_module <- function(id){
         }else{
           rowData(my_dep)$Peptides = rowData(my_dep)[,input$peptidescol]
         }
-        my_dep_save <<- my_dep
+        # my_dep_save <<- my_dep
         return(my_dep)
       })
 
@@ -1485,7 +1452,8 @@ DEP_pg_server_module <- function(id){
         filename = function() { paste("results", ".RData", sep = "") },
         content = function(file) {
           withProgress(message = 'Please wait ...', value = 0.66, {
-            save(my_data, my_filt, my_norm, my_imp, my_dep, file=file)})}
+            data = data(); filt = filt(); norm = norm();imp = imp(); dep = dep()
+            save(data = data, filt = filt, norm, imp, dep, file=file)})}
       )
 
 
@@ -1531,26 +1499,6 @@ DEP_pg_server_module <- function(id){
           downloadButton(session$ns("Save_RData"), "save result RData", class = "Save_RData")
           # downloadButton(session$ns("Save_markdown"), "save result markdown", class = "Save_RData")
         })
-
-        # output$Save_markdown <- downloadHandler(
-        #   filename = function() {
-        #     paste('DEP2_result', Sys.time(), sep = '.', 'html')
-        #   },
-        #   content = function(file) {
-        #     # dat = d1()
-        #     # thedata = my_data()
-        #     detect = detect_input()
-        #     heatmap_input = heatmap_input()
-        #     thedf = df()
-        #     thedf_save <<- thedf
-        #     src <- normalizePath('./markdown_test/report_dep.Rmd')
-        #     owd <- setwd(tempdir())
-        #     on.exit(setwd(owd))
-        #     file.copy(src, 'report_dep.Rmd', overwrite = TRUE)
-        #     library(rmarkdown)
-        #     out <- render('report_dep.Rmd', html_document())
-        #     file.rename(out, file)
-        #   })
 
         output$significantBox <- renderInfoBox({
           num_total <- dep() %>%
@@ -2204,38 +2152,27 @@ DEP_pg_server_module <- function(id){
       observeEvent(input$help_format_DEP, {
         showModal(modalDialog(
           title = "Format specifications",
-          includeMarkdown(system.file("extdata", "DEP_LFQ.md", package = "DEP2")),
-          h4("Example:"),
-          tags$img(
-            src = base64enc::dataURI(file = system.file("extdata", "DEP_LFQ.png", package = "DEP2"), mime = "image/png"),
-            width = 750
-          ),
-          easyClose = TRUE,
-          footer = NULL,
-          size = "l"
-        ))
-      })
-      ### help imputation
-      observeEvent(input$help_imputation, {
-        showModal(modalDialog(
-          title = "The detailed information of imputation methods",
-          includeMarkdown(system.file("extdata", "impute.md", package = "DEP2")),
+          # includeMarkdown(system.file("extdata", "DEP_LFQ.md", package = "DEP2")),
+          includeMarkdown("www/DEP_LFQ.md"),
+          br(),
+          # h4("Example:"),
+          # tags$img(
+          #   # src = base64enc::dataURI(file = system.file("extdata", "DEP_LFQ.png", package = "DEP2"), mime = "image/png"),
+          #   src = base64enc::dataURI(file = "www/DEP_LFQ.png", mime = "image/png"),
+          #   width = 750
+          # ),
           easyClose = TRUE,
           footer = NULL,
           size = "l"
         ))
       })
 
-      ###"question for RNA"
-      observeEvent(input$help_format_RNA, {
+      ### help imputation
+      observeEvent(input$help_imputation, {
         showModal(modalDialog(
-          title = "Format specifications for DEG-RNAseq",
-          includeMarkdown(system.file("extdata", "DEG_RNAseq.md", package = "DEP2")),
-          h4("Example:"),
-          tags$img(
-            src = base64enc::dataURI(file = system.file("extdata", "DEG_RNAseq.png", package = "DEP2"), mime = "image/png"),
-            width = 750
-          ),
+          title = "The detailed information of imputation methods",
+          # includeMarkdown(system.file("extdata", "impute.md", package = "DEP2")),
+          includeMarkdown("www/impute.md"),
           easyClose = TRUE,
           footer = NULL,
           size = "l"

@@ -1,8 +1,8 @@
 ---
 title: "DEP2 Shiny Application"
 author: "Zhenhuan Feng"
-date: "2022-10-18"
-package: "DEP2 0.0.1.1013"
+date: "2023-02-01"
+package: "DEP2 0.0.2.127"
 output: 
   BiocStyle::html_document:
     number_sections: no

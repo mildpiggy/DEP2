@@ -3087,31 +3087,31 @@ get_all_lists_for_gsea <- function(){
 
 
 # for annotation, ORA, GSEA, PPI, DEG-RNAseq select organism
-annoSpecies_df <<-
-    data.frame(
-      species = c(
-        "", "Anopheles", "Arabidopsis", "Bovine", "Worm",
-        "Canine", "Fly", "Zebrafish", "E coli strain K12",
-        "E coli strain Sakai", "Chicken", "Human", "Mouse",
-        "Rhesus", "Malaria", "Chimp", "Rat",
-        "Yeast", "Streptomyces coelicolor", "Pig", "Toxoplasma gondii",
-        "Xenopus"
-      ),
-      pkg = c(
-        "", "org.Ag.eg.db", "org.At.tair.db", "org.Bt.eg.db", "org.Ce.eg.db",
-        "org.Cf.eg.db", "org.Dm.eg.db", "org.Dr.eg.db", "org.EcK12.eg.db",
-        "org.EcSakai.eg.db", "org.Gg.eg.db", "org.Hs.eg.db", "org.Mm.eg.db",
-        "org.Mmu.eg.db", "org.Pf.plasmo.db", "org.Pt.eg.db", "org.Rn.eg.db",
-        "org.Sc.sgd.db", "org.Sco.eg.db", "org.Ss.eg.db", "org.Tgondii.eg.db",
-        "org.Xl.eg.db"
-      ),
-      stringsAsFactors = FALSE
-    )
-annoSpecies_df$organism = c("", "aga", "ath", "bta", "cel", "cfa", "dme", "dre", "eco", "ecs", "gga", "hsa", "mmu", "mcc", "pfa", "ptr", "rno", "sce", "sco", "ssc", "tgo", "xla")
-annoSpecies_df_for_reactome <- annoSpecies_df[c(12,17,13,5,18,8,7), ]
-annoSpecies_df_for_reactome$organism = c("human", "rat", "mouse", "celegans", "yeast", "zebrafish", "fly")
-annoSpecies_df <- annoSpecies_df[order(annoSpecies_df$species), ]
-rownames(annoSpecies_df) <- annoSpecies_df$species # easier to access afterwards
+# annoSpecies_df <<-
+#     data.frame(
+#       species = c(
+#         "", "Anopheles", "Arabidopsis", "Bovine", "Worm",
+#         "Canine", "Fly", "Zebrafish", "E coli strain K12",
+#         "E coli strain Sakai", "Chicken", "Human", "Mouse",
+#         "Rhesus", "Malaria", "Chimp", "Rat",
+#         "Yeast", "Streptomyces coelicolor", "Pig", "Toxoplasma gondii",
+#         "Xenopus"
+#       ),
+#       pkg = c(
+#         "", "org.Ag.eg.db", "org.At.tair.db", "org.Bt.eg.db", "org.Ce.eg.db",
+#         "org.Cf.eg.db", "org.Dm.eg.db", "org.Dr.eg.db", "org.EcK12.eg.db",
+#         "org.EcSakai.eg.db", "org.Gg.eg.db", "org.Hs.eg.db", "org.Mm.eg.db",
+#         "org.Mmu.eg.db", "org.Pf.plasmo.db", "org.Pt.eg.db", "org.Rn.eg.db",
+#         "org.Sc.sgd.db", "org.Sco.eg.db", "org.Ss.eg.db", "org.Tgondii.eg.db",
+#         "org.Xl.eg.db"
+#       ),
+#       stringsAsFactors = FALSE
+#     )
+# annoSpecies_df$organism = c("", "aga", "ath", "bta", "cel", "cfa", "dme", "dre", "eco", "ecs", "gga", "hsa", "mmu", "mcc", "pfa", "ptr", "rno", "sce", "sco", "ssc", "tgo", "xla")
+# annoSpecies_df_for_reactome <- annoSpecies_df[c(12,17,13,5,18,8,7), ]
+# annoSpecies_df_for_reactome$organism = c("human", "rat", "mouse", "celegans", "yeast", "zebrafish", "fly")
+# annoSpecies_df <- annoSpecies_df[order(annoSpecies_df$species), ]
+# rownames(annoSpecies_df) <- annoSpecies_df$species # easier to access afterwards
 
 
 

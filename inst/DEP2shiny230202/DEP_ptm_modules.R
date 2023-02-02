@@ -36,7 +36,7 @@ DEP_ptm_sidebar_mod <-  function(id,labelname){
                                            accept=c('text/csv',
                                                     'text/comma-separated-values,text/plain',
                                                     '.csv')),
-                                 fileInput(ns('resultRData_ptm'),'load saved result RData',width = "300px")
+                                 # fileInput(ns('resultRData_ptm'),'load saved result RData',width = "300px")
                           ),
                           column(
                             width = 1, h4(),
@@ -114,7 +114,7 @@ DEP_ptm_sidebar_mod <-  function(id,labelname){
                         uiOutput(ns("protein_group_choose")),
                         uiOutput(ns("Protein_level_correction_options")),
                         shinyBS::bsTooltip(ns("Protein_level_correction"),
-                                           "If on, enriched(modified)-peptide intensity will be Corrected by protein-level qutification before differential test")
+                                           "If on, enriched(modified)-peptide intensity will be corrected by protein-level qutification before differential test")
 
         ),
         bsCollapsePanel("FDR correction",  ## DEP FDR correct options
@@ -881,226 +881,226 @@ DEP_ptm_server_module <- function(id, Omics_res){
       Omics_res_list <- reactive({
         # Omics_res_list_save <<- reactiveValuesToList(Omics_res)
         reactiveValuesToList(Omics_res)
-        })
+      })
 
       # observeEvent(input$threshold_method,{
 
-        # req(!is.null(input$threshold_method))
-        cat("DEP_ptm_server_module load")
-        thedf <- reactive(NULL)
+      # req(!is.null(input$threshold_method))
+      cat("DEP_ptm_server_module loaded \n")
+      # thedf <- reactive(NULL)
 
-        ### UI functions ### --------------------------------------------------------
-        output$name_ptm <- renderUI({
-          shiny::validate(need(!is.null(data()), " "))
-          selectizeInput(session$ns("name_ptm"),
-                         "Gene name column",
-                         choices=colnames(data()),
-                         selected = "Gene.names")
-        })
+      ### UI functions ### --------------------------------------------------------
+      output$name_ptm <- renderUI({
+        shiny::validate(need(!is.null(data()), " "))
+        selectizeInput(session$ns("name_ptm"),
+                       "Gene name column",
+                       choices=colnames(data()),
+                       selected = "Gene.names")
+      })
 
-        output$id_ptm <- renderUI({
-          shiny::validate(need(!is.null(data()), " "))
-          selectizeInput(session$ns("id_ptm"),
-                         "Protin ID column",
-                         choices=colnames(data()),
-                         selected = "Protein")
-        })
+      output$id_ptm <- renderUI({
+        shiny::validate(need(!is.null(data()), " "))
+        selectizeInput(session$ns("id_ptm"),
+                       "Protin ID column",
+                       choices=colnames(data()),
+                       selected = "Protein")
+      })
 
-        output$amino_acid_ptm <- renderUI({
-          selectizeInput(session$ns("amino_acid_ptm"),
-                         "Amino acid column",
-                         choices=colnames(data()),
-                         selected = "Amino.acid")
-        })
+      output$amino_acid_ptm <- renderUI({
+        selectizeInput(session$ns("amino_acid_ptm"),
+                       "Amino acid column",
+                       choices=colnames(data()),
+                       selected = "Amino.acid")
+      })
 
-        output$aa_position_ptm <- renderUI({
-          selectizeInput(session$ns("aa_position_ptm"),
-                         "Amino acid position column",
-                         choices=colnames(data()),
-                         selected = "Position")
-        })
+      output$aa_position_ptm <- renderUI({
+        selectizeInput(session$ns("aa_position_ptm"),
+                       "Amino acid position column",
+                       choices=colnames(data()),
+                       selected = "Position")
+      })
 
-       # output$peptidescol_ptm <- renderUI({ input$peptidescol_input_ptm})
-        # peptidescol_input_ptm
-        # output$peptidescol_ptm <- renderUI({
-        #   if("Peptides" %in% colnames(data())){
-        #     return(selectizeInput("peptidescol_ptm",
-        #                    "peptide column",
-        #                    choices=c(colnames(data()), ""),
-        #                    selected = "Peptides"))
-        #   }else{
-        #     return(selectizeInput("peptidescol_ptm",
-        #                    "peptide column",
-        #                    choices=c("", colnames(data())),
-        #                    selected = NULL))
-        #   }
-        # })
-        output$intensitycols <- renderUI({
-          LFQcols = grep("^LFQ",colnames(data()),value = T)
-          if(length(LFQcols)==0) LFQcols = grep("^Intensity",colnames(data()),value = T)
-          if(length(LFQcols)==0) LFQcols = grep("^intensity",colnames(data()),value = T)
-          if(length(LFQcols)==0) LFQcols = grep(".Quantity",colnames(data()),value = T)
-          if(length(LFQcols) > 0) LFQcols = LFQcols[-grep("__",LFQcols)]
+      # output$peptidescol_ptm <- renderUI({ input$peptidescol_input_ptm})
+      # peptidescol_input_ptm
+      # output$peptidescol_ptm <- renderUI({
+      #   if("Peptides" %in% colnames(data())){
+      #     return(selectizeInput("peptidescol_ptm",
+      #                    "peptide column",
+      #                    choices=c(colnames(data()), ""),
+      #                    selected = "Peptides"))
+      #   }else{
+      #     return(selectizeInput("peptidescol_ptm",
+      #                    "peptide column",
+      #                    choices=c("", colnames(data())),
+      #                    selected = NULL))
+      #   }
+      # })
+      output$intensitycols <- renderUI({
+        LFQcols = grep("^LFQ",colnames(data()),value = T)
+        if(length(LFQcols)==0) LFQcols = grep("^Intensity",colnames(data()),value = T)
+        if(length(LFQcols)==0) LFQcols = grep("^intensity",colnames(data()),value = T)
+        if(length(LFQcols)==0) LFQcols = grep(".Quantity",colnames(data()),value = T)
+        if(length(LFQcols) > 0) LFQcols = LFQcols[-grep("__",LFQcols)]
 
-          # selectizeInput("intensitycols",
-          #                " ",#Expression columns
-          #                choices=colnames(data()),
-          #                multiple = TRUE,
-          #                selected = grep("^LFQ",LFQcols,value = T), width = '100%')
-          bsCollapse(id = session$ns("IntensityCols"), open = "Expression columns",
-                     bsCollapsePanel("Expression columns",
-                                     selectizeInput(session$ns("intensitycols"),
-                                                    label = "Choose the expression columns",
-                                                    choices=colnames(data()),
-                                                    multiple = TRUE,
-                                                    selected = colnames(data())[grep("^Intensity. *",colnames(data()),value = F) %>%
-                                                                                  .[!.%in%grep("__",colnames(data()),value = F)]], width = '100%'),
-                                     checkboxInput(inputId = session$ns("remove_prefix"),"remove prefix of label", value = T),
-                                     checkboxInput(inputId = session$ns("remove_suffix"),"remove suffix of label", value = T)
-                                     , style = "primary"))
-        })
+        # selectizeInput("intensitycols",
+        #                " ",#Expression columns
+        #                choices=colnames(data()),
+        #                multiple = TRUE,
+        #                selected = grep("^LFQ",LFQcols,value = T), width = '100%')
+        bsCollapse(id = session$ns("IntensityCols"), open = "Expression columns",
+                   bsCollapsePanel("Expression columns",
+                                   selectizeInput(session$ns("intensitycols"),
+                                                  label = "Choose the expression columns",
+                                                  choices=colnames(data()),
+                                                  multiple = TRUE,
+                                                  selected = colnames(data())[grep("^Intensity. *",colnames(data()),value = F) %>%
+                                                                                .[!.%in%grep("__",colnames(data()),value = F)]], width = '100%'),
+                                   checkboxInput(inputId = session$ns("remove_prefix"),"remove prefix of label", value = T),
+                                   checkboxInput(inputId = session$ns("remove_suffix"),"remove suffix of label", value = T)
+                                   , style = "primary"))
+      })
 
 
 
-        output$filt_ptm <- renderUI({
-          selectizeInput(session$ns("filt_ptm"),
-                         "Filter on columns" ,
-                         colnames(data()),
-                         multiple = TRUE,
-                         selected = c("Reverse","Potential.contaminant"))
-        })
+      output$filt_ptm <- renderUI({
+        selectizeInput(session$ns("filt_ptm"),
+                       "Filter on columns" ,
+                       colnames(data()),
+                       multiple = TRUE,
+                       selected = c("Reverse","Potential.contaminant"))
+      })
 
-        output$filt_num_cutoff_ptm <- renderUI({
-          selectizeInput(session$ns("filt_num_cutoff_ptm"),
-                         "Cutoff based on" ,
-                         colnames(data()),
-                         multiple = FALSE,
-                         selected = c("Localization.prob"))
-        })
+      output$filt_num_cutoff_ptm <- renderUI({
+        selectizeInput(session$ns("filt_num_cutoff_ptm"),
+                       "Cutoff based on" ,
+                       colnames(data()),
+                       multiple = FALSE,
+                       selected = c("Localization.prob"))
+      })
 
-        output$order <- renderUI({
-          validate(need(!is.null(input$file1), "Please upload expression ProteinGroups in Files"))
-          validate(need(!is.null(input$intensitycols), "Please select the Expression columns"))
-          validate(need(length(input$intensitycols) > 1 , "More expression columns is required"))
-          # groups = exp_design()[,input$groupby]
+      output$order <- renderUI({
+        validate(need(!is.null(input$file1), "Please upload expression ProteinGroups in Files"))
+        validate(need(!is.null(input$intensitycols), "Please select the Expression columns"))
+        validate(need(length(input$intensitycols) > 1 , "More expression columns is required"))
+        # groups = exp_design()[,input$groupby]
+        if (input$anno == "columns" & !is.null(data()) ) {
+          condition = expdesign()$condition
+        } else {
+          if (input$anno == "expdesign" & !is.null(expdesign()) ) {
+            condition = make.names(expdesign()$condition)
+          }
+        }
+
+        selectizeInput(session$ns("order"),
+                       "Set the groups order",
+                       choices = condition, multiple = TRUE,
+                       selected = NULL, width = '100%')
+      })
+
+      output$control <- renderUI({
+        validate(need(!is.null(input$file1), ""))
+        # validate(need(!is.null(input$intensitycols), "Please select the Expression columns"))
+        # validate(need(length(input$intensitycols) > 1 , "More expression columns is required"))
+
+        if(input$contrasts == "control"){
           if (input$anno == "columns" & !is.null(data()) ) {
-            condition = expdesign()$condition
+            condition = make.names(expdesign()$condition)
           } else {
             if (input$anno == "expdesign" & !is.null(expdesign()) ) {
               condition = make.names(expdesign()$condition)
             }
           }
-
-          selectizeInput(session$ns("order"),
-                         "Set the groups order",
-                         choices = condition, multiple = TRUE,
-                         selected = NULL, width = '100%')
-        })
-
-        output$control <- renderUI({
-          validate(need(!is.null(input$file1), ""))
-          # validate(need(!is.null(input$intensitycols), "Please select the Expression columns"))
-          # validate(need(length(input$intensitycols) > 1 , "More expression columns is required"))
-
-          if(input$contrasts == "control"){
-            if (input$anno == "columns" & !is.null(data()) ) {
-              condition = make.names(expdesign()$condition)
-            } else {
-              if (input$anno == "expdesign" & !is.null(expdesign()) ) {
-                condition = make.names(expdesign()$condition)
-              }
-            }
-            selectizeInput(session$ns("control"),
-                           "Control",
-                           choices = condition,
-                           selected = NULL)
-          }
-        })
+          selectizeInput(session$ns("control"),
+                         "Control",
+                         choices = condition,
+                         selected = NULL)
+        }
+      })
 
 
-        output$test_manual_ptm <- renderUI({
-          validate(need(!is.null(input$file1), ""))
-          if(!is.null(data()) & input$contrasts == "manual"){
-            # cols <<- grep("^LFQ", colnames(data()))
-            cols <- which(colnames(data()) %in% input$intensitycols)#according to intensitycols
-            prefix <<- get_prefix(data()[,cols] %>% colnames())
-            test_manual_name <- unique(make.names(unlist(lapply(colnames(data())[cols] %>% gsub(prefix,"",.) %>% strsplit(., split = "_"), function(x){x[1]}))))
-            test_manual_name <- cbind(combn(test_manual_name,2),combn(test_manual_name,2, FUN = rev))
-            test_manual_name <- apply(test_manual_name, 2, function(i){paste(i[1], i[2], sep = "_vs_")})
-            selectizeInput(session$ns("test_manual_ptm"), "Manual test",
-                           choices=test_manual_name, selected = NULL, multiple = TRUE)
-          }
-        })
+      output$test_manual_ptm <- renderUI({
+        validate(need(!is.null(input$file1), ""))
+        if(!is.null(data()) & input$contrasts == "manual"){
+          # cols <<- grep("^LFQ", colnames(data()))
+          cols <- which(colnames(data()) %in% input$intensitycols)#according to intensitycols
+          prefix <<- get_prefix(data()[,cols] %>% colnames())
+          test_manual_name <- unique(make.names(unlist(lapply(colnames(data())[cols] %>% gsub(prefix,"",.) %>% strsplit(., split = "_"), function(x){x[1]}))))
+          test_manual_name <- cbind(combn(test_manual_name,2),combn(test_manual_name,2, FUN = rev))
+          test_manual_name <- apply(test_manual_name, 2, function(i){paste(i[1], i[2], sep = "_vs_")})
+          selectizeInput(session$ns("test_manual_ptm"), "Manual test",
+                         choices=test_manual_name, selected = NULL, multiple = TRUE)
+        }
+      })
 
-        output$protein_group_choose <- renderUI({
-          Omics_res_list = Omics_res_list()
-          Omics_res_list2 = Omics_res_list[grep("^Proteome",names(Omics_res_list))]
+      output$protein_group_choose <- renderUI({
+        Omics_res_list = Omics_res_list()
+        Omics_res_list2 = Omics_res_list[grep("^Proteome",names(Omics_res_list))]
 
-          if(length(Omics_res_list2) == 0) {
-            Omics_res_list2 = NULL
-          }else{
-            Omics_res_list2 = Omics_res_list2[
-              which((Omics_res_list2 %>%
-                       lapply(., function(x){
-                         x1 <<- x
-                         temp = try(x(), silent = T)
-                         if(class(temp) == "try-error")
-                           return(FALSE)
-                         return(TRUE)
-                         # is.na(x1 <<- x)
-                       }) %>%
-                       unlist()))
-            ]}
+        if(length(Omics_res_list2) == 0) {
+          Omics_res_list2 = NULL
+        }else{
+          Omics_res_list2 = Omics_res_list2[
+            which((Omics_res_list2 %>%
+                     lapply(., function(x){
+                       x1 <<- x
+                       temp = try(x(), silent = T)
+                       if(class(temp) == "try-error")
+                         return(FALSE)
+                       return(TRUE)
+                       # is.na(x1 <<- x)
+                     }) %>%
+                     unlist()))
+          ]}
 
-          if(is.null(Omics_res_list2) ||length(Omics_res_list2) < 1)
-            return(p("Required a exit proteomics analysis. Please perform a proteomics analysis first!"))
-          conditionalPanel(
-            condition = paste0("input['", session$ns("Protein_level_correction"),"']"),
-            selectInput(inputId = session$ns("protein_group_choose"),
-                        label = "Corresponding proteomics", choices = names(Omics_res_list2))
-          )
-        })
+        if(is.null(Omics_res_list2) ||length(Omics_res_list2) < 1)
+          return(p("Required a exit proteomics analysis. Please perform a proteomics analysis first!"))
+        conditionalPanel(
+          condition = paste0("input['", session$ns("Protein_level_correction"),"']"),
+          selectInput(inputId = session$ns("protein_group_choose"),
+                      label = "Corresponding proteomics", choices = names(Omics_res_list2))
+        )
+      })
 
-        output$Protein_level_correction_options <- renderUI({
-          options <- tagList(
-            radioButtons(
-              inputId = session$ns("correct_key"),
-              label = "The column correction based on",
-              choices = list("Gene name" = "name", "Protein ID" = "ID"),
-              inline = TRUE
-              # status = "success",
-              # fill = TRUE
-            ),
-            radioButtons(
-              inputId = session$ns("unidentified_protein_treatment"),
-              label = "How to treat peptide whose proteins unidentified in corresponding proteomics",
-              choices = c("retain", "remove"),
-              inline = TRUE,
-              # status = "success",
-              # fill = TRUE
-            ),
-            radioButtons(
-              inputId = session$ns("correct_level"),
-              label = "Corresponding relationship between",
-              choices = list("condition to condition" = "condition", "repetition to repetition" = "label"),
-              inline = TRUE,
-              # status = "success",
-              # fill = TRUE
-            ),
-            shinyBS::bsTooltip(session$ns("correct_key"),
-                               "Match enriched-peptides quantity and corresponding proteomics based on Gene name or protein ID (both were set in the Columns options)",
-                               "top", options = list(container = "body")),
-            shinyBS::bsTooltip(session$ns("unidentified_protein_treatment"),
-                               "Some enriched peptides' proteins may lack effective quantity in corresponding proteomics. /n
+      output$Protein_level_correction_options <- renderUI({
+        options <- tagList(
+          radioButtons(
+            inputId = session$ns("correct_key"),
+            label = "The column correction based on",
+            choices = list("Gene name" = "name", "Protein ID" = "ID"),
+            inline = TRUE
+            # status = "success",
+            # fill = TRUE
+          ),
+          radioButtons(
+            inputId = session$ns("unidentified_protein_treatment"),
+            label = "How to treat peptide whose proteins unidentified in corresponding proteomics",
+            choices = c("retain", "remove"),
+            inline = TRUE,
+            # status = "success",
+            # fill = TRUE
+          ),
+          radioButtons(
+            inputId = session$ns("correct_level"),
+            label = "Corresponding relationship between",
+            choices = list("condition to condition" = "condition", "repetition to repetition" = "label"),
+            inline = TRUE,
+            # status = "success",
+            # fill = TRUE
+          ),
+          shinyBS::bsTooltip(session$ns("correct_key"),
+                             "Match enriched-peptides quantity and corresponding proteomics based on Gene name or protein ID (both were set in the Columns options)",
+                             "top", options = list(container = "body")),
+          shinyBS::bsTooltip(session$ns("unidentified_protein_treatment"),
+                             "Some enriched peptides' proteins may lack effective quantity in corresponding proteomics. /n
                                Choose remove to eliminate these peptides or choose retain to transmit the original peptide quantity(without correction)",
-                               "top", options = list(container = "body"))
+                             "top", options = list(container = "body"))
 
-          )
-          conditionalPanel(
-            condition = paste0("input['", session$ns("Protein_level_correction"),"']"),
-            options)
+        )
+        conditionalPanel(
+          condition = paste0("input['", session$ns("Protein_level_correction"),"']"),
+          options)
 
-        })
+      })
 
 
       # output$Peptides1_ptm <- renderUI({
@@ -1184,92 +1184,92 @@ DEP_ptm_server_module <- function(id, Omics_res){
 
 
 
-        observe(
-          if(input$threshold_method_ptm == "curve") {
-            removeTab(inputId = "DEP_ptm_results_tabs", target = "Volcano plot")
-            # removeTab(inputId = "DEP_ptm_results_tabs", target = "Custom Volcano")
-            # insertTab(inputId = "DEP_ptm_results_tabs",
-            #           tabPanel("DEP curve 1", "This a DEP curve method added tab"),
-            #           target = "Heatmap", position = "after"
-            # )
-          }
-        )
+      observe(
+        if(input$threshold_method_ptm == "curve") {
+          removeTab(inputId = "DEP_ptm_results_tabs", target = "Volcano plot")
+          # removeTab(inputId = "DEP_ptm_results_tabs", target = "Custom Volcano")
+          # insertTab(inputId = "DEP_ptm_results_tabs",
+          #           tabPanel("DEP curve 1", "This a DEP curve method added tab"),
+          #           target = "Heatmap", position = "after"
+          # )
+        }
+      )
 
 
-        observe(
-          if(input$threshold_method_ptm == "curve") {
-            insertTab(inputId = "DEP_QC_tabs_ptm",
-                      tabPanel(title = "Normal distribution - Fit",
-                               fluidRow(
-                                 box(uiOutput(session$ns("cntrst_norm_distribution_ptm")), width = 8)
-                               ),
-                               fluidRow(
-                                 box(numericInput(session$ns("norm_distribution_Width_ptm"),
-                                                  "width",
-                                                  min = 1, max = 30, value = 7), width = 6),
-                                 box(numericInput(session$ns("norm_distribution_Height_ptm"),
-                                                  "height",
-                                                  min = 1, max = 30, value = 7), width = 6)
-                               ),
-                               fluidRow(
-                                 plotOutput(session$ns("norm_distribution_plot_ptm"),height=600),
-                                 downloadButton(session$ns('download_norm_distribution_plot_ptm'), 'Save')
-                               ),
-                               shinyBS::bsTooltip(session$ns("cntrst_norm_distribution_ptm"), "Choose the contrast to plot", "top", options = list(container = "body")),
-                               shinyBS::bsTooltip(session$ns("norm_distribution_Width_ptm"), "Width of the figure to export", "top", options = list(container = "body")),
-                               shinyBS::bsTooltip(session$ns("norm_distribution_Height_ptm"), "Height of the figure to export", "top", options = list(container = "body"))
-                      ),
+      observe(
+        if(input$threshold_method_ptm == "curve") {
+          insertTab(inputId = "DEP_QC_tabs_ptm",
+                    tabPanel(title = "Normal distribution - Fit",
+                             fluidRow(
+                               box(uiOutput(session$ns("cntrst_norm_distribution_ptm")), width = 8)
+                             ),
+                             fluidRow(
+                               box(numericInput(session$ns("norm_distribution_Width_ptm"),
+                                                "width",
+                                                min = 1, max = 30, value = 7), width = 6),
+                               box(numericInput(session$ns("norm_distribution_Height_ptm"),
+                                                "height",
+                                                min = 1, max = 30, value = 7), width = 6)
+                             ),
+                             fluidRow(
+                               plotOutput(session$ns("norm_distribution_plot_ptm"),height=600),
+                               downloadButton(session$ns('download_norm_distribution_plot_ptm'), 'Save')
+                             ),
+                             shinyBS::bsTooltip(session$ns("cntrst_norm_distribution_ptm"), "Choose the contrast to plot", "top", options = list(container = "body")),
+                             shinyBS::bsTooltip(session$ns("norm_distribution_Width_ptm"), "Width of the figure to export", "top", options = list(container = "body")),
+                             shinyBS::bsTooltip(session$ns("norm_distribution_Height_ptm"), "Height of the figure to export", "top", options = list(container = "body"))
+                    ),
 
-                      target = "Pca plot", position = "before"
-            )
-          }
-        )
+                    target = "Pca plot", position = "before"
+          )
+        }
+      )
 
-        observe(
-         if(input$threshold_method_ptm == "intersect") {
-           removeTab(inputId = "DEP_QC_tabs_ptm", target = "DEP curve 2")
-         }
-       )
+      observe(
+        if(input$threshold_method_ptm == "intersect") {
+          removeTab(inputId = "DEP_QC_tabs_ptm", target = "DEP curve 2")
+        }
+      )
 
-        ### check input ### --------------------------------------------------------
-        iv <- InputValidator$new()
-        iv$add_rule("p_ptm", sv_between(0.0001, 0.1))
-        iv$add_rule("lfc_ptm", sv_between(0, 10))
-        iv$add_rule("curvature_ptm", sv_between(0.1, 6))
-        iv$add_rule("x0_fold_ptm", sv_between(1, 10))
-        iv$add_rule("filt_num_ptm", sv_between(0, 1))
-        iv$enable()
+      ### check input ### --------------------------------------------------------
+      iv <- InputValidator$new()
+      iv$add_rule("p_ptm", sv_between(0.0001, 0.1))
+      iv$add_rule("lfc_ptm", sv_between(0, 10))
+      iv$add_rule("curvature_ptm", sv_between(0.1, 6))
+      iv$add_rule("x0_fold_ptm", sv_between(1, 10))
+      iv$add_rule("filt_num_ptm", sv_between(0, 1))
+      iv$enable()
 
-        ### Reactive functions ### --------------------------------------------------
-        expdesign <- reactive({
-          inFile <- input$file2
-          if (is.null(inFile) & (!is.null(data())) ){
-            cols <- which(colnames(data()) %in% input$intensitycols)
-            if(length(cols) == 0){
-              return(NULL)
-            }else{
-              label <- colnames(data())[cols]
-              expdesign <- get_exdesign_parse(label, mode = "delim", sep = "_",
-                                              remove_prefix = input$remove_prefix, remove_suffix = input$remove_suffix)
-              # my_expdesign <<- expdesign
-            }
-          }else{
-            read.csv(inFile$datapath, header = TRUE,
-                     sep = "\t", stringsAsFactors = FALSE) %>%
-              mutate(id = row_number())
-          }
-
-
-        })
-
-        data <- reactive({
-          inFile <- input$file1
-          if (is.null(inFile))
+      ### Reactive functions ### --------------------------------------------------
+      expdesign <- reactive({
+        inFile <- input$file2
+        if (is.null(inFile) & (!is.null(data())) ){
+          cols <- which(colnames(data()) %in% input$intensitycols)
+          if(length(cols) == 0){
             return(NULL)
-          my_data <<- read.csv(inFile$datapath, header = TRUE,
-                               sep = "\t", stringsAsFactors = FALSE) %>%
+          }else{
+            label <- colnames(data())[cols]
+            expdesign <- get_exdesign_parse(label, mode = "delim", sep = "_",
+                                            remove_prefix = input$remove_prefix, remove_suffix = input$remove_suffix)
+            # my_expdesign <<- expdesign
+          }
+        }else{
+          read.csv(inFile$datapath, header = TRUE,
+                   sep = "\t", stringsAsFactors = FALSE) %>%
             mutate(id = row_number())
-        })
+        }
+
+
+      })
+
+      data <- reactive({
+        inFile <- input$file1
+        if (is.null(inFile))
+          return(NULL)
+        my_data <<- read.csv(inFile$datapath, header = TRUE,
+                             sep = "\t", stringsAsFactors = FALSE) %>%
+          mutate(id = row_number())
+      })
 
       #   data <- reactive({
       #     inFile <- input$file1
@@ -1291,29 +1291,29 @@ DEP_ptm_server_module <- function(id, Omics_res){
       #   })
 
 
-        filt0_ptm <- reactive({
-          data <- data()
-          # aaaa <<- data
-          # order_save <<- the_order()
-          # if(is.null(input$peptidescol_ptm)|input$peptidescol_ptm==""){
-          #   data$Peptides = 3
-          # }else{
-          #   data$Peptides = data[,input$peptidescol_ptm]
-          # }
+      filt0_ptm <- reactive({
+        data <- data()
+        # aaaa <<- data
+        # order_save <<- the_order()
+        # if(is.null(input$peptidescol_ptm)|input$peptidescol_ptm==""){
+        #   data$Peptides = 3
+        # }else{
+        #   data$Peptides = data[,input$peptidescol_ptm]
+        # }
 
-          cols <- which(colnames(data) %in% input$intensitycols)
-          data[,cols] = apply(data[,cols], 2, function(x){
-              x[!(!grepl("[A-z]",x) & grepl("\\d",x))] = 0
-              return(as.numeric(x))
-            })
+        cols <- which(colnames(data) %in% input$intensitycols)
+        data[,cols] = apply(data[,cols], 2, function(x){
+          x[!(!grepl("[A-z]",x) & grepl("\\d",x))] = 0
+          return(as.numeric(x))
+        })
 
 
-          if(is.null(input$filt_ptm)){
-            cat("the filter column is empty! Do not filter with column")
-          }
+        if(is.null(input$filt_ptm)){
+          cat("the filter column is empty! Do not filter with column")
+        }
 
-          # req(input$id_ptm, input$name_ptm)
-          validate(need(!(input$name_ptm == "" & input$id_ptm == ""), "Please ensure that: at least one of your name column and id column is non-empty!"))
+        # req(input$id_ptm, input$name_ptm)
+        validate(need(!(input$name_ptm == "" & input$id_ptm == ""), "Please ensure that: at least one of your name column and id column is non-empty!"))
         if(input$name_ptm == "" & input$id_ptm == "") {
           sendSweetAlert(
             session = shiny::getDefaultReactiveDomain(),
@@ -1322,221 +1322,203 @@ DEP_ptm_server_module <- function(id, Omics_res){
             type = "warning"
           )
         }
-          validate(need(input$amino_acid_ptm != "", "Please ensure that: Amino acid column is non-empty"))
-          validate(need(input$aa_position_ptm != "", "Please ensure that: Amino acid position column is non-empty"))
+        validate(need(input$amino_acid_ptm != "", "Please ensure that: Amino acid column is non-empty"))
+        validate(need(input$aa_position_ptm != "", "Please ensure that: Amino acid position column is non-empty"))
 
-          filter_column_names = input$filt_ptm
-          cols_filt <- intersect(filter_column_names, colnames(data))
-          data_save1 <<- data
-          if(length(cols_filt) > 0){
-            message("Filtering based on '", paste(cols_filt,
-                                                  collapse = "', '"), "' column(s)")
+        filter_column_names = input$filt_ptm
+        cols_filt <- intersect(filter_column_names, colnames(data))
+        data_save1 <<- data
+        if(length(cols_filt) > 0){
+          message("Filtering based on '", paste(cols_filt,
+                                                collapse = "', '"), "' column(s)")
 
-            filtered = data[apply((data[, cols_filt,drop = F] == "" | is.na(data[, cols_filt, drop = F])), 1, all), ]
-          }
-          filtered_save1 <<- filtered
-          filtered = make_unique_ptm(filtered, gene_name = ifelse(input$name_ptm == "", input$id_ptm, input$name_ptm),
-                                     protein_ID = ifelse(input$id_ptm == "", input$name_ptm, input$id_ptm),
-                                     modified_name = NULL,
-                                     aa = input$amino_acid_ptm, pos = input$aa_position_ptm,
-                                     delim = input$delim_ptm
-                                     )
-          filtered_save2 <<- filtered
-
-          # if (!is.null(cols_filt)) {
-          #   NAs <- is.na(data[, cols_filt])
-          #   data[, cols_filt][NAs] <- ""
-          #   if (length(cols_filt) == 1) {
-          #     data <- dplyr::filter(data, data[, cols_filt] !=
-          #                             "+")
-          #   }
-          #   else if (length(cols_filt) > 1) {
-          #     data <- dplyr::filter(data, !apply(data[, cols_filt] ==
-          #                                          "+", 1, any))
-          #   }
-          # }
-
-          # filtered <- try(filter_peptide(PTMdata = data,
-          #                                gene.name = ifelse(input$name_ptm == "", input$id_ptm, input$name_ptm),
-          #                                protein.ID = ifelse(input$id_ptm == "", input$name_ptm, input$id_ptm),
-          #                                aa = input$amino_acid_ptm,
-          #                                pos = input$aa_position_ptm,
-          #                                filter_column_names = input$filt_ptm,
-          #                                delim = input$delim_ptm,
-          #                                cutoff_based = input$filt_num_cutoff_ptm,
-          #                                cutoff = input$filt_num_ptm),
-          #                 silent = TRUE)
-          # validate(need(filtered, "The function filter_peptide get an error"))
-          # a133 <<- input$filt
-          a122 <<- input$name_ptm
-          a133 <<- input$id_ptm
-
-          ind_empty = c(grep("^_", filtered$name), which(filtered$name == ""))
-          if(length(ind_empty) > 0) {
-            filtered = filtered[-ind_empty, ]
-          }
-
-          if (input$anno == "columns") {
-            se <- DEP2::make_se_parse(filtered, cols, mode = "delim", sep = "_")
-          }
-          if (input$anno == "expdesign") {
-            se <- DEP2::make_se(filtered, cols, expdesign())
-            colData(se)$replicate = as.character(colData(se)$replicate)
-          }
-          se_save <<- se
-          cutoff_col = input$filt_num_cutoff_ptm; cutoff_val = input$filt_num_ptm
-          filter_formula = paste( "~(!is.na(",cutoff_col,")&",cutoff_col," >= ",cutoff_val, ")") %>% as.formula()
-          filt <- DEP2::filter_se(se_save,thr = input$thr_ptm, filter_formula = filter_formula) ## filter the location prosibility or other scores
-          my_filt <<- filt
-        })
-
-        iv1 <- InputValidator$new()
-        iv1$add_rule("order",
-                     sv_required(message = "Complete order is required, sort all groups", test = function(x){
-                       is.null(x) || length(x) == (length(filt0_ptm()@colData$condition %>% unique))
-                     })
+          filtered = data[apply((data[, cols_filt,drop = F] == "" | is.na(data[, cols_filt, drop = F])), 1, all), ]
+        }
+        filtered_save1 <<- filtered
+        filtered = make_unique_ptm(filtered, gene_name = ifelse(input$name_ptm == "", input$id_ptm, input$name_ptm),
+                                   protein_ID = ifelse(input$id_ptm == "", input$name_ptm, input$id_ptm),
+                                   modified_name = NULL,
+                                   aa = input$amino_acid_ptm, pos = input$aa_position_ptm,
+                                   delim = input$delim_ptm
         )
-        iv1$enable()
+        filtered_save2 <<- filtered
 
-        the_order <- reactive({
-          req(iv1$is_valid())
-          order_save1 <<- input$order
-          if(length(input$order) == length(filt0_ptm()@colData$condition %>% unique))
-            return(input$order)
-          return(NULL)
-        })
+        # if (!is.null(cols_filt)) {
+        #   NAs <- is.na(data[, cols_filt])
+        #   data[, cols_filt][NAs] <- ""
+        #   if (length(cols_filt) == 1) {
+        #     data <- dplyr::filter(data, data[, cols_filt] !=
+        #                             "+")
+        #   }
+        #   else if (length(cols_filt) > 1) {
+        #     data <- dplyr::filter(data, !apply(data[, cols_filt] ==
+        #                                          "+", 1, any))
+        #   }
+        # }
 
-        filt_ptm <- reactive({
-          filt_ptm = filt0_ptm()
-          order_save <<- the_order()
-          my_filt_save <<- filt_ptm
-          if(is.null(the_order())){
-            return(filt_ptm)
-          }else{
-            order_save2 <<- the_order()
-            filt_ptm@colData$condition = factor(filt_ptm@colData$condition, levels = the_order())
-            filt_ptm = filt_ptm[,order(filt_ptm@colData$condition)]
-            # filt@colData = filt@colData %>% as.data.frame() %>% arrange(., condition) %>% DataFrame()
-            return(filt_ptm)
-          }
+        # filtered <- try(filter_peptide(PTMdata = data,
+        #                                gene.name = ifelse(input$name_ptm == "", input$id_ptm, input$name_ptm),
+        #                                protein.ID = ifelse(input$id_ptm == "", input$name_ptm, input$id_ptm),
+        #                                aa = input$amino_acid_ptm,
+        #                                pos = input$aa_position_ptm,
+        #                                filter_column_names = input$filt_ptm,
+        #                                delim = input$delim_ptm,
+        #                                cutoff_based = input$filt_num_cutoff_ptm,
+        #                                cutoff = input$filt_num_ptm),
+        #                 silent = TRUE)
+        # validate(need(filtered, "The function filter_peptide get an error"))
+        # a133 <<- input$filt
+        a122 <<- input$name_ptm
+        a133 <<- input$id_ptm
 
-        })
+        ind_empty = c(grep("^_", filtered$name), which(filtered$name == ""))
+        if(length(ind_empty) > 0) {
+          filtered = filtered[-ind_empty, ]
+        }
 
-        norm_ptm <- reactive({
-           my_norm <<- normalize_vsn(filt_ptm())
-        })
+        if (input$anno == "columns") {
+          se <- DEP2::make_se_parse(filtered, cols, mode = "delim", sep = "_")
+        }
+        if (input$anno == "expdesign") {
+          se <- DEP2::make_se(filtered, cols, expdesign())
+          colData(se)$replicate = as.character(colData(se)$replicate)
+        }
+        se_save <<- se
+        cutoff_col = input$filt_num_cutoff_ptm; cutoff_val = input$filt_num_ptm
+        filter_formula = paste( "~(!is.na(",cutoff_col,")&",cutoff_col," >= ",cutoff_val, ")") %>% as.formula()
+        filt <- DEP2::filter_se(se_save,thr = input$thr_ptm, filter_formula = filter_formula) ## filter the location prosibility or other scores
+        my_filt <<- filt
+      })
+
+      iv1 <- InputValidator$new()
+      iv1$add_rule("order",
+                   sv_required(message = "Complete order is required, sort all groups", test = function(x){
+                     is.null(x) || length(x) == (length(filt0_ptm()@colData$condition %>% unique))
+                   })
+      )
+      iv1$enable()
+
+      the_order <- reactive({
+        req(iv1$is_valid())
+        order_save1 <<- input$order
+        if(length(input$order) == length(filt0_ptm()@colData$condition %>% unique))
+          return(input$order)
+        return(NULL)
+      })
+
+      filt_ptm <- reactive({
+        filt_ptm = filt0_ptm()
+        order_save <<- the_order()
+        my_filt_save <<- filt_ptm
+        if(is.null(the_order())){
+          return(filt_ptm)
+        }else{
+          order_save2 <<- the_order()
+          filt_ptm@colData$condition = factor(filt_ptm@colData$condition, levels = the_order())
+          filt_ptm = filt_ptm[,order(filt_ptm@colData$condition)]
+          # filt@colData = filt@colData %>% as.data.frame() %>% arrange(., condition) %>% DataFrame()
+          return(filt_ptm)
+        }
+
+      })
+
+      norm_ptm <- reactive({
+        my_norm <- normalize_vsn(filt_ptm())
+        my_norm
+      })
 
 
-        imp_ptm <-  reactive({
-          inFile1 <- input$resultRData_ptm
+      imp_ptm <-  reactive({
+        inFile1 <- input$resultRData_ptm
 
-          if(is.null(inFile1)){
-            if(input$imputation_ptm == "mixed on proteins") { ## mixed imputation
-              # Extract protein names with missing values
-              # in all replicates of at least one condition
-              proteins_MNAR <- get_df_long(norm_ptm()) %>%
-                dplyr::group_by(name, condition) %>%
-                dplyr::summarize(NAs = all(is.na(intensity))) %>%
-                dplyr::filter(NAs) %>%
-                dplyr::pull(name) %>%
-                unique()
+        if(is.null(inFile1)){
+          if(input$imputation_ptm == "mixed on proteins") { ## mixed imputation
+            # Extract protein names with missing values
+            # in all replicates of at least one condition
+            proteins_MNAR <- get_df_long(norm_ptm()) %>%
+              dplyr::group_by(name, condition) %>%
+              dplyr::summarize(NAs = all(is.na(intensity))) %>%
+              dplyr::filter(NAs) %>%
+              dplyr::pull(name) %>%
+              unique()
 
-              # Get a logical vector
-              MNAR <- names(norm_ptm()) %in% proteins_MNAR
+            # Get a logical vector
+            MNAR <- names(norm_ptm()) %in% proteins_MNAR
 
-              # Perform a mixed imputation
-              my_imp <- DEP2::impute(
-                norm_ptm(),
-                fun = "mixed",
-                randna = !MNAR, # we have to define MAR which is the opposite of MNAR
-                mar = "knn", # imputation function for MAR
-                mnar = "MinDet") # imputation function for MNAR
+            # Perform a mixed imputation
+            my_imp <- DEP2::impute(
+              norm_ptm(),
+              fun = "mixed",
+              randna = !MNAR, # we have to define MAR which is the opposite of MNAR
+              mar = "knn", # imputation function for MAR
+              mnar = "MinDet") # imputation function for MNAR
+            validate(
+              need(length(which(is.na((assay(my_imp)[which(MNAR),])))) == 0, "Please select another imputation method")
+            )
+            # my_imp
+
+          } else {
+            if(input$imputation_ptm == "mixed on samples") { ## perfrom MNAR impute for control and MAR for treatment. May suit for AP-MS experiment
+              sample_specific_imputation <- norm_ptm()
+              MSnSet <- as(sample_specific_imputation, "MSnSet")
+
+              # Impute differently for two sets of samples
+              MSnSet_imputed1 <- MSnbase::impute(MSnSet[, which(gsub("_\\d$", "", colnames(assay(sample_specific_imputation))) %in% input$control)], method = "MinProb") # control samples that need not random (MNAR) left-censored imputation
+              MSnSet_imputed2 <- MSnbase::impute(MSnSet[, -which(gsub("_\\d$", "", colnames(assay(sample_specific_imputation))) %in% input$control)], method = "knn")# treatment samples that need random(MAR) imputation
+
+              # Combine into the SummarizedExperiment object
+              assay(sample_specific_imputation) <- cbind(
+                MSnbase::exprs(MSnSet_imputed1),
+                MSnbase::exprs(MSnSet_imputed2))
+              my_imp <- sample_specific_imputation
               validate(
-                need(length(which(is.na((assay(my_imp)[which(MNAR),])))) == 0, "Please select another imputation method")
+                need(length(which(is.na((assay(my_imp))))) == 0, "Please select another imputation method")
               )
               # my_imp
-
             } else {
-              if(input$imputation_ptm == "mixed on samples") { ## perfrom MNAR impute for control and MAR for treatment. May suit for AP-MS experiment
-                sample_specific_imputation <- norm_ptm()
-                MSnSet <- as(sample_specific_imputation, "MSnSet")
-
-                # Impute differently for two sets of samples
-                MSnSet_imputed1 <- MSnbase::impute(MSnSet[, which(gsub("_\\d$", "", colnames(assay(sample_specific_imputation))) %in% input$control)], method = "MinProb") # control samples that need not random (MNAR) left-censored imputation
-                MSnSet_imputed2 <- MSnbase::impute(MSnSet[, -which(gsub("_\\d$", "", colnames(assay(sample_specific_imputation))) %in% input$control)], method = "knn")# treatment samples that need random(MAR) imputation
-
-                # Combine into the SummarizedExperiment object
-                assay(sample_specific_imputation) <- cbind(
-                  MSnbase::exprs(MSnSet_imputed1),
-                  MSnbase::exprs(MSnSet_imputed2))
-                my_imp <- sample_specific_imputation
-                validate(
-                  need(length(which(is.na((assay(my_imp))))) == 0, "Please select another imputation method")
-                )
-                # my_imp
-              } else {
-                #set.seed(12345)
-                my_imp <- DEP2::impute(norm_ptm(), input$imputation_ptm)
-                # my_imp <<- DEP2::impute(norm_ptm(), input$imputation_ptm)
-              }
+              #set.seed(12345)
+              my_imp <- DEP2::impute(norm_ptm(), input$imputation_ptm)
+              # my_imp <<- DEP2::impute(norm_ptm(), input$imputation_ptm)
             }
-            my_imp_ptm <<- my_imp
-            return(my_imp)
-          } else {
-            load(file = inFile1$datapath)
-            my_imp <- my_imp
-            return(my_imp)
           }
-        })
+          # my_imp_ptm <<- my_imp
+          return(my_imp)
+        } else {
+          load(file = inFile1$datapath)
+          my_imp <- my_imp
+          return(my_imp)
+        }
+      })
 
-        Correct_ptm <- reactive({
-          imp_ptm = imp_ptm()
-          PG_choosed = input$protein_group_choose
-          omictype <- strsplit(PG_choosed,"_")[[1]][1]
+      Correct_ptm <- reactive({
+        imp_ptm = imp_ptm()
+        PG_choosed = input$protein_group_choose
+        omictype <- strsplit(PG_choosed,"_")[[1]][1]
 
-          the_res <- Omics_res[[PG_choosed]]()
-          # PG_data <- assay(the_res)
-          correct_key_save <<- input$correct_key
+        the_res <- Omics_res[[PG_choosed]]()
+        # PG_data <- assay(the_res)
+        # correct_key_save <<- input$correct_key
 
-          Correct_ptm = DEP2::correct_PTM_by_Protein(enriched_peptide = imp_ptm,
-                                                     relative_protein = the_res,
-                                                     correct_key = input$correct_key,
-                                                     correct_level = input$correct_level,
-                                                     unidentified_treatment = input$unidentified_protein_treatment)
-          Correct_ptm_save <<- Correct_ptm
-        })
+        Correct_ptm = DEP2::correct_PTM_by_Protein(enriched_peptide = imp_ptm,
+                                                   relative_protein = the_res,
+                                                   correct_key = input$correct_key,
+                                                   correct_level = input$correct_level,
+                                                   unidentified_treatment = input$unidentified_protein_treatment)
+        # Correct_ptm_save <<- Correct_ptm
+        Correct_ptm
+      })
 
-        FDR_type_ptm <- reactive({
-          FDR_type_ptm <- input$FDR_type_ptm
-          # FDR_type_ptm <- ifelse(length(grep(FDR_type_ptm,"qval"))>1,"qval","lfdr")
-        })
+      FDR_type_ptm <- reactive({
+        FDR_type_ptm <- input$FDR_type_ptm
+      })
 
-        # df_all_ptm = reactive({
-        #   inFile1 <- input$resultRData_ptm
-        #   # if(is.null(inFile1)){
-        #   #   df_all <- DEP2::test_diff(se = imp_ptm(), type = "all",FDRmethod=input$fdr_correction_ptm)
-        #   # }else{
-        #   #   load(file = inFile1$datapath)
-        #   #   df_all <- DEP2::test_diff(se = my_imp, type = "all",FDRmethod=input$fdr_correction_ptm)
-        #   # }
-        #
-        #   if(is.null(inFile1)){
-        #     df_all <- test_diff(se = imp_ptm(), type = "all", fdr.type = FDR_type_ptm())
-        #   }else{
-        #     load(file = inFile1$datapath)
-        #     df_all <- test_diff(se = my_imp, type = "all", fdr.type = FDR_type_ptm())
-        #   }
-        #   # df_all2 <<- df_all
-        #   df_all
-        # })
-
-        df_ptm <- reactive({
-          if(input$contrasts == "control") {
-            validate(
-              need(input$control != "", "Please select a control condition under menuItem Columns in the DEP-PTM options of the sidebar"),
-              need(all(input$intensitycols %in% colnames(data())), "Please select the Expression columns in the sidebar")
-            )
-          }
+      df_ptm <- reactive({
+        if(input$contrasts == "control") {
+          validate(
+            need(input$control != "", "Please select a control condition under menuItem Columns in the DEP-PTM options of the sidebar"),
+            need(all(input$intensitycols %in% colnames(data())), "Please select the Expression columns in the sidebar")
+          )
+        }
 
         if(input$contrasts == "manual") {
           validate(
@@ -1554,7 +1536,7 @@ DEP_ptm_server_module <- function(id, Omics_res){
         if(is.null(inFile1)){
           if(input$contrasts == "control"){
             df <- test_diff(se = my_imp, type = input$contrasts, control = input$control,
-                             fdr.type = FDR_type_ptm())
+                            fdr.type = FDR_type_ptm())
           }
 
           if(input$contrasts == "all") {
@@ -1566,12 +1548,12 @@ DEP_ptm_server_module <- function(id, Omics_res){
                             fdr.type = FDR_type_ptm())
           }
         } else {
-        # load your saved RData in order to get the same result (imp is the key of if result from two analysis being the same)
+          # load your saved RData in order to get the same result (imp is the key of if result from two analysis being the same)
           load(file = inFile1$datapath)
           my_imp <- my_imp
           if(input$contrasts == "control"){
             df <- test_diff(se = my_imp, type = input$contrasts, control = input$control,
-                             fdr.type = FDR_type_ptm())
+                            fdr.type = FDR_type_ptm())
           }
 
           if(input$contrasts == "all") {
@@ -1580,822 +1562,704 @@ DEP_ptm_server_module <- function(id, Omics_res){
 
           if(input$contrasts == "manual") {
             df <- test_diff(se = my_imp, type = input$contrasts, test = input$test_manual_ptm,
-                             fdr.type = FDR_type_ptm())
+                            fdr.type = FDR_type_ptm())
           }
         }
         # my_df <<- df
         return(df)
       })
 
-        thedf <- df_ptm
+      # thedf <- df_ptm
 
-        # dep_all_ptm <- reactive({
-        #   if(all( input$intensitycols %in% colnames(data())) ){
-        #     req(input$threshold_method_ptm)
-        #     if(input$threshold_method_ptm == "intersect") {
-        #       req(input$p_ptm,input$lfc_ptm)
-        #       dep_all <- add_rejections(diff = df_all_ptm(), alpha = input$p_ptm, lfc = input$lfc_ptm, thresholdmethod = input$threshold_method_ptm)
-        #     }
-        #     if(input$threshold_method_ptm == "curve") {
-        #       req(input$curvature_ptm,input$x0_fold_ptm)
-        #       dep_all <- add_rejections(diff = df_all_ptm(), thresholdmethod = input$threshold_method_ptm, curvature = input$curvature_ptm, x0_fold = input$x0_fold_ptm)
-        #     }
-        #     # dep_all3 <<- dep_all
-        #     req(input$p_ptm,input$lfc_ptm)
-        #     # get_dep_ptm_siglist(dep = dep_all,alpha = input$p_ptm , lfc = input$lfc_ptm, threshold_method = input$threshold_method_ptm, curvature = input$curvature_ptm, x0_fold = input$x0_fold_ptm)
-        #     # get_dep_listforgsea(dep_all)
-        #     # Genelist_server_module("bbb",dep_all = dep_all,alpha = input$p_ptm , lfc = input$lfc_ptm)
-        #     return(dep_all)
-        #   }
-        # })
-
-          dep_ptm <- reactive({
-            aaa <<- input$curvature_ptm
-            if(input$threshold_method_ptm == "intersect") {
-              my_dep <- add_rejections(diff = df_ptm(), alpha = input$p_ptm, lfc = input$lfc_ptm, thresholdmethod = input$threshold_method_ptm)
-            }
-            if(input$threshold_method_ptm == "curve") {
-              my_dep <- add_rejections(diff = df_ptm(), thresholdmethod = input$threshold_method_ptm, curvature = input$curvature_ptm, x0_fold = input$x0_fold_ptm)
-            }
-
-            my_dep_ptm_save <<- my_dep
-            # if(is.null(input$peptidescol_ptm)|input$peptidescol_ptm==""){
-            #     rowData(my_dep)$Peptides = 3
-            # }else{
-            #    rowData(my_dep)$Peptides = rowData(my_dep)[,input$peptidescol_ptm]
-            # }
-            return(my_dep)
-          })
-
-        output$Save_RData_ptm <- downloadHandler(
-          filename = function() { paste("results", ".RData", sep = "") },
-          content = function(file) {
-            withProgress(message = 'Please wait ...', value = 0.66, {
-              save(my_data, my_filt, my_norm, my_imp, my_dep, file=file)})}
-        )
-
-        ## All object and functions upon 'Analyze' input  ### ----------------------
-         observeEvent(input$analyze_ptm, {
-  if(is.null(input$filt_ptm)) {
-    sendSweetAlert(
-      session = shiny::getDefaultReactiveDomain(),
-      title = "Note :",
-      text = "Your filter column is empty! If needed, please choose the filter columns. Otherwise, please ignore this message",
-      type = "info"
-    )
-  }
-
-    # validate(
-    #   need(input$filt_ptm,"filter column is empty\n")
-    # )
-
-
-
-    # temp <- observe(dep_all_ptm())
-    ### Interactive UI functions ### ------------------------------------------
-    output$downloadTable_ptm <- renderUI({
-      selectizeInput(session$ns("dataset_ptm"),
-                     "Choose a dataset to save" ,
-                     c("results","significant_peptides",
-                       "displayed_subset","full_dataset"))
-    })
-
-    output$downloadButton_ptm <- renderUI({
-      downloadButton(session$ns('downloadData_ptm'), 'Save', class = "downloadData_ptm")
-    })
-
-    output$downloadButton_for_save_RData_ptm <- renderUI({
-      downloadButton(session$ns("Save_RData_ptm"), "save result RData", class = "Save_RData_ptm")
-    })
-
-    output$significantBox_ptm <- renderInfoBox({
-      num_total <- dep_ptm() %>%
-        nrow()
-      num_signif <- dep_ptm() %>%
-        .[rowData(.)$significant, ] %>%
-        nrow()
-      frac <- num_signif / num_total
-
-      if(frac > 0.2) {
-        info_box <- infoBox("Significant peptides",
-                            paste0(num_signif,
-                                   " out of ",
-                                   num_total),
-                            paste0("Too large fraction (",
-                                   signif(frac * 100, digits = 3),
-                                   "%) of peptides differentially expressed"),
-                            icon = icon("minus", lib = "glyphicon"),
-                            color = "orange",
-                            width = 4)
-      }
-      if(frac == 0) {
-        info_box <- infoBox("Significant peptides",
-                            paste0(num_signif,
-                                   " out of ",
-                                   num_total),
-                            "No peptides differentially expressed",
-                            icon = icon("thumbs-down", lib = "glyphicon"),
-                            color = "red",
-                            width = 4)
-      }
-      if(frac > 0 & frac <= 0.2) {
-        info_box <-     infoBox("Significant peptides",
-                              paste0(num_signif,
-                                     " out of ",
-                                     num_total),
-                              paste0(signif(frac * 100, digits = 3),
-                                     "% of peptides differentially expressed"),
-                              icon = icon("thumbs-up", lib = "glyphicon"),
-                              color = "green",
-                              width = 4)
-      }
-      info_box
-    })
-
-    output$select_ptm <- renderUI({
-      row_data <- rowData(dep_ptm())
-      cols <- grep("_significant", colnames(row_data))
-      names <- colnames(row_data)[cols]
-      names <- gsub("_significant", "", names)
-      selectizeInput(session$ns("select_ptm"),
-                     "Select direct comparisons",
-                     choices=names,
-                     multiple = TRUE)
-    })
-
-
-    output$exclude_ptm <- renderUI({
-      row_data <- rowData(dep_ptm())
-      cols <- grep("_significant", colnames(row_data))
-      names <- colnames(row_data)[cols]
-      names <- gsub("_significant","",names)
-      selectizeInput(session$ns("exclude_ptm"),
-                     "Exclude direct comparisons",
-                     choices = names,
-                     multiple = TRUE)
-    })
-
-
-    output$heatmap_cntrst_ptm <- renderUI({
-      if (!is.null(selected_ptm())) {
-        df <- rowData(selected_ptm())
-        cols <- grep("_significant$",colnames(df))
-        selectizeInput(session$ns("heatmap_cntrst_ptm"),
-                       "Contrast",
-                       choices = gsub("_significant", "", colnames(df)[cols]), multiple = TRUE)
-      }
-    })
-
-
-    output$mysplit_ptm <- renderUI({
-      selectizeInput(session$ns("mysplit_ptm"),
-                     "my split",
-                     choices = c(1 : input$k_ptm), multiple = TRUE)
-
-    })
-
-    output$Custom_columns_order_ptm <- renderUI({
-      selectizeInput(session$ns("Custom_columns_order_ptm"),
-                     "Custom columns order",
-                     choices = colnames(assay(dep_ptm())), multiple = TRUE)
-
-    })
-
-    output$Custom_columns_order_for_missval_heatmap_ptm <- renderUI({
-      selectizeInput(session$ns("Custom_columns_order_for_missval_heatmap_ptm"),
-                     "Custom columns order",
-                     choices = colnames(assay(dep_ptm())), multiple = TRUE)
-    })
-
-
-    # output$volcano_cntrst_ptm <- renderUI({
-    #   if (!is.null(selected_ptm())) {
-    #     df <- rowData(selected_ptm())
-    #     cols <- grep("_significant$",colnames(df))
-    #     selectizeInput(session$ns("volcano_cntrst_ptm"),
-    #                    "Contrast",
-    #                    choices = gsub("_significant", "", colnames(df)[cols]))
-    #   }
-    # })
-
-    output$volcano_cntrst_ptm <- renderUI({
-      if (!is.null(selected_ptm())) {
-        df <- rowData(selected_ptm())
-        cols <- grep("_significant$",colnames(df))
-        selectizeInput(session$ns("volcano_cntrst_ptm"),
-                       label = "Contrast",
-                       choices = gsub("_significant", "", colnames(df)[cols]))
-      }
-    })
-
-    # output$Volcano_cntrst_stastical_plot_ptm <- renderUI({
-    #   if (!is.null(selected_ptm())) {
-    #     df <- rowData(selected_ptm())
-    #     cols <- grep("_significant$",colnames(df))
-    #     selectizeInput(session$ns("Volcano_cntrst_stastical_plot_ptm"),
-    #                    "Contrast",
-    #                    choices = gsub("_significant", "", colnames(df)[cols]))
-    #   }
-    # })
-
-    output$cntrst_norm_distribution_ptm <- renderUI({
-      if (!is.null(selected_ptm())) {
-        df <- rowData(selected_ptm())
-        cols <- grep("_significant$",colnames(df))
-        selectizeInput(session$ns("cntrst_norm_distribution_ptm"),
-                       "Contrast",
-                       choices = gsub("_significant", "", colnames(df)[cols]))
-      }
-    })
-
-
-    output$selected_proteins_ptm <- renderUI({
-        row_Data <- rowData(dep_ptm())
-        selectizeInput(session$ns("selected_proteins_ptm"),
-                       "selected peptides",
-                       choices = row_Data$name, selected = NULL, multiple = TRUE)
-    })
-
-    output$chooseToshow_ptm <- renderUI({
-      selectizeInput(session$ns("chooseToshow_ptm"),
-                     "selected peptides",
-                     choices = name_for_choose_ptm(), selected = NULL, multiple = TRUE)
-    })
-
-    output$plot_stat_contrasts <- renderUI({
-      selectInput(session$ns("plot_stat_contrasts"),
-                  "plot contrasts",
-                  choices = get_contrast(selected_ptm()),
-                  multiple = T,
-                  selected = get_contrast(selected_ptm()))
-    })
-
-    output$umap_n_neighbors_ptm <- renderUI({
-      cat("umap_n_neighbors")
-      sliderInput(inputId = session$ns("umap_n_neighbors_ptm"),"number of nearest neighbors",min=2,max=min(15,ncol(dep_ptm())),value=4)}
-    )
-
-    output$pca_top_n_ptm  <- renderUI(
-      sliderInput(inputId = session$ns("pca_top_n_ptm"),"number of top variable proteins to consider",min = 2, max = nrow(dep_ptm()), value=500)
-    )
-
-
-    output$Tsne_perplexity_ptm <- renderUI(
-      sliderInput(inputId = session$ns("Tsne_perplexity_ptm"),"perplexity",min=1,max= (ncol(dep_ptm())-1)/3 - 2^(-31) ,value=2)
-    )
-
-
-
-    ### Reactive functions ### ------------------------------------------------
-    name_for_choose_ptm <- reactive({
-      # heatmap_name(dep = selected_ptm(), manual = input$manual_heatmap_ptm, manual_name = input$heatmap_cntrst_ptm)
-      DEP2::get_signicant(selected_ptm(), contrasts = input$heatmap_cntrst_ptm, return_type = "names")
-      })
-
-    excluded_ptm <- reactive({
-      DEP2:::exclude_contrasts(dep_ptm(), input$exclude_ptm)
-    })
-
-    selected_ptm <- reactive({
-      DEP2:::select_contrasts(excluded_ptm(), input$select_ptm)
-    })
-
-    res_ptm <- reactive({
-      bbbb <<- selected_ptm()
-      PTM_get_results(selected_ptm())
-    })
-
-    table_ptm <- reactive({
-      aaaaa <<- res_ptm()
-      PTM_get_table(res_ptm(), input$pres_ptm)
-    })
-
-    #### plots ----
-    selected_plot_input_ptm <- reactive ({
-      if(!is.null(input$table_ptm_rows_selected)) {
-        selected_id <- table_ptm()[input$table_ptm_rows_selected,1]
-        DEP2::plot_single(selected_ptm(), selected_id, input$pres_ptm)
-      }
-    })
-
-    heatmap_input_ptm <- reactive({
-
-      withProgress(message = 'Plotting', value = 0.66, {
-        if(input$cluster_columns_ptm || is.null(input$Custom_columns_order_ptm) || length(input$Custom_columns_order_ptm) < 2) {
-          selected = selected_ptm()
-        } else {
-          cols <- input$Custom_columns_order_ptm
-          selected <- selected_ptm()[,cols]
+      dep_ptm <- reactive({
+        aaa <<- input$curvature_ptm
+        if(input$threshold_method_ptm == "intersect") {
+          my_dep <- add_rejections(diff = df_ptm(), alpha = input$p_ptm, lfc = input$lfc_ptm, thresholdmethod = input$threshold_method_ptm)
+        }
+        if(input$threshold_method_ptm == "curve") {
+          my_dep <- add_rejections(diff = df_ptm(), thresholdmethod = input$threshold_method_ptm, curvature = input$curvature_ptm, x0_fold = input$x0_fold_ptm)
         }
 
-        DEP2::plot_heatmap(object = selected,
-                           type = input$pres_ptm,
-                           manual_contrast = input$heatmap_cntrst_ptm,
-                           kmeans = TRUE,
-                           k = input$k_ptm,
-                           color = input$colorbar_ptm,
-                           col_limit = input$limit_ptm,
-                           row_font_size = input$row_font_size_ptm,
-                           col_font_size = input$col_font_size_ptm,
-                           cluster_columns = input$cluster_columns_ptm,
-                           split_order = input$mysplit_ptm,
-                           label_few_peptide_rows = F,
-                           chooseToshow = input$chooseToshow_ptm,
-                           )
-        # plot_heatmap(dep = selected_ptm(),
-        #              type = input$pres_ptm,
-        #              manual = input$manual_heatmap_ptm,
-        #              manual_name = input$heatmap_cntrst_ptm,
-        #              kmeans = TRUE,
-        #              k = input$k_ptm,
-        #              color = input$colorbar_ptm,
-        #              col_limit = input$limit_ptm,
-        #              #same_trend = input$same_trend_ptm,
-        #              row_font_size = input$row_font_size_ptm,
-        #              col_font_size = input$col_font_size_ptm,
-        #              cluster_columns = input$cluster_columns_ptm,
-        #              if_mysplit = input$if_mysplit_ptm,
-        #              mysplit = input$mysplit_ptm,
-        #              if_rowname_color = FALSE,
-        #              if_chooseToshow = input$if_chooseToshow_ptm,
-        #              chooseToshow = input$chooseToshow_ptm,
-        #              column_order = if(input$cluster_columns_ptm) {NULL} else {input$Custom_columns_order_ptm})
+        return(my_dep)
       })
-    })
 
-
-    # volcano_input_ptm <- reactive({
-    #   if(!is.null(input$volcano_cntrst_ptm)) {
-    #     plot_volcano(dep = selected_ptm(),
-    #                  contrast = input$volcano_cntrst_ptm,
-    #                  label_size = input$fontsize_ptm,
-    #                  add_names = input$check_names_ptm,
-    #                  adjusted = input$p_adj_ptm,
-    #                  same_width = input$same_width_ptm,
-    #                  my_breaks = input$my_breaks_ptm,
-    #                  mybreaks = as.numeric(input$mybreaks_ptm))
-    #   }
-    # })
-
-
-    custom_volcano_input_ptm <- reactive({
-      if(!is.null(input$volcano_cntrst_ptm)) {
-        withProgress(message = 'Plotting', value = 0.66, {
-          DEP2::plot_volcano(object = selected_ptm(),
-                             contrast = input$volcano_cntrst_ptm,
-                             add_threshold_line = input$threshold_method_ptm,
-                             adjusted = ifelse(input$threshold_method_ptm == "intersect", input$P_adj_ptm, TRUE),
-                             label_size = input$fontSize_ptm,
-                             label_number = input$showNum_ptm,
-                             label_trend = input$labelWay_ptm,
-                             chooseTolabel = input$selected_proteins_ptm,
-                             x_symmetry = input$Same_width_ptm,
-                             fcCutoff = input$lfc_ptm,
-                             pCutoff = input$p_ptm,
-                             curvature = input$curvature_ptm,
-                             x0_fold = input$x0_fold_ptm,
-                             dot_size = input$dotsize_ptm,
-                             highlight_PGs_with_few_peptides = F,
-                             down_color = input$down_color_ptm,
-                             stable_color = input$stable_color_ptm,
-                             up_color = input$up_color_ptm,
-          )
-
-          # my_plot_volcano(dep = selected_ptm(),
-          #                 contrast = input$Volcano_cntrst_ptm,
-          #                 adjusted = ifelse(input$threshold_method_ptm == "intersect", input$P_adj_ptm, TRUE),
-          #                 labelWay = switch (input$labelWay_ptm,
-          #                         "all significant" = "all significant",
-          #                         "up" = "up",
-          #                         "down" = "down",
-          #                         "selected peptides" = "selected proteins"),
-          #                 showNum = input$showNum_ptm,
-          #                 chooseTolabel = input$selected_proteins_ptm,
-          #                 fontSize = input$fontSize_ptm,
-          #                 dotsize = input$dotsize_ptm,
-          #                 same_width = input$Same_width_ptm,
-          #                 fcCutoff = input$lfc_ptm,
-          #                 adjpCutoff = input$p_ptm,
-          #                 if_peptide_color = FALSE,
-          #                 label.rectangle = input$if_label_rectangle_ptm,
-          #                 stroke = input$stroke_ptm,
-          #                 down_color = input$down_color_ptm,
-          #                 stable_color = input$stable_color_ptm,
-          #                 up_color = input$up_color_ptm,
-          #                 threshold_method = input$threshold_method_ptm,
-          #                 curvature = input$curvature_ptm ,
-          #                 x0_fold = input$x0_fold_ptm,
-          #                 PTM = TRUE
-          # )
-        })
-      }
-    })
-
-
-    # stastical_plot_input_ptm <- reactive({
-    #   if(!is.null(input$Volcano_cntrst_stastical_plot_ptm)){
-    #     statistics_plot(dep = selected_ptm(),
-    #                     x = input$stastical_plot_x_ptm, y = input$stastical_plot_y_ptm,
-    #                     plottype = input$stastical_plot_type_ptm,
-    #                     contrast=input$Volcano_cntrst_stastical_plot_ptm)
-    #   }
-    # })
-    stastical_plot_input <- reactive({
-      if(!is.null(input$plot_stat_contrasts)){
-        # statistics_plot(dep = selected(),
-        #                 x = input$stastical_plot_x, y = input$stastical_plot_y,
-        #                 plottype = input$stastical_plot_type,
-        #                 contrast=input$Volcano_cntrst_stastical_plot)
-        DEP2::plot_statistics(selected_ptm(), statistic = input$stastical_plot_x ,contrasts = input$plot_stat_contrasts)
-      }
-    })
-
-    norm_distribution_input_ptm <- reactive({
-      if(!is.null(input$cntrst_norm_distribution_ptm)){
-        DEP2::plot_norm_distribution(dep = dep_ptm(),
-                                     contrast=input$cntrst_norm_distribution_ptm)
-      }
-    })
-
-    pca_input_ptm <- reactive({
-      DEP2::plot_pca(object = dep_ptm(), indicate = input$Indicate_ptm, if_square = input$if_square_ptm, n = input$pca_top_n_ptm, features = "peptides")
-    })
-
-    umap_input_ptm <- reactive({
-      DEP2::plot_umap(dep_ptm(), indicate = input$umap_Indicate_ptm, if_square = input$umap_if_square_ptm, n_neighbors = input$umap_n_neighbors_ptm, features = "peptides")
-    })
-
-    Tsne_input_ptm <- reactive({
-      DEP2::plot_Tsne(dep_ptm(), indicate = input$Tsne_Indicate_ptm, if_square = input$Tsne_if_square_ptm, perplexity = input$Tsne_perplexity_ptm, theseed = input$Tsne_theseed_ptm, features = "peptides")
-    })
-
-    Pearson_correlation_input_ptm <- reactive({
-      DEP2::plot_cor(dep_ptm(), pal = input$Pearson_pal_ptm, pal_rev = input$Pearson_pal_rev_ptm, lower = input$Pearson_lower_ptm, upper = input$Pearson_upper_ptm, add_values = input$add_values_for_DEP_person_ptm, value_size = input$value_size_for_DEP_person_ptm, digits = input$value_digits_for_DEP_person_ptm)
-    })
-
-    meanSdPlot_input_ptm <- reactive({
-      DEP2::meanSdPlot(dep_ptm())
-    })
-
-    Gowers_distance_input_ptm <- reactive({
-      DEP2::plot_dist(dep_ptm(), pal = input$Gower_pal_ptm, pal_rev = input$Gower_pal_rev_ptm, add_values = input$add_values_for_DEP_gower_ptm, value_size = input$value_size_for_DEP_gower_ptm, digits = input$value_digits_for_DEP_gower_ptm)
-    })
-
-    Sample_CVs_input_ptm <- reactive({
-      DEP2::plot_cvs(dep_ptm())
-    })
-
-
-    norm_input_ptm <- reactive({
-      DEP2::plot_normalization(filt_ptm(),
-                               norm_ptm())
-    })
-
-    missval_input_ptm <- reactive({
-      DEP2::plot_missval(norm_ptm(),
-                         cluster_columns = input$cluster_columns_for_missval_heatmap_ptm,
-                         column_order = if(input$cluster_columns_for_missval_heatmap_ptm) {NULL} else {input$Custom_columns_order_for_missval_heatmap_ptm}
+      output$Save_RData_ptm <- downloadHandler(
+        filename = function() { paste("results", ".RData", sep = "") },
+        content = function(file) {
+          withProgress(message = 'Please wait ...', value = 0.66, {
+            data_ptm = data(); filt = filt_ptm(); norm = norm_ptm(); imp = imp_ptm(); dep = dep_ptm()
+            save(data_ptm, filt, norm, imp, dep, file=file)
+          })
+        }
       )
-    })
 
-    detect_input_ptm <- reactive({
-      DEP2::plot_detect(norm_ptm())
-    })
+      ## All object and functions upon 'Analyze' input  ### ----------------------
+      observeEvent(input$analyze_ptm, {
+        if(is.null(input$filt_ptm)) {
+          sendSweetAlert(
+            session = shiny::getDefaultReactiveDomain(),
+            title = "Note :",
+            text = "Your filter column is empty! If needed, please choose the filter columns. Otherwise, please ignore this message",
+            type = "info"
+          )
+        }
 
-    imputation_input_ptm <- reactive({
-      DEP2::plot_imputation(norm_ptm(),
-                            df_ptm())
-    })
+        # temp <- observe(dep_all_ptm())
+        ### Interactive UI functions ### ------------------------------------------
+        output$downloadTable_ptm <- renderUI({
+          selectizeInput(session$ns("dataset_ptm"),
+                         "Choose a dataset to save" ,
+                         c("results","significant_peptides",
+                           "displayed_subset","full_dataset"))
+        })
 
-    numbers_input_ptm <- reactive({
-      DEP2::plot_numbers(se = norm_ptm(), plot = TRUE, features_type = "peptides")
-    })
+        output$downloadButton_ptm <- renderUI({
+          downloadButton(session$ns('downloadData_ptm'), 'Save', class = "downloadData_ptm")
+        })
 
-    coverage_input_ptm <- reactive({
-      DEP2::plot_coverage(se = norm_ptm(), plot = TRUE, features_type = "peptides")
-    })
+        output$downloadButton_for_save_RData_ptm <- renderUI({
+          downloadButton(session$ns("Save_RData_ptm"), "save result RData", class = "Save_RData_ptm")
+        })
 
-    ### Output functions ### --------------------------------------------------
-    output$table_ptm <- DT::renderDataTable({
-      table_ptm()
-    }, options = list(pageLength = 25, scrollX = T),
-    selection = list(selected = c(1)))
+        output$significantBox_ptm <- renderInfoBox({
+          num_total <- dep_ptm() %>%
+            nrow()
+          num_signif <- dep_ptm() %>%
+            .[rowData(.)$significant, ] %>%
+            nrow()
+          frac <- num_signif / num_total
 
-    output$selected_plot_ptm <- renderPlot({
-      selected_plot_input_ptm()
-    })
+          if(frac > 0.2) {
+            info_box <- infoBox("Significant peptides",
+                                paste0(num_signif,
+                                       " out of ",
+                                       num_total),
+                                paste0("Too large fraction (",
+                                       signif(frac * 100, digits = 3),
+                                       "%) of peptides differentially expressed"),
+                                icon = icon("minus", lib = "glyphicon"),
+                                color = "orange",
+                                width = 4)
+          }
+          if(frac == 0) {
+            info_box <- infoBox("Significant peptides",
+                                paste0(num_signif,
+                                       " out of ",
+                                       num_total),
+                                "No peptides differentially expressed",
+                                icon = icon("thumbs-down", lib = "glyphicon"),
+                                color = "red",
+                                width = 4)
+          }
+          if(frac > 0 & frac <= 0.2) {
+            info_box <-     infoBox("Significant peptides",
+                                    paste0(num_signif,
+                                           " out of ",
+                                           num_total),
+                                    paste0(signif(frac * 100, digits = 3),
+                                           "% of peptides differentially expressed"),
+                                    icon = icon("thumbs-up", lib = "glyphicon"),
+                                    color = "green",
+                                    width = 4)
+          }
+          info_box
+        })
 
-    output$heatmap_ptm <- renderPlot({
-      print(heatmap_input_ptm())
-    })
+        output$select_ptm <- renderUI({
+          row_data <- rowData(dep_ptm())
+          cols <- grep("_significant", colnames(row_data))
+          names <- colnames(row_data)[cols]
+          names <- gsub("_significant", "", names)
+          selectizeInput(session$ns("select_ptm"),
+                         "Select direct comparisons",
+                         choices=names,
+                         multiple = TRUE)
+        })
 
-    # output$volcano_ptm <- renderPlot({
-    #   volcano_input_ptm()
-    # })
 
-    output$custom_volcano_ptm <- renderPlot({
-      custom_volcano_input_ptm()
-    })
+        output$exclude_ptm <- renderUI({
+          row_data <- rowData(dep_ptm())
+          cols <- grep("_significant", colnames(row_data))
+          names <- colnames(row_data)[cols]
+          names <- gsub("_significant","",names)
+          selectizeInput(session$ns("exclude_ptm"),
+                         "Exclude direct comparisons",
+                         choices = names,
+                         multiple = TRUE)
+        })
 
-    output$stastical_plot_ptm <- renderPlot({
-      stastical_plot_input()
-    })
 
-    output$norm_distribution_plot_ptm <- renderPlot({
-      norm_distribution_input_ptm()
+        output$heatmap_cntrst_ptm <- renderUI({
+          if (!is.null(selected_ptm())) {
+            df <- rowData(selected_ptm())
+            cols <- grep("_significant$",colnames(df))
+            selectizeInput(session$ns("heatmap_cntrst_ptm"),
+                           "Contrast",
+                           choices = gsub("_significant", "", colnames(df)[cols]), multiple = TRUE)
+          }
+        })
+
+
+        output$mysplit_ptm <- renderUI({
+          selectizeInput(session$ns("mysplit_ptm"),
+                         "my split",
+                         choices = c(1 : input$k_ptm), multiple = TRUE)
+
+        })
+
+        output$Custom_columns_order_ptm <- renderUI({
+          selectizeInput(session$ns("Custom_columns_order_ptm"),
+                         "Custom columns order",
+                         choices = colnames(assay(dep_ptm())), multiple = TRUE)
+
+        })
+
+        output$Custom_columns_order_for_missval_heatmap_ptm <- renderUI({
+          selectizeInput(session$ns("Custom_columns_order_for_missval_heatmap_ptm"),
+                         "Custom columns order",
+                         choices = colnames(assay(dep_ptm())), multiple = TRUE)
+        })
+
+
+        output$volcano_cntrst_ptm <- renderUI({
+          if (!is.null(selected_ptm())) {
+            df <- rowData(selected_ptm())
+            cols <- grep("_significant$",colnames(df))
+            selectizeInput(session$ns("volcano_cntrst_ptm"),
+                           label = "Contrast",
+                           choices = gsub("_significant", "", colnames(df)[cols]))
+          }
+        })
+
+        output$cntrst_norm_distribution_ptm <- renderUI({
+          if (!is.null(selected_ptm())) {
+            df <- rowData(selected_ptm())
+            cols <- grep("_significant$",colnames(df))
+            selectizeInput(session$ns("cntrst_norm_distribution_ptm"),
+                           "Contrast",
+                           choices = gsub("_significant", "", colnames(df)[cols]))
+          }
+        })
+
+
+        output$selected_proteins_ptm <- renderUI({
+          row_Data <- rowData(dep_ptm())
+          selectizeInput(session$ns("selected_proteins_ptm"),
+                         "selected peptides",
+                         choices = row_Data$name, selected = NULL, multiple = TRUE)
+        })
+
+        output$chooseToshow_ptm <- renderUI({
+          selectizeInput(session$ns("chooseToshow_ptm"),
+                         "selected peptides",
+                         choices = name_for_choose_ptm(), selected = NULL, multiple = TRUE)
+        })
+
+        output$plot_stat_contrasts <- renderUI({
+          selectInput(session$ns("plot_stat_contrasts"),
+                      "plot contrasts",
+                      choices = get_contrast(selected_ptm()),
+                      multiple = T,
+                      selected = get_contrast(selected_ptm()))
+        })
+
+        output$umap_n_neighbors_ptm <- renderUI({
+          cat("umap_n_neighbors")
+          sliderInput(inputId = session$ns("umap_n_neighbors_ptm"),"number of nearest neighbors",min=2,max=min(15,ncol(dep_ptm())),value=4)}
+        )
+
+        output$pca_top_n_ptm  <- renderUI(
+          sliderInput(inputId = session$ns("pca_top_n_ptm"),"number of top variable proteins to consider",min = 2, max = nrow(dep_ptm()), value=500)
+        )
+
+
+        output$Tsne_perplexity_ptm <- renderUI(
+          sliderInput(inputId = session$ns("Tsne_perplexity_ptm"),"perplexity",min=1,max= (ncol(dep_ptm())-1)/3 - 2^(-31) ,value=2)
+        )
+
+
+
+        ### Reactive functions ### ------------------------------------------------
+        name_for_choose_ptm <- reactive({
+          DEP2::get_signicant(selected_ptm(), contrasts = input$heatmap_cntrst_ptm, return_type = "names")
+        })
+
+        excluded_ptm <- reactive({
+          DEP2:::exclude_contrasts(dep_ptm(), input$exclude_ptm)
+        })
+
+        selected_ptm <- reactive({
+          DEP2:::select_contrasts(excluded_ptm(), input$select_ptm)
+        })
+
+        res_ptm <- reactive({
+          bbbb <<- selected_ptm()
+          PTM_get_results(selected_ptm())
+        })
+
+        table_ptm <- reactive({
+          aaaaa <<- res_ptm()
+          PTM_get_table(res_ptm(), input$pres_ptm)
+        })
+
+        #### plots ----
+        selected_plot_input_ptm <- reactive ({
+          if(!is.null(input$table_ptm_rows_selected)) {
+            selected_id <- table_ptm()[input$table_ptm_rows_selected,1]
+            DEP2::plot_single(selected_ptm(), selected_id, input$pres_ptm)
+          }
+        })
+
+        heatmap_input_ptm <- reactive({
+
+          withProgress(message = 'Plotting', value = 0.66, {
+            if(input$cluster_columns_ptm || is.null(input$Custom_columns_order_ptm) || length(input$Custom_columns_order_ptm) < 2) {
+              selected = selected_ptm()
+            } else {
+              cols <- input$Custom_columns_order_ptm
+              selected <- selected_ptm()[,cols]
+            }
+
+            DEP2::plot_heatmap(object = selected,
+                               type = input$pres_ptm,
+                               manual_contrast = input$heatmap_cntrst_ptm,
+                               kmeans = TRUE,
+                               k = input$k_ptm,
+                               color = input$colorbar_ptm,
+                               col_limit = input$limit_ptm,
+                               row_font_size = input$row_font_size_ptm,
+                               col_font_size = input$col_font_size_ptm,
+                               cluster_columns = input$cluster_columns_ptm,
+                               split_order = input$mysplit_ptm,
+                               label_few_peptide_rows = F,
+                               chooseToshow = input$chooseToshow_ptm,
+            )
+
+          })
+        })
+
+        custom_volcano_input_ptm <- reactive({
+          if(!is.null(input$volcano_cntrst_ptm)) {
+            withProgress(message = 'Plotting', value = 0.66, {
+              DEP2::plot_volcano(object = selected_ptm(),
+                                 contrast = input$volcano_cntrst_ptm,
+                                 add_threshold_line = input$threshold_method_ptm,
+                                 adjusted = ifelse(input$threshold_method_ptm == "intersect", input$P_adj_ptm, TRUE),
+                                 label_size = input$fontSize_ptm,
+                                 label_number = input$showNum_ptm,
+                                 label_trend = input$labelWay_ptm,
+                                 chooseTolabel = input$selected_proteins_ptm,
+                                 x_symmetry = input$Same_width_ptm,
+                                 fcCutoff = input$lfc_ptm,
+                                 pCutoff = input$p_ptm,
+                                 curvature = input$curvature_ptm,
+                                 x0_fold = input$x0_fold_ptm,
+                                 dot_size = input$dotsize_ptm,
+                                 highlight_PGs_with_few_peptides = F,
+                                 down_color = input$down_color_ptm,
+                                 stable_color = input$stable_color_ptm,
+                                 up_color = input$up_color_ptm,
+              )
+            })
+          }
+        })
+
+        stastical_plot_input <- reactive({
+          if(!is.null(input$plot_stat_contrasts)){
+
+            DEP2::plot_statistics(selected_ptm(), statistic = input$stastical_plot_x ,contrasts = input$plot_stat_contrasts)
+          }
+        })
+
+        norm_distribution_input_ptm <- reactive({
+          if(!is.null(input$cntrst_norm_distribution_ptm)){
+            DEP2::plot_norm_distribution(dep = dep_ptm(),
+                                         contrast=input$cntrst_norm_distribution_ptm)
+          }
+        })
+
+        pca_input_ptm <- reactive({
+          DEP2::plot_pca(object = dep_ptm(), indicate = input$Indicate_ptm, if_square = input$if_square_ptm, n = input$pca_top_n_ptm, features = "peptides")
+        })
+
+        umap_input_ptm <- reactive({
+          DEP2::plot_umap(dep_ptm(), indicate = input$umap_Indicate_ptm, if_square = input$umap_if_square_ptm, n_neighbors = input$umap_n_neighbors_ptm, features = "peptides")
+        })
+
+        Tsne_input_ptm <- reactive({
+          DEP2::plot_Tsne(dep_ptm(), indicate = input$Tsne_Indicate_ptm, if_square = input$Tsne_if_square_ptm, perplexity = input$Tsne_perplexity_ptm, theseed = input$Tsne_theseed_ptm, features = "peptides")
+        })
+
+        Pearson_correlation_input_ptm <- reactive({
+          DEP2::plot_cor(dep_ptm(), pal = input$Pearson_pal_ptm, pal_rev = input$Pearson_pal_rev_ptm, lower = input$Pearson_lower_ptm, upper = input$Pearson_upper_ptm, add_values = input$add_values_for_DEP_person_ptm, value_size = input$value_size_for_DEP_person_ptm, digits = input$value_digits_for_DEP_person_ptm)
+        })
+
+        meanSdPlot_input_ptm <- reactive({
+          DEP2::meanSdPlot(dep_ptm())
+        })
+
+        Gowers_distance_input_ptm <- reactive({
+          DEP2::plot_dist(dep_ptm(), pal = input$Gower_pal_ptm, pal_rev = input$Gower_pal_rev_ptm, add_values = input$add_values_for_DEP_gower_ptm, value_size = input$value_size_for_DEP_gower_ptm, digits = input$value_digits_for_DEP_gower_ptm)
+        })
+
+        Sample_CVs_input_ptm <- reactive({
+          DEP2::plot_cvs(dep_ptm())
+        })
+
+
+        norm_input_ptm <- reactive({
+          DEP2::plot_normalization(filt_ptm(),
+                                   norm_ptm())
+        })
+
+        missval_input_ptm <- reactive({
+          DEP2::plot_missval(norm_ptm(),
+                             cluster_columns = input$cluster_columns_for_missval_heatmap_ptm,
+                             column_order = if(input$cluster_columns_for_missval_heatmap_ptm) {NULL} else {input$Custom_columns_order_for_missval_heatmap_ptm}
+          )
+        })
+
+        detect_input_ptm <- reactive({
+          DEP2::plot_detect(norm_ptm())
+        })
+
+        imputation_input_ptm <- reactive({
+          DEP2::plot_imputation(norm_ptm(),
+                                df_ptm())
+        })
+
+        numbers_input_ptm <- reactive({
+          DEP2::plot_numbers(se = norm_ptm(), plot = TRUE, features_type = "peptides")
+        })
+
+        coverage_input_ptm <- reactive({
+          DEP2::plot_coverage(se = norm_ptm(), plot = TRUE, features_type = "peptides")
+        })
+
+        ### Output functions ### --------------------------------------------------
+        output$table_ptm <- DT::renderDataTable({
+          table_ptm()
+        }, options = list(pageLength = 25, scrollX = T),
+        selection = list(selected = c(1)))
+
+        output$selected_plot_ptm <- renderPlot({
+          selected_plot_input_ptm()
+        })
+
+        output$heatmap_ptm <- renderPlot({
+          print(heatmap_input_ptm())
+        })
+
+        # output$volcano_ptm <- renderPlot({
+        #   volcano_input_ptm()
+        # })
+
+        output$custom_volcano_ptm <- renderPlot({
+          custom_volcano_input_ptm()
+        })
+
+        output$stastical_plot_ptm <- renderPlot({
+          stastical_plot_input()
+        })
+
+        output$norm_distribution_plot_ptm <- renderPlot({
+          norm_distribution_input_ptm()
+        })
+
+        output$pca_ptm <- renderPlot({
+          pca_input_ptm()
+        })
+
+        output$umap_ptm <- renderPlot({
+          umap_input_ptm()
+        })
+
+        output$Tsne_ptm <- renderPlot({
+          Tsne_input_ptm()
+        })
+
+        output$Pearson_correlation_ptm <- renderPlot({
+          Pearson_correlation_input_ptm()
+        })
+
+        output$meanSdPlot_ptm <- renderPlot({
+          meanSdPlot_input_ptm()
+        })
+
+        output$Gowers_distance_ptm <- renderPlot({
+          Gowers_distance_input_ptm()
+        })
+
+        output$Sample_CVs_ptm <- renderPlot({
+          Sample_CVs_input_ptm()
+        })
+
+        output$norm_ptm <- renderPlot({
+          norm_input_ptm()
+        })
+
+        output$missval_ptm <- renderPlot({
+          missval_input_ptm()
+        })
+
+        output$detect_ptm <- renderPlot({
+          detect_input_ptm()
+        })
+
+        output$imputation_ptm <- renderPlot({
+          imputation_input_ptm()
+        })
+
+        output$numbers_ptm <- renderPlot({
+          numbers_input_ptm()
+        })
+
+        output$coverage_ptm <- renderPlot({
+          coverage_input_ptm()
+        })
+
+        observe({
+          output$plot_ptm <- renderUI({
+            plotOutput(session$ns("heatmap_ptm"), height = (100 * as.numeric(input$size_ptm)))
+          })
+        })
+
+        ### Download objects and functions ### ------------------------------------
+        datasetInput_ptm <- reactive({
+          switch(input$dataset_ptm,
+                 "results" = PTM_get_results(dep_ptm()),
+                 "significant_peptides" = PTM_get_results(
+                   dep_ptm()) %>%
+                   dplyr::filter(significant) %>%
+                   dplyr::select(-significant),
+                 "displayed_subset" = res_ptm() %>%
+                   dplyr::filter(significant) %>%
+                   dplyr::select(-significant),
+                 "full_dataset" = get_df_wide(dep_ptm()))
+        })
+
+        output$downloadData_ptm <- downloadHandler(
+          filename = function() { paste(input$dataset_ptm, ".txt", sep = "") },
+          content = function(file) {
+            write.table(datasetInput_ptm(),
+                        file,
+                        col.names = TRUE,
+                        row.names = FALSE,
+                        sep ="\t") }
+        )
+
+        output$downloadPlot_ptm <- downloadHandler(
+          filename = function() {
+            paste0("Barplot_", table_ptm()[input$table_ptm_rows_selected,1], ".pdf")
+          },
+          content = function(file) {
+            pdf(file, width = input$selected_plot_Width_ptm, height = input$selected_plot_Height_ptm)
+            print(selected_plot_input_ptm())
+            dev.off()
+          }
+        )
+
+        output$downloadHeatmap_ptm <- downloadHandler(
+          filename = 'Heatmap.pdf',
+          content = function(file) {
+            pdf(file, width = input$Width_ptm, height = input$Height_ptm)
+            print(heatmap_input_ptm())
+            dev.off()
+          }
+        )
+
+        output$downloadVolcano_ptm <- downloadHandler(
+          filename = function() {
+            paste0("Volcano_", input$volcano_cntrst_ptm, ".pdf")
+          },
+          content = function(file) {
+            pdf(file, width = input$Volcano_Width_ptm, height = input$Volcano_Height_ptm)
+            print(volcano_input_ptm())
+            dev.off()
+          }
+        )
+
+        output$download_custom_volcano_ptm <- downloadHandler(
+          filename = function() {
+            paste0("custom_Volcano_", input$volcano_cntrst_ptm, ".pdf")
+          },
+          content = function(file) {
+            pdf(file, width = input$custom_volcano_Width_ptm, height = input$custom_volcano_Height_ptm)
+            print(custom_volcano_input_ptm())
+            dev.off()
+          }
+        )
+
+        output$downloadstastical_plot_ptm <- downloadHandler(
+          filename = function() {
+            paste0("statistical_plot_", paste0(input$plot_stat_contrasts,collapse = "_"), ".pdf")
+          },
+          content = function(file) {
+            pdf(file, width = input$stastical_plot_Width_ptm, height = input$stastical_plot_Height_ptm)
+            print(stastical_plot_input())
+            dev.off()
+          }
+        )
+
+        output$download_norm_distribution_plot_ptm <- downloadHandler(
+          filename = 'norm_distribution.pdf',
+          content = function(file) {
+            pdf(file, width = input$norm_distribution_Width_ptm, height = input$norm_distribution_Height_ptm)
+            print(norm_distribution_input_ptm())
+            dev.off()
+          }
+        )
+
+        output$downloadPca_ptm <- downloadHandler(
+          filename = 'Pca.pdf',
+          content = function(file) {
+            pdf(file, width = input$pca_Width_ptm, height = input$pca_Height_ptm)
+            print(pca_input_ptm())
+            dev.off()
+          }
+        )
+
+        output$downloadUMAP_ptm <- downloadHandler(
+          filename = 'UMAP.pdf',
+          content = function(file) {
+            pdf(file, width = input$umap_Width_ptm, height = input$umap_Height_ptm)
+            print(umap_input_ptm())
+            dev.off()
+          }
+        )
+
+        output$downloadTSNE_ptm <- downloadHandler(
+          filename = 'TSNE.pdf',
+          content = function(file) {
+            pdf(file, width = input$Tsne_Width_ptm, height = input$Tsne_Height_ptm)
+            print(Tsne_input_ptm())
+            dev.off()
+          }
+        )
+
+        output$downloadmeanSdPlot_ptm <- downloadHandler(
+          filename = 'meanSdPlot.pdf',
+          content = function(file) {
+            pdf(file, width = input$meanSdPlot_Width_ptm, height = input$meanSdPlot_Height_ptm)
+            print(meanSdPlot_input_ptm())
+            dev.off()
+          }
+        )
+
+        output$download_Pearson_correlation_ptm <- downloadHandler(
+          filename = 'Pearson_correlation.pdf',
+          content = function(file) {
+            pdf(file, width = input$Pearson_Width_ptm, height = input$Pearson_Height_ptm)
+            print(Pearson_correlation_input_ptm())
+            dev.off()
+          }
+        )
+
+        output$download_Gowers_distance_ptm <- downloadHandler(
+          filename = 'Gowers_distance.pdf',
+          content = function(file) {
+            pdf(file, width = input$Gower_Width_ptm, height = input$Gower_Height_ptm)
+            print(Gowers_distance_input_ptm())
+            dev.off()
+          }
+        )
+
+        output$download_Sample_CVs_ptm <- downloadHandler(
+          filename = 'Sample_CVs.pdf',
+          content = function(file) {
+            pdf(file, width = input$Sample_CVs_Width_ptm, height = input$Sample_CVs_Height_ptm)
+            print(Sample_CVs_input_ptm())
+            dev.off()
+          }
+        )
+
+        output$downloadNorm_ptm <- downloadHandler(
+          filename = "normalization.pdf",
+          content = function(file) {
+            pdf(file, width = input$norm_Width_ptm, height = input$norm_Height_ptm)
+            print(norm_input_ptm())
+            dev.off()
+          }
+        )
+
+        output$downloadMissval_ptm <- downloadHandler(
+          filename = "missing_values_heatmap.pdf",
+          content = function(file) {
+            pdf(file, width = input$missval_heatmap_Width_ptm, height = input$missval_heatmap_Height_ptm)
+            print(missval_input_ptm())
+            dev.off()
+          }
+        )
+
+        output$downloadDetect_ptm <- downloadHandler(
+          filename = "missing_values_quant.pdf",
+          content = function(file) {
+            pdf(file, width = input$detect_Width_ptm, height = input$detect_Height_ptm)
+            gridExtra::grid.arrange(detect_input_ptm())
+            dev.off()
+          }
+        )
+
+        output$downloadImputation_ptm <- downloadHandler(
+          filename = "imputation.pdf",
+          content = function(file) {
+            pdf(file, width = input$imputation_Width_ptm, height = input$imputation_Height_ptm)
+            print(imputation_input_ptm())
+            dev.off()
+          }
+        )
+
+        output$downloadNumbers_ptm <- downloadHandler(
+          filename = "numbers.pdf",
+          content = function(file) {
+            pdf(file, width = input$numbers_Width_ptm, height = input$numbers_Height_ptm)
+            print(numbers_input_ptm())
+            dev.off()
+          }
+        )
+
+        output$downloadCoverage_ptm <- downloadHandler(
+          filename = "coverage.pdf",
+          content = function(file) {
+            pdf(file, width = input$coverage_Width_ptm, height = input$coverage_Height_ptm)
+            print(coverage_input_ptm())
+            dev.off()
+          }
+
+        )
       })
-
-    output$pca_ptm <- renderPlot({
-      pca_input_ptm()
-    })
-
-    output$umap_ptm <- renderPlot({
-      umap_input_ptm()
-    })
-
-    output$Tsne_ptm <- renderPlot({
-      Tsne_input_ptm()
-    })
-
-    output$Pearson_correlation_ptm <- renderPlot({
-      Pearson_correlation_input_ptm()
-    })
-
-    output$meanSdPlot_ptm <- renderPlot({
-      meanSdPlot_input_ptm()
-    })
-
-    output$Gowers_distance_ptm <- renderPlot({
-      Gowers_distance_input_ptm()
-    })
-
-    output$Sample_CVs_ptm <- renderPlot({
-      Sample_CVs_input_ptm()
-    })
-
-    output$norm_ptm <- renderPlot({
-      norm_input_ptm()
-    })
-
-    output$missval_ptm <- renderPlot({
-      missval_input_ptm()
-    })
-
-    output$detect_ptm <- renderPlot({
-      detect_input_ptm()
-    })
-
-    output$imputation_ptm <- renderPlot({
-      imputation_input_ptm()
-    })
-
-    output$numbers_ptm <- renderPlot({
-      numbers_input_ptm()
-    })
-
-    output$coverage_ptm <- renderPlot({
-      coverage_input_ptm()
-    })
-
-    observe({
-      output$plot_ptm <- renderUI({
-        plotOutput(session$ns("heatmap_ptm"), height = (100 * as.numeric(input$size_ptm)))
-      })
-    })
-
-    ### Download objects and functions ### ------------------------------------
-    datasetInput_ptm <- reactive({
-      switch(input$dataset_ptm,
-             "results" = PTM_get_results(dep_ptm()),
-             "significant_peptides" = PTM_get_results(
-              dep_ptm()) %>%
-               dplyr::filter(significant) %>%
-               dplyr::select(-significant),
-             "displayed_subset" = res_ptm() %>%
-               dplyr::filter(significant) %>%
-               dplyr::select(-significant),
-             "full_dataset" = get_df_wide(dep_ptm()))
-    })
-
-    output$downloadData_ptm <- downloadHandler(
-      filename = function() { paste(input$dataset_ptm, ".txt", sep = "") },
-      content = function(file) {
-        write.table(datasetInput_ptm(),
-                    file,
-                    col.names = TRUE,
-                    row.names = FALSE,
-                    sep ="\t") }
-    )
-
-    output$downloadPlot_ptm <- downloadHandler(
-      filename = function() {
-        paste0("Barplot_", table_ptm()[input$table_ptm_rows_selected,1], ".pdf")
-      },
-      content = function(file) {
-        pdf(file, width = input$selected_plot_Width_ptm, height = input$selected_plot_Height_ptm)
-        print(selected_plot_input_ptm())
-        dev.off()
-      }
-    )
-
-    output$downloadHeatmap_ptm <- downloadHandler(
-      filename = 'Heatmap.pdf',
-      content = function(file) {
-        pdf(file, width = input$Width_ptm, height = input$Height_ptm)
-        print(heatmap_input_ptm())
-        dev.off()
-      }
-    )
-
-    output$downloadVolcano_ptm <- downloadHandler(
-      filename = function() {
-        paste0("Volcano_", input$volcano_cntrst_ptm, ".pdf")
-      },
-      content = function(file) {
-        pdf(file, width = input$Volcano_Width_ptm, height = input$Volcano_Height_ptm)
-        print(volcano_input_ptm())
-        dev.off()
-      }
-    )
-
-    output$download_custom_volcano_ptm <- downloadHandler(
-      filename = function() {
-        paste0("custom_Volcano_", input$volcano_cntrst_ptm, ".pdf")
-      },
-      content = function(file) {
-        pdf(file, width = input$custom_volcano_Width_ptm, height = input$custom_volcano_Height_ptm)
-        print(custom_volcano_input_ptm())
-        dev.off()
-      }
-    )
-
-    output$downloadstastical_plot_ptm <- downloadHandler(
-      filename = function() {
-        paste0("statistical_plot_", paste0(input$plot_stat_contrasts,collapse = "_"), ".pdf")
-      },
-      content = function(file) {
-        pdf(file, width = input$stastical_plot_Width_ptm, height = input$stastical_plot_Height_ptm)
-        print(stastical_plot_input())
-        dev.off()
-      }
-    )
-
-    output$download_norm_distribution_plot_ptm <- downloadHandler(
-      filename = 'norm_distribution.pdf',
-      content = function(file) {
-        pdf(file, width = input$norm_distribution_Width_ptm, height = input$norm_distribution_Height_ptm)
-        print(norm_distribution_input_ptm())
-        dev.off()
-      }
-    )
-
-    output$downloadPca_ptm <- downloadHandler(
-      filename = 'Pca.pdf',
-      content = function(file) {
-        pdf(file, width = input$pca_Width_ptm, height = input$pca_Height_ptm)
-        print(pca_input_ptm())
-        dev.off()
-      }
-    )
-
-    output$downloadUMAP_ptm <- downloadHandler(
-      filename = 'UMAP.pdf',
-      content = function(file) {
-        pdf(file, width = input$umap_Width_ptm, height = input$umap_Height_ptm)
-        print(umap_input_ptm())
-        dev.off()
-      }
-    )
-
-    output$downloadTSNE_ptm <- downloadHandler(
-      filename = 'TSNE.pdf',
-      content = function(file) {
-        pdf(file, width = input$Tsne_Width_ptm, height = input$Tsne_Height_ptm)
-        print(Tsne_input_ptm())
-        dev.off()
-      }
-    )
-
-    output$downloadmeanSdPlot_ptm <- downloadHandler(
-      filename = 'meanSdPlot.pdf',
-      content = function(file) {
-        pdf(file, width = input$meanSdPlot_Width_ptm, height = input$meanSdPlot_Height_ptm)
-        print(meanSdPlot_input_ptm())
-        dev.off()
-      }
-    )
-
-    output$download_Pearson_correlation_ptm <- downloadHandler(
-      filename = 'Pearson_correlation.pdf',
-      content = function(file) {
-        pdf(file, width = input$Pearson_Width_ptm, height = input$Pearson_Height_ptm)
-        print(Pearson_correlation_input_ptm())
-        dev.off()
-      }
-    )
-
-    output$download_Gowers_distance_ptm <- downloadHandler(
-      filename = 'Gowers_distance.pdf',
-      content = function(file) {
-        pdf(file, width = input$Gower_Width_ptm, height = input$Gower_Height_ptm)
-        print(Gowers_distance_input_ptm())
-        dev.off()
-      }
-    )
-
-    output$download_Sample_CVs_ptm <- downloadHandler(
-      filename = 'Sample_CVs.pdf',
-      content = function(file) {
-        pdf(file, width = input$Sample_CVs_Width_ptm, height = input$Sample_CVs_Height_ptm)
-        print(Sample_CVs_input_ptm())
-        dev.off()
-      }
-    )
-
-    output$downloadNorm_ptm <- downloadHandler(
-      filename = "normalization.pdf",
-      content = function(file) {
-        pdf(file, width = input$norm_Width_ptm, height = input$norm_Height_ptm)
-        print(norm_input_ptm())
-        dev.off()
-      }
-    )
-
-    output$downloadMissval_ptm <- downloadHandler(
-      filename = "missing_values_heatmap.pdf",
-      content = function(file) {
-        pdf(file, width = input$missval_heatmap_Width_ptm, height = input$missval_heatmap_Height_ptm)
-        print(missval_input_ptm())
-        dev.off()
-      }
-    )
-
-    output$downloadDetect_ptm <- downloadHandler(
-      filename = "missing_values_quant.pdf",
-      content = function(file) {
-        pdf(file, width = input$detect_Width_ptm, height = input$detect_Height_ptm)
-        gridExtra::grid.arrange(detect_input_ptm())
-        dev.off()
-      }
-    )
-
-    output$downloadImputation_ptm <- downloadHandler(
-      filename = "imputation.pdf",
-      content = function(file) {
-        pdf(file, width = input$imputation_Width_ptm, height = input$imputation_Height_ptm)
-        print(imputation_input_ptm())
-        dev.off()
-      }
-    )
-
-    output$downloadNumbers_ptm <- downloadHandler(
-      filename = "numbers.pdf",
-      content = function(file) {
-        pdf(file, width = input$numbers_Width_ptm, height = input$numbers_Height_ptm)
-        print(numbers_input_ptm())
-        dev.off()
-      }
-    )
-
-    output$downloadCoverage_ptm <- downloadHandler(
-      filename = "coverage.pdf",
-      content = function(file) {
-        pdf(file, width = input$coverage_Width_ptm, height = input$coverage_Height_ptm)
-        print(coverage_input_ptm())
-        dev.off()
-      }
-
-    )
-  })
 
 
       ###"question for DEP-PTM"
-        observeEvent(input$help_format_DEP_ptm, {
-          showModal(modalDialog(
-            title = "Format specifications for DEP-PTM",
-            includeMarkdown(system.file("extdata", "DEP_PTM.md", package = "DEP2")),
-            h4("Example:"),
-            tags$img(
-              src = base64enc::dataURI(file = system.file("extdata", "DEP_PTM.png", package = "DEP2"), mime = "image/png"),
-              width = 750
-            ),
-            easyClose = TRUE,
-            footer = NULL,
-            size = "l"
-          ))
-        })
-        ### help imputation for ptm
-        observeEvent(input$help_imputation_ptm, {
-          showModal(modalDialog(
-            title = "The detailed information of imputation methods",
-            includeMarkdown(system.file("extdata", "impute.md", package = "DEP2")),
-            easyClose = TRUE,
-            footer = NULL,
-            size = "l"
-          ))
-        })
+      observeEvent(input$help_format_DEP_ptm, {
+        showModal(modalDialog(
+          title = "Format specifications for DEP-PTM",
+          # includeMarkdown(system.file("extdata", "DEP_PTM.md", package = "DEP2")),
+          includeMarkdown("www/DEP_ptm.md"),
+          # h4("Example:"),
+          # tags$img(
+          #   src = base64enc::dataURI(file = system.file("extdata", "DEP_PTM.png", package = "DEP2"), mime = "image/png"),
+          #   width = 750
+          # ),
+          easyClose = TRUE,
+          footer = NULL,
+          size = "l"
+        ))
+      })
 
-        return(df_ptm)
+      ### help imputation for ptm
+      observeEvent(input$help_imputation_ptm, {
+        showModal(modalDialog(
+          title = "The detailed information of imputation methods",
+          # includeMarkdown(system.file("extdata", "impute.md", package = "DEP2")),
+          includeMarkdown("www/impute.md"),
+          easyClose = TRUE,
+          footer = NULL,
+          size = "l"
+        ))
+      })
+
+      return(df_ptm)
 
       # },
       # ignoreNULL = TRUE,
@@ -2404,6 +2268,6 @@ DEP_ptm_server_module <- function(id, Omics_res){
 
 
     })
-  }
+}
 
 
