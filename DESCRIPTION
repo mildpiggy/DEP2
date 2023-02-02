@@ -14,8 +14,7 @@ Description: DEP2 provides an comprehensive analysis workflow for mass spectrome
     timecourse cluster and protein-protein interaction network. DEP2 also contains an easy-used shiny application designed under modularization.
 License: GPL (>= 3)
 Encoding: UTF-8
-LazyData: true
-LazyDataCompression: xz
+LazyData: false
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Suggests: 
@@ -41,3 +40,4 @@ VignetteBuilder: knitr
 Depends: 
     R (>= 4.1.0),
     SummarizedExperiment (>= 1.11.5)
+Config/build/clean-inst-doc: FALSE
