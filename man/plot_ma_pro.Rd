@@ -61,6 +61,9 @@ The fontsize of \code{labels_intgenes}}
 \item{labels_repel}{Logical, whether to use \code{geom_text_repel} for placing the
 labels on the features to mark}
 }
+\value{
+A ggplot object
+}
 \description{
 Plot MA-plot for a differential test result.
 }

@@ -56,6 +56,7 @@ based on a single data.frame.
 }
 \examples{
 # Load example
+data(Silicosis_pg)
 data <- Silicosis_pg
 data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 

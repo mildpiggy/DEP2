@@ -19,6 +19,7 @@ of the supplied words.
 }
 \examples{
 # Load example
+data(Silicosis_pg)
 data <- Silicosis_pg
 names <- grep("LFQ.", colnames(data), value = TRUE)
 

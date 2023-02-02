@@ -15,3 +15,17 @@ a histogram plot of row coefficient of variation (standard deviation / mean) in 
 \description{
 Plot sample coefficient of variation whitin group
 }
+\examples{
+data(Silicosis_pg)
+data <- Silicosis_pg
+data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
+
+# Differential test
+ecols <- grep("LFQ.", colnames(data_unique))
+se <- make_se_parse(data_unique, ecols,mode = "delim")
+filt <- filter_se(se, thr = 0, fraction = 0.4, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
+norm <- normalize_vsn(filt)
+imputed <- impute(norm, fun = "MinProb", q = 0.05)
+plot_cvs(imputed)
+
+}

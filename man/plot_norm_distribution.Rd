@@ -17,3 +17,19 @@ A histogram plot with a normal curve
 \description{
 Plot the fit normal for log2 fold change
 }
+\examples{
+# Load example
+data(Silicosis_pg)
+data <- Silicosis_pg
+data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
+
+# Differential test
+ecols <- grep("LFQ.", colnames(data_unique))
+se <- make_se_parse(data_unique, ecols,mode = "delim")
+filt <- filter_se(se, thr = 0, fraction = 0.4, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
+norm <- normalize_vsn(filt)
+imputed <- impute(norm, fun = "MinProb", q = 0.05)
+diff <- test_diff(imputed, type = "control", control  = c("PBS"), fdr.type = "Storey's qvalue")
+plot_norm_distribution(diff, contrast = "W4_vs_PBS")
+
+}

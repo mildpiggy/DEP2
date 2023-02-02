@@ -16,6 +16,7 @@ Character, the existing contrast(s) in object, which is introduced in the test_d
 Get contrast(s) from SummarizedExperiment or DEGdata
 }
 \examples{
+data(Silicosis_pg)
 data <- Silicosis_pg
 data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 # Make SummarizedExperiment

@@ -28,17 +28,16 @@ of all conditions for input objects, e.g. before and after normalization.
 }
 \examples{
 # Load example
-data <- UbiLength
-data <- data[data$Reverse != "+" & data$Potential.contaminant != "+",]
+data(Silicosis_pg)
+data <- Silicosis_pg
 data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 
-# Make SummarizedExperiment
-columns <- grep("LFQ.", colnames(data_unique))
-exp_design <- UbiLength_ExpDesign
-se <- make_se(data_unique, columns, exp_design)
+# Construct SE
+ecols <- grep("LFQ.", colnames(data_unique))
+se <- make_se_parse(data_unique, ecols,mode = "delim")
 
-# Filter and normalize
-filt <- filter_missval(se, thr = 0)
+# Filter and normalization
+filt <- filter_se(se, thr = 0, fraction = 0.4, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
 norm <- normalize_vsn(filt)
 
 # Plot normalization

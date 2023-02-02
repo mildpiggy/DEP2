@@ -31,6 +31,7 @@ based on two data.frames: the protein table and experimental design.
 }
 \examples{
 # Load example
+data(Silicosis_pg)
 data <- Silicosis_pg
 data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 

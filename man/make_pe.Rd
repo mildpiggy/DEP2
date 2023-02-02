@@ -43,6 +43,7 @@ data(Silicosis_peptide)
 # Exctract Intensity columns
 (ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T))
 (expDesign = Silicosis_ExpDesign)
+
 # Construct a QFeatures object, with a 'peptideRaw' assay
 pe_peptides <- make_pe(Silicosis_peptide, columns = ecols,   # columns is the abundance columns
                        expdesign = expDesign) # log2transform

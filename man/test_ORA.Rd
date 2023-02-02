@@ -37,3 +37,31 @@ A enrichResult or compareClusterResult object according by_contrast.
 \description{
 Enrich biological functions on significant candidate via a over representation analysis.
 }
+\examples{
+\dontrun{
+# Load example
+data(Silicosis_pg)
+data <- Silicosis_pg
+data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
+
+# Make SummarizedExperiment
+ecols <- grep("LFQ.", colnames(data_unique))
+se <- make_se_parse(data_unique, ecols,mode = "delim")
+
+# Filter and normalize
+filt <- filter_se(se, thr = 0, fraction = 0.4, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
+norm <- normalize_vsn(filt)
+
+# Impute missing values using different functions
+imputed <- impute(norm, fun = "MinProb", q = 0.05)
+
+# Test for differentially expressed proteins
+diff <- test_diff(imputed, type = "control", control  = c("PBS"), fdr.type = "Storey's qvalue")
+dep <- add_rejections(diff, alpha = 0.01,lfc = 2)
+
+# GO enrichment
+check_organismDB_depends(organism = "Mouse") # check annotation package of Mouse
+res_ora <- test_ORA(dep, contrasts = "W4_vs_PBS", species = "Mouse",type = "GO")
+enrichplot::dotplot(res_ora)
+}
+}

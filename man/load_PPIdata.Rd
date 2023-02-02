@@ -9,8 +9,14 @@ load_PPIdata(speciesname, STRING.version = "11.5", STRINGdata_path = NULL)
 \arguments{
 \item{speciesname}{Species name.}
 
+\item{STRING.version}{character(1), STRING dataset version, default is "11.5".}
+
 \item{STRINGdata_path}{NULL or a selected path. Recommend NULL.}
 }
 \description{
 Check and load a local STRING data. If local file do not exist, will try to download from \href{http://stringdb-static.org/download/}{STRING}.
+}
+\examples{
+# Load STRING data. If local STRING is missing, PPI_res will download to system.file("PPIdata", "Mouse",package = "DEP2")
+load_PPIdata(speciesname = "Mouse")
 }

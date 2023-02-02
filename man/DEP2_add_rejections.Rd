@@ -38,6 +38,7 @@ annotated with logical columns indicating significant proteins.
 \examples{
 \dontrun{
 # For proteomics data -----
+data(Silicosis_pg)
 data <- Silicosis_pg
 data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 
@@ -56,17 +57,23 @@ dep <- add_rejections(diff, alpha = 0.05, lfc = 1)
 dep <- add_rejections(diff, me)
 
 # For peptide workflow -----
-data <- Silicosis_peptide
+## Load example peptide data
+data(Silicosis_peptide)
 ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T)
-pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = T, log2transform = T)
+
+## construct QFeatures object
+pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = T, log2transform = T,mode = "delim")
 filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
 imp_pe <- QFeatures::addAssay(filt_pe, DEP2::impute(filt_pe[["peptideRaw"]], fun = "MinDet"), name = "peptideImp")
-
 norm_pe <- DEP2:::normalize_pe(imp_pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
-protein_pe <- DEP2::aggregate_pe(norm_pe, fcol = "Proteins", peptide_assay_name = "peptideNorm")
 
+## Summarize peptide value to protein quantity
+protein_pe <- DEP2::aggregate_pe(norm_pe, fcol = "Proteins", peptide_assay_name = "peptideNorm")
+class(protein_pe)
+
+## Construct a SE object
 SE_pep <- pe2se(protein_pe)
-# Test for differentially expressed proteins
+## Test for differentially expressed proteins
 diff_pep <- DEP2::test_diff(SE_pep,type = "control", control = "PBS", fdr.type = "Strimmer's qvalue(t)")
 dep_pep <- add_rejections(diff_pep)
 }

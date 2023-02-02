@@ -64,8 +64,10 @@ Expression pattern clustering for timecourse or multi-group experiment via
 }
 \examples{
 # Load sample
+data(Silicosis_pg)
 data <- Silicosis_pg
 data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
+
 # Make SummarizedExperiment
 ecols <- grep("LFQ.", colnames(data_unique))
 se <- make_se_parse(data_unique, ecols, mode = "delim", sep = "_")

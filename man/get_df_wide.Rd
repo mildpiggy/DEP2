@@ -29,7 +29,7 @@ se <- make_se_parse(data_unique, ecols, mode = "delim", sep = "_")
 filt <- filter_se(se, thr = 0, fraction = 0.4, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
 norm <- normalize_vsn(filt)
 imputed <- impute(norm, fun = "MinDet")
-diff <- DEP2::test_diff(imputed,type = "control", control = "PBS")
+diff <- test_diff(imputed,type = "control", control = "PBS")
 dep <- add_rejections(diff)
 get_df_wide(dep)
 

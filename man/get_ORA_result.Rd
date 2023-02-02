@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions_enrichment.R
 \name{get_ORA_result}
 \alias{get_ORA_result}
-\title{Extract significant enrichment base on giving threshold}
+\title{Extract significant enrichment terms base on giving threshold}
 \usage{
 get_ORA_result(
   ORA_enrichment,
@@ -21,9 +21,11 @@ get_ORA_result(
 
 \item{pvalueCutoff}{Numeric(1), the p.value cutoff on enrichment result}
 
-\item{qvalueCutoff}{Numeric(1), The qvalue cutoff on enrichment tests}
+\item{qvalueCutoff}{Numeric(1), the qvalue cutoff on enrichment tests}
 
-\item{simplify}{Logical(1), if simplify GO terms by}
+\item{simplify}{Logical(1), if simplify GO terms by \code{\link[clusterProfiler]{simplify}}}
+
+\item{simplify.cutoff}{Numeric(1), the cutoff value transmitted to  \code{\link[clusterProfiler]{simplify}}}
 
 \item{return_table}{Logical(1), if true return a enrichResult or a result table}
 
@@ -34,5 +36,25 @@ A enrichResult/compareClusterResult of significant enrichment,
 or a result table of the significant enrichment if return_table is TRUE.
 }
 \description{
-\code{get_ORA_result} perform a
+\code{get_ORA_result} filter the enrichment result
+from \code{test_ORA} though certain threshold.
+}
+\examples{
+\dontrun{
+# Load example
+data(Silicosis_pg)
+data <- Silicosis_pg
+data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
+
+# Differential test
+ecols <- grep("LFQ.", colnames(data_unique))
+se <- make_se_parse(data_unique, ecols,mode = "delim")
+filt <- filter_se(se, thr = 0, fraction = 0.4, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
+norm <- normalize_vsn(filt)
+imputed <- impute(norm, fun = "MinProb", q = 0.05)
+diff <- test_diff(imputed, type = "control", control  = c("PBS"), fdr.type = "Storey's qvalue")
+
+res_ora <- test_ORA(dep, contrasts = "W4_vs_PBS", species = "Mouse",type = "GO")
+res_ora2 <- get_ORA_result(res_ora)
+}
 }

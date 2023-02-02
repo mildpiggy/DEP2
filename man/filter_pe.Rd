@@ -50,8 +50,10 @@ The dataset is filtered for proteins that have a maximum of
 or a filter_formula
 }
 \examples{
-data <- Silicosis_peptide
+# Load example peptide data
+data(Silicosis_peptide)
 ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = TRUE)
+
 # Construct a QFeatures object, with a 'peptideRaw' assay
 pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = TRUE, log2transform = TRUE,mode = "delim")
 filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )

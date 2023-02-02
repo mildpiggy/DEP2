@@ -50,6 +50,7 @@ or a filter_formula
 }
 \examples{
 # Load example
+data(Silicosis_pg)
 data <- Silicosis_pg
 data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 

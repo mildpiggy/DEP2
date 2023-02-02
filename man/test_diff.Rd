@@ -57,6 +57,7 @@ using \code{"Strimmer's qvalue"}, \code{"Benjamini-Hochberg fdr"} or \code{"Stor
 }
 \examples{
 # Load example
+data(Silicosis_pg)
 data <- Silicosis_pg
 data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 

@@ -26,12 +26,18 @@ Normalize a QFeatures object though \link[QFeatures:QFeatures-processing]{QFeatu
 }
 \examples{
 \dontrun{
-#' data <- Silicosis_peptide
+# Load example peptide data
+data(Silicosis_peptide)
 ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T)
+
+# Construct QFeature object
 pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = T, log2transform = T,mode = "delim")
+
+# Filter, imputation
 filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
 imp_pe <- QFeatures::addAssay(filt_pe, DEP2::impute(filt_pe[["peptideRaw"]], fun = "MinDet"), name = "peptideImp")
 
+# Normalization
 norm_pe <- normalize_pe(imp_pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
 }
 }

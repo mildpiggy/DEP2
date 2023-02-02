@@ -42,8 +42,11 @@ ecols <- grep("LFQ.intensity.", colnames(unique_pg))
 
 ## Construct SE
 ### 1. import a experiment design table.
-expdesign <- read.delim("../inst/example/Silicosis_expdesign.txt")
+data(Silicosis_ExpDesign)
+expdesign <- Silicosis_ExpDesign
+# expdesign <- read.delim(system.file("extdata/Silicosis_expdesign.txt", package="DEP2"))
 head(expdesign,6) # the example experiment design
+
 se_pg <- DEP2::make_se(unique_pg, columns = ecols, expdesign = expdesign, 
                        log2transform = T)
 class(se_pg)
@@ -129,7 +132,7 @@ imp_pg_RF <- DEP2::impute(norm_pg_sample, fun = "RF", ntree = 50, mtry = 5)
 
 ## Impute missing data using Gibbs
 imp_pg_GSimp <- DEP2::impute(norm_pg_sample, fun = "GSimp", hi_q = 0.1,
-                       iters_each=40, iters_all=8) 
+                       iters_each=40, iters_all=8)
 
 ## Impute missing data using QRILC
 imp_pg_QRILC <- DEP2::impute(norm_pg_sample, fun = "QRILC") 
@@ -373,13 +376,13 @@ tc_ptm$ht
 ## The cluster result table
 tc_ptm$res %>% head
 
-## ----PPI1,warning=FALSE,eval=TRUE---------------------------------------------
+## ----PPI1,warning=FALSE,eval=TRUE,message=FALSE-------------------------------
 # Check required packages for network construction.
 check_PPI_depends()
 # Load STRING data. If local STRING is missing, PPI_res will download to system.file("PPIdata", "Mouse",package = "DEP2")
 load_PPIdata(speciesname = "Mouse") 
 
-## Load STRING data and perform PPI analysis. If local STRING is missing, PPI_res will download to system.file("PPIdata",package = "DEP2")
+# Load STRING data and perform PPI analysis. If local STRING is missing, PPI_res will download to system.file("PPIdata",package = "DEP2")
 PPI_res <- test_PPI(
   dep_pg,
   contrasts = "W4_vs_PBS",
@@ -388,7 +391,7 @@ PPI_res <- test_PPI(
   score_cutoff = 400
 )
 
-## igraph network
+# igraph network
 PPI_ig <- PPInetwork(PPI_res,returntype = "igraph")
 igraph::plot.igraph(PPI_ig)
 

@@ -13,9 +13,10 @@ ID_transform(
 )
 }
 \arguments{
-\item{x}{SummarizedExperiment object from \code{\link{make_se}()}) or \code{\link{make_pe}()}), or a DEGdata object from \code{\link{test_diff_deg}()}).}
+\item{x}{SummarizedExperiment object from \code{\link{make_se}()}) or \code{\link{make_pe}()}),
+or a DEGdata object from \code{\link{test_diff_deg}()}).}
 
-\item{from_columns}{Character(), the origin ID from one of "rownames" or colnames of \code{rowData(x)}}
+\item{from_columns}{Character(), the origin ID from one of "rownames" or column of \code{rowData(x)}}
 
 \item{fromtype}{Character(1), the type of origin ID, e.g. "ENSEMBEL", "SYMBOL", "UNIPROT", "ENTREZID".}
 
@@ -34,4 +35,20 @@ Rownames of object are replaced according replace_rowname.
 Transform ID for SummarizedExperiment or DEGdata according origin ID.
 The annotation package of certain species must be installed. Using \code{annoSpecies_df}
 to check species names and
+}
+\examples{
+\dontrun{
+data(Silicosis_pg)
+data <- Silicosis_pg
+data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
+ecols <- grep("LFQ.", colnames(data_unique))
+se <- make_se_parse(data_unique, ecols,mode = "delim")
+
+## transform uniport ID
+check_organismDB_depends(organism = "Mouse") # check annotation package of Mouse
+head(rowData(se)$ID)
+se2 <- ID_transform(se,from_columns = "ID",fromtype = "UNIPROT",species = "Mouse")
+head(rowData(se2)$SYMBOL)
+head(rownames(se2))
+}
 }

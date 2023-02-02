@@ -45,3 +45,31 @@ The local STRING data (including protein.info, protein.aliases and protein.links
 If it is absent, \code{test_PPI} will download from \href{http://stringdb-static.org/download/}{STRING} automatically according
 \code{species} and \code{STRING.version}.
 }
+\examples{
+\dontrun{
+# Load example
+data(Silicosis_pg)
+data <- Silicosis_pg
+data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
+
+# Differential test
+ecols <- grep("LFQ.", colnames(data_unique))
+se <- make_se_parse(data_unique, ecols,mode = "delim")
+filt <- filter_se(se, thr = 0, fraction = 0.4, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
+norm <- normalize_vsn(filt)
+imputed <- impute(norm, fun = "MinProb", q = 0.05)
+diff <- test_diff(imputed, type = "control", control  = c("PBS"), fdr.type = "Storey's qvalue")
+dep <- add_rejections(diff, alpha = 0.01,lfc = 2)
+
+# PPI construct
+if(check_PPI_depends()){
+
+  # Load STRING data. If local STRING is missing, PPI_res will download to system.file("PPIdata", "Mouse",package = "DEP2")
+  load_PPIdata(speciesname = "Mouse")
+
+  PPI_res <- test_PPI(dep, contrasts = "W4_vs_PBS", species = "Mouse",
+                      STRING.version = "11.5",score_cutoff = 400)
+  head(PPI_res)
+}
+}
+}
