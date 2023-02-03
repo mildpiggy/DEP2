@@ -62,7 +62,13 @@ assign(".PostModule", initialized_postmod, envir = get_DEPglobal_env())
 
 # Define UI
 ui <- navbarPage(
-  title = "DEP2",
+  title = div(
+    # "DEP2 ",
+    img(src = "logo.png",
+        id = "logo", height = "48px",width = "50",
+        style = "position: relative; margin:-18px 12px; display:right-align;")
+  ),
+  windowTitle = "DEP2-app",
   theme = shinythemes::shinytheme("spacelab"),
   id = "DEPnavbar",
   selected = "Welcome",
@@ -84,14 +90,20 @@ ui <- navbarPage(
   ## add mod button
   tags$script(
     HTML("var header = $('.navbar > .container-fluid');
-                              header.append('<div style=\"float:right; padding-top: 8px\"><button id=\"addmod\" type=\"button\" class=\"btn btn-primary action-button\" onclick=\"AddModule()\">Add module</button></div>')")
+                              header.append('<div style=\"float:right; padding-top: 5px\"><button id=\"addmod\" type=\"button\" class=\"btn btn-primary action-button\" onclick=\"AddModule()\">Add module</button></div>')")
   ),
   tags$head(tags$style(HTML("
                                body {
                                   width: 100% !important;
                                   max-width: 100% !important;
                                }
-                               ")))
+                               "))),
+  # tags$style(HTML('.navbar-nav > li > a, .navbar-brand {
+  #                  padding-top:14px !important;
+  #                  padding-bottom:0 !important;
+  #                  height: 50px;
+  #                }
+  #                .navbar {min-height:50px !important;}'))
 )
 
 

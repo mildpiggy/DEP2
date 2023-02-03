@@ -6,6 +6,8 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
+![logo](inst/DEP2shiny230202/www/logo.png)
+
 DEP2 provides an comprehensive analysis workflow for mass spectrometry
 based proteomics data, developed from the previous package DEP. This
 package provided differential expression/enrichment analysis pipelines

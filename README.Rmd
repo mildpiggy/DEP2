@@ -13,22 +13,27 @@ knitr::opts_chunk$set(
 )
 ```
 
+
 # DEP2
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-DEP2 provides an comprehensive analysis workflow for mass spectrometry based proteomics data, 
-developed from the previous package DEP. This package provided differential expression/enrichment analysis pipelines for various data including protein-level quantity(e.g. proteingroup), peptide-level quantity data and modification-specific proteomics (quantities of modified peptides). Inherited from DEP, DEP2 provides functions for data processing, hypothesis testing (via limma) and visualization. The peptide to protein aggregation strategy is integrated into workflows. To reduced the barrier in omics analysis, downstream functional exploration are packaged as suites including functional enrichment, timecourse cluster and protein-protein interaction network. DEP2 also contains an easy-used shiny application designed under modularization.
+![logo](inst/DEP2shiny230202/www/logo.png)
+
+DEP2 provides an comprehensive analysis workflow for mass spectrometry based proteomics data, developed from the previous package DEP. This package provided differential expression/enrichment analysis pipelines for various data including protein-level quantity(e.g. proteingroup), peptide-level quantity data and modification-specific proteomics (quantities of modified peptides). Inherited from DEP, DEP2 provides functions for data processing, hypothesis testing (via limma) and visualization. The peptide to protein aggregation strategy is integrated into workflows. To reduced the barrier in omics analysis, downstream functional exploration are packaged as suites including functional enrichment, timecourse cluster and protein-protein interaction network. DEP2 also contains an easy-used shiny application designed under modularization.
 
 ## Installation
+
 You can install DEP2 from [GitHub](https://github.com/) with:
 
-``` {r, eval=FALSE}
+```{r, eval=FALSE}
 # install.packages("devtools")
 devtools::install_github("mildpiggy/DEP2")
 ```
+
 ## Run shiny application
+
 Run the build-in shiny application though `run_app` function
 
 ```{r, eval=FALSE}
@@ -37,6 +42,7 @@ DEP2::run_app()
 ```
 
 ## Check the suggested packages required in analysis
+
 Some depend packages are required in some functionalities.
 
 ```{r example,eval=FALSE}
@@ -57,9 +63,8 @@ DEP2::check_RNAseq_depends(install = TRUE)
 
 ## Vignette
 
-View the Vignette for more information 
+View the Vignette for more information
+
 ```{r Vignette, eval=FALSE}
 vignette("DEP2_analysis")
 ```
-
-

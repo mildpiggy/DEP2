@@ -313,7 +313,7 @@ dep_pg_curve <- add_rejections(diff_pg, thresholdmethod = "curve", curvature  = 
 
 ## the cutoff line on volcano
 plot_volcano(dep_pg_curve, contrast = "W4_vs_PBS", add_threshold_line = "curve", curvature = 2, x0_fold = 2) /
-  plot_volcano(dep_pg_curve, contrast = "W4_vs_PBS", add_threshold_line = "curve", curvature = 2, x0_fold = 2)
+  plot_volcano(dep_pg_curve, contrast = "W6_vs_PBS", add_threshold_line = "curve", curvature = 2, x0_fold = 2)
 
 ```
 
