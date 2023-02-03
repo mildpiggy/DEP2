@@ -6,7 +6,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-![logo](inst/DEP2shiny230202/www/logo.png)
+<img src="inst/DEP2shiny230202/www/logo.png" alt="logo" width="300"/>
 
 DEP2 provides an comprehensive analysis workflow for mass spectrometry
 based proteomics data, developed from the previous package DEP. This

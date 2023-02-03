@@ -13,13 +13,13 @@ knitr::opts_chunk$set(
 )
 ```
 
-
 # DEP2
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
-![logo](inst/DEP2shiny230202/www/logo.png)
+<img src="inst/DEP2shiny230202/www/logo.png" alt="logo" width="300"/>
 
 DEP2 provides an comprehensive analysis workflow for mass spectrometry based proteomics data, developed from the previous package DEP. This package provided differential expression/enrichment analysis pipelines for various data including protein-level quantity(e.g. proteingroup), peptide-level quantity data and modification-specific proteomics (quantities of modified peptides). Inherited from DEP, DEP2 provides functions for data processing, hypothesis testing (via limma) and visualization. The peptide to protein aggregation strategy is integrated into workflows. To reduced the barrier in omics analysis, downstream functional exploration are packaged as suites including functional enrichment, timecourse cluster and protein-protein interaction network. DEP2 also contains an easy-used shiny application designed under modularization.
 
