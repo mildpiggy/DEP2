@@ -30,6 +30,7 @@ get_prefix <- function(words) {
     stop("'words' contains NAs")
   }
 
+  words <- unique(words)
   # Truncate words to smallest name
   minlen <- min(nchar(words))
   truncated <- substr(words, 1, minlen)
@@ -74,6 +75,7 @@ get_suffix <- function(words) {
     stop("'words' contains NAs")
   }
 
+  words <- unique(words)
   # Truncate words to smallest name
   minlen <- min(nchar(words))
   truncated <- substr(words, nchar(words) - minlen + 1, nchar(words))
