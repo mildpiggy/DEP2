@@ -25,6 +25,140 @@ clean_character <- function(express_assay){
 }
 
 
+#' Reshape a long table to wide
+#'
+#' Transform the long-format table to wide-format, and each row is feature and cols are expression data or
+#' identification information. The output table can be used as the input of DEP2
+#'
+#' @param long_table data.frame, a long-format table
+#' @param feature_col character(1), the unique identifier of feature, such as "protein.group" for protein,
+#' "peptide.sequence" for peptides, "precursor.Id" for precursors.
+#' @param expression_col character(1), the expression column.
+#' @param sample_col character(1), the samples column. The samples in these column will be the columns names of output transformed table
+#' @param remove_sample_prefix logical(1), whether to remove the prefix of samples.
+#' @param remove_sample_suffix logical(1), whether to remove the suffix of samples.
+#' @param shrink_ident_cols NULL or characters,the variablesvariables (identification information, like score, protein.names)
+#' to stored in transformed table.
+#' If the variable is multiple for a feature, it will paste to a character string. Else, it will store as the unique value.
+#' @param extend_ident_cols NULL or characters,the variables (identification information, like score, protein.names)
+#' to stored in transformed table, like the .
+#' The variables will be extended to wide table like the expression_col, the value of different sample will store in different colmun in out table.
+#'
+#' @return
+#' A data.frame in a wide format
+#' @export
+#'
+#' @importFrom tidyr pivot_wider
+#' @examples
+#' # Read in a example long export table
+#' long_table <- read.csv(system.file("extdata/DIA-NN_Export.tsv.gz",package = "DEP2"),sep = "\t")
+#' head(long_table)
+#'
+#' # Reshape to a wide expression table
+#' wide_table <- reshape_long2wide(long_table,sample_col = "File.Name",
+#'                                 feature_col = "Precursor.Id", expression_col = "Precursor.Normalised")
+#' head(wide_table)
+#'
+#' # If do not remove prefix or suffix of samples
+#' wide_table2 <- reshape_long2wide(long_table,sample_col = "File.Name",
+#'                                  feature_col = "Precursor.Id", expression_col = "Precursor.Normalised",
+#'                                  remove_sample_prefix = F, remove_sample_suffix = F)
+#' colnames(wide_table2)
+#'
+#' # Keep some identification information
+#' wide_table2 <- reshape_long2wide(long_table,sample_col = "File.Name",
+#'                                  feature_col = "Precursor.Id", expression_col = "Precursor.Normalised",
+#'                                  shrink_ident_cols = c("Protein.Names","Protein.Group",
+#'                                                        "Stripped.Sequence","Modified.Sequence",
+#'                                                        "Precursor.Charge","Evidence"),
+#'                                  extend_ident_cols = "Q.Value"
+#' )
+#' str(wide_table2)
+#'
+reshape_long2wide <- function(long_table,
+                              feature_col, # character(1)
+                              expression_col, # character(1)
+                              sample_col, # character(1)
+                              remove_sample_prefix=T, # logical(1)
+                              remove_sample_suffix=T, # logical(1)
+                              shrink_ident_cols = NULL, # characters
+                              extend_ident_cols = NULL # characters
+){
+  assertthat::assert_that(is.data.frame(long_table),
+                          is.character(feature_col) & length(feature_col) == 1,
+                          is.character(expression_col) & length(expression_col) == 1,
+                          is.character(sample_col) & length(sample_col) == 1,
+                          is.logical((remove_sample_prefix)) & length(remove_sample_prefix) == 1,
+                          is.logical((remove_sample_suffix)) & length(remove_sample_suffix) == 1,
+                          is.null(shrink_ident_cols)||is.character(shrink_ident_cols),
+                          is.null(extend_ident_cols)||is.character(extend_ident_cols)
+  )
+  if(!feature_col %in% colnames(long_table)) stop("feature_col must be a column name of long_table")
+  if(!expression_col %in% colnames(long_table)) stop("expression_col must be a column name of long_table")
+  if(!sample_col %in% colnames(long_table)) stop("sample_col must be a column name of long_table")
+
+  if(remove_sample_prefix){
+    prefix <- DEP2:::get_prefix(long_table[,sample_col])
+    prefix <- gsub("\\\\","\\\\\\\\",prefix)
+    long_table[,sample_col]= gsub(prefix,"",long_table[,sample_col])
+  }
+  if(remove_sample_suffix){
+    long_table[,sample_col]= DEP2:::delete_suffix(long_table[,sample_col])
+  }
+
+
+  samp = long_table[,sample_col] %>% unique
+  long_table2 = long_table
+  long_table2[,sample_col]  = factor(long_table2[,sample_col],levels = rev(samp))
+  long_table2 = long_table2 %>% arrange(.data[[sample_col]])
+
+  exp_df = tidyr::pivot_wider(long_table, id_cols = feature_col, names_from = sample_col, values_from = expression_col)
+
+  if(!is.null(shrink_ident_cols)){
+    if(! all(shrink_ident_cols %in% colnames(long_table)))
+      stop(shrink_ident_cols[!shrink_ident_cols %in% colnames(long_table)], " is not the colname.")
+
+    reduce_table(long_table2, feature_col= feature_col, sample_col = sample_col, val_col= "Stripped.Sequence")
+    fea_id_table_shrink <- shrink_ident_cols %>% lapply(reduce_table, long_table2=long_table2,
+                                                        feature_col=feature_col,sample_col = sample_col)
+    if(length(shrink_ident_cols) > 1){
+      fea_id_table_shrink2 <- Reduce(function(...) merge(..., all=T), fea_id_table_shrink) %>% head()
+    }else{fea_id_table_shrink2 = fea_id_table_shrink[[1]]}
+
+    reduce_table <- function(long_table2, feature_col, sample_col, val_col){
+      var_nub_each_feat <- long_table2 %>% group_by(.,.data[[feature_col]]) %>%
+        summarise(fnum = sum(!duplicated(.data[[val_col]])))
+      ## Not one feature one values, paste all values, collapse ";"
+      if(!all(var_nub_each_feat$fnum == 1)){
+        cat("aaa")
+        tb1 = long_table2 %>% group_by(.,.data[[feature_col]],.data[[sample_col]]) %>% summarise(the_val = .data[[val_col]])
+        cat("bbb")
+        tb2 = tb1 %>% pivot_wider(id_cols = feature_col, names_from = sample_col,values_from = the_val,values_fill = NA) %>%
+          pivot_longer(cols = colnames(.)[-1],names_to = sample_col, values_to = "the_val") %>%
+          group_by(.,.data[[feature_col]]) %>% summarise(the_val = paste0(the_val,collapse = ";"))
+      }else{ ## One feature one values, just use the unique value for each
+        tb2 = long_table2 %>% group_by(.,.data[[feature_col]]) %>% summarise(the_val = unique(.data[[val_col]]))
+      }
+      colnames(tb2)[2] = val_col
+      return(tb2)
+    }
+
+    exp_df = merge(exp_df,fea_id_table_shrink2)
+  }
+
+  if(!is.null(extend_ident_cols)){
+    if(! all(extend_ident_cols %in% colnames(long_table)))
+      stop(extend_ident_cols[!extend_ident_cols %in% colnames(long_table)], " is not the colname.")
+
+    fea_id_table_extend <- reshape(long_table[,c(sample_col,feature_col,extend_ident_cols)],
+                                   direction = "wide", idvar = feature_col, timevar = sample_col)
+
+    exp_df = merge(exp_df,fea_id_table_extend)
+  }
+
+  return(as.data.frame(exp_df))
+
+}
 
 #' Make unique names
 #'
