@@ -79,7 +79,7 @@ get_signicant <- function(object,
                         x0_fold = x0_fold,
                         diff = diff,
                         alpha = alpha)
-    de_save <<- de
+    de
   }
 
   row_data = rowData(de)
@@ -99,7 +99,7 @@ get_signicant <- function(object,
       }
     }
     sig_ind <- row_data[ , paste(contrasts, "_significant", sep = ""),drop = F]
-    sig_ind_save <<- sig_ind
+
     if(class(sig_ind) == "data.frame" || class(sig_ind) == "DFrame"){
       r_ind = apply(sig_ind, 1, any)
 

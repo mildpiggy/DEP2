@@ -957,7 +957,7 @@ DEP_pep_server_module <- function(id){
       output$peptidescol <- renderUI({
         shiny::validate(need(!is.null(peptide()), " "))
         shiny::validate(need(!is.null(data_QF()), " "))
-        # data_save22 <<- data_QF()
+
         if(".n" %in% colnames(rowData(data_QF()[["protein"]]))){
           return(selectizeInput(inputId = ns("peptidescol"),
                                 label = "peptide column",
@@ -1008,7 +1008,6 @@ DEP_pep_server_module <- function(id){
         validate(need(!(is.null(data_QF()) && is.null(input$resultRData)), "Please finish aggregate first."))
         if (input$anno == "columns" & !is.null(data_QF()) & input$contrasts == "control") {
           my_data <- data_QF()
-          # my_data_save <<- data_QF()
 
           selectizeInput(ns("control"), "Control",
                          choices = colData(my_data[["protein"]])$condition %>% unique,
@@ -1047,9 +1046,6 @@ DEP_pep_server_module <- function(id){
       output$test_manual <- renderUI({
         validate(need(!is.null(input$file1), ""))
         if(!is.null(data_QF()) & input$contrasts == "manual"){
-          # cols <- which(colnames(rowData(data_QF()[["protein"]])) %in% input$intensitycols)#according to intensitycols
-          # prefix <<- get_prefix(data_QF()[,cols] %>% colnames())
-          # test_manual_name <- unique(make.names(unlist(lapply(colnames(rowData(data_QF()[["protein"]]))[cols] %>% gsub(prefix,"",.) %>% strsplit(., split = "_"), function(x){x[1]}))))
 
           test_manual_name <- colData(data_QF()[["protein"]])$condition %>% unique
           test_manual_name <- cbind(combn(test_manual_name,2),combn(test_manual_name,2, FUN = rev))
@@ -1133,7 +1129,7 @@ DEP_pep_server_module <- function(id){
             label <- colnames(data_QF())[cols]
             expdesign <- get_exdesign_parse(label, mode = "delim", sep = "_",
                                             remove_prefix = input$remove_prefix, remove_suffix = input$remove_suffix)
-            # my_expdesign <<- expdesign
+
           }
         }else{
           print(inFile)
@@ -1161,7 +1157,7 @@ DEP_pep_server_module <- function(id){
           my_data = as.data.frame(my_data)
           colnames(my_data) = gsub("^\\[(.*)\\] ","",colnames(my_data))
           colnames(my_data) = make.names(colnames(my_data))
-          # my_data <<- my_data
+
           return(my_data)
         }else{
           base::load(file = rdataFile$datapath)
@@ -1218,10 +1214,10 @@ DEP_pep_server_module <- function(id){
           }
           filter_formula = as.formula(filter_formula)
         }
-        # filter_formula_save <<- filter_formula
+
         pe_filt <- DEP2::filter_pe(pe, thr = input$thr,
                                    filter_formula = filter_formula)
-        # pe_filt_save <<- pe_filt
+
         cat("Filter finished.\n")
         return(pe_filt)
       })
@@ -1247,8 +1243,7 @@ DEP_pep_server_module <- function(id){
               cat("Impute after normalize \n")
               pe_norm <- normalize_pe(pe_filt, method = input$norm_method, i = "peptideRaw", name = "peptideNorm")
               message("Normalize finished")
-              # imputation_save <<- input$imputation
-              # pe_norm_save0 <<- pe_norm
+
               pe_norm <- addAssay(pe_norm,
                                   DEP2::impute(pe_norm[["peptideNorm"]], fun = input$imputation),
                                   name = "peptideImp")
@@ -1256,7 +1251,7 @@ DEP_pep_server_module <- function(id){
               message("Impute finished")
             })
           }
-          # pe_norm_save <<- pe_norm
+
           return(pe_norm)
         }else{
           load(rdataFile$datapath)
@@ -1268,7 +1263,6 @@ DEP_pep_server_module <- function(id){
       #   pe_norm <- pe_norm()
       #   # pe_filt <- pe_filt()
       #   pe_imp <- QFeatures::normalize(pe_norm, fun = input$imputation, i = "peptideNorm", "peptideImp")
-      #   pe_imp_save <<- pe_imp
       #   return(pe_imp)
       # })
 
@@ -1283,13 +1277,11 @@ DEP_pep_server_module <- function(id){
             rdataFile <- input$resultRData
             load(rdataFile$datapath)
             cat("load rdataFile in filt0 \n")
-            # data_1111 <<- data
             data
           })
           data <- data_QF()[["protein"]]
         }
 
-        # data_save2 <<- data
         # req(input$id, input$name)
         validate(need(!(input$name == "" & input$id == ""), "Please ensure that: at least one of your name column and id column is non-empty!"))
         if(input$name == "" & input$id == "") {
@@ -1300,7 +1292,7 @@ DEP_pep_server_module <- function(id){
             type = "warning"
           )
         }
-        # ddd <<- input$delim
+
         # unique_names <- make_unique(proteins = filtered, names = ifelse(input$name == "", input$id, input$name), ids = ifelse(input$id == "", input$name, input$id), delim = input$delim)
         rowData(data) <- DEP2::make_unique(rowData(data) %>% as.data.frame(),
                                            names =  ifelse(input$name == "",
@@ -1312,7 +1304,6 @@ DEP_pep_server_module <- function(id){
                                            delim = input$delim)
         rownames(data) <- rowData(data)$name
         cat("Make_unique finished")
-        # filt_save <<- data
         data
       })
 
@@ -1326,7 +1317,7 @@ DEP_pep_server_module <- function(id){
 
       the_order <- reactive({
         req(iv1$is_valid())
-        # order_save1 <<- input$order
+
         if(length(input$order) == length(filt0()@colData$condition %>% unique))
           return(input$order)
         return(NULL)
@@ -1334,21 +1325,19 @@ DEP_pep_server_module <- function(id){
 
       filt <- reactive({
         filt = filt0()
-        # filt_save
+
         if(is.null(the_order())){
           return(filt)
         }else{
-          # order_save2 <<- the_order()
+
           filt@colData$condition = factor(filt@colData$condition, levels = the_order())
           filt = filt[,order(filt@colData$condition)]
-          # filt_save2 <<- filt
           return(filt)
         }
       })
 
       norm <- reactive({
         norm <- normalize_vsn(filt())
-        # my_norm <<- norm
         cat("VSN finished\n")
         return(norm)
       })
@@ -1415,12 +1404,10 @@ DEP_pep_server_module <- function(id){
                                   fdr.type = FDR_type())
           }
         }
-        # my_df <<- df
         df
       })
 
       dep <- reactive({
-        # aaa <<- input$curvature
         if(input$threshold_method == "intersect") {
           my_dep <- add_rejections(diff = df(), alpha = input$p, lfc = input$lfc, thresholdmethod = input$threshold_method)
         }
@@ -1493,7 +1480,7 @@ DEP_pep_server_module <- function(id){
           input$aggregate_button
           isolate({
             pe_norm = pe_norm()
-            # pe_norm_save2 <<- pe_norm
+
             fcol = input$id
             aggrefun = switch(input$aggregation_method,
                               totalSum = base::colSums,
@@ -1752,7 +1739,6 @@ DEP_pep_server_module <- function(id){
         })
 
         table <- reactive({
-          # aaa <<- res()
           DEP2:::get_table(res(), input$pres)
         })
 

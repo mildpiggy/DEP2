@@ -193,8 +193,6 @@ make_pe_parse <- function(Peptide,
 
   rownames(expdesign) = expdesign$label
   Peptide[,columns] = apply(Peptide[,columns], 2, function(x){
-    # temp1 <<- x
-    # temp <<- as.integer(x)
     x[!(!grepl("[A-z]",x) & grepl("\\d",x))] = 0
     return(as.numeric(x))
   })

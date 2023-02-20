@@ -879,7 +879,6 @@ DEP_ptm_server_module <- function(id, Omics_res){
     function(input,output,session){
 
       Omics_res_list <- reactive({
-        # Omics_res_list_save <<- reactiveValuesToList(Omics_res)
         reactiveValuesToList(Omics_res)
       })
 
@@ -1021,9 +1020,9 @@ DEP_ptm_server_module <- function(id, Omics_res){
       output$test_manual_ptm <- renderUI({
         validate(need(!is.null(input$file1), ""))
         if(!is.null(data()) & input$contrasts == "manual"){
-          # cols <<- grep("^LFQ", colnames(data()))
+
           cols <- which(colnames(data()) %in% input$intensitycols)#according to intensitycols
-          prefix <<- get_prefix(data()[,cols] %>% colnames())
+          prefix <- get_prefix(data()[,cols] %>% colnames())
           test_manual_name <- unique(make.names(unlist(lapply(colnames(data())[cols] %>% gsub(prefix,"",.) %>% strsplit(., split = "_"), function(x){x[1]}))))
           test_manual_name <- cbind(combn(test_manual_name,2),combn(test_manual_name,2, FUN = rev))
           test_manual_name <- apply(test_manual_name, 2, function(i){paste(i[1], i[2], sep = "_vs_")})
@@ -1042,12 +1041,11 @@ DEP_ptm_server_module <- function(id, Omics_res){
           Omics_res_list2 = Omics_res_list2[
             which((Omics_res_list2 %>%
                      lapply(., function(x){
-                       x1 <<- x
                        temp = try(x(), silent = T)
                        if(class(temp) == "try-error")
                          return(FALSE)
                        return(TRUE)
-                       # is.na(x1 <<- x)
+
                      }) %>%
                      unlist()))
           ]}
@@ -1251,7 +1249,7 @@ DEP_ptm_server_module <- function(id, Omics_res){
             label <- colnames(data())[cols]
             expdesign <- get_exdesign_parse(label, mode = "delim", sep = "_",
                                             remove_prefix = input$remove_prefix, remove_suffix = input$remove_suffix)
-            # my_expdesign <<- expdesign
+
           }
         }else{
           read.csv(inFile$datapath, header = TRUE,
@@ -1266,7 +1264,7 @@ DEP_ptm_server_module <- function(id, Omics_res){
         inFile <- input$file1
         if (is.null(inFile))
           return(NULL)
-        my_data <<- read.csv(inFile$datapath, header = TRUE,
+        my_data <- read.csv(inFile$datapath, header = TRUE,
                              sep = "\t", stringsAsFactors = FALSE) %>%
           mutate(id = row_number())
       })
@@ -1293,8 +1291,7 @@ DEP_ptm_server_module <- function(id, Omics_res){
 
       filt0_ptm <- reactive({
         data <- data()
-        # aaaa <<- data
-        # order_save <<- the_order()
+
         # if(is.null(input$peptidescol_ptm)|input$peptidescol_ptm==""){
         #   data$Peptides = 3
         # }else{
@@ -1327,21 +1324,20 @@ DEP_ptm_server_module <- function(id, Omics_res){
 
         filter_column_names = input$filt_ptm
         cols_filt <- intersect(filter_column_names, colnames(data))
-        data_save1 <<- data
+
         if(length(cols_filt) > 0){
           message("Filtering based on '", paste(cols_filt,
                                                 collapse = "', '"), "' column(s)")
 
           filtered = data[apply((data[, cols_filt,drop = F] == "" | is.na(data[, cols_filt, drop = F])), 1, all), ]
         }
-        filtered_save1 <<- filtered
+
         filtered = make_unique_ptm(filtered, gene_name = ifelse(input$name_ptm == "", input$id_ptm, input$name_ptm),
                                    protein_ID = ifelse(input$id_ptm == "", input$name_ptm, input$id_ptm),
                                    modified_name = NULL,
                                    aa = input$amino_acid_ptm, pos = input$aa_position_ptm,
                                    delim = input$delim_ptm
         )
-        filtered_save2 <<- filtered
 
         # if (!is.null(cols_filt)) {
         #   NAs <- is.na(data[, cols_filt])
@@ -1367,9 +1363,6 @@ DEP_ptm_server_module <- function(id, Omics_res){
         #                                cutoff = input$filt_num_ptm),
         #                 silent = TRUE)
         # validate(need(filtered, "The function filter_peptide get an error"))
-        # a133 <<- input$filt
-        a122 <<- input$name_ptm
-        a133 <<- input$id_ptm
 
         ind_empty = c(grep("^_", filtered$name), which(filtered$name == ""))
         if(length(ind_empty) > 0) {
@@ -1383,11 +1376,11 @@ DEP_ptm_server_module <- function(id, Omics_res){
           se <- DEP2::make_se(filtered, cols, expdesign())
           colData(se)$replicate = as.character(colData(se)$replicate)
         }
-        se_save <<- se
+
         cutoff_col = input$filt_num_cutoff_ptm; cutoff_val = input$filt_num_ptm
         filter_formula = paste( "~(!is.na(",cutoff_col,")&",cutoff_col," >= ",cutoff_val, ")") %>% as.formula()
-        filt <- DEP2::filter_se(se_save,thr = input$thr_ptm, filter_formula = filter_formula) ## filter the location prosibility or other scores
-        my_filt <<- filt
+        filt <- DEP2::filter_se(se,thr = input$thr_ptm, filter_formula = filter_formula) ## filter the location prosibility or other scores
+
       })
 
       iv1 <- InputValidator$new()
@@ -1400,7 +1393,7 @@ DEP_ptm_server_module <- function(id, Omics_res){
 
       the_order <- reactive({
         req(iv1$is_valid())
-        order_save1 <<- input$order
+
         if(length(input$order) == length(filt0_ptm()@colData$condition %>% unique))
           return(input$order)
         return(NULL)
@@ -1408,12 +1401,11 @@ DEP_ptm_server_module <- function(id, Omics_res){
 
       filt_ptm <- reactive({
         filt_ptm = filt0_ptm()
-        order_save <<- the_order()
-        my_filt_save <<- filt_ptm
+
         if(is.null(the_order())){
           return(filt_ptm)
         }else{
-          order_save2 <<- the_order()
+
           filt_ptm@colData$condition = factor(filt_ptm@colData$condition, levels = the_order())
           filt_ptm = filt_ptm[,order(filt_ptm@colData$condition)]
           # filt@colData = filt@colData %>% as.data.frame() %>% arrange(., condition) %>% DataFrame()
@@ -1478,10 +1470,9 @@ DEP_ptm_server_module <- function(id, Omics_res){
             } else {
               #set.seed(12345)
               my_imp <- DEP2::impute(norm_ptm(), input$imputation_ptm)
-              # my_imp <<- DEP2::impute(norm_ptm(), input$imputation_ptm)
             }
           }
-          # my_imp_ptm <<- my_imp
+
           return(my_imp)
         } else {
           load(file = inFile1$datapath)
@@ -1496,15 +1487,12 @@ DEP_ptm_server_module <- function(id, Omics_res){
         omictype <- strsplit(PG_choosed,"_")[[1]][1]
 
         the_res <- Omics_res[[PG_choosed]]()
-        # PG_data <- assay(the_res)
-        # correct_key_save <<- input$correct_key
 
         Correct_ptm = DEP2::correct_PTM_by_Protein(enriched_peptide = imp_ptm,
                                                    relative_protein = the_res,
                                                    correct_key = input$correct_key,
                                                    correct_level = input$correct_level,
                                                    unidentified_treatment = input$unidentified_protein_treatment)
-        # Correct_ptm_save <<- Correct_ptm
         Correct_ptm
       })
 
@@ -1565,14 +1553,13 @@ DEP_ptm_server_module <- function(id, Omics_res){
                             fdr.type = FDR_type_ptm())
           }
         }
-        # my_df <<- df
+
         return(df)
       })
 
       # thedf <- df_ptm
 
       dep_ptm <- reactive({
-        aaa <<- input$curvature_ptm
         if(input$threshold_method_ptm == "intersect") {
           my_dep <- add_rejections(diff = df_ptm(), alpha = input$p_ptm, lfc = input$lfc_ptm, thresholdmethod = input$threshold_method_ptm)
         }
@@ -1793,12 +1780,10 @@ DEP_ptm_server_module <- function(id, Omics_res){
         })
 
         res_ptm <- reactive({
-          bbbb <<- selected_ptm()
           PTM_get_results(selected_ptm())
         })
 
         table_ptm <- reactive({
-          aaaaa <<- res_ptm()
           PTM_get_table(res_ptm(), input$pres_ptm)
         })
 

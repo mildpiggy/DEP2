@@ -295,7 +295,7 @@ plot_cor_util <- function (data, coldata, lower = -1, upper = 1, pal = "PRGn",
   #   length(pal_rev) == 1, is.numeric(font_size), length(font_size) ==
   #     1, is.logical(plot), length(plot) == 1)
   # if (!(lower >= -1 & upper >= -1 & lower <= 1 & upper <= 1)) {
-  #   stop("'lower' and/or 'upper' arguments are not valid\n         Run plot_my_cor() with 'lower' and 'upper' between -1 and 1",
+  #   stop("'lower' and/or 'upper' arguments are not valid\n         Run plot_cor() with 'lower' and 'upper' between -1 and 1",
   #        call. = FALSE)
   # }
   # pals <- RColorBrewer::brewer.pal.info %>% rownames_to_column() %>%
@@ -303,7 +303,7 @@ plot_cor_util <- function (data, coldata, lower = -1, upper = 1, pal = "PRGn",
   # if (!pal %in% pals$rowname) {
   #   stop("'", pal, "' is not a valid color panel",
   #        " (qualitative panels also not allowed)\n",
-  #        "Run plot_my_cor() with one of the following 'pal' options: ",
+  #        "Run plot_cor() with one of the following 'pal' options: ",
   #        paste(pals$rowname, collapse = "', '"), "'",
   #        call. = FALSE)
   # }
@@ -461,11 +461,11 @@ plot_pca <- function(object, x = 1, y = 2, indicate = c("condition", "replicate"
   coldata = colData(object)
   if (x > ncol(data) | y > ncol(data)) {
     stop(paste0("'x' and/or 'y' arguments are not valid\n",
-                "Run plot_my_pca() with 'x' and 'y' <= ", ncol(data),
+                "Run plot_pca() with 'x' and 'y' <= ", ncol(data),
                 "."), call. = FALSE)
   }
   if (n > nrow(data)) {
-    stop(paste0("'n' argument is not valid.\n", "Run plot_my_pca() with 'n' <= ",
+    stop(paste0("'n' argument is not valid.\n", "Run plot_pca() with 'n' <= ",
                 nrow(data), "."), call. = FALSE)
   }
 
@@ -477,7 +477,7 @@ plot_pca <- function(object, x = 1, y = 2, indicate = c("condition", "replicate"
   columns <- colnames(mycolData)
   if (!is.null(indicate)) {
     if (length(indicate) > 3) {
-      stop("Too many features in 'indicate'\n        Run plot_my_pca() with a maximum of 3 indicate features")
+      stop("Too many features in 'indicate'\n        Run plot_pca() with a maximum of 3 indicate features")
     }
     if (any(!indicate %in% columns)) {
       stop(paste0("'", paste0(indicate, collapse = "' and/or '"),
@@ -496,7 +496,7 @@ plot_pca <- function(object, x = 1, y = 2, indicate = c("condition", "replicate"
   for (feat in indicate) {
     pca_df[[feat]] <- as.factor(pca_df[[feat]])
   }
-  pca_df_save <<- pca_df
+
   limit = unlist(pca_df[,c(paste0("PC", x), paste0("PC", y))])
   p <- ggplot(pca_df, aes(get(paste0("PC", x)), get(paste0("PC", y)))) +
     labs(title = paste0("PCA plot - top ", n, " variable ", features), x = paste0("PC", x, ": ", percent[x], "%"), y = paste0("PC", y, ": ", percent[y], "%")) +

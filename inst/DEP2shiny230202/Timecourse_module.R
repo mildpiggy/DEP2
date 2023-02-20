@@ -129,7 +129,7 @@ Timecourse_server_module <- function(id, Omics_res) {
 
       selected_omics <- reactive({
         if(is.null(dropzone_input_list())) return(NULL)
-        selected_omics_save <<- names(dropzone_input_list()) %>% sapply(., function(x){strsplit(x,"-ds-")[[1]][1]}) %>% unique
+        selected_omics <- names(dropzone_input_list()) %>% sapply(., function(x){strsplit(x,"-ds-")[[1]][1]}) %>% unique
       })
 
       gene_name <- reactive({
@@ -143,13 +143,12 @@ Timecourse_server_module <- function(id, Omics_res) {
           gene_name<- NULL
         }
         gene_name = data.frame(name = gene_name)
-        gene_name_save <<- gene_name
+
         return(gene_name)
       })
 
       selected_omics_result <- reactive({
-        # Omics_res_save <<- Omics_res
-        # selected_omics_result_save <<- Omics_res[[selected_omics()]]()
+
         Omics_res[[selected_omics()]]()
       })
 
@@ -165,12 +164,12 @@ Timecourse_server_module <- function(id, Omics_res) {
         }else if(omictype == "Proteomepg" | omictype == "Proteomepep"){
           ht_mat = ht_mat[ which(rownames(ht_mat) %in% gene_name()$name),]
         }
-          return(ht_mat_save <<- ht_mat)
+          return(ht_mat)
       })
 
       exp_design <- reactive({
         shiny::validate(need(length(selected_omics()) == 1, "Only perform on one omics result"))
-        exp_design_save <<- selected_omics_result()@colData
+        exp_design <- selected_omics_result()@colData
       })
 
       Omics_res_list <- reactive({
@@ -265,8 +264,7 @@ Timecourse_server_module <- function(id, Omics_res) {
           ~ { drop_genelist_modules[[.]] <- NULL })
         # print(input$Timecourse_dropzone)
         print("exctract_genelist_Server2 load")
-        drop_genelist_modules_save <<- drop_genelist_modules
-        # dropzone_save <<- input$Timecourse_dropzone
+        drop_genelist_modules
       }, priority = 1, ignoreNULL = F)
 
 
@@ -291,16 +289,8 @@ Timecourse_server_module <- function(id, Omics_res) {
       Timecourse_heatmap_res <- reactiveVal()
       observeEvent(input$analyze_for_Timecourse,{
         print("heatmap")
-        ht_mat_save <<- ht_mat()
+        ht_mat_1 <- ht_mat()
         exp_design <- exp_design()
-        # groupby_sav <<- input$groupby
-        # columns_order_sav <<- input$Custom_columns_order
-        # algo_sav <<- input$algo
-        # k_sav <<- input$k
-        # color_sav <<- input$colorbar
-        # col_limit_sav <<- input$limit
-        # row_font_size_sav <<- input$row_font_size
-        # col_font_size_sav <<- input$col_font_size
 
         # Timecourse_heatmap_res <- Timecourse_heatmap_res(
         #   withProgress(message = 'Plotting', value = 0.66, {
@@ -323,16 +313,7 @@ Timecourse_server_module <- function(id, Omics_res) {
         Timecourse_heatmap_input <- reactive({
           shiny::validate( need( length(unique(exp_design[,input$groupby])) >2 , "Cluster is only meaningful for experiement with more the two groups!") )
           withProgress(message = 'Plotting', value = 0.66, {
-            req(nrow(ht_mat_save) > 0)
-            ht_mat_save1 <<- ht_mat(); exp_design_save <<- exp_design; groupby_save <<- input$groupby; columns_order_save <<- input$Custom_columns_order
-            # algo_save <<- input$algo;
-            k_save <<- input$k; color_save <<- input$colorbar; col_limit_save <<- input$limit;
-            row_font_size_save <<- input$row_font_size;col_font_size_save <<- input$col_font_size; heatmap_height_save <<- input$Height; heatmap_width_save <<- input$Width
-            seed_save <<- input$seed
-            # get_tc_cluster(ht_mat = ht_mat_save1,exp_design = exp_design_save, groupby = groupby_save,
-            #                # algo = "cm",
-            #                group_order = columns_order_save, k = k_save,col_limit = col_limit_save,
-            #                row_font_size = row_font_size_save, col_font_size = col_font_size_save, heatmap_height =  heatmap_height_save, seed = seed_save)
+            req(nrow(ht_mat_1) > 0)
 
             res = get_tc_cluster(ht_mat = ht_mat(),
                                  exp_design = exp_design,
@@ -505,13 +486,7 @@ exctract_genelist_Server2 <- function(id, ID, Omics_Serv_res, suffix = ""){
                    reactiveValuesToList(input)
                  })
 
-                 # output$restest <- renderDataTable({
-                 #   sig_res_save <<- sig_res()
-                 #   (sig_res())
-                 # }, options = list(pageLength = 10, scrollX = T))
-
                  output$table_bttn <- renderUI({
-                   # sig_res_save3 <<- sig_res()
                    if(omictype == "RNAseq" && nrow(test_res()@geneinfo) == 0 ){ ## check id transform of RNAseq data
                      return(
                        tagList(
@@ -540,7 +515,6 @@ exctract_genelist_Server2 <- function(id, ID, Omics_Serv_res, suffix = ""){
 
                  omics_id <- strsplit(ID, split = "-ds-")[[1]][1]
                  test_res = reactive({
-                   # Omics_Serv_res_save <<- Omics_Serv_res
                    theomics <- Omics_Serv_res()[[omics_id]]()
                  })
 
@@ -580,12 +554,12 @@ exctract_genelist_Server2 <- function(id, ID, Omics_Serv_res, suffix = ""){
                                                alpha = pcutoff(), lfc = l2fc(),
                                                thresholdmethod = input$method,
                                                curvature = curvature(), x0_fold = x0_fold())
-                     # dep_res_save <<- dep_res
+
                      # if(nrow(dep_res) > 0){
                      sigcol <- paste0(input$contrast,"_significant")
                      req( all(sigcol %in% colnames( rowData(dep_res))) )
                      sigdf <- rowData(dep_res)[,sigcol] %>% as.data.frame()
-                     # sigcol_save <<- sigcol
+
                      sig <- dep_res[rowAnys( sigdf == TRUE, na.rm = T ), ]
                      if(nrow(sig) > 0){
                        if(length(sigcol) == 1){
@@ -613,7 +587,6 @@ exctract_genelist_Server2 <- function(id, ID, Omics_Serv_res, suffix = ""){
                        return(NULL)
                      the_res$name = gene_info$SYMBOL
 
-                     the_res_save <<- the_res
                      thecontrast = input$contrast
                      pcol <- paste0(thecontrast,"_p.adj")
                      L2Fcol <- paste0(thecontrast,"_diff")

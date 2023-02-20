@@ -44,6 +44,13 @@ annoSpecies_df <- function(){
   return(annoSpecies_df)
 }
 
+annoSpecies_df2 <- function(){
+  theannoSpecies_df <- DEP2:::annoSpecies_df()
+  pkg <- theannoSpecies_df$pkg
+  installed <- pkg[-1] %>% sapply(.,function(x){rlang::is_installed(x)})
+  theannoSpecies_df[1+which(installed),]
+}
+DEP2:::annoSpecies_df()
 
 #' ID transform SE or DEGdata
 #'
@@ -119,7 +126,6 @@ ID_transform <- function(x, from_columns = "rownames", fromtype = "ENSEMBL", spe
     x@geneinfo = ann2
     if( !is.null(x@test_result) && nrow(x@test_result) == nrow(x)){
       x@test_result$symbol = ann2$SYMBOL
-      # x_save1 <<- x
       x@test_result =  x@test_result %>% data.frame() %>%
         select(symbol, everything()) %>% DataFrame()
     }
@@ -651,13 +657,12 @@ goAnalysis <- function( gene_id, organism="Human", species_df,
   pkg = species_df$pkg[species_df$species == organism]
   require(pkg, character.only = TRUE)
   orgDB <- get(pkg)
-  # gene_id_save <<- gene_id
+
   if(class(gene_id) == "data.frame"){
     reat_ALL <- try(clusterProfiler::enrichGO(gene = gene_id$ENTREZID, OrgDb = orgDB, ont = "ALL",
                                               pvalueCutoff = pvalueCutoff, qvalueCutoff = qvalueCutoff, readable = F,
                                               ...))
     if(class(reat_ALL) == "try-error") return(reat_ALL)
-    # reat_ALL_save <<- reat_ALL
     reat_ALL@result$geneID %<>% set_readable(., ids_table = gene_id)
   }else if(class(gene_id) == "list"){
     gene_id_list = gene_id
@@ -674,7 +679,6 @@ goAnalysis <- function( gene_id, organism="Human", species_df,
 
   reat_ALL@readable = TRUE
   reat_ALL@gene2Symbol = set_names(gene_id$name, gene_id$ENTREZID )
-  # reat_ALL_save2 <<- reat_ALL
   return(reat_ALL)
 }
 

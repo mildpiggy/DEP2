@@ -640,10 +640,10 @@ DEG_server_module <- function(id){
       })
 
       output$dds_design <- renderUI({
-        exdesign_save <<- exdesign()
+        exdesign_1 <- exdesign()
         if(!is.null(exdesign())) {
           exdesign <- exdesign()
-          ddschoices = which( (exdesign %>% apply(., 2, function(x){length(unique(x))})) < nrow(exdesign_save) )
+          ddschoices = which( (exdesign %>% apply(., 2, function(x){length(unique(x))})) < nrow(exdesign_1) )
           shiny::validate(need(
             length(ddschoices) > 0,
             "No column match requirement, check the experiement design"
@@ -827,9 +827,7 @@ DEG_server_module <- function(id){
             return(NULL)
           }else{
             countData <- countData()
-            # countData_save <<- countData
             label_names = colnames(countData)
-            # if()
             exdesign = DEP2::get_exdesign_parse(label_names)
             return(exdesign)
           }
@@ -1027,11 +1025,9 @@ DEG_server_module <- function(id){
 
         dds_1 <- reactive({
           dds_1 <- DESeqDataSetFromMatrix(countData = countData(),colData = exdesign(), design = as.formula(paste0("~", paste(input$dds_design, collapse = " + "))))
-          # dds_1_save <<- dds_1
         })
 
         dds_filter <- reactive({
-          # dds_filter_save <<- dds_1()[rowSums(counts(dds_1())) >= input$filter_rowsum, ]
           dds_1 = dds_1()
           if(input$filter_missnum > ncol(dds_1)){
             filter_missnum =ncol(dds_1)
@@ -1087,14 +1083,13 @@ DEG_server_module <- function(id){
                                    independentFiltering = input$independent_filtering,
                                    lfcshark = input$Shrink_lfc)
             message("Get results finished.")
-            # diff_deg_save1 <<- diff
+
             diff <- DEP2::rlg_deg(diff)
             diff <- DEP2::ntf_deg(diff)
-            # diff_deg_save2 <<- diff
             message("rlg & ntf finished.")
 
             isolate({transformit_it <- transformit()})
-            # transformit_it2 <<- transformit_it
+
             input$analyze_for_DERNAseq
             if(transformit_it){
               # incProgress(2/3,message = "Transforming ID")
@@ -1104,7 +1099,7 @@ DEG_server_module <- function(id){
               })
               # cat("finished \n")
             }
-            # diff_deg_save <<- diff
+
             message("diff finished.")
             return(diff)
 
@@ -1116,7 +1111,7 @@ DEG_server_module <- function(id){
           deg <- DEP2::add_rejections(diff = diff(), alpha = input$p_for_DERNAseq, lfc = input$lfc_for_DERNAseq)
           returnval <- returnval(deg)
           cat("deg")
-          # my_deg_save <<- deg
+
           return(deg)
         })
         deg_df <- reactive(deg()@test_result)
@@ -1140,7 +1135,6 @@ DEG_server_module <- function(id){
           res_for_RNAseq_merge = as.data.frame(deg_df())
           res_for_RNAseq_merge$gene = rownames(res_for_RNAseq_merge)
           ntd_res <- merge(res_for_RNAseq_merge, as.data.frame(deg()@ntf), by.x = "gene", by.y = "row.names")
-          my_res_for_RNAseq_merge <<- ntd_res
           return(ntd_res)
         })
 
@@ -1431,20 +1425,6 @@ DEG_server_module <- function(id){
             dev.off()
           }
         )
-        # test10 <<- exdesign()
-        # test11 <<- countData()
-        # test9 <<- diff()
-        # # test9 <<- res_for_RNAseq_1()
-        # # test1 <<- res_for_RNAseq_4()
-        # test1 <<- deg()
-        # test8 <<- deg_sig()
-        # # test8 <<- selected_genes_input_for_RNAseq()
-        # test7 <<- dds()
-        # # test6 <<- heatmap_input_for_RNAseq()
-        # test12 <<- data_forRNAseq_heatmap()
-        # test4 <<- res_for_RNAseq_merge()
-        # test3 <<- deg()@ntf
-        # test2 <<- deg()@rlg
 
         # return(res_for_RNAseq_1)
       })

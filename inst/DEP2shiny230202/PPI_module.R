@@ -227,7 +227,6 @@ PPI_server_module <- function(id, Omics_res) {
         Omics_res = Omics_res[check] ## remove
       })
 
-      # Omics_res_list_save <<- Omics_res_list()
       output$PPI_drag_drop <- renderUI({
         validate(need(length(Omics_res_list()) > 0 && !all(sapply(Omics_res_list(), is.null)), message = "There are no omics analysis result. Please do omics analysis in . \n\n"))
         tagList(
@@ -297,7 +296,7 @@ PPI_server_module <- function(id, Omics_res) {
           setdiff(names(drop_genelist_modules)[check], input$PPI_dropzone),
           ~ { drop_genelist_modules[[.]] <- NULL })
         print("exctract_genelist_Server load")
-        # drop_genelist_modules_save <<- drop_genelist_modules
+
       }, priority = 1, ignoreNULL = F)
 
 
@@ -311,18 +310,11 @@ PPI_server_module <- function(id, Omics_res) {
             return(NULL)
 
           genelist <- fread(text = temp, header = F) %>% as.data.frame()
-          # genelist_save <<- genelist
-
-          # if(ncol(genelist) < 1) return(NULL)
           gene_name = genelist[,1] %>% sapply(., the1stname) %>% unique()
-          # gene_name_save1 <<- gene_name
-          # colnames(genelist)[1] = c("name")
-          # genelist$name <-  sapply(genelist$name,the1stname)
-          # genelist$fc = as.numeric(genelist$fc)
 
         }else{ ## drag-drop input
           genelist <- drop_genelist_modules %>% reactiveValuesToList()
-          # genelist_save <<- genelist
+
           if(length(genelist)>0){
             gene_name = vector()
             for(i in 1:length(genelist)){
@@ -338,13 +330,13 @@ PPI_server_module <- function(id, Omics_res) {
             gene_name<- NULL
           }
         }
-        # gene_name_save1 <<- gene_name
+
         if(is.null(gene_name)||length(gene_name) < 1) return(NULL) ## when no sig res (no gene as input)
         gene_name = data.frame(name = gene_name %>% DEP2:::rm_digit_end()  %>% unique()) %>%
           dplyr::filter(!is.na(name))
         # gene_name = name = gene_name %>% DEP2:::rm_digit_end()  %>% unique()
         # gene_name = gene_name[!is.na(gene_name)]
-        # gene_name_save2 <<- gene_name
+
         return(gene_name)
       })
 
@@ -453,74 +445,26 @@ PPI_server_module <- function(id, Omics_res) {
 
           check_ppi <- reactive({
             print("check ppi data")
-            # spe_save <<- input$organism
+
             try(DEP2::load_PPIdata(input$organism), silent = TRUE)
           })
 
           links <- reactive({
             print("Searching links.")
-            links <<- DEP2::test_PPI(gene_name()$name, species = input$organism,
+            links <- DEP2::test_PPI(gene_name()$name, species = input$organism,
                                           choose_scores = input$chooseScore, score_cutoff = 400)
-            links_save <<- links
+            links
           })
           links2 <- reactive({
             print("Filter links.")
             links2 <- dplyr::filter(links(), combined_score >= input$scorecutoff)
-            links2_save <<- links2
           })
 
 
 
-          # geneID <- reactive({
-          #   # isol
-          #   require(orgDbname, character.only = TRUE)
-          #   geneID <- my_to_entrezid(orgDB = get(orgDbname), gene = as.character(gene_name()$name)) %>%
-          #     tibble::rownames_to_column() %>% dplyr::rename(SYMBOL = rowname, ENTREZID = id) %>%
-          #     dplyr::select(SYMBOL, ENTREZID) %>% dplyr::filter(!is.na(ENTREZID))
-          #
-          #   # geneID_save <<- geneID
-          # })
-          #
-          # incProgress(0.3)
-          #
-          # data_mapped <- reactive({
-          #   check_ppi()
-          #   aliasDf <- get("aliasDf",envir = strEnv)
-          #   proteinsDf <- get("proteinsDf",envir = strEnv)
-          #   protein_links_detail <- get("protein_links_detail",envir = strEnv)
-          #   data_mapped <- geneID() %>% mymap(my_data_frame_id_col_names = "ENTREZID",
-          #                                     aliasDf=get("aliasDf",envir = strEnv),
-          #                                     proteinsDf=get("proteinsDf",envir = strEnv), ## data_mapped 3cols ENTREZID SYMBOL STRING_id
-          #                                     removeUnmappedRows = TRUE,reload = F)
-          # })
-          # link_table <- reactive({
-          #   data_mapped <- data_mapped()
-          #   myget_interactions(protein_detail = get("protein_links_detail",envir = strEnv),mapped_data = data_mapped,choose_scores = input$chooseScore, score_cutoff = 400)
-          # })
-          # links <- reactive({
-          #   data_mapped <- data_mapped()
-          #   link_table() %>%                                                ## links 3cols from to weight from&to is SYMBOL
-          #     mutate(from = data_mapped[match(from, data_mapped$STRING_id), "SYMBOL"]) %>%
-          #     mutate(to = data_mapped[match(to, data_mapped$STRING_id), "SYMBOL"])
-          # })
-          # links2 <- reactive({filterlink(links(), scorecutoff=input$scorecutoff) })
-
 
           output$String_Table <- DT::renderDataTable({
-            # print("b1")
-            # if(nrow(geneID()) == 0){
-            #   # return(gene_name())
-            #   require(orgDbname, character.only = TRUE)
-            #   return(my_to_entrezid(orgDB = get(orgDbname), gene = as.character(gene_name()$name)) %>%
-            #            tibble::rownames_to_column() %>% dplyr::rename(SYMBOL = rowname, ENTREZID = id) %>%
-            #            dplyr::select(SYMBOL, ENTREZID))
-            # }
             validate(need(nrow(gene_name()) > 1, "No genes (or less than 2) meet your requirements, and can not do the PPI(Protein-Protein Interaction Network) analysis!"))
-
-            # require(orgDbname, character.only = TRUE)
-            # orgDB = get(orgDbname)
-            # geneID = DEP2:::map_to_entrezid(gene_name(), orgDB = orgDB)
-            # validate(need(nrow(geneID) > 1, "No genes (or less than 2) meet your requirements, and can not do the PPI(Protein-Protein Interaction Network) analysis!"))
 
             validate(
               need(class(check_ppi()) != "try-error",
@@ -583,8 +527,13 @@ PPI_server_module <- function(id, Omics_res) {
           aplot <- reactive({
             # isolate(linksTable = links2())
             shiny::validate(need(nrow(gene_name()) > 1, "PPI should perform on at least 2 proteins/genes"))
-            aplot <- stringNetwork(linksTable = links2() , layoutway=input$layoutway , nodecolor= input$nodecolor , nodeshape=input$nodeshape, linecolor=input$linecolor , nodesize=input$nodesize , changesize=input$changesize , fontsize=input$PPIfontsize , changewidth=input$changewidth , linewidth=input$linewidth,smoothline = input$smoothline, smoothtype = input$smoothtype,highlightkey=input$highlightkey)
-            # aplot_save <<- aplot_save
+            aplot <- stringNetwork(linksTable = links2() , layoutway=input$layoutway ,
+                                   nodecolor= input$nodecolor , nodeshape=input$nodeshape,
+                                   linecolor=input$linecolor , nodesize=input$nodesize ,
+                                   changesize=input$changesize , fontsize=input$PPIfontsize ,
+                                   changewidth=input$changewidth , linewidth=input$linewidth,
+                                   smoothline = input$smoothline, smoothtype = input$smoothtype,
+                                   highlightkey=input$highlightkey)
           })
 
           incProgress(0.5)

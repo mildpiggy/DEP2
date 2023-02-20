@@ -237,11 +237,9 @@ GSEA_GO_server_module <- function(id, gene_list, organism_for_GSEA, annoSpecies_
         #   need(length(input$gsego_Phenotype) != 0, "Please choose at least one Phenotype"),
         #   need(class(reat_gsego()) != "try-error", "Your order ranked geneList can not do gsea analysis, Please go to GO panel if desired")
         # )
-        reat_gsego_save <<- reat_gsego()
         try(give_gseGO_res_and_table(reat = reat_gsego(), ont = input$gsego_ont, pCutoff = input$gsego_p, p.adj.cutoff = input$gsego_padj, NES.cutoff = input$gsego_NES, simplify = input$gsego_simplify, Phenotype = input$gsego_Phenotype), silent = TRUE)
       })
 
-      test22222 <<- res_gsego()
 
       output$gsego_Table <- DT::renderDataTable({
         shiny::validate(need(require(pkg_for_GSEA, character.only = TRUE), message = paste0("The package ", pkg_for_GSEA, " is not installed/available. Try installing it with BiocManager::install('", pkg_for_GSEA, "')")))
@@ -709,17 +707,11 @@ GSEA_other_server_module <- function(id, gene_list, organism_for_GSEA, annoSpeci
       print(gene_list)
 
       pkg_for_GSEA <- annoSpecies_df$pkg[annoSpecies_df$species == organism_for_GSEA]
-      pkg_for_GSEA_save221 <<- pkg_for_GSEA
-      organism_for_GSEA_sss <<- organism_for_GSEA
+
       print(pkg_for_GSEA)
 
       if(type == "kegg"){
-        # reat_gseOther <<- reactive({
-        # Create a Progress object
-        # progress <- shiny::Progress$new()
-        # progress$set(message = "I am doing gseOther analysis, please wait ...", value = 0.66)
-        # # Close the progress when this reactive exits (even if there's an error)
-        # on.exit(progress$close())
+
         reat_gseOther <- reactive(try(gsekeggAnalysis(gene_list = gene_list, organism = organism_for_GSEA, species_df = annoSpecies_df), silent = TRUE))
 
         res_gseOther <- reactive({
@@ -738,11 +730,11 @@ GSEA_other_server_module <- function(id, gene_list, organism_for_GSEA, annoSpeci
                              # msigdb = "c2.cgp (chemical and genetic perturbations)"
           ), silent = TRUE
         ))
-        reat_gseOther_save <<- reat_gseOther
+
         res_gseOther <- reactive({
           try(give_gseOther_res_and_table(reat = reat_gseOther(), pCutoff = input$gseOther_p, p.adj.cutoff = input$gseOther_padj, NES.cutoff = input$gseOther_NES, Phenotype = input$gseOther_Phenotype), silent = TRUE)
         })
-        res_gseOther_save <<- res_gseOther
+
       }
 
       ### Interactive UI functions ### ------------------------------------------
@@ -759,9 +751,6 @@ GSEA_other_server_module <- function(id, gene_list, organism_for_GSEA, annoSpeci
 
 
 
-      test2 <<- res_gseOther()
-
-      pkg_for_GSEA_save111 <<- pkg_for_GSEA
       output$gseOther_Table <- DT::renderDataTable({
         shiny::validate(
           need(require(pkg_for_GSEA, character.only = TRUE),
@@ -1023,7 +1012,6 @@ GSEA_other_server_module <- function(id, gene_list, organism_for_GSEA, annoSpeci
 #* Msigdb submodule UI/Server in GSEA module ----
 GSEA_Msigdb_UI <- function(id, tab_name = "Msigdb"){
   ns = NS(id)
-  # id_save2 <<- id
   tabPanel(
     tab_name,
     uiOutput(ns("Msigdb_tabs"))
@@ -1032,20 +1020,16 @@ GSEA_Msigdb_UI <- function(id, tab_name = "Msigdb"){
 
 GSEA_Msigdb_server_module <- function(id, gene_df, gene_list, organism_for_GSEA, annoSpecies_df, Msigdb_selection = NULL, Msigdb_selection2 = NULL) {
   # id = paste0(id,"_",suffix)
-  # id_save <<- id
 
   moduleServer(
     id = id,
     function(input, output, session) {
       ns = session$ns
-      print("000")
-      Msigdb_selection_save <<- Msigdb_selection
-      Msigdb_selection2_save <<- Msigdb_selection2
-      print("111")
+      # print("000")
+      # print("111")
       #** Msigdb_tabs render in msigdb ----
       output$Msigdb_tabs <- renderUI({
-        # tabs_save <<- tabs
-        print("aa")
+        # print("aa")
         tabsetPanel(
           id = session$ns("Msigdb_Tabs")
         )
@@ -1054,34 +1038,34 @@ GSEA_Msigdb_server_module <- function(id, gene_df, gene_list, organism_for_GSEA,
 
         if(length(Msigdb_selection) > 0){
           for (i in 1:length(Msigdb_selection)) { ## append subtabs UI
-            print("bb")
+            # print("bb")
             # tabs[[i]] <- GSEA_Msigdb_UI(ns(Msigdb_selection[i]), tab_name = Msigdb_selection[i])
             appendTab("Msigdb_Tabs",GSEA_other_UI(ns(Msigdb_selection[i]), tab_name = Msigdb_selection[i]))
-            print("bb")
+            # print("bb")
           }
 
           for (i in 1:length(Msigdb_selection)) { ## import subtabs server
             if(Msigdb_selection[i] != "other"){
-              print("cc")
+              # print("cc")
               category = strsplit(Msigdb_selection[i] ,"\\.")[[1]][1]
               subcategory = Msigdb_selection2
-              print("dd")
-              subcategory_save <<- subcategory
+              # print("dd")
+
               if(!is.null(subcategory)){
                 if(is.na(subcategory)) {subcategory =NULL
                 }else if(subcategory == "TFT") { subcategory == "TFT:GTRD"}
               }
-              print("ddd")
+              # print("ddd")
               GSEA_other_server_module(id = Msigdb_selection[i], gene_list = gene_list, organism_for_GSEA = organism_for_GSEA, annoSpecies_df = annoSpecies_df,
                                       type = "Msigdb", Msigdb_category = category , Msigdb_subcategory = subcategory )
-              print("ee")
+              # print("ee")
             }else if(!is.null(Msigdb_selection2)){
-              Msigdb_selection2_saved2 <<- Msigdb_selection2
+
               Msigdb_select2 <- Msigdb_selection2 %>% sapply(.,function(x) strsplit(x," \\(")[[1]][1]) %>% unname()
-              print("cc.1")
+              # print("cc.1")
               GSEA_other_server_module(id = Msigdb_selection[i], gene_list = gene_list, organism_for_GSEA = organism_for_GSEA, annoSpecies_df = annoSpecies_df,
                                       type = "Msigdb", Msigdb_category = NULL , Msigdb_subcategory = Msigdb_select2 )
-              print("FF")
+              # print("FF")
             }
           }
 

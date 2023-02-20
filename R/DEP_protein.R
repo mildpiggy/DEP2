@@ -122,7 +122,7 @@ reshape_long2wide <- function(long_table,
       stop(shrink_ident_cols[!shrink_ident_cols %in% colnames(long_table2)], " is not the colname.")
 
     # reduce_table(long_table2, feature_col= feature_col, sample_col = sample_col, val_col= "Stripped.Sequence")
-    fea_id_table_shrink <<- shrink_ident_cols %>% lapply(reduce_table, long_table2=long_table2,
+    fea_id_table_shrink <- shrink_ident_cols %>% lapply(reduce_table, long_table2=long_table2,
                                                         feature_col=feature_col,sample_col = sample_col)
     if(length(shrink_ident_cols) > 1){
       fea_id_table_shrink2 <- Reduce(function(...) merge(..., all=T), fea_id_table_shrink)

@@ -283,7 +283,7 @@ server <- function(input, output,session = session) {
               cat(" load server \n")
               # DEP_server_module(ID)
               omics_Servers[[ID]] <- DEP_pg_server_module(ID) ## DEP Server. The test values are stored in omics_Servers for postanalysis modules to call
-              # omics_Servers_saved <<- omics_Servers
+
               omics_Servers
               # omics_Servers_list <- reactive({reactiveValuesToList(omics_Servers)})
             }
@@ -316,7 +316,7 @@ server <- function(input, output,session = session) {
               cat(ID)
               cat(" load server \n")
               omics_Servers[[ID]] <- DEG_server_module(ID) ## DEG Server. The test values are stored in omics_Servers for postanalysis modules to call
-              # omics_Servers_saved <<- omics_Servers
+
               omics_Servers
             }
           },
@@ -344,7 +344,7 @@ server <- function(input, output,session = session) {
               cat(ID)
               cat(" load server \n")
               omics_Servers[[ID]] <- DEP_pep_server_module(ID) ## DEG Server. The test values are stored in omics_Servers for postanalysis modules to call
-              # omics_Servers_saved <<- omics_Servers
+
               omics_Servers
             }
           },
@@ -374,7 +374,7 @@ server <- function(input, output,session = session) {
             cat(" load server \n")
             # DEP_server_module(ID)
             omics_Servers[[ID]] <- DEP_ptm_server_module(ID, Omics_res = omics_Servers)   ## DEP_ptm Server. The test values are stored in omics_Servers for postanalysis modules to call
-            # omics_Servers_saved <<- omics_Servers
+
             omics_Servers
             # omics_Servers_list <- reactive({reactiveValuesToList(omics_Servers)})
           }

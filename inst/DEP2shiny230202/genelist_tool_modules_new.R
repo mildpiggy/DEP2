@@ -135,7 +135,6 @@ exctract_genelist_Server <- function(id, ID, Omics_Serv_res, suffix = ""){
                    })
                  }else if(omictype == "Timecourse"){
                    output$genelistUI <- renderUI({
-                     test_res_save <<- test_res()
                      tagList(
                        fluidRow(
                          column(width = 6,
@@ -157,7 +156,6 @@ exctract_genelist_Server <- function(id, ID, Omics_Serv_res, suffix = ""){
                  })
 
                  output$table_bttn <- renderUI({
-                   sig_res_save3 <<- sig_res()
                    if(omictype == "RNAseq" && nrow(test_res()@geneinfo) == 0 ){ ## check id transform of RNAseq data
                      return(
                        tagList(
@@ -187,9 +185,7 @@ exctract_genelist_Server <- function(id, ID, Omics_Serv_res, suffix = ""){
 
                  omics_id <- strsplit(ID, split = "-ds-")[[1]][1]
                  test_res = reactive({
-                   # Omics_Serv_res_save <<- Omics_Serv_res
                    theomics <- Omics_Serv_res()[[omics_id]]()
-                   test_res_save <<- theomics
                  })
 
                  iv1 <- InputValidator$new()
@@ -230,16 +226,16 @@ exctract_genelist_Server <- function(id, ID, Omics_Serv_res, suffix = ""){
                                                alpha = pcutoff(), lfc = l2fc(),
                                                thresholdmethod = input$method,
                                                curvature = curvature(), x0_fold = x0_fold())
-                     # dep_res_save <<- dep_res
+
                      # if(nrow(dep_res) > 0){
                      sigcol <- paste0(input$contrast,"_significant")
                      req( all(sigcol %in% colnames( rowData(dep_res))) )
                      sigdf <- rowData(dep_res)[,sigcol] %>% as.data.frame()
-                     # sigcol_save <<- sigcol
+
                      sig <- dep_res[rowAnys( sigdf == TRUE, na.rm = T ), ]
-                     sig_save <<- sig
+
                      sig_res <- get_results(sig)
-                     sig_res_save <<- sig_res
+
                      if(omictype == "PTM"){
                        identifier_cols = 1:4 ## "name", "ID", "gene_name", "protein_ID"
                      }else{
@@ -250,14 +246,14 @@ exctract_genelist_Server <- function(id, ID, Omics_Serv_res, suffix = ""){
                        if(length(sigcol) == 1){
                          sig_res <- sig_res %>% .[,c(identifier_cols,grep(paste0("(^",input$contrast,"_)", collapse = "|"),colnames(.)))]
                          if(input$trend == "both"){
-                           return(sig_res_save2 <<- sig_res)
+                           return(sig_res)
                          }else if(input$trend == "upregulate"){
-                           return(sig_res_save2 <<- sig_res[(sig_res %>% dplyr::select(paste0(input$contrast,"_ratio"))) > 0,])
+                           return(sig_res[(sig_res %>% dplyr::select(paste0(input$contrast,"_ratio"))) > 0,])
                          }else if(input$trend == "downregulate"){
-                           return(sig_res_save2 <<- sig_res[(sig_res %>% dplyr::select(paste0(input$contrast,"_ratio"))) < 0,])
+                           return(sig_res[(sig_res %>% dplyr::select(paste0(input$contrast,"_ratio"))) < 0,])
                          }
                        }else if(length(sigcol) > 1){
-                         return(sig_res_save2 <<- sig_res %>% .[,c(identifier_cols,grep(paste0("(^",input$contrast,"_)", collapse = "|"),colnames(.)))])
+                         return(sig_res %>% .[,c(identifier_cols,grep(paste0("(^",input$contrast,"_)", collapse = "|"),colnames(.)))])
                        }
 
                      }else{
@@ -292,7 +288,7 @@ exctract_genelist_Server <- function(id, ID, Omics_Serv_res, suffix = ""){
                      }else if(length(thecontrast) == 1){
                        sig_rows = which(the_res[,pcol] < pcutoff() & abs(the_res[,L2Fcol] )> l2fc())
                        sig_res = the_res[sig_rows,] %>% dplyr::select(name,starts_with(thecontrast)) %>% rownames_to_column("ID")
-                       sig_res_save <<- sig_res
+
                        if(nrow(sig_res) == 0) return(NULL)
                        if(input$trend == "both"){
                          return(sig_res)
@@ -310,7 +306,7 @@ exctract_genelist_Server <- function(id, ID, Omics_Serv_res, suffix = ""){
                      req(!is.null(input$cluster))
                      sig_res = test_res()$res
                      sig_res = sig_res[which(sig_res$Timecourse_cluster %in% input$cluster),]
-                     sig_res_save <<- sig_res
+                     sig_res
                    })
                  }
 
@@ -325,10 +321,8 @@ exctract_genelist_Server <- function(id, ID, Omics_Serv_res, suffix = ""){
                  })
 
                  output$sig_table <- DT::renderDT({
-                   # sig_res_save <- sig_res()
                    sig_res()
                  }, options = list(pageLength = 10, scrollX = T))
-                 # sig_res_saved <<- sig_res
                  return(sig_res)
                })
 }
@@ -549,7 +543,6 @@ genelist_tool_Server <- function(id, Omics_res){
           Dropzone3 = dropzone3_list,
           Dropzone4 = dropzone4_list
         )
-        dropzone_input_list_save <<- dropzone_input_list
 
         dropzone_input_list2 = dropzone_input_list %>% lapply(., function(x){
           temp = c()
@@ -564,7 +557,6 @@ genelist_tool_Server <- function(id, Omics_res){
           }
           return(NULL)
         })
-        dropzone_input_list2_save <<- dropzone_input_list2
 
         to_upper = input$to_upper
         if( length(dropzone_input_list2) > 0 ){
@@ -588,7 +580,6 @@ genelist_tool_Server <- function(id, Omics_res){
             }
           })
         }else{return(NULL)}
-        dropzone_input_list3_save <<- dropzone_input_list3
         return(dropzone_input_list3)
       })
 
@@ -612,13 +603,13 @@ genelist_tool_Server <- function(id, Omics_res){
         df <- data.frame(sapply(venn_list, "[", i = 1:max(sapply(venn_list, length))))
         df[is.na(df)] <- ""
         colnames(df) <- region_names
-        df_save <<- df
+
         return(df)
       })
 
       venn_items <- reactive({
         data <- venn_data()
-        data_save <<- data
+
         req(!is.null(data))
         items <- data@region %>% dplyr::rowwise() %>%
           dplyr::mutate(text = stringr::str_wrap(paste0(.data$item, collapse = " "), width = 40)) %>%
@@ -756,7 +747,6 @@ genelist_tool_Server <- function(id, Omics_res){
               setdiff(names(layer_modules1)[check], input$dropzone1),
               ~ { layer_modules1[[.]] <- NULL })
             print("exctract_genelist_Server load")
-            # layer_modules1_saved <<- layer_modules1
           }
         }, priority = 1, ignoreNULL = F, ignoreInit = T)
 
@@ -793,20 +783,7 @@ genelist_tool_Server <- function(id, Omics_res){
       print("render dropzone2 finished")
 
       layer_modules2 <- reactiveValues()
-      # gene_name <- reactive({
-      #   if(input$if_paste_2){
-      #     temp <<- input$text_input_2
-      #     if(is.null(temp)) return(NULL)
-      #     genelist <- read.table(text = temp)
-      #     if(is.null(genelist) || length(genelist) == 0) return(NULL)
-      #     gene_name <- genelist[,1] %>% sapply( ., function(x){strsplit(x,";")[[1]][1] })
-      #
-      #     gene_name = data.frame(name = gene_name %>% sapply(.,function(x){strsplit(x,"\\.")[[1]][1]})  %>% unlist)
-      #     gene_name_save <<- gene_name
-      #     return(gene_name)
-      #   }
-      #   return(NULL)
-      # })
+
       observeEvent(
         list(a = input$dropzone2,
              b = input$if_paste_2),
@@ -820,7 +797,7 @@ genelist_tool_Server <- function(id, Omics_res){
                 if(nrow(genelist) == 0) return(NULL)
                 gene_name <- sapply(genelist[,1],the1stname)
                 gene_name = data.frame(name = gene_name %>% sapply(.,function(x){strsplit(x,"\\.")[[1]][1]})  %>% unlist)
-                gene_name_save <<- gene_name
+
                 return(gene_name)
               }
               return(NULL)
@@ -842,7 +819,6 @@ genelist_tool_Server <- function(id, Omics_res){
             purrr::map(
               setdiff(names(layer_modules2)[check], dropzone2_input),
               ~ { layer_modules2[[.]] <- NULL })
-            # layer_modules2_saved <<- layer_modules2
           }
         },
         priority = 1, ignoreNULL = F, ignoreInit = T)
@@ -1007,41 +983,20 @@ genelist_tool_Server <- function(id, Omics_res){
             purrr::map(
               setdiff(names(layer_modules4)[check], input$dropzone4),
               ~ { layer_modules4[[.]] <- NULL })
-            # layer_modules4_saved <<- layer_modules4
           }
         }, priority = 1, ignoreNULL = F, ignoreInit = T)
-
-      # observeEvent(input$save_modsession, {
-      #   session_saved2 <<- session
-      #   session_saved3 <<- session$parent
-      #   session_saved4 <<- .subset2(session, "parent")
-      #   re_domain <<- getDefaultReactiveDomain() ## the session is the getDefaultReactiveDomain()
-      #   # cat(aaa())
-      #   # aaa_saved <<- aaa
-      # })
 
 
       output$showme <- renderText({
         paste("Dropzone:", paste0(input$dropzone, collapse = " "))
       })
 
-      # output$inputvals1 <- renderPrint({
-      #   reactiveValuesToList(input)
-      # })
-
-      # output$venn_selected <- renderPrint({
-      #   venn_click()
-      # })
-
-      # output$venn_selected2 <- renderPrint({
-      #   venn_click2()
-      # })
 
       heatmap_plot = reactive({
         library(ComplexHeatmap)
 
         venn_click2 <- venn_click2() %>% unique()
-        # venn_click2_save <<- venn_click2
+
         if(is.null(venn_click2))
           return(NULL)
 
@@ -1099,7 +1054,6 @@ genelist_tool_Server <- function(id, Omics_res){
 
       output$inputlist_view <- renderUI({
         dropzone_input_list <- dropzone_input_list()
-        # dropzone_input_list <- dropzone_input_list_save
         if (!is.null(dropzone_input_list[["Dropzone1"]]) && length(dropzone_input_list[["Dropzone1"]]) >0) {
           tag1 <- tagList(
             p("proteins(genes) in Dropzone1",style = "font-weight:bold"),
@@ -1153,7 +1107,6 @@ genelist_tool_Server <- function(id, Omics_res){
       })
 
       output$Genelist1 <- renderPrint({
-        # dropzone_input_list <- dropzone_input_list_save
         dropzone_input_list <- dropzone_input_list()
         if(!is.null(dropzone_input_list[["Dropzone1"]]) && length(dropzone_input_list[["Dropzone1"]] >0)){
           cat(paste0(dropzone_input_list[["Dropzone1"]],collapse = " "))
@@ -1163,7 +1116,6 @@ genelist_tool_Server <- function(id, Omics_res){
       })
 
       output$Genelist2 <- renderPrint({
-        # dropzone_input_list <- dropzone_input_list_save
         dropzone_input_list <- dropzone_input_list()
         if(!is.null(dropzone_input_list[["Dropzone2"]]) && length(dropzone_input_list[["Dropzone2"]] >0)){
           cat(paste0(dropzone_input_list[["Dropzone2"]],collapse = " "))
@@ -1173,7 +1125,6 @@ genelist_tool_Server <- function(id, Omics_res){
       })
 
       output$Genelist3 <- renderPrint({
-        # dropzone_input_list <- dropzone_input_list_save
         dropzone_input_list <- dropzone_input_list()
         if(!is.null(dropzone_input_list[["Dropzone3"]]) && length(dropzone_input_list[["Dropzone3"]] >0)){
           cat(paste0(dropzone_input_list[["Dropzone3"]],collapse = " "))
@@ -1183,7 +1134,6 @@ genelist_tool_Server <- function(id, Omics_res){
       })
 
       output$Genelist4 <- renderPrint({
-        # dropzone_input_list <- dropzone_input_list_save
         dropzone_input_list <- dropzone_input_list()
         if(!is.null(dropzone_input_list[["Dropzone4"]]) && length(dropzone_input_list[["Dropzone4"]] >0)){
           cat(paste0(dropzone_input_list[["Dropzone4"]],collapse = " "))
@@ -1197,14 +1147,6 @@ genelist_tool_Server <- function(id, Omics_res){
         data <- venn_data()
         items <- venn_items()
         shiny::validate(need(!is.null(venn_data()), "Must provide two input"))
-        # items <<- data@region %>% dplyr::rowwise() %>%
-        #   dplyr::mutate(text = stringr::str_wrap(paste0(.data$item, collapse = " "), width = 40)) %>%
-        #   # sf::st_as_sf() %>%
-        #   dplyr::mutate(ratio = round(count/sum(data@region$count),3)) %>%
-        #   dplyr::mutate(count2 = paste(count,"(",ratio*100,"%)",sep = ""))
-        # label_coord = sf::st_centroid(items$geometry) %>% sf::st_coordinates()
-        # items$textx = label_coord[,1]
-        # items$texty = label_coord[,2]
 
         p1 <- items %>% highlight_key(~id) %>% {
           ggplot(.) +

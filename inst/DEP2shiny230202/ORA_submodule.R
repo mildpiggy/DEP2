@@ -261,7 +261,7 @@ ORA_GO_server_module <- function(id, gene_id, organism_for_ORA, annoSpecies_df) 
       print("b1")
 
       pkg_for_ORA <- annoSpecies_df$pkg[annoSpecies_df$species == organism_for_ORA]
-      pkg_for_ORA_save <<- pkg_for_ORA
+
       output$downloadTable_go <- renderUI({
         selectizeInput(session$ns("dataset_for_go"),
                        "Choose a dataset to save" ,
@@ -273,22 +273,13 @@ ORA_GO_server_module <- function(id, gene_id, organism_for_ORA, annoSpecies_df) 
         downloadButton(session$ns('downloadgo'), 'Save table')
       })
 
-      # reat <<- try(goAnalysis(df = gene_df, df_with_lg2fc = F, organism = organism_for_ORA, species_df = annoSpecies_df), silent = TRUE)
-      # print("aaa")
-      # gene_id_save1 <<- gene_id
-
       reat <- reactive({
-        # df_test <<- gene_df
-        # organism <<- organism_for_ORA
-        # species_df <<- annoSpecies_df
-        # gene_id_save <<- gene_id
         try(goAnalysis(gene_id = gene_id,
                        # df_with_lg2fc = F,
                        organism = organism_for_ORA, species_df = annoSpecies_df),
             silent = TRUE)
       })
-      # print("bbb")
-      # test1 <<- reat()
+
       res <- reactive({
         try(giveGO_res_and_table(reat = reat(), ont = input$go_ont, pCutoff = input$go_p, p.adj.cutoff = input$go_padj, q.cutoff = input$go_qvalue, simplify = input$go_simplify), silent = TRUE)
       })
@@ -302,8 +293,6 @@ ORA_GO_server_module <- function(id, gene_id, organism_for_ORA, annoSpecies_df) 
         }
         return(res)
       })
-
-      test2 <<- res()
 
       output$Table <- DT::renderDataTable({
 
@@ -789,11 +778,10 @@ ORA_other_server_module <- function(id,
   moduleServer(
     id,
     function(input, output, session,id=id) {
-      # organism_for_ORA_save <<- organism_for_ORA
+
       print(organism_for_ORA)
       pkg_for_ORA <- annoSpecies_df$pkg[annoSpecies_df$species == organism_for_ORA]
 
-      # type_save <<- type
       print(type)
       print(pkg_for_ORA)
 
@@ -809,12 +797,7 @@ ORA_other_server_module <- function(id,
         downloadButton(session$ns('downloadkegg'), 'Save table')
       })
 
-      # reat <<- reactive({
-      # Create a Progress object
-      # progress <- shiny::Progress$new()
-      # progress$set(message = "I am doing KEGG analysis, please wait ...", value = 0.66)
-      # # Close the progress when this reactive exits (even if there's an error)
-      # on.exit(progress$close())
+
       if(type == "kegg"){
         reat <- reactive({try(keggAnalysis(gene_id = gene_id,
                                            # df = gene_df,
@@ -1095,7 +1078,7 @@ ORA_other_server_module <- function(id,
 #* Msigdb submodule UI/Server in ORA module ----
 ORA_Msigdb_UI <- function(id, tab_name = "Msigdb"){
   ns = NS(id)
-  # id_save2 <<- id
+
   tabPanel(
     tab_name,
     uiOutput(ns("Msigdb_tabs"))
@@ -1104,20 +1087,15 @@ ORA_Msigdb_UI <- function(id, tab_name = "Msigdb"){
 
 ORA_Msigdb_server_module <- function(id, gene_df, gene_id, organism_for_ORA, annoSpecies_df, Msigdb_selection = NULL, Msigdb_selection2 = NULL) {
   # id = paste0(id,"_",suffix)
-  # id_save <<- id
 
   moduleServer(
     id = id,
     function(input, output, session) {
       ns = session$ns
-      print("000")
-      Msigdb_selection_save <<- Msigdb_selection
-      Msigdb_selection2_save <<- Msigdb_selection2
-      print("111")
+
       #** Msigdb_tabs render in msigdb ----
       output$Msigdb_tabs <- renderUI({
-        # tabs_save <<- tabs
-        print("aa")
+
         tabsetPanel(
           id = session$ns("Msigdb_Tabs")
         )
@@ -1125,14 +1103,12 @@ ORA_Msigdb_server_module <- function(id, gene_df, gene_id, organism_for_ORA, ann
       observeEvent(input$Msigdb_Tabs,{
         if(length(Msigdb_selection) > 0){
           for (i in 1:length(Msigdb_selection)) { ## subtabs UI
-            print("bb")
-            # tabs[[i]] <- ORA_other_UI(ns(Msigdb_selection[i]), tab_name = Msigdb_selection[i])
+
             appendTab("Msigdb_Tabs",ORA_other_UI(ns(Msigdb_selection[i]), tab_name = Msigdb_selection[i]))
-            print("BB")
           }
           for (i in 1:length(Msigdb_selection)) { ## subtabs server
             if(Msigdb_selection[i] != "other"){
-              print("CC")
+
               category = strsplit(Msigdb_selection[i] ,"\\.")[[1]][1]
               subcategory = strsplit(Msigdb_selection[i] ,"\\.")[[1]][2]
               # subcategory = ifelse(is.na(subcategory), NULL, ifelse(subcategory == "TFT","TFT:GTRD", subcategory))
@@ -1140,13 +1116,12 @@ ORA_Msigdb_server_module <- function(id, gene_df, gene_id, organism_for_ORA, ann
               }else if(subcategory == "TFT") { subcategory == "TFT:GTRD"}
               ORA_other_server_module(id = Msigdb_selection[i], gene_id = gene_id, organism_for_ORA = organism_for_ORA, annoSpecies_df = DEP2:::annoSpecies_df(),
                                       type = "Msigdb", Msigdb_category = category , Msigdb_subcategory =subcategory )
-              print("ee")
+
             }else if(!is.null(Msigdb_selection2)){
-              Msigdb_selection2_saved2 <<- Msigdb_selection2
               Msigdb_select2 <- Msigdb_selection2 %>% sapply(.,function(x) strsplit(x," \\(")[[1]][1]) %>% unname()
               ORA_other_server_module(id = Msigdb_selection[i], gene_id = gene_id, organism_for_ORA = organism_for_ORA, annoSpecies_df = DEP2:::annoSpecies_df(),
                                       type = "Msigdb", Msigdb_category = NULL , Msigdb_subcategory = Msigdb_select2 )
-              print("FF")
+
             }
           }
         }

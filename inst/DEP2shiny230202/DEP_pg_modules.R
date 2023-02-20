@@ -1001,14 +1001,12 @@ DEP_pg_server_module <- function(id){
       output$test_manual <- renderUI({
         validate(need(!is.null(input$file1), ""))
         if(!is.null(data()) & input$contrasts == "manual"){
-          # cols <<- grep("^LFQ", colnames(data()))
           cols <- which(colnames(data()) %in% input$intensitycols)#according to intensitycols
           if(input$remove_prefix){
             prefix <- get_prefix(data()[,cols] %>% colnames())
             label = colnames(data())[cols] %>% gsub(prefix,"",.)
           }else label = colnames(data())[cols]
 
-          # prefix <- get_prefix(data()[,cols] %>% colnames())
           test_manual_name <- unique(make.names(unlist(lapply(label %>% strsplit(., split = "_"), function(x){x[1]}))))
           test_manual_name <- cbind(combn(test_manual_name,2),combn(test_manual_name,2, FUN = rev))
           test_manual_name <- apply(test_manual_name, 2, function(i){paste(i[1], i[2], sep = "_vs_")})
@@ -1038,10 +1036,7 @@ DEP_pg_server_module <- function(id){
       })
 
       observe({
-        # cat(input$threshold_method)
-        # session_saved <<- session
-        # input_save <<- input
-        # cat(input[session$ns("threshold_method")])
+
         if((input$threshold_method) == "intersect") {
           print("observe1")
           # removeTab(inputId = "DEP_results_tabs", target = "DEP curve 1")
@@ -1166,7 +1161,6 @@ DEP_pg_server_module <- function(id){
             label <- colnames(data())[cols]
             expdesign <- get_exdesign_parse(label, mode = "delim", sep = "_",
                                             remove_prefix = input$remove_prefix, remove_suffix = input$remove_suffix)
-            # my_expdesign <<- expdesign
           }
         }else{
           read.csv(inFile$datapath, header = TRUE,
@@ -1192,7 +1186,7 @@ DEP_pg_server_module <- function(id){
         ## replace the [xxx] characters in colnames
         colnames(my_data) = gsub("^\\[(.*)\\] ","",colnames(my_data))
         colnames(my_data) = make.names(colnames(my_data))
-        # my_data <<- my_data
+
         my_data
       })
 
@@ -1215,9 +1209,8 @@ DEP_pg_server_module <- function(id){
           )
         }
 
-        # ddd <<- input$delim
         unique_names <- DEP2::make_unique(proteins = data, names = ifelse(input$name == "", input$id, input$name), ids = ifelse(input$id == "", input$name, input$id), delim = input$delim)
-        # uuu <<- unique_names
+
         ind_empty = c(grep("^\\.\\d*$", unique_names$name), which(unique_names$name == ""))
         if(length(ind_empty) > 0) {
           unique_names = unique_names[-ind_empty, ]
@@ -1232,36 +1225,22 @@ DEP_pg_server_module <- function(id){
           colData(se)$replicate = as.character(colData(se)$replicate)
         }
 
-        # se_save <<- se
         filtered <- se
-        # filtered_save1 <<- filtered
-        # filt_save <<- input$filt
+
         if(is.null(input$filt)){
           message("the filter column is empty! Do not filter with column")
-          # filtered <- se
         }else{
           for(i in input$filt){
             filter_formula = paste( "~(is.na(",i,")|",i,"=='')") %>% as.formula()
-            # filter_formula_save <<-filter_formula
-            # filtered_save2 <<- filtered
             message(filter_formula)
             filtered <-DEP2:::filter_se(filtered, filter_formula = filter_formula)
           }
-          # filtered1 <- DEP2:::filter_se(se, as.formula())
         }
 
         thr <- ifelse(is.na(input$thr), 0, input$thr)
-        # my_filt <- filter_missval(se, thr = thr)
+
         my_filt <- filter_se(filtered, thr = thr)
-        # my_filt_save <<- my_filt
-        # order_save <<- input$order
-        # if(is.null(input$order) || length(input$order) != length(my_filt@colData$conditon %>% unique)){
-        #   return(my_filt)
-        # }else{
-        #   order_save2 <<- input$order
-        #   my_filt@colData$condition = factor(my_filt@colData$condition, levels = input$order)
-        #   my_filt@colData = my_filt@colData %>% arrange(., condition)
-        # }
+
         return(my_filt)
       })
 
@@ -1275,7 +1254,7 @@ DEP_pg_server_module <- function(id){
 
       the_order <- reactive({
         req(iv1$is_valid())
-        # order_save1 <<- input$order
+
         if(length(input$order) == length(filt0()@colData$condition %>% unique))
           return(input$order)
         return(NULL)
@@ -1283,22 +1262,17 @@ DEP_pg_server_module <- function(id){
 
       filt <- reactive({
         filt = filt0()
-        # order_save <<- the_order()
-        # my_filt_save <<- filt
+
         if(is.null(the_order())){
           return(filt)
         }else{
-          # order_save2 <<- the_order()
-          # filt@colData$condition = factor(filt@colData$condition, levels = the_order())
-          # filt = filt[,order(filt@colData$condition)]
           filt = DEP2::Order_cols(filt,the_order())
-          # filt@colData = filt@colData %>% as.data.frame() %>% arrange(., condition) %>% DataFrame()
+
           return(filt)
         }
       })
 
       norm <- reactive({
-        # my_filt_save2 <<- filt()
         my_norm <- try({normalize_vsn(filt())})
         if(class(my_norm) == "try-error"){
           ## if vsn failed for a small matrix, skip vsn normalization
@@ -1355,12 +1329,10 @@ DEP_pg_server_module <- function(id){
               )
               my_imp
             } else {
-              #set.seed(12345)
               my_imp <- impute(norm(), input$imputation)
-              # my_imp <- DEP2::impute(norm(), input$imputation)
             }
           }
-          my_imp_pg <<- my_imp
+
           return(my_imp)
         } else {
           return(NULL)
@@ -1407,7 +1379,6 @@ DEP_pg_server_module <- function(id){
         } else {
           #load your saved RData in order to get the same result (imp is the key of if result from two analysis being the same)
           load(file = inFile1$datapath)
-          # my_imp <<- my_imp
           if(input$contrasts == "control"){
             df <- DEP2::test_diff(se = my_imp, type = input$contrasts, control = input$control,
                             fdr.type = FDR_type())
@@ -1424,13 +1395,11 @@ DEP_pg_server_module <- function(id){
                             fdr.type = FDR_type())
           }
         }
-        # my_df <<- df
         df
       })
 
 
       dep <- reactive({
-        # aaa <<- input$curvature
         req(input$threshold_method %in% c("intersect", "curve"))
         if(input$threshold_method == "intersect") {
           my_dep <- DEP2::add_rejections(diff = df(), alpha = input$p, lfc = input$lfc, thresholdmethod = input$threshold_method)
@@ -1444,7 +1413,7 @@ DEP_pg_server_module <- function(id){
         }else{
           rowData(my_dep)$Peptides = rowData(my_dep)[,input$peptidescol]
         }
-        # my_dep_save <<- my_dep
+
         return(my_dep)
       })
 

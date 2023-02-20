@@ -126,14 +126,13 @@ ORA_server_module2 <- function(id, Omics_res) {
       library(ReactomePA)
 
       ns = session$ns
-      session_save2 <<- session
 
       annoSpecies_df <- DEP2:::annoSpecies_df()
       # annoSpecies_df_for_reactome <- DEP2:::annoSpecies_df()
 
       #* organism selection ----
       output$organism_for_ORA <- renderUI({
-        aa <<- input$type_for_ORA
+
         if(is.element("Msigdb", input$type_for_ORA)){
           selectizeInput(ns("organism_for_ORA"), "Select organism", choices=c("Human", "Mouse", "Rat"), selected="Human")
         } else {
@@ -259,9 +258,7 @@ ORA_server_module2 <- function(id, Omics_res) {
       # })
       # Msigdb_opt_selected2 <- reactive({
       #   tree_sel <- get_selected(input$Msigdb_opt2 , format = "slices")
-      #   tree_sel_save <<- tree_sel
       #   # shinytreeInput_treatment(tree_sel %>% unlist() %>% names)
-      #   tree_sel_save2 <<- shinytreeInput_treatment(tree_sel %>% unlist() %>% names)
       # })
 
       #* input handle ----
@@ -279,10 +276,10 @@ ORA_server_module2 <- function(id, Omics_res) {
           # gene_name <-unlist(strsplit(genelist[,1],";")[[1]])
 
           genelist <- fread(text = temp, header = F) %>% as.data.frame()
-          genelist_save <<- genelist
+
           if(nrow(genelist) == 0) return(NULL)
           gene_name <- genelist[,1] %>% sapply(., the1stname) %>% unique()
-          # gene_name_save1 <<- gene_name
+
         }else{
           genelist <- drop_genelist_modules %>% reactiveValuesToList()
           if(length(genelist)>0){
@@ -300,11 +297,11 @@ ORA_server_module2 <- function(id, Omics_res) {
             gene_name<- NULL
           }
         }
-        gene_name_save1 <<- gene_name
+
         if(is.null(gene_name)||length(gene_name) < 1) return(NULL) ## when no sig res (no gene as input)
         gene_name = data.frame(name = gene_name %>% DEP2:::rm_digit_end()  %>% unique()) %>%
           dplyr::filter(!is.na(name))
-        gene_name_save2 <<- gene_name
+
         return(gene_name)
       })
 
@@ -335,12 +332,9 @@ ORA_server_module2 <- function(id, Omics_res) {
         # %>% filter(!is.na(ENTREZID)) %>% filter(!duplicated(ENTREZID))
 
         # ids = my_to_entrezid(orgDB = orgDB, gene = as.character(gene_df$name))
-        ids_save1 <<- ids
         ids <- ids %>% inner_join(., gene_df, by = "name") %>% filter(!is.na(ENTREZID))
-        ids_save2 <<- ids
         ids = unlist(ids$ENTREZID)
         names(ids) = ids
-        ids_save3 <<- ids
         print("Mapping ENTREZID finished!")
         return(ids)
       })
@@ -358,9 +352,8 @@ ORA_server_module2 <- function(id, Omics_res) {
       })
 
       observeEvent(input$ORA,{
-        save1 <<- input$ORA
         hideTab(inputId = "ORA", target = "KEGG"); hideTab(inputId = "ORA", target = "Reactome"); hideTab(inputId = "ORA", target = "Msigdb")
-        save2 <<- input$ORA
+
       },once = T, ignoreNULL = T, ignoreInit = F)
 
       observeEvent(input$type_for_ORA,{
@@ -378,7 +371,6 @@ ORA_server_module2 <- function(id, Omics_res) {
 
       observeEvent(input$analyze_for_ORA,{
         # warning if select no database
-        # temp1 <<-input$type_for_ORA
         type_for_ORA_Pass1 <- ifelse((is.null(input$type_for_ORA) || input$type_for_ORA == ""), F, T)
         shinyFeedback::feedbackWarning("type_for_ORA", !type_for_ORA_Pass1, "Please select at least one database")
         req(type_for_ORA_Pass1)
@@ -409,7 +401,6 @@ ORA_server_module2 <- function(id, Omics_res) {
         }
 
         if("Reactome" %in% ORA_database_selected()){
-          session_save3 <<- session
           print("loading Reactome server")
           ORA_other_server_module(id = "Reactome",
                                   # gene_df = gene_df,

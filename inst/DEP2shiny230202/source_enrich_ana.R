@@ -1,17 +1,5 @@
 #### for gene annotation -------
 
-# library(clusterProfiler)
-# library(dplyr)
-# library(parallel)
-# library(PFAM.db)
-# library(GO.db)
-# library(AnnotationDbi)
-# library(reactome.db)
-# library(stringr)
-# library(shinyTree)
-# library(org.Hs.eg.db)
-# library(org.Mm.eg.db)
-# library(org.Rn.eg.db)
 
 
 ## to handle the shiny tree input, is canceled in this version
@@ -91,7 +79,7 @@ enrichGO <- function(gene,
       if(GO_DATAfile2 == GO_DATAfile)
         use_cashed = T  ## a correct RDS was loaded
     }
-    use_cashed_save <<- use_cashed
+
     if(use_cashed){
       GO_DATA = get("GO_DATA",envir = GO_DATA_environment)
     }else{
@@ -104,14 +92,12 @@ enrichGO <- function(gene,
 
   }else{
     cat("creat new db")
-    OrgDb_save <<- OrgDb
-    keyType_save <<- keyType
     ## creat a GO_DATA for particular GO options: OrgDb,ont,keyType
     GO_DATA <- list(ALL = as.list(my_get_GO_data(OrgDb, "ALL", keyType)),
                     BP = as.list(my_get_GO_data(OrgDb, "BP", keyType)),
                     MF = as.list(my_get_GO_data(OrgDb, "MF", keyType)),
                     CC = as.list(my_get_GO_data(OrgDb, "CC", keyType)))
-    GO_DATA_save <<- GO_DATA
+
     ## save the GO_DATA as an rds file
     saveRDS(GO_DATA,file = paste(GO_DATAfolder,"/",GO_DATAfile,sep = ""))
 
@@ -267,7 +253,6 @@ my_get_GO_data <- function (OrgDb, ont, keytype)
   goOnt <- goOnt.df[, 2]
   names(goOnt) <- goOnt.df[, 1]
   assign("GO2ONT", goOnt, envir = GO_DATA)
-  GO_DATA_save <<- GO_DATA
   return(GO_DATA)
 }
 
@@ -302,85 +287,6 @@ my_to_entrezid <- function(orgDB = org.Hs.eg.db, gene) {
   return(my_ids1)
 }
 
-
-
-## geneid : entrezid, class as: character
-## keytype: "ENTREZID"
-## genedb： one of mouse:"org.Mm.eg.db"; human:"org.Hs.eg.db"; rat:org.Rn.eg.db: default "org.Hs.eg.db"
-# Geneannotate <- function(geneid,keytype="ENTREZID",genedb){
-#   GOdata <- GO.db
-#   ##ago <- NA
-#   #ago<- AnnotationDbi::select(genedb, keys=geneid, columns = c("GO","ENTREZID","ENSEMBL", "SYMBOL", "PFAM", "UNIPROT", "GENENAME", "PATH"), keytype = keytype)
-#   ago<- AnnotationDbi::select(genedb, keys=geneid, columns = c("GO","ENTREZID", "SYMBOL", "PFAM", "GENENAME", "PATH"), keytype = keytype)
-#   ago <- ago %>% mutate(numb=c(1:nrow(ago)))
-#   # try(temgo<-AnnotationDbi::select(GOdata,key=ago$GO,columns = c("DEFINITION","TERM"),keytype = "GOID"))
-#   try(temgo<-AnnotationDbi::select(GOdata,key=ago$GO,columns = c("TERM"),keytype = "GOID"))
-#   temgo <- temgo %>% mutate(numb=c(1:nrow(ago)))
-#   bgo <- merge(ago,temgo,by="numb")
-#
-#   kegg <- ko2name(ko = paste("ko","",bgo$PATH, sep = ""))
-#   names(kegg)[2] = "kegg"
-#   names(kegg)[1] = "PATH"
-#   kegg[ , 1] = gsub("ko", "", kegg[ , 1])
-#   kegg = kegg[!duplicated(kegg$kegg), ]
-#
-#   bgo <- dplyr::left_join(x = bgo, y = kegg, by = "PATH")
-#
-#   react = AnnotationDbi::select(reactome.db, keys = geneid, columns = c("REACTOMEID", "PATHNAME"), keytypes="ENTREZID")
-#   names(react)[3] = "react"
-#   bgo <- dplyr::left_join(x = bgo, y = react, by = "ENTREZID")
-#   #################### test
-#   pfamAC = as.data.frame(PFAMID)
-#   names(pfamAC)[1:2] = c("PFAM", "PFAM_ID")
-#
-#   bgo = dplyr::left_join(x = bgo, y = pfamAC, by = "PFAM")
-#
-#   IDS <<- unique(bgo$ENTREZID)
-#   return(bgo)
-# }
-
-# x: Geneannotate函数返回对象bgo$ENTREZID
-# bgo： Geneannotate函数返回对象bgo
-# mergego <- function(x,bgo){
-#   library(dplyr)
-#   subgo <- bgo %>% dplyr::filter(ENTREZID==x)
-#   subgo <- subgo[!duplicated(subgo$GO),]
-#   GOCC <- subgo%>%dplyr::filter(ONTOLOGY=="CC") %>%dplyr::select("TERM")%>%unlist()%>% paste0(collapse = " ; ")
-#   GOBP <- subgo%>%dplyr::filter(ONTOLOGY=="BP") %>%dplyr::select("TERM")%>%unlist()%>% paste0(collapse = " ;  ")
-#   GOMF <- subgo%>%dplyr::filter(ONTOLOGY=="MF") %>%dplyr::select("TERM")%>%unlist()%>% paste0(collapse = " ;  ")
-#
-#   #DECC <- subgo%>%dplyr::filter(ONTOLOGY=="CC") %>%dplyr::select("DEFINITION")%>%unlist()%>% paste0(collapse = " ;  ")
-#   #DEBP <- subgo%>%dplyr::filter(ONTOLOGY=="BP") %>%dplyr::select("DEFINITION")%>%unlist()%>% paste0(collapse = " ;  ")
-#   #DEMF <- subgo%>%dplyr::filter(ONTOLOGY=="MF") %>%dplyr::select("DEFINITION")%>%unlist()%>% paste0(collapse = " ;  ")
-#   #GOs <- c(GOCC,DECC,GOBP,DEBP,GOMF,DEMF)
-#   GOs <- c(GOCC,GOBP,GOMF)
-#
-#   subpfam <- bgo %>% dplyr::filter(ENTREZID==x)
-#   subpfam <- subpfam[!duplicated(subpfam$PFAM_ID),]
-#   pfam <- subpfam %>% dplyr::select("PFAM_ID") %>% unlist() %>% paste0(collapse = " ; ")
-#
-#
-#   sub_gene.descri <- bgo %>% dplyr::filter(ENTREZID==x)
-#   sub_gene.descri <- sub_gene.descri[!duplicated(sub_gene.descri$GENENAME),]
-#   gene.descri <- sub_gene.descri %>% dplyr::select("GENENAME") %>% unlist() %>% paste0(collapse = " ; ")
-#
-#   subkegg <- bgo %>% dplyr::filter(ENTREZID==x)
-#   subkegg <- subkegg[!duplicated(subkegg$kegg),]
-#   kegg <- subkegg %>% dplyr::select("kegg") %>% unlist() %>% paste0(collapse = " ; ")
-#
-#   subreact <- bgo %>% dplyr::filter(ENTREZID==x)
-#   subreact <- subreact[!duplicated(subreact$react),]
-#   react <- subreact %>% dplyr::select("react") %>% unlist() %>% paste0(collapse = " ; ")
-#
-#   res = c(GOs, pfam, gene.descri, kegg, react)
-#   return(res)
-# }
-############ gene: gene name , class as character
-# sym_to_entr <- function(gene) {
-#   ids <- bitr(gene, fromType = "SYMBOL",
-#               toType = "ENTREZID",
-#               OrgDb = db)
-# }
 
 the1stname <- function(gene.name){
   names <- strsplit(as.character(gene.name),";")[[1]][1]
@@ -466,8 +372,6 @@ giveGO_res_and_table <- function(reat, ont = "BP", pCutoff = 0.05, p.adj.cutoff 
 
 #legend fold change to log2 fold change
 Heatplot <-  function (x, showCategory = 30, foldChange = NULL) {
-  Heatplot_x_saved <<- x
-  foldChange_saved <<- foldChange
   n <- update_n(x, showCategory)
   geneSets <- extract_geneSets(x, n)
   foldChange <- fc_readable(x, foldChange)
@@ -853,53 +757,6 @@ keggAnalysis <- function( gene_id ,
 
   organism <- species_df$organism[species_df$species == organism]
 
-  # if(organism == "hsa"){
-  #   library(org.Hs.eg.db)
-  #   orgDB <<- org.Hs.eg.db
-  #   #kegg_organism <- "hsa"
-  # }
-  # if(organism == "mmu"){
-  #   library(org.Mm.eg.db)
-  #   orgDB <<- org.Mm.eg.db
-  #   #kegg_organism <- "mmu"
-  # }
-  # if(organism == "rno"){
-  #   library(org.Rn.eg.db)
-  #   orgDB <<- org.Rn.eg.db
-  #   #kegg_organism <- "rno"
-  # }
-
-
-  # ids <- bitr(df$name, fromType = "SYMBOL",
-  #             toType = "ENTREZID",
-  #             OrgDb = orgDB)
-  # ids1 <- try(bitr(setdiff(df$name, ids$SYMBOL), fromType = "UNIPROT",
-  #             toType = "ENTREZID",
-  #             OrgDb = orgDB))
-  # if(class(ids1) != "try-error") {
-  #   names(ids1)[1] = "SYMBOL"
-  #   ids = rbind(ids, ids1)
-  # }
-
-  # names(ids)[1] = "name"
-  #  ids <- inner_join(ids, df, by = "name")
-
-  # ids1 = my_to_entrezid(orgDB = orgDB, gene = as.character(df$name))
-  # ids2 <- ids1 %>% tibble::rownames_to_column() %>% dplyr::rename(., name = rowname, ENTREZID = id) %>% dplyr::select(name, ENTREZID)
-  #
-  # ids <- inner_join(ids2, df, by = "name")
-  #
-  # if(df_with_lg2fc){
-  #   ids <- ids[!is.na(ids$ENTREZID) & !is.na(ids$fc), ]
-  #   de = ids$fc
-  #   names(de) = unlist(ids$ENTREZID)
-  #   de = sort(de, decreasing = T)
-  # } else {
-  #   ids <- ids[!is.na(ids$ENTREZID), ]
-  #   de = unlist(ids$ENTREZID)
-  #   names(de) = de
-  # }
-
   reat <- enrichKEGG(gene = names(gene_id), organism = organism,
                      pAdjustMethod = "BH", pvalueCutoff = 1, qvalueCutoff = 1)
   reat <- setReadable(reat, OrgDb = orgDB, keyType="ENTREZID")
@@ -1080,8 +937,7 @@ gsegoAnalysis <- function(
   # de = sort(de, decreasing = T)
 
   set.seed(10086)
-  # gene_list_save2 <<- gene_list
-  # orgDB_save2 <<- orgDB
+
   reat_ALL <- suppressWarnings(try(gseGO(gene = gene_list, OrgDb = orgDB, ont = "ALL",
                                          pAdjustMethod = "BH",
                                          nPerm = 1000, ## use fgsea
@@ -1512,7 +1368,6 @@ gsemsigdb_Analysis <- function(gene_list, organism="Human", species_df, category
                                # msigdb = c("c2.cgp (chemical and genetic perturbations)", "c2.cp.biocarta", "c2.cp (Canonical pathways)", "c3.all (motif gene sets)", "c3.tft (transcription factor targets)", "c6.all (oncogenic signatures)", "c7.all (immunologic signatures)", "h.all.v6.1 (hallmark gene sets)")){
 
 ){
-  gene_list_s <<- gene_list; organism_s <<- organism; species_df_s <<- species_df; category_s<<-category;subcategory_s<<-subcategory
   speciesID = switch (organism,
                       "Human" = "Homo sapiens",
                       "Mouse" = "Mus musculus",
@@ -1530,48 +1385,6 @@ gsemsigdb_Analysis <- function(gene_list, organism="Human", species_df, category
     m_t2g = m_t2g
   }
 
-  # # organism <- species_df$organism[species_df$species == organism]
-  # if(msigdb == "c2.cgp (chemical and genetic perturbations)") {
-  #   m_t2g <- msigdbr(species = speciesID, category = "C2", subcategory = "CGP") %>% dplyr::select(gs_name, entrez_gene)
-  # }
-  #
-  # if(msigdb == "c2.cp.biocarta") {
-  #   m_t2g <- msigdbr(species = speciesID, category = "C2", subcategory = "BIOCARTA") %>% dplyr::select(gs_name, entrez_gene)
-  # }
-  #
-  # if(msigdb == "c2.cp (Canonical pathways)") {
-  #   m_t2g <- msigdbr(species = speciesID, category = "C2", subcategory = NULL) %>% dplyr::select(gs_name, entrez_gene)
-  # }
-  #
-  # if(msigdb == "c3.all (motif gene sets)") {
-  #   m_t2g <- msigdbr(species = speciesID, category = "C3", subcategory = NULL) %>% dplyr::select(gs_name, entrez_gene)
-  # }
-  #
-  # if(msigdb == "c3.tft (transcription factor targets)") {
-  #   m_t2g <- msigdbr(species = speciesID, category = "C3", subcategory = "TFT:GTRD") %>% dplyr::select(gs_name, entrez_gene)
-  # }
-  #
-  # if(msigdb == "c6.all (oncogenic signatures)") {
-  #   m_t2g <- msigdbr(species = speciesID, category = "C6", subcategory = NULL) %>% dplyr::select(gs_name, entrez_gene)
-  # }
-  #
-  # if(msigdb == "c7.all (immunologic signatures)") {
-  #   m_t2g <- msigdbr(species = speciesID, category = "C7", subcategory = NULL) %>% dplyr::select(gs_name, entrez_gene)
-  # }
-  #
-  # if(msigdb == "h.all.v6.1 (hallmark gene sets)") {
-  #   m_t2g <- msigdbr(species = speciesID, category = "H", subcategory = NULL) %>% dplyr::select(gs_name, entrez_gene)
-  # }
-
-  # ids1 = my_to_entrezid(orgDB = orgDB, gene = as.character(df$name))
-  # ids2 <- ids1 %>% tibble::rownames_to_column() %>% dplyr::rename(., name = rowname, ENTREZID = id) %>% dplyr::select(name, ENTREZID)
-  #
-  # ids <- inner_join(ids2, df, by = "name")
-  #
-  # ids <- ids[!is.na(ids$ENTREZID) & !is.na(ids$fc), ]
-  # de = ids$fc
-  # names(de) = unlist(ids$ENTREZID)
-  # de = sort(de, decreasing = T)
 
   set.seed(1234)
   reat <- try(GSEA(geneList = gene_list, TERM2GENE = m_t2g, pAdjustMethod = "BH", pvalueCutoff = 1, verbose = TRUE, seed = FALSE), silent = TRUE)

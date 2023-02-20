@@ -128,7 +128,7 @@ GSEA_server_module <- function(id, Omics_res) {
 
       #** organism selection ----
       output$organism_for_GSEA <- renderUI({
-        aa <<- input$type_for_GSEA
+
         if(is.element("Msigdb", input$type_for_GSEA)){
           selectizeInput(ns("organism_for_GSEA"), "Select organism", choices=c("Human", "Mouse", "Rat"), selected="Human")
         } else {
@@ -147,7 +147,7 @@ GSEA_server_module <- function(id, Omics_res) {
           uiOutput(ns("ui_dropzone"))
         )
       })
-      # Omics_res_list <- reactive({Omics_res_list_save <<- reactiveValuesToList(Omics_res)}) # change omics-analyze result reactivevalues into List
+
       Omics_res_list <- reactive({
         Omics_res = reactiveValuesToList(Omics_res)
         omictype <- names(Omics_res) %>% sapply(function(x){strsplit(x,"_")[[1]][1]})
@@ -230,7 +230,6 @@ GSEA_server_module <- function(id, Omics_res) {
           ~ { drop_genelist_modules[[.]] <- NULL })
         print("exctract_genelist_Server_GSEA load")
 
-        drop_genelist_modules_save <<- drop_genelist_modules
       }, priority = 1, ignoreNULL = F)
 
 
@@ -260,7 +259,6 @@ GSEA_server_module <- function(id, Omics_res) {
 
       # Msigdb_opt_selected2 <- reactive({
       #   tree_sel <- get_selected(input$Msigdb_opt2 , format = "slices")
-      #   tree_sel_save <<- tree_sel
       #   # shinytreeInput_treatment(tree_sel %>% unlist() %>% names)
       #   tree_sel_save2 <- shinytreeInput_treatment(tree_sel %>% unlist() %>% names)
       # })
@@ -270,7 +268,7 @@ GSEA_server_module <- function(id, Omics_res) {
       gene_df <- reactive({
         if(input$import_from_text_paste){
 
-          temp <<- input$text_input_for_GSEA
+          temp <- input$text_input_for_GSEA
           # check the nrow of text input
           check <- strsplit(temp,'\n')[[1]]
           if(is.null(check) || length(check) == 0)
@@ -301,7 +299,7 @@ GSEA_server_module <- function(id, Omics_res) {
           colnames(genelist) = c("name","fc")
         }
         genelist <- as.data.frame(genelist)
-        gene_df_GSEA_save <<- genelist
+
         return(genelist)
       })
 
@@ -317,15 +315,24 @@ GSEA_server_module <- function(id, Omics_res) {
 
         print("a2")
         pkg = annoSpecies_df$pkg[annoSpecies_df$species == GSEA_organism()]
-        req( try(require(pkg, character.only = TRUE)) )
+        # req( try(require(pkg, character.only = TRUE)) )
+        if(!require(pkg, character.only = TRUE)){
+          sendSweetAlert(
+            session = shiny::getDefaultReactiveDomain(),
+            title = "warning !",
+            text = paste0("It needs the annotation data package ",pkg," for the species '", ORA_organism(),"'. But it is not installed!",
+                          "Please install it first."),
+            type = "warning"
+          )
+          return(NULL)
+        }
 
         print("a3")
         orgDB <- get(pkg)
         gene_id_table <- DEP2:::map_to_entrezid(as.character(gene_df$name), orgDB = orgDB)
         ids <- gene_id_table %>% tibble::rownames_to_column() %>%
           dplyr::rename(., name = rowname, ENTREZID = id) %>% dplyr::select(name, ENTREZID)
-        ids_save1 <<- ids
-        gene_df_save1 <<- gene_df
+
         ids <- ids %>% inner_join(., as.data.frame(gene_df), by = "name")
 
         ids <- ids[!is.na(ids$ENTREZID) & !is.na(ids$fc), ]
@@ -333,15 +340,13 @@ GSEA_server_module <- function(id, Omics_res) {
         de = ids$fc
         names(de) = unlist(ids$ENTREZID)
         de = sort(de, decreasing = T)
-        # gene_list_save3 <<- de
-        topn_save <<- input$topn
+
         if((!is.na(input$topn)) && (!is.null(input$topn)) && (input$topn != "")){
           de = de[order(abs(de),decreasing = T)[1:min(input$topn,length(de))]]
           de = sort(de, decreasing = T)
         }
         de = de[which(!duplicated(names(de)))] ## remove duplicated genes, only retain the first one(with a highest l2fc)
-        gene_list_save_gsea <<- de
-        # gene_list_save4 <<- de
+
         print("a4")
         return(de)
       })
@@ -359,9 +364,7 @@ GSEA_server_module <- function(id, Omics_res) {
       })
 
       observeEvent(input$GSEA,{
-        # save1 <<- input$GSEA
         hideTab(inputId = "GSEA", target = "KEGG"); hideTab(inputId = "GSEA", target = "Reactome"); hideTab(inputId = "GSEA", target = "Msigdb")
-        # save2 <<- input$GSEA
       },once = T, ignoreNULL = T, ignoreInit = F)
 
       observeEvent(input$type_for_GSEA,{
@@ -380,7 +383,6 @@ GSEA_server_module <- function(id, Omics_res) {
 
       observeEvent(input$analyze_for_GSEA,{
         # warning if select no database
-        # temp1 <<-input$type_for_GSEA
         type_for_GSEA_Pass1 <- ifelse((is.null(input$type_for_GSEA) || input$type_for_GSEA == ""), F, T)
         shinyFeedback::feedbackWarning("type_for_GSEA", !type_for_GSEA_Pass1, "Please select at least one database")
         req(type_for_GSEA_Pass1)
@@ -412,7 +414,6 @@ GSEA_server_module <- function(id, Omics_res) {
         }
 
         if("Reactome" %in% GSEA_database_selected()){
-          # session_save3 <<- session
           print("loading Reactome server")
           GSEA_other_server_module(id = "Reactome",
                                   # gene_df = gene_df,
@@ -480,16 +481,14 @@ exctract_genelist_Server_GSEA <- function(id, ID, Omics_Serv_res, suffix = ""){
       }
 
       # output$restest <- renderDataTable({
-      #   sig_res_save <<- sig_res()
       #   (sig_res())
       # }, options = list(pageLength = 10, scrollX = T))
 
       output$table_bttn <- renderUI({
-        # sig_res_save3 <<- sig_res()
         # omictype <- strsplit(ID,"_")[[1]][1]
         theres <- test_res()
         thegenelist <- genelist()
-        thegenelist_save <<- thegenelist
+
         if((omictype == "RNAseq") && (nrow(theres@geneinfo) == 0) ){ ## check id transform of RNAseq data
           return(
             tagList(
@@ -517,9 +516,8 @@ exctract_genelist_Server_GSEA <- function(id, ID, Omics_Serv_res, suffix = ""){
 
       omics_id <- strsplit(ID, split = "-ds-")[[1]][1]
       test_res <-  reactive({
-        # Omics_Serv_res_save <<- Omics_Serv_res
         test_res <- Omics_Serv_res()[[omics_id]]()
-        test_res_save <<- test_res
+        test_res
       })
 
       iv1 <- InputValidator$new()
@@ -536,7 +534,7 @@ exctract_genelist_Server_GSEA <- function(id, ID, Omics_Serv_res, suffix = ""){
           dep_res <- rowData(test_res()) %>% as.data.frame()
           genelist = dep_res[,c("name", "ID", paste0(input$contrast,c("_diff","_p.adj")))]
           colnames(genelist) = c("name", "ID", "L2FC", "padj")
-          genelist_save <<- genelist
+
           return(genelist)
         })
       }else if(omictype == "RNAseq"){
@@ -549,7 +547,7 @@ exctract_genelist_Server_GSEA <- function(id, ID, Omics_Serv_res, suffix = ""){
 
           thecontrast = input$contrast
           genelist <- data.frame(name = gene_info$SYMBOL,L2FC =  the_res[, paste0(thecontrast,"_diff")], padj = the_res[paste0(thecontrast,"_p.adj")])
-          genelist_save <<- genelist
+
           return(genelist)
         })
       }
@@ -568,16 +566,7 @@ exctract_genelist_Server_GSEA <- function(id, ID, Omics_Serv_res, suffix = ""){
         # sig_res_save <- sig_res()
         genelist()
       }, options = list(pageLength = 10, scrollX = T))
-      # observeEvent(input$save_modmod_session, {
-      #   session_saved21 <<- session
-      #   session_saved31 <<- session$parent
-      #   session_saved41 <<- .subset2(session, "parent")
-      #   # sfwe <<- test_ser(input,output,session = session_saved41)
-      #   thens <<- session$ns
-      #   # b1_saved2 <<- test_res2()
-      #   re_domain11 <<- getDefaultReactiveDomain() ## the session is the getDefaultReactiveDomain()
-      # })
-      # sig_res_saved <<- sig_res
+
       return(genelist)
     })
 }

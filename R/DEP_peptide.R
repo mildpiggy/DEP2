@@ -127,7 +127,7 @@ correct_PTM_by_Protein = function(enriched_peptide , relative_protein, correct_k
 
   key_col = ifelse(correct_key == "name", "gene_name", "protein_ID")
 
-  enriched_peptide2 <<- enriched_peptide
+  enriched_peptide2 <- enriched_peptide
   if(unidentified_treatment == "remove")
     enriched_peptide2 = enriched_peptide2[enriched_peptide2@elementMetadata[, key_col] %in% protein_df_wide[, correct_key],]
 
@@ -143,12 +143,11 @@ correct_PTM_by_Protein = function(enriched_peptide , relative_protein, correct_k
 
   ## calculate mean centered quantity of each condition
   thegroups <- c(correct_level, "key")
-  protein_assay2_save <<- protein_assay2
+
   protein_assay3 = protein_assay2 %>%
     group_by_at(vars(one_of(thegroups))) %>%
     # group_by(.dots = thegroups) %>%
     summarise(pro_expression = mean(pro_expression))
-  protein_assay3_save <<- protein_assay3
 
   PTM_assay2 = PTM_assay %>% data.frame() %>% rowid_to_column()
   PTM_assay2[,"key"] = enriched_peptide2@elementMetadata[, key_col]
@@ -156,16 +155,15 @@ correct_PTM_by_Protein = function(enriched_peptide , relative_protein, correct_k
   PTM_assay2[,correct_level] = PTM_design[match(PTM_assay2$label, PTM_design$label), correct_level]
   # PTM_assay2$condition = PTM_design$condition[match(PTM_assay2$label, PTM_design$label)]
   PTM_assay2 %>% head()
-  PTM_assay2_save <<- PTM_assay2
 
   ## PTM quantity minus relative proteingroup quantity in different condition
   PTM_assay3 = left_join(PTM_assay2,protein_assay3 , by= c("key",correct_level))
   PTM_assay3$pro_expression[is.na(PTM_assay3$pro_expression)] = 0
   PTM_assay3$expression = PTM_assay3$expression - PTM_assay3$pro_expression
-  # PTM_assay3_save <<- PTM_assay3
+
   PTM_assay4 = spread(PTM_assay3[,c("rowid","label","expression")],key = label,value = expression  ) %>%
     arrange(rowid) %>% .[,colnames(enriched_peptide2)] %>% `rownames<-` (rownames(enriched_peptide2))
-  # PTM_assay4_save <<- PTM_assay4
+
 
   assay(enriched_peptide2) = PTM_assay4
 

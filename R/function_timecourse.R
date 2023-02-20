@@ -87,7 +87,7 @@ get_tc_cluster <- function(x, ht_mat, exp_design, groupby = "condition",
   rownames(ht_mat2) = rownames(ht_mat)
 
   col_order <- group_order %>% sapply(., function(x){which(exp_design[,groupby] %in% x)}) %>% unlist
-  col_order_save <<- col_order
+
   ht_mat = ht_mat[,col_order]
 
   if(is.null(seed)) seed <- sample(1:2^15, 1)

@@ -271,13 +271,10 @@ PPInetwork <- function(PPIlinks, layoutway = "layout_components",nodecolor = "#2
   }
   igraph::V(net)$label.cex <- fontsize/50
   igraph::V(net)$label.dist <- -0.17*igraph::V(net)$size
-  # net_save <<- net
 
   # nodes$size =200
   colnames(nodes)[1] <- "id"
 
-  # links4 <<- links3;nodes4 <<-nodes
-  # nodes_save <<- nodes
   nwplot <- visNetwork::visNetwork(nodes,links3,width = "170%",height = "500px") %>%
     visNetwork::visIgraphLayout(layout = layoutway ) %>%
     visNetwork::visNodes(size=nodes$size,
@@ -500,7 +497,6 @@ Author(s):
                      !(toupper(iconv(alias, "WINDOWS-1252", "UTF-8")) %in% toupper(unlist(strsplit(proteins$protein_external_id, "\\."))[seq(from=2, to=2*nrow(proteins), by=2)])) )
 
   aliasDf2=rbind(pr1,pr2,pr3, aliasDf)
-  aliases_tf <<- aliasDf2
 
   return(aliasDf2)
 }

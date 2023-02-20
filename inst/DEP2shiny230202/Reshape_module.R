@@ -145,17 +145,7 @@ Reshape_Server <- function(id, Omics_res) {
             if(is.null(input$extend_col)|| input$extend_col == ""){
               extend_ident_cols = NULL
             }else{extend_ident_cols = input$extend_col}
-            # extend_ident_cols <<- extend_ident_cols
-            # shrink_ident_cols <<- shrink_ident_cols
-            # cat("awfe")
 
-            # long_table22 <<- long_table()
-            # colnames(long_table22)
-            # reshape_long2wide(long_table22,feature_col = "Precursor.Id",
-            #                   expression_col = "Precursor.Quantity",sample_col = "File.Name",
-            #                   remove_sample_prefix = T,remove_sample_suffix = T,
-            #                   shrink_ident_cols = c("Protein.Ids","Genes"),
-            #                   extend_ident_cols = "Q.Value") %>% dim()
             out_tb <- reshape_long2wide(long_table(),feature_col = input$feature_col,
                                         expression_col = input$expression_col,sample_col = input$sample_col,
                                         remove_sample_prefix = input$rm_prefix,remove_sample_suffix = input$rm_suffix,

@@ -1113,7 +1113,7 @@ plot_statistics <- function(object, statistic = c("diff","t.stastic","p.val","p.
     colnames(temp)[-ncol(temp)] = colnames(temp)[-ncol(temp)] %>% sapply(.,function(x){strsplit(x,"_")[[1]] %>% tail(1)})
     statistics_df = rbind(statistics_df,temp)
   }
-  # statistics_df_save <<- statistics_df
+
   p = list()
   for(i in statistic){
     p[[i]] = ggplot(statistics_df) +
