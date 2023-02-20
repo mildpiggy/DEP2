@@ -304,11 +304,13 @@ PPInetwork <- function(PPIlinks, layoutway = "layout_components",nodecolor = "#2
 # download a file when it is not already present. From STRINGdb package.
 downloadAbsentFile <- function(urlStr, oD = tempdir()){
   fileName = tail(strsplit(urlStr, "/")[[1]], 1)
-  temp <- paste(oD,"/", fileName, sep="")
+  temp <- paste(oD,"/", fileName,sep="")
+  temp2 <- paste0(temp,".tmp")
   fristDownload = F
   if(! file.exists(temp) || file.info(temp)$size==0){
     cat("Download ", fileName," to ",oD,"\n")
-    download.file(urlStr,temp)
+    download.file(urlStr,temp2)
+    file.rename(temp2,temp)
     fristDownload = T
   }
   if(file.info(temp)$size==0) {
@@ -316,7 +318,7 @@ downloadAbsentFile <- function(urlStr, oD = tempdir()){
     temp=NULL
     cat(paste("ERROR: failed to download ", fileName,".\nPlease check your internet connection and/or try again. " ,sep=""))
   }
-  cat(fristDownload)
+  cat("fristDownload\n")
   return(fristDownload)
 }
 
@@ -380,8 +382,10 @@ trimSTRINGdata <- function(links_detailfilename, oD = NULL)  {
 #' @importFrom data.table fread
 #' @export
 #' @examples
+#' \dontrun{
 #' # Load STRING data. If local STRING is missing, PPI_res will download to system.file("PPIdata", "Mouse",package = "DEP2")
 #' load_PPIdata(speciesname = "Mouse")
+#' }
 load_PPIdata <- function(speciesname, STRING.version = "11.5", STRINGdata_path = NULL){
   strEnv <- get_string_Env()
 

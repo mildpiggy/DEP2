@@ -19,8 +19,8 @@ where each row represents a protein/gene.
 }
 \examples{
 # Load example
-data <- Silicosis_pg
-data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
+data(Silicosis_pg)
+data_unique <- make_unique(Silicosis_pg, "Gene.names", "Protein.IDs", delim = ";")
 
 # Make SummarizedExperiment
 ecols <- grep("LFQ.", colnames(data_unique))

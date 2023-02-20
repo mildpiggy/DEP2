@@ -1457,7 +1457,8 @@ DEG_server_module <- function(id){
           includeMarkdown(system.file("extdata", "DEG_RNAseq.md", package = "DEP2")),
           h4("Example:"),
           tags$img(
-            src = base64enc::dataURI(file = system.file("extdata", "DEG_RNAseq.png", package = "DEP2"), mime = "image/png"),
+            # src = base64enc::dataURI(file = system.file("extdata", "DEG_RNAseq.png", package = "DEP2"), mime = "image/png"),
+            src = base64enc::dataURI(file = "www/DEG_RNAseq.png", mime = "image/png"),
             width = 750
           ),
           easyClose = TRUE,

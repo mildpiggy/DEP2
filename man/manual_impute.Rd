@@ -10,7 +10,7 @@ manual_impute(se, scale = 0.3, shift = 1.8)
 \item{se}{SummarizedExperiment,
 Proteomics data (output from \code{\link{make_se}()} or
 \code{\link{make_se_parse}()}). It is adviced to first remove
-proteins with too many missing values using \code{\link{filter_missval}()}
+proteins with too many missing values using \code{\link{filter_se}()}
 and normalize the data using \code{\link{normalize_vsn}()}.}
 
 \item{scale}{Numeric(1),

@@ -20,6 +20,7 @@ source("DEP_pep_modules.R")
 source("DEP_ptm_modules.R")
 source("PPI_module.R")
 source("Timecourse_module.R")
+source("Reshape_module.R")
 
 # library(BiocStyle)
 library(dplyr)
@@ -58,6 +59,7 @@ initialized_postmod <- data.frame(
 )
 assign(".OmicsModule", initialized_omicsmod, envir = get_DEPglobal_env())
 assign(".PostModule", initialized_postmod, envir = get_DEPglobal_env())
+assign(".OtherModule", initialized_postmod, envir = get_DEPglobal_env())
 # rm(list = ls(envir = get_DEPglobal_env(),all.names = T), envir = get_DEPglobal_env())
 
 # Define UI
@@ -97,7 +99,7 @@ ui <- navbarPage(
                                   width: 100% !important;
                                   max-width: 100% !important;
                                }
-                               "))),
+                               ")))
   # tags$style(HTML('.navbar-nav > li > a, .navbar-brand {
   #                  padding-top:14px !important;
   #                  padding-bottom:0 !important;
@@ -188,18 +190,30 @@ server <- function(input, output,session = session) {
                 label = "Select post-analysis type",
                 width = "100%",
                 choices = Post_analysis_choice
-                # choices = c(
-                #   "Over-representation analysis" = "ORA",
-                #   "GSEA" = "GSEA",
-                #   "Protein-protein interaction" = "PPI",
-                #   "Timecourse cluster" = "Timecourse",
-                #   "Integrated analysis" = "Instegrated"
-                # )
               )
             )
           ),
           tagList(
             actionButton("add_postanalysis", "Add"),
+            modalButton("cancel")
+          )
+        ),
+        tabPanel(
+          "Other function",
+          tags$h4("Add other module"),
+          fluidRow(
+            column(
+              width = 12,
+              awesomeRadio(
+                inputId = "OtherType",
+                label = "Select function",
+                width = "100%",
+                choices = c("Reshape long table to wide-format" = "Reshape")
+              )
+            )
+          ),
+          tagList(
+            actionButton("add_other", "Add"),
             modalButton("cancel")
           )
         )
@@ -377,7 +391,7 @@ server <- function(input, output,session = session) {
 
   #* import post analysis modules -----
   observeEvent(input$add_postanalysis, {
-    if (exists(".OmicsModule", envir = get_DEPglobal_env())) {
+    if (exists(".PostModule", envir = get_DEPglobal_env())) {
       Postmodules <- get(".PostModule", envir = get_DEPglobal_env())
       if (length(which(Postmodules$type == input$PostanalysisType)) > 0) {
         ID <- Postmodules[which(Postmodules$type == input$PostanalysisType), "ID"] %>%
@@ -405,50 +419,82 @@ server <- function(input, output,session = session) {
         # target = "Home",
         select = T
       )
-      #  call genelist tool modules tool, transmit omics module infor & test result
-      # omics_Servers_list <- reactiveValuesToList(omics_Servers)
-      # omics_Servers_list_saved <<- omics_Servers_list
-      # cat(names(omics_Servers_list))
-      # ID_saved <<- ID
+
       genelist_tool_Server(ID, Omics_res = omics_Servers)
     }else if(input$PostanalysisType == "ORA") {
       appendTab(inputId = "DEPnavbar",
                 tabPanel(ID,
                          ORA_UI(id = ID)
                 ),
-                # target = "Welcome",
                 select = T
       )
-      # session_save3 <<- session
+
       ORA_server_module2(ID, Omics_res = omics_Servers)
+
     } else if(input$PostanalysisType == "GSEA") {
       appendTab(inputId = "DEPnavbar",
                 tabPanel(ID,
                          GSEA_UI(id = ID)
                 ),
-                # target = "Welcome",
                 select = T
       )
+
       GSEA_server_module(ID, Omics_res = omics_Servers)
+
     }else if(input$PostanalysisType == "PPI"){
       appendTab(inputId = "DEPnavbar",
                 tabPanel(ID,
                          PPI_UI(id = ID)
                 ),
-                # target = "Welcome",
                 select = T
       )
+
       PPI_server_module(ID, Omics_res = omics_Servers)
+
     }else if(input$PostanalysisType == "Timecourse"){
       appendTab(inputId = "DEPnavbar",
                 tabPanel(ID,
                          Timecourse_UI(id = ID)
                 ),
-                # target = "Welcome",
                 select = T
       )
       ## the time-course cluster result is also saved in omics_Servers for following extract.
       omics_Servers[[ID]] <- Timecourse_server_module(ID, Omics_res = omics_Servers)
+    }
+
+    removeModal() ## close modalDialog
+  })
+
+  #* import other modules -----
+  observeEvent(input$add_other, {
+    if (exists(".OtherModule", envir = get_DEPglobal_env())) {
+      Othermodules <- get(".OtherModule", envir = get_DEPglobal_env())
+      if (length(which(Othermodules$type == input$OtherType)) > 0) {
+        ID <- Othermodules[which(Othermodules$type == input$OtherType), "ID"] %>%
+          .[length(.)] %>%
+          sapply(., function(x) {
+            strsplit(x, "_")[[1]][2]
+          }) %>%
+          as.numeric()
+      } else {
+        ID <- 0
+      }
+      ID <- paste(input$OtherType, ID + 1, sep = "_")
+      OtherModule <- rbind(Othermodules, c(name = ID, type = input$OtherType, ID = ID))
+      assign(".OtherModule", OtherModule, envir = get_DEPglobal_env())
+    } else {
+      ID <- paste(input$OtherType, 1, sep = "_")
+      assign(".OtherModule", data.frame(name = ID, type = input$OtherType, ID = ID), envir = get_DEPglobal_env())
+    }
+
+    if (input$OtherType == "Reshape") {
+      appendTab(
+        inputId = "DEPnavbar",
+        tabPanel(ID, Reshape_UI(ID)), ## inserttab of reshape tool UI
+        select = T
+      )
+
+      Reshape_Server(ID, Omics_res = omics_Servers)
     }
 
     removeModal() ## close modalDialog

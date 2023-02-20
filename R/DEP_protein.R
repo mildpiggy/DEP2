@@ -106,51 +106,36 @@ reshape_long2wide <- function(long_table,
     long_table[,sample_col]= DEP2:::delete_suffix(long_table[,sample_col])
   }
 
-
+  ## all samples, and arrange the table
   samp = long_table[,sample_col] %>% unique
   long_table2 = long_table
-  long_table2[,sample_col]  = factor(long_table2[,sample_col],levels = rev(samp))
+  long_table2[,sample_col]  = factor(long_table2[,sample_col],levels = samp)
   long_table2 = long_table2 %>% arrange(.data[[sample_col]])
 
-  exp_df = tidyr::pivot_wider(long_table, id_cols = feature_col, names_from = sample_col, values_from = expression_col)
+  ## Remove Duplicates in c(feature_col,sample_col,expression_col)
+  long_table2 <- long_table2[!duplicated(long_table2[,c(feature_col,sample_col,expression_col)]),]
+
+  exp_df = tidyr::pivot_wider(long_table2, id_cols = feature_col, names_from = sample_col, values_from = expression_col)
 
   if(!is.null(shrink_ident_cols)){
-    if(! all(shrink_ident_cols %in% colnames(long_table)))
-      stop(shrink_ident_cols[!shrink_ident_cols %in% colnames(long_table)], " is not the colname.")
+    if(! all(shrink_ident_cols %in% colnames(long_table2)))
+      stop(shrink_ident_cols[!shrink_ident_cols %in% colnames(long_table2)], " is not the colname.")
 
-    reduce_table(long_table2, feature_col= feature_col, sample_col = sample_col, val_col= "Stripped.Sequence")
-    fea_id_table_shrink <- shrink_ident_cols %>% lapply(reduce_table, long_table2=long_table2,
+    # reduce_table(long_table2, feature_col= feature_col, sample_col = sample_col, val_col= "Stripped.Sequence")
+    fea_id_table_shrink <<- shrink_ident_cols %>% lapply(reduce_table, long_table2=long_table2,
                                                         feature_col=feature_col,sample_col = sample_col)
     if(length(shrink_ident_cols) > 1){
-      fea_id_table_shrink2 <- Reduce(function(...) merge(..., all=T), fea_id_table_shrink) %>% head()
+      fea_id_table_shrink2 <- Reduce(function(...) merge(..., all=T), fea_id_table_shrink)
     }else{fea_id_table_shrink2 = fea_id_table_shrink[[1]]}
-
-    reduce_table <- function(long_table2, feature_col, sample_col, val_col){
-      var_nub_each_feat <- long_table2 %>% group_by(.,.data[[feature_col]]) %>%
-        summarise(fnum = sum(!duplicated(.data[[val_col]])))
-      ## Not one feature one values, paste all values, collapse ";"
-      if(!all(var_nub_each_feat$fnum == 1)){
-        cat("aaa")
-        tb1 = long_table2 %>% group_by(.,.data[[feature_col]],.data[[sample_col]]) %>% summarise(the_val = .data[[val_col]])
-        cat("bbb")
-        tb2 = tb1 %>% pivot_wider(id_cols = feature_col, names_from = sample_col,values_from = the_val,values_fill = NA) %>%
-          pivot_longer(cols = colnames(.)[-1],names_to = sample_col, values_to = "the_val") %>%
-          group_by(.,.data[[feature_col]]) %>% summarise(the_val = paste0(the_val,collapse = ";"))
-      }else{ ## One feature one values, just use the unique value for each
-        tb2 = long_table2 %>% group_by(.,.data[[feature_col]]) %>% summarise(the_val = unique(.data[[val_col]]))
-      }
-      colnames(tb2)[2] = val_col
-      return(tb2)
-    }
 
     exp_df = merge(exp_df,fea_id_table_shrink2)
   }
 
   if(!is.null(extend_ident_cols)){
-    if(! all(extend_ident_cols %in% colnames(long_table)))
-      stop(extend_ident_cols[!extend_ident_cols %in% colnames(long_table)], " is not the colname.")
+    if(! all(extend_ident_cols %in% colnames(long_table2)))
+      stop(extend_ident_cols[!extend_ident_cols %in% colnames(long_table2)], " is not the colname.")
 
-    fea_id_table_extend <- reshape(long_table[,c(sample_col,feature_col,extend_ident_cols)],
+    fea_id_table_extend <- reshape(long_table2[,c(sample_col,feature_col,extend_ident_cols)],
                                    direction = "wide", idvar = feature_col, timevar = sample_col)
 
     exp_df = merge(exp_df,fea_id_table_extend)
@@ -158,6 +143,23 @@ reshape_long2wide <- function(long_table,
 
   return(as.data.frame(exp_df))
 
+}
+
+reduce_table <- function(long_table2, feature_col, sample_col, val_col){
+  var_nub_each_feat <- long_table2 %>% group_by(.,.data[[feature_col]]) %>%
+    summarise(fnum = sum(!duplicated(.data[[val_col]])))
+  ## Not one feature one values, paste all values, collapse ";"
+  if(!all(var_nub_each_feat$fnum == 1)){
+    tb1 = long_table2 %>% group_by(.,.data[[feature_col]],.data[[sample_col]]) %>% summarise(the_val = .data[[val_col]])
+
+    tb2 = tb1 %>% tidyr::pivot_wider(id_cols = feature_col, names_from = sample_col,values_from = the_val,values_fill = NA) %>%
+      tidyr::pivot_longer(cols = colnames(.)[-1],names_to = sample_col, values_to = "the_val") %>%
+      group_by(.,.data[[feature_col]]) %>% summarise(the_val = paste0(the_val,collapse = ";"))
+  }else{ ## One feature one values, just use the unique value for each
+    tb2 = long_table2 %>% group_by(.,.data[[feature_col]]) %>% summarise(the_val = unique(.data[[val_col]]))
+  }
+  colnames(tb2)[2] = val_col
+  return(tb2)
 }
 
 #' Make unique names
