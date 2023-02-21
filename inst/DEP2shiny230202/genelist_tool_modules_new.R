@@ -1009,8 +1009,10 @@ genelist_tool_Server <- function(id, Omics_res){
         dropzone_selected_omics <- c(input$dropzone1, input$dropzone2, input$dropzone3, input$dropzone4)
         dropzone_selected_omics2 <- dropzone_selected_omics %>% sapply(., function(x){strsplit(x,"-ds-")[[1]][1]}) %>% unique
 
+        dropzone_selected_omics3 <- dropzone_selected_omics2[-grep("^Timecourse|^PTM",dropzone_selected_omics2)]
+
         # omics_list <- Omics_res %>% reactiveValuesToList() %>% .[dropzone_selected_omics2] %>% lapply(function(x) x())
-        omics_list <- Omics_res_list() %>% .[dropzone_selected_omics2] %>% lapply(function(x) x())
+        omics_list <- Omics_res_list() %>% .[dropzone_selected_omics3] %>% lapply(function(x) x())
         multi_ht <- plot_multi_heatmap(omics_list = omics_list, choose_name = selected_proteins, to_upper = input$to_upper,
                                        color = input$heatmap_color,col_limit = input$heatmap_color_limit,
                                        width = input$heatmap_width,

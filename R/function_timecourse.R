@@ -27,7 +27,7 @@
 #' - the output of \code{\link[TCseq]{timeclust}} and the seed.
 #' @export
 #'
-#' @importFrom  TCseq timeclust clustCluster clustData clustMembership
+#' @importFrom  TCseq clustCluster clustData clustMembership
 #'
 #' @examples
 #' # Load sample
@@ -61,7 +61,7 @@ get_tc_cluster <- function(x, ht_mat, exp_design, groupby = "condition",
                            col_font_size = 5, heatmap_width = 3, heatmap_height = 5,
                            seed = NULL
                            # ,...
-                           ){
+){
   algo = "cm"
   color <- match.arg(color)
   cat("aa")
@@ -94,7 +94,7 @@ get_tc_cluster <- function(x, ht_mat, exp_design, groupby = "condition",
   set.seed(seed)
 
   cat(paste0("beging 'cm' cluster by dist = ", "'", dist, "'\n"))
-  tca <- TCseq::timeclust(ht_mat2, algo = algo, k = k, standardize = TRUE, dist = dist)
+  tca <- timeclust(ht_mat2, algo = algo, k = k, standardize = TRUE, dist = dist)
   cluster1 <- TCseq::clustCluster(tca)
   tcadata <- TCseq::clustData(tca)
 
@@ -174,4 +174,127 @@ get_tc_cluster <- function(x, ht_mat, exp_design, groupby = "condition",
 }
 
 
+# The timeclust function from TCseq 1.16.0
+#	[dist] character string specifying method for distance(dissimilarity) calculation.
+# It should be one of 'correlation' or one of the distance measure method in dist function (for example 'euclidean', 'manhattan')
+timeclust <- function (x, algo, k, dist = "euclidean", centers = NULL, standardize = TRUE,
+                       ...)
+{
+  if (is.matrix(x)) {
+    data.tmp <- x
+  }
+  else {
+    data.tmp <- x@tcTable
+  }
+  if (standardize) {
+    for (i in seq_len(nrow(data.tmp))) {
+      data.tmp[i, ] <- (data.tmp[i, ] - mean(data.tmp[i,
+      ], na.rm = TRUE))/sd(data.tmp[i, ], na.rm = TRUE)
+    }
+    data.tmp <- data.tmp[complete.cases(data.tmp), ]
+  }
+  object <- new("clust")
+  object@method <- algo
+  object@dist <- dist
+  object@data <- data.tmp
+  res <- .timeclust(data = data.tmp, algo = algo, k = k, dist = dist,
+                    centers = centers, ...)
+  if (algo == "cm") {
+    object@cluster <- res$cluster
+    object@membership <- res$membership
+    object@centers <- res$centers
+  }
+  else {
+    object@cluster <- res$cluster
+    object@centers <- res$centers
+  }
+  if (is.matrix(x)) {
+    object
+  }
+  else {
+    x@clusterRes <- object
+    x
+  }
+}
 
+# The .timeclust function from TCseq 1.16.0
+#' @importFrom e1071 cmeans
+.timeclust <- function (data, algo, k, centers = NULL, dist = "euclidean",
+                        ...)
+{
+  if (!algo %in% c("pam", "km", "hc", "cm")) {
+    stop("clustering method should be one of 'pam','km','hc','cm'")
+  }
+  if (!dist %in% c("correlation", "euclidean", "maximum", "manhattan",
+                   "canberra", "binary", "minkowski")) {
+    stop("Distance metric should be 'correlation', or one of the distance measures in dist function")
+  }
+  if (algo == "km") {
+    if (dist != "euclidean") {
+      stop("kmeans only support euclidean metric; for other distance metrices, please see the help page")
+    }
+  }
+  if (algo == "cm") {
+    if (!dist %in% c("euclidean", "manhattan")) {
+      stop("cmeans only support euclidean or mahattan distance metrics")
+    }
+  }
+  d <- NULL
+  if (algo %in% c("pam", "hc")) {
+    if (dist == "correlation") {
+      d <- as.dist(1 - cor(t(data)))
+    }
+    if (dist != "correlation") {
+      d <- dist(data, method = dist)
+    }
+  }
+  clustres <- list()
+  if (algo != "hc") {
+    if (!is.null(centers)) {
+      if (nrow(centers) != k) {
+        stop("Number of rows of centers must be equal to k")
+      }
+    }
+  }
+  clustres <- switch(algo, km = {
+    if (!is.null(centers)) {
+      res <- kmeans(data, centers = centers, ...)
+    } else {
+      res <- kmeans(data, centers = k, ...)
+    }
+    clustres$cluster <- res$cluster
+    clustres$centers <- res$centers
+    clustres
+  }, pam = {
+    if (!is.null(centers)) {
+      ind <- data[, 1] %in% centers[, 1]
+      ind <- which(ind)
+      if (length(ind) != k) {
+        stop("For 'pam', centers must be chosen from the data")
+      } else {
+        res <- pam(d, k = k, medoids = ind, ...)
+      }
+    }
+    res <- pam(d, k = k, ...)
+    clustres$cluster <- res$clustering
+    clustres$centers <- data[res$medoids, ]
+    clustres
+  }, hc = {
+    tree <- hclust(d, ...)
+    res <- cutree(tree, k = k)
+    clustres$cluster <- res
+    clustres$centers <- matrix(0, 0, 0)
+    clustres
+  }, cm = {
+    if (!is.null(centers)) {
+      res <- e1071::cmeans(data, centers = centers, ...)
+    } else {
+      res <- e1071::cmeans(data, centers = k, ...)
+    }
+    clustres$cluster <- res$cluster
+    clustres$centers <- res$centers
+    clustres$membership <- res$membership
+    clustres
+  })
+  clustres
+}

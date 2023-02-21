@@ -86,10 +86,10 @@ check_shiny_depends = function(install = T){
 check_enrichment_depends = function(install = T){
   need_packages = c(
     "clusterProfiler", "YuLab-SMU/clusterProfiler.dplyr", "ReactomePA", "msigdbr",
-    "org.Hs.eg.db", "org.Mm.eg.db"
+    "org.Hs.eg.db", "org.Mm.eg.db","dbplyr"
   )
   bioc_pkg = need_packages
-  need_version = c("4.3.1.900",rep(NA, times = 5))
+  need_version = c("4.3.1.900",rep(NA, times = 6))
   checek_req_depends(need_packages,need_version = need_version, install = install, mess = "for enrichment analysis", bioc_pkg = bioc_pkg)
 }
 

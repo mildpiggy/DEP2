@@ -405,7 +405,7 @@ ORA_server_module2 <- function(id, Omics_res) {
           ORA_other_server_module(id = "Reactome",
                                   # gene_df = gene_df,
                                   gene_id = gene_id(),  organism_for_ORA = ORA_organism,
-                                  annoSpecies_df = annoSpecies_df_for_reactome, type = "reactome")
+                                  annoSpecies_df = annoSpecies_df, type = "reactome")
           print("loaded Reactome server")
         }
 

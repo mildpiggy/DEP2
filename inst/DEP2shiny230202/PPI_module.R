@@ -212,7 +212,7 @@ PPI_server_module <- function(id, Omics_res) {
   moduleServer(
     ID,
     function(input, output, session) {
-
+      library(visNetwork)
       ns = session$ns
 
 
@@ -409,7 +409,7 @@ PPI_server_module <- function(id, Omics_res) {
           # print(speciesname)
           orgDbname = reactive({
             the_annoSpecies_df = DEP2:::annoSpecies_df()
-            orgDB = the_annoSpecies_df$pkg[the_annoSpecies_df$species == species]
+            orgDB = the_annoSpecies_df$pkg[the_annoSpecies_df$species == input$organism]
             # require(orgDB, character.only = TRUE)
             # switch(speciesname,
             #        "Anopheles" = "org.Ag.eg.db",
@@ -476,8 +476,8 @@ PPI_server_module <- function(id, Omics_res) {
             print("b5")
             validate(
               need(
-                require(orgDbname, character.only = TRUE),
-                paste0("The package ", orgDbname, " is not installed/available. Try installing it with BiocManager::install('", orgDbname, "')")
+                require(orgDbname(), character.only = TRUE),
+                paste0("The package ", orgDbname(), " is not installed/available. Try installing it with BiocManager::install('", orgDbname(), "')")
               )
             )
 

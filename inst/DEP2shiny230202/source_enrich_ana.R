@@ -777,7 +777,7 @@ reactAnalysis <- function(gene_id, organism="Human", df_with_lg2fc = FALSE, spec
   require(pkg, character.only = TRUE)
   orgDB <- get(pkg)
 
-  organism <- species_df$organism[species_df$species == organism]
+  organism <- species_df$reactome_organism[species_df$species == organism]
 
 
   # cat("a1")
@@ -1177,7 +1177,7 @@ my_gseaplot2 <- function (x, geneSetID, title = "", color = "green", base_size =
                                                       r = 0.2, b = 0.2, l = 0.2, unit = "cm")))
   if (length(rel_heights) > length(subplots))
     rel_heights <- rel_heights[subplots]
-  PloT <- plot_grid(plotlist = plotlist, ncol = 1, align = "v", rel_heights = rel_heights)
+  PloT <- enrichplot::plot_grid(plotlist = plotlist, ncol = 1, align = "v", rel_heights = rel_heights)
   PloT + theme(plot.margin = margin(t = 1,
                                     r = 1, b = 0.2, l = 0.2, unit = "cm"))
 }

@@ -491,7 +491,7 @@ plot_pca <- function(object, x = 1, y = 2, indicate = c("condition", "replicate"
 
   pca <- prcomp(t(df), scale = FALSE)
   pca_df <- pca$x %>% data.frame() %>% rownames_to_column() %>%
-    tidygraph::left_join(., data.frame(mycolData), by = c(rowname = "ID"))
+    dplyr::left_join(., data.frame(mycolData), by = c(rowname = "ID"))
   percent <- round(100 * pca$sdev^2/sum(pca$sdev^2), 1)
   for (feat in indicate) {
     pca_df[[feat]] <- as.factor(pca_df[[feat]])
