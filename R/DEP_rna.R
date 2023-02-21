@@ -16,7 +16,7 @@ setClass("DEGdata",
            geneinfo = "data.frame",
            ntf = "matrix",
            rlg = "matrix",
-           test_result = "DataFrame")
+           test_result = "DFrame")
 )
 
 
@@ -89,9 +89,9 @@ setMethod("[", "DEGdata",
 #'             "Quantity.C1","Quantity.C2")
 #' get_exdesign_parse(samples, mode = "char", chars = 1)
 #' # Reserve prefix
-#' get_exdesign_parse(samples, mode = "char", chars = 1, remove_prefix = F)
+#' get_exdesign_parse(samples, mode = "char", chars = 1, remove_prefix = FALSE)
 get_exdesign_parse <- function(label, mode = c("delim", "char"),
-                               chars = 1, sep = "_", remove_prefix = T, remove_suffix = F){
+                               chars = 1, sep = "_", remove_prefix = TRUE, remove_suffix = FALSE){
   mode = match.arg(mode)
 
   if(remove_prefix){
@@ -153,7 +153,7 @@ test_diff_deg <- function(dds, type = c("all", "control", "manual"), control = N
                     filter_ihw = FALSE, independentFiltering = TRUE, lfcshark = FALSE,
                     ... # DESeq parameters
                     ) {
-  assertthat::assert_that(inherits(se, "SummarizedExperiment"),
+  assertthat::assert_that(inherits(dds, "SummarizedExperiment"),
                           is.null(control) | is.character(control),
                           is.null(test_contrasts) | is.character(test_contrasts),
                           is.character(contrast_upon)
