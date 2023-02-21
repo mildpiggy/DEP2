@@ -318,7 +318,7 @@ Timecourse_server_module <- function(id, Omics_res) {
             res = get_tc_cluster(ht_mat = ht_mat(),
                                  exp_design = exp_design,
                                  groupby = input$groupby,
-                                 columns_order = input$Custom_columns_order,
+                                 group_order = input$Custom_columns_order,
                                  # algo = input$algo,
                                  k = input$k,
                                  color = input$colorbar,
