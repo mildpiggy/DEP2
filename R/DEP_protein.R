@@ -62,7 +62,7 @@ clean_character <- function(express_assay){
 #' # If do not remove prefix or suffix of samples
 #' wide_table2 <- reshape_long2wide(long_table,sample_col = "File.Name",
 #'                                  feature_col = "Precursor.Id", expression_col = "Precursor.Normalised",
-#'                                  remove_sample_prefix = F, remove_sample_suffix = F)
+#'                                  remove_sample_prefix = FALSE, remove_sample_suffix = FALSE)
 #' colnames(wide_table2)
 #'
 #' # Keep some identification information
@@ -266,6 +266,9 @@ make_unique <- function(proteins, names, ids, delim = ";") {
 #'
 #' # Make SummarizedExperiment
 #' columns <- grep("LFQ.", colnames(data_unique))
+#'
+#' ## Load experiement design
+#' data(Silicosis_ExpDesign)
 #' exp_design <- Silicosis_ExpDesign
 #' se <- make_se(data_unique, columns, exp_design)
 #' @export
@@ -462,6 +465,9 @@ make_se_parse <- function (proteins_unique, columns, mode = c("char", "delim"),
 #'
 #' # Make SummarizedExperiment
 #' ecols <- grep("LFQ.", colnames(data_unique))
+#'
+#' # Load experiement design
+#' data(Silicosis_ExpDesign)
 #' exp_design <- Silicosis_ExpDesign
 #' se <- make_se(data_unique, ecols, exp_design)
 #' se <- make_se_parse(data_unique, ecols, mode = "delim", sep = "_")
@@ -678,6 +684,10 @@ manual_impute <- function(se, scale = 0.3, shift = 1.8) {
 #'
 #' # Make SummarizedExperiment
 #' ecols <- grep("LFQ.", colnames(data_unique))
+#'
+#'
+#' ## Load experiement design
+#' data(Silicosis_ExpDesign)
 #' exp_design <- Silicosis_ExpDesign
 #' se <- make_se(data_unique, ecols, exp_design)
 #'

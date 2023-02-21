@@ -9,8 +9,8 @@ get_exdesign_parse(
   mode = c("delim", "char"),
   chars = 1,
   sep = "_",
-  remove_prefix = T,
-  remove_suffix = F
+  remove_prefix = TRUE,
+  remove_suffix = FALSE
 )
 }
 \arguments{
@@ -39,5 +39,5 @@ samples = c("Quantity.A1","Quantity.A2","Quantity.A3","Quantity.B1","Quantity.B2
             "Quantity.C1","Quantity.C2")
 get_exdesign_parse(samples, mode = "char", chars = 1)
 # Reserve prefix
-get_exdesign_parse(samples, mode = "char", chars = 1, remove_prefix = F)
+get_exdesign_parse(samples, mode = "char", chars = 1, remove_prefix = FALSE)
 }

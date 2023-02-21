@@ -63,6 +63,10 @@ data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 
 # Make SummarizedExperiment
 ecols <- grep("LFQ.", colnames(data_unique))
+
+
+## Load experiement design
+data(Silicosis_ExpDesign)
 exp_design <- Silicosis_ExpDesign
 se <- make_se(data_unique, ecols, exp_design)
 

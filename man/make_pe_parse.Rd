@@ -61,10 +61,10 @@ by colnames of expression assay.
 \examples{
 # Load a peptides
 data(Silicosis_peptide)
-ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T)
+ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = TRUE)
 # Construct a QFeatures object, with a 'peptideRaw' assay
 pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols,   # columns is the abundance columns
                              mode = "delim", sep = "_",
-                             remove_prefix = T, log2transform = T)
+                             remove_prefix = TRUE, log2transform = TRUE)
 pe_peptides
 }

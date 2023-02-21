@@ -41,7 +41,11 @@ based on two data.frames: the peptide table and experimental design.
 # Load a peptides
 data(Silicosis_peptide)
 # Exctract Intensity columns
-(ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T))
+(ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = TRUE))
+
+
+# Load experiement design
+data(Silicosis_ExpDesign)
 (expDesign = Silicosis_ExpDesign)
 
 # Construct a QFeatures object, with a 'peptideRaw' assay

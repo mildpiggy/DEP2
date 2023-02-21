@@ -57,7 +57,7 @@ head(wide_table)
 # If do not remove prefix or suffix of samples
 wide_table2 <- reshape_long2wide(long_table,sample_col = "File.Name",
                                  feature_col = "Precursor.Id", expression_col = "Precursor.Normalised",
-                                 remove_sample_prefix = F, remove_sample_suffix = F)
+                                 remove_sample_prefix = FALSE, remove_sample_suffix = FALSE)
 colnames(wide_table2)
 
 # Keep some identification information

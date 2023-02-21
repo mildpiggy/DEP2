@@ -17,6 +17,8 @@ load_PPIdata(speciesname, STRING.version = "11.5", STRINGdata_path = NULL)
 Check and load a local STRING data. If local file do not exist, will try to download from \href{http://stringdb-static.org/download/}{STRING}.
 }
 \examples{
+\dontrun{
 # Load STRING data. If local STRING is missing, PPI_res will download to system.file("PPIdata", "Mouse",package = "DEP2")
 load_PPIdata(speciesname = "Mouse")
+}
 }

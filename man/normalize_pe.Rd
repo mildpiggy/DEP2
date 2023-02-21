@@ -28,10 +28,10 @@ Normalize a QFeatures object though \link[QFeatures:QFeatures-processing]{QFeatu
 \dontrun{
 # Load example peptide data
 data(Silicosis_peptide)
-ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T)
+ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = TRUE)
 
 # Construct QFeature object
-pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = T, log2transform = T,mode = "delim")
+pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = TRUE, log2transform = TRUE,mode = "delim")
 
 # Filter, imputation
 filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )

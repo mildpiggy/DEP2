@@ -25,7 +25,11 @@
 #' # Load a peptides
 #' data(Silicosis_peptide)
 #' # Exctract Intensity columns
-#' (ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T))
+#' (ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = TRUE))
+#'
+#'
+#' # Load experiement design
+#' data(Silicosis_ExpDesign)
 #' (expDesign = Silicosis_ExpDesign)
 #'
 #' # Construct a QFeatures object, with a 'peptideRaw' assay
@@ -136,11 +140,11 @@ make_pe <- function(Peptide, columns,
 #' @examples
 #' # Load a peptides
 #' data(Silicosis_peptide)
-#' ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T)
+#' ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = TRUE)
 #' # Construct a QFeatures object, with a 'peptideRaw' assay
 #' pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols,   # columns is the abundance columns
 #'                              mode = "delim", sep = "_",
-#'                              remove_prefix = T, log2transform = T)
+#'                              remove_prefix = TRUE, log2transform = TRUE)
 #' pe_peptides
 make_pe_parse <- function(Peptide,
                           columns,
@@ -482,10 +486,10 @@ aggregateFeatures = function(object, i, fcol, name = "newAssay",
 #' \dontrun{
 #' # Load example peptide data
 #' data(Silicosis_peptide)
-#' ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T)
+#' ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = TRUE)
 #'
 #' # Construct QFeature object
-#' pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = T, log2transform = T,mode = "delim")
+#' pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = TRUE, log2transform = TRUE,mode = "delim")
 #'
 #' # Filter, imputation
 #' filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
@@ -543,10 +547,10 @@ normalize_pe <- function(pe, method = c("diff.median", "quantiles", "quantiles.r
 #' \dontrun{
 #' # Load example peptide data
 #' data(Silicosis_peptide)
-#' ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T)
+#' ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = TRUE)
 #'
 #' # construct QFeatures object
-#' pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = T, log2transform = T,mode = "delim")
+#' pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = TRUE, log2transform = TRUE,mode = "delim")
 #' filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
 #' imp_pe <- QFeatures::addAssay(filt_pe, DEP2::impute(filt_pe[["peptideRaw"]], fun = "MinDet"), name = "peptideImp")
 #' norm_pe <- DEP2:::normalize_pe(imp_pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
@@ -641,10 +645,10 @@ aggregate_pe <- function(pe, aggrefun = c("RobustSummary","medianPolish","totalM
 #' \dontrun{
 #' # Load example peptide data
 #' data(Silicosis_peptide)
-#' ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T)
+#' ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = TRUE)
 #'
 #' # construct QFeatures object
-#' pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = T, log2transform = T,mode = "delim")
+#' pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = TRUE, log2transform = TRUE,mode = "delim")
 #' filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
 #' imp_pe <- QFeatures::addAssay(filt_pe, DEP2::impute(filt_pe[["peptideRaw"]], fun = "MinDet"), name = "peptideImp")
 #' norm_pe <- DEP2:::normalize_pe(imp_pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
