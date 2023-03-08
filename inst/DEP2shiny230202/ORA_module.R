@@ -122,6 +122,7 @@ ORA_server_module2 <- function(id, Omics_res) {
       library(DOSE)
       library(GO.db)
       library(dplyr)
+      library(clusterProfiler)
       library(clusterProfiler.dplyr)
       library(ReactomePA)
 

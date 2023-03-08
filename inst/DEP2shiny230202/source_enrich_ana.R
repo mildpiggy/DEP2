@@ -926,15 +926,6 @@ gsegoAnalysis <- function(
   if(!is.null(topN)){
     gene_list = gene_list[order(abs(gene_list),decreasing = T)[1:min(topN,length(gene_list))]]
   }
-  # ids1 = my_to_entrezid(orgDB = orgDB, gene = as.character(df$name))
-  # ids2 <- ids1 %>% tibble::rownames_to_column() %>% dplyr::rename(., name = rowname, ENTREZID = id) %>% dplyr::select(name, ENTREZID)
-  #
-  # ids <- inner_join(ids2, df, by = "name")
-  #
-  # ids <- ids[!is.na(ids$ENTREZID) & !is.na(ids$fc), ]
-  # de = ids$fc
-  # names(de) = unlist(ids$ENTREZID)
-  # de = sort(de, decreasing = T)
 
   set.seed(10086)
 
