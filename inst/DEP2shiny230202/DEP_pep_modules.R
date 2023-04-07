@@ -1199,8 +1199,9 @@ DEP_pep_server_module <- function(id){
       ### filter
       pe_filt <- reactive({
         pe <- pe()
-        if(length(input$filt)==1 && input$filt == ""){
+        if(length(input$filt)==0 || (length(input$filt)==1 && input$filt == "")){
           filtcols = NULL
+          filter_formula = NULL
         }else{
           filtcols = input$filt
           filtcols = filtcols[filtcols!=""]

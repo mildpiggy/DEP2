@@ -255,7 +255,7 @@ filter_pe <- function(pe,
                       return_keeprows = F){
   if(is.character(filter_formula) & length(filter_formula) == 1) filter_formula = as.formula(filter_formula)
   assertthat::assert_that(class(pe) == "QFeatures", is.null(thr)|is.numeric(thr), is.null(missnum)|is.numeric(missnum),
-                          is.character(assay_name), length(assay_name) == 1, rlang::is_formula(filter_formula),
+                          is.character(assay_name), length(assay_name) == 1, rlang::is_formula(filter_formula)|is.null(filter_formula),
                           is.null(fraction)|is.numeric(fraction), is.null(fraction)|length(fraction) == 1)
 
   if(!assay_name %in% names(pe))
