@@ -27,7 +27,7 @@ Reshape_sidebar_mod <-  function(id,label="Reshape_sidabar"){
                                            'Long table',
                                            accept=c('text/csv',
                                                     'text/comma-separated-values,text/plain',
-                                                    '.csv','.tsv')),
+                                                    '.csv','.tsv',".gz",".GZ")),
                           )
                         ),
                         fluidRow(
