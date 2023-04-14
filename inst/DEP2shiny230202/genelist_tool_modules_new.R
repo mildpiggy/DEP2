@@ -232,7 +232,9 @@ exctract_genelist_Server <- function(id, ID, Omics_Serv_res, suffix = ""){
                      req( all(sigcol %in% colnames( rowData(dep_res))) )
                      sigdf <- rowData(dep_res)[,sigcol] %>% as.data.frame()
 
-                     sig <- dep_res[rowAnys( sigdf == TRUE, na.rm = T ), ]
+                     sig_index <- rowAnys( sigdf == TRUE, na.rm = T )
+                     if(sum(sig_index) < 1) stop("No significant under current input, please check.")
+                     sig <- dep_res[sig_index, ]
 
                      sig_res <- get_results(sig)
 
@@ -515,7 +517,9 @@ genelist_tool_Server <- function(id, Omics_res){
       }
 
       # Omics_res_list <- reactiveVal(check_omics(isolate(omics_res)))
-      Omics_res_list <- reactive( check_omics(omics_res) )
+      Omics_res_list <- reactive({
+        check_omics(omics_res)
+      })
 
       observeEvent(input$refresh,{
         # Omics_res_list2 <- Omics_res_list(check_omics(isolate(omics_res)))
@@ -1007,12 +1011,14 @@ genelist_tool_Server <- function(id, Omics_res){
 
         print(input$dropzone1)
         dropzone_selected_omics <- c(input$dropzone1, input$dropzone2, input$dropzone3, input$dropzone4)
+
         dropzone_selected_omics2 <- dropzone_selected_omics %>% sapply(., function(x){strsplit(x,"-ds-")[[1]][1]}) %>% unique
 
-        dropzone_selected_omics3 <- dropzone_selected_omics2[-grep("^Timecourse|^PTM",dropzone_selected_omics2)]
+        dropzone_selected_omics3 <- dropzone_selected_omics2[!grepl("^Timecourse|^PTM",dropzone_selected_omics2)]
 
         # omics_list <- Omics_res %>% reactiveValuesToList() %>% .[dropzone_selected_omics2] %>% lapply(function(x) x())
         omics_list <- Omics_res_list() %>% .[dropzone_selected_omics3] %>% lapply(function(x) x())
+
         multi_ht <- plot_multi_heatmap(omics_list = omics_list, choose_name = selected_proteins, to_upper = input$to_upper,
                                        color = input$heatmap_color,col_limit = input$heatmap_color_limit,
                                        width = input$heatmap_width,
