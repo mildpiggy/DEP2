@@ -30,7 +30,7 @@
 
 **Cutoff based on**: Optional. Filter out low-confidence PTM by certain score. Such as the "Localization.prob" in Maxquant.
 
-**Cutoff **: the lower limit of filtration based on the previous option.
+**Cutoff**: the lower limit of filtration based on the previous option.
 
 **Allowed max.miss.num at least one condition**: The threshold of miss values in one condition.
 

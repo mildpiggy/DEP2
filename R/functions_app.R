@@ -1,4 +1,6 @@
 
+# The DEP2 shiny app version, to verify the log file
+app_version = 0503
 
 #' Run shiny application in DEP2
 #'

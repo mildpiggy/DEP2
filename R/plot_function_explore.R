@@ -1118,7 +1118,7 @@ plot_ma_utili <- function(ma_df,
 #'
 plot_norm_distribution <- function(object, contrast = get_contrast(object)) {
   row_data <- as.data.frame(rowData(object))
-  cols_diff <- grep(paste(contrast, "_diff", sep = ""), colnames(row_data))
+  cols_diff <- grep(paste("^",contrast, "_diff", sep = ""), colnames(row_data))
 
 
   x = row_data[, cols_diff]

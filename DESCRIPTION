@@ -1,6 +1,6 @@
 Package: DEP2
 Title: What the Package Does (One Line, Title Case)
-Version: 0.2.02.21
+Version: 0.2.05.23
 Authors@R: 
     c(
     person("Zhenhuan", "Feng", email = "feng_zhenhuan@gibh.ac.cn", role = c("cre", "aut")),
