@@ -298,6 +298,7 @@ make_se <- function (proteins_unique, columns, expdesign, log2transform = TRUE)
          "Or run clean_character() to filter character values(like 'NA'), and transfer numeric in these columns",
          call. = FALSE)
   }
+
   if (tibble::is_tibble(proteins_unique))
     proteins_unique <- as.data.frame(proteins_unique)
   if (tibble::is_tibble(expdesign))
@@ -423,22 +424,28 @@ make_se_parse <- function (proteins_unique, columns, mode = c("char", "delim"),
   row_data <- proteins_unique[, -columns]
 
   rownames(row_data) <- row_data$name
-  if (mode == "char") {
-    col_data <- data.frame(label = colnames(raw), stringsAsFactors = FALSE) %>%
-      mutate(condition = substr(label, 1, nchar(label) -
-                                  chars), replicate = substr(label, nchar(label) +
-                                                               1 - chars, nchar(label))) %>% unite(ID, condition,
-                                                                                                   replicate, remove = FALSE)
-  }
-  if (mode == "delim") {
-    # colnames(raw) = gsub(get_suffix(colnames(raw)),"", colnames(raw))
-    col_data <- data.frame(label = colnames(raw), stringsAsFactors = FALSE) %>%
-      separate(label, c("condition", "replicate"), sep = sep,
-               remove = FALSE, extra = "merge") %>% unite(ID,
-                                                          condition, replicate, remove = FALSE)
-  }
+
+  col_data <- get_exdesign_parse(label = colnames(raw), mode = mode, chars = chars,
+                                 remove_prefix = FALSE, remove_suffix = FALSE)
+
+  # if (mode == "char") {
+  #   col_data <- data.frame(label = colnames(raw), stringsAsFactors = FALSE) %>%
+  #     mutate(condition = substr(label, 1, nchar(label) - chars),
+  #            replicate = substr(label, nchar(label) + 1 - chars, nchar(label))) %>%
+  #     unite(ID, condition, replicate, remove = FALSE)
+  # }
+  # if (mode == "delim") {
+  #   # colnames(raw) = gsub(get_suffix(colnames(raw)),"", colnames(raw))
+  #   col_data <- data.frame(label = colnames(raw), stringsAsFactors = FALSE) %>%
+  #     separate(label, c("condition", "replicate"), sep = sep,
+  #              remove = FALSE, extra = "merge") %>% unite(ID,
+  #                                                         condition, replicate, remove = FALSE)
+  # }
+
   rownames(col_data) <- col_data$ID
+
   colnames(raw)[match(col_data$label, colnames(raw))] <- col_data$ID
+
   raw <- raw[, !is.na(colnames(raw))]
   se <- SummarizedExperiment(assays = as.matrix(raw), colData = col_data,
                              rowData = row_data)

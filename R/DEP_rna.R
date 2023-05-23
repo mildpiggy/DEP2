@@ -109,13 +109,12 @@ get_exdesign_parse <- function(label, mode = c("delim", "char"),
                                                                                                    replicate, remove = FALSE)
   }
   if (mode == "delim") {
-    # colnames(raw) = gsub(get_suffix(colnames(raw)),"", colnames(raw))
     col_data <- data.frame(label = label, stringsAsFactors = FALSE) %>%
       separate(label, c("condition", "replicate"), sep = sep,
                remove = FALSE, extra = "merge") %>% unite(ID,
                                                           condition, replicate, remove = FALSE)
   }
-  # rownames(col_data) <- col_data$ID
+
   rownames(col_data) <- seq(nrow(col_data))
   return(col_data)
 }

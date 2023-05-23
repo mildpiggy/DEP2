@@ -178,24 +178,29 @@ make_pe_parse <- function(Peptide,
     colnames(Peptide)[columns] <- delete_prefix(colnames(Peptide)[columns]) %>% make.names()
   }
   if(remove_suffix){
-    colnames(raw) <- delete_suffix(colnames(raw)) %>% make.names()
-  }
-  if (mode == "char") {
-    expdesign <- data.frame(label = colnames(Peptide)[columns], stringsAsFactors = FALSE) %>%
-      mutate(condition = substr(label, 1, nchar(label) -
-                                  chars), replicate = substr(label, nchar(label) +
-                                                               1 - chars, nchar(label))) %>% unite(ID, condition,
-                                                                                                   replicate, remove = FALSE)
-  }
-  if (mode == "delim") {
-    # colnames(raw) = gsub(get_suffix(colnames(raw)),"", colnames(raw))
-    expdesign <- data.frame(label = colnames(Peptide)[columns], stringsAsFactors = FALSE) %>%
-      separate(label, c("condition", "replicate"), sep = sep,
-               remove = FALSE, extra = "merge") %>% unite(ID,
-                                                          condition, replicate, remove = FALSE)
+    colnames(Peptide)[columns] <- delete_suffix(colnames(Peptide)[columns]) %>% make.names()
   }
 
-  rownames(expdesign) = expdesign$label
+  expdesign = get_exdesign_parse(label = colnames(Peptide)[columns], mode = mode, chars = chars,
+                                 remove_prefix = FALSE, remove_suffix = FALSE)
+  # if (mode == "char") {
+  #   expdesign <- data.frame(label = colnames(Peptide)[columns], stringsAsFactors = FALSE) %>%
+  #     mutate(condition = substr(label, 1, nchar(label) -
+  #                                 chars), replicate = substr(label, nchar(label) +
+  #                                                              1 - chars, nchar(label))) %>% unite(ID, condition,
+  #                                                                                                  replicate, remove = FALSE)
+  # }
+  # if (mode == "delim") {
+  #   # colnames(raw) = gsub(get_suffix(colnames(raw)),"", colnames(raw))
+  #   expdesign <- data.frame(label = colnames(Peptide)[columns], stringsAsFactors = FALSE) %>%
+  #     separate(label, c("condition", "replicate"), sep = sep,
+  #              remove = FALSE, extra = "merge") %>% unite(ID,
+  #                                                         condition, replicate, remove = FALSE)
+  # }
+
+  rownames(expdesign) = expdesign$ID
+  colnames(Peptide)[match(expdesign$label, colnames(Peptide))] <- expdesign$ID
+
   Peptide[,columns] = apply(Peptide[,columns], 2, function(x){
     x[!(!grepl("[A-z]",x) & grepl("\\d",x))] = 0
     return(as.numeric(x))
@@ -516,7 +521,7 @@ normalize_pe <- function(pe, method = c("diff.median", "quantiles", "quantiles.r
                                     name = name,
                                     method = method)
   }else if(method %in% c("quantiles.robust")){
-    if(anyNA(assay(pe[[i]]))) stop("quantiles.robust normalize can work for data with missing values (NA).")
+    if(anyNA(assay(pe[[i]]))) stop("quantiles.robust normalize can't work for data with missing values (NA).")
     pe_norm <- QFeatures::normalize(pe,
                                     i = i,
                                     name = name,
@@ -585,7 +590,8 @@ aggregate_pe <- function(pe, aggrefun = c("RobustSummary","medianPolish","totalM
     fil_formula <- as.formula( paste0("~",fcol," %in% smallestUniqueGroups(rowData(pe[['",peptide_assay_name ,"']])$",fcol,")") )
     pe <- filter_pe(pe, filter_formula = fil_formula, assay_name =  peptide_assay_name )
     print("aggregate by uniques peptides, filterFeatures finished")
-    rowData(pe)$smallestProteingroups <- rowData(pe)[,fcol]
+    # rowData(pe[[peptide_assay_name]])$smallestProteingroups <- rowData(pe[[peptide_assay_name]])[,fcol]
+    rowData(pe[[peptide_assay_name]])$smallestProteingroups <- rowData(pe[[peptide_assay_name]])[,fcol]
     protein <- suppressWarnings(
       {aggregateFeatures(object = pe ,
                          i = peptide_assay_name, fcol = fcol,
