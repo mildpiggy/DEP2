@@ -49,14 +49,17 @@ DEP_pg_sidebar_mod <-  function(id,labelname){
                                                'ProteinGroups.txt',
                                                accept=c('text/csv',
                                                         'text/comma-separated-values,text/plain',
-                                                        '.csv')),
+                                                        '.csv',
+                                                        '.gz',
+                                                        '.tsv')),
                                      conditionalPanel(
                                        condition = paste0("input['",ns("anno"),"']","== 'expdesign'"),
                                        fileInput(ns('file2'),width = "300px",
                                                  'ExperimentalDesign.txt',
                                                  accept=c('text/csv',
                                                           'text/comma-separated-values,text/plain',
-                                                          '.csv'))
+                                                          '.csv','.gz',
+                                                          '.tsv'))
                                      )
                                      # ,
                                      # fileInput(ns('resultRData'),'Load saved result RData',width = "300px")

@@ -27,14 +27,16 @@ DEG_sidebar_mod <- function(id,labelname = "DEP-pg_sidabar"){
                                              'Countmatrix.txt',
                                              accept=c('text/csv',
                                                       'text/comma-separated-values,text/plain',
-                                                      '.csv')),
+                                                      '.csv',
+                                                      '.gz',
+                                                      '.tsv')),
                                    conditionalPanel(
                                      condition = paste0("input['",ns("anno"),"']","== 'expdesign'"),
                                      fileInput(ns('file2'),width = "300px",
                                                'ExperimentalDesign.txt',
                                                accept=c('text/csv',
                                                         'text/comma-separated-values,text/plain',
-                                                        '.csv')),
+                                                        '.csv','.gz','.tsv')),
                                      uiOutput(ns("for_loadcount")) ## only to force counts file is read in immediately
                                    )
 
