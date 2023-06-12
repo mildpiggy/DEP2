@@ -6,7 +6,7 @@
 \usage{
 impute(
   se,
-  fun = c("bpca", "knn", "QRILC", "MLE", "MinDet", "MinProb", "man", "min", "zero",
+  fun = c("QRILC", "bpca", "knn", "MLE", "MinDet", "MinProb", "man", "min", "zero",
     "mixed", "nbavg", "RF", "GSimp"),
   ...
 )

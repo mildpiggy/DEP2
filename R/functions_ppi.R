@@ -192,6 +192,7 @@ test_PPI <- function(x,
 #'
 #' @return
 #' A visNetwork plot or a igraph obejct according \code{returntype}.
+#'
 #' @examples
 #' \dontrun{
 #' # Load example
@@ -223,7 +224,7 @@ test_PPI <- function(x,
 #'
 #'   ## visNetwork network
 #'   PPInetwork(PPI_res, returntype = "visNetwork")
-#' }
+#'   }
 #' }
 #'
 #' @export

@@ -83,7 +83,7 @@ filter_se <- function(se,
   }
 
   if(!is.null(fraction)){
-    message("filter base on missing number fraction < ",fraction," in each column\n")
+    message("filter base on missing number fraction < ",fraction," in each row\n")
     if(fraction < 0 | fraction > 1) {
       warning("invalid filter threshold 'fraction' applied",
               "Run filter_se() with a percent ranging from 0 to 1.\n",

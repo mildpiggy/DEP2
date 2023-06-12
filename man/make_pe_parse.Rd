@@ -34,11 +34,11 @@ and requires the 'chars' parameter.
 
 \item{chars}{Numeric(1),
 The number of characters to take at the end of the column headers
-as replicate number (only for mode == "char").}
+as replicate number (only for mode = "char").}
 
 \item{sep}{Character(1),
 The separator used to parse the column header
-(only for mode == "delim").}
+(only for mode = "delim").}
 
 \item{remove_prefix}{Logical(1),
 whether remove the prefix of expression columns.}

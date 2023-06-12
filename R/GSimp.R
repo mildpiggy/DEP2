@@ -98,7 +98,7 @@ multi_impute <- function(data_miss, iters_each=50, iters_all=20, initial='qrilc'
   } else {stop('improper argument: iters_each')}
 
 
-  ## Missing count in each column ##
+  ## Missing count in each columns ##
   miss_count <- data_miss %>% apply(., 2, function(x) sum(is.na(x)))
   ## Index of missing variables, sorted (increasing) by the number of missings
   miss_col_idx <- order(miss_count, decreasing = T) %>% magrittr::extract(1:sum(miss_count!=0)) %>% rev()

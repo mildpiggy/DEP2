@@ -97,6 +97,11 @@ reshape_long2wide <- function(long_table,
   if(!expression_col %in% colnames(long_table)) stop("expression_col must be a column name of long_table")
   if(!sample_col %in% colnames(long_table)) stop("sample_col must be a column name of long_table")
 
+  ## check whether input cols are repeated.
+  all_col = c(feature_col,expression_col,shrink_ident_cols,extend_ident_cols)
+  if(any(duplicated(all_col))) stop(all_col[duplicated(all_col)],"is repeated in input, please check")
+
+  long_table[,sample_col] = iconv(long_table[,sample_col], "WINDOWS-1252", "UTF-8")
   if(remove_sample_prefix){
     prefix <- DEP2:::get_prefix(long_table[,sample_col])
     prefix <- gsub("\\\\","\\\\\\\\",prefix)
@@ -106,7 +111,7 @@ reshape_long2wide <- function(long_table,
     long_table[,sample_col]= DEP2:::delete_suffix(long_table[,sample_col])
   }
 
-  ## all samples, and arrange the table
+  ## transform samples to factor, and arrange the table
   samp = long_table[,sample_col] %>% unique
   long_table2 = long_table
   long_table2[,sample_col]  = factor(long_table2[,sample_col],levels = samp)
@@ -115,7 +120,26 @@ reshape_long2wide <- function(long_table,
   ## Remove Duplicates in c(feature_col,sample_col,expression_col)
   long_table2 <- long_table2[!duplicated(long_table2[,c(feature_col,sample_col,expression_col)]),]
 
-  exp_df = tidyr::pivot_wider(long_table2, id_cols = feature_col, names_from = sample_col, values_from = expression_col)
+  ## If features have multiple expression values on one sample, take the max one.
+  if( any( duplicated(long_table2[,c(feature_col,sample_col)]) ) ){
+    dup_precent = (
+      ( (duplicated(long_table2[,c(feature_col,sample_col)])) %>% sum ) / nrow(long_table2) *100
+      ) %>% round(2)
+    message(dup_precent,"% of features have multiple expression, keep the max value.")
+
+    long_table2 = long_table2[order(long_table2[,expression_col],decreasing = T), ]
+    long_table2 = long_table2[!duplicated(long_table2[,c(feature_col,sample_col)]), ]
+  }
+
+  exp_df = tidyr::pivot_wider(long_table2, id_cols = feature_col, names_from = sample_col, values_from = expression_col,
+                              values_fn = function(x){
+                                if(all(is.na(x))){
+                                  NA
+                                }else{
+                                  max(x,na.rm = T)  ## Use the maximum
+                                }
+                              }
+  )
 
   if(!is.null(shrink_ident_cols)){
     if(! all(shrink_ident_cols %in% colnames(long_table2)))
@@ -125,7 +149,7 @@ reshape_long2wide <- function(long_table,
     fea_id_table_shrink <- shrink_ident_cols %>% lapply(reduce_table, long_table2=long_table2,
                                                         feature_col=feature_col,sample_col = sample_col)
     if(length(shrink_ident_cols) > 1){
-      fea_id_table_shrink2 <- Reduce(function(...) merge(..., all=T), fea_id_table_shrink)
+      fea_id_table_shrink2 <- base::Reduce(function(...) merge(..., all=T), fea_id_table_shrink)
     }else{fea_id_table_shrink2 = fea_id_table_shrink[[1]]}
 
     exp_df = merge(exp_df,fea_id_table_shrink2)
@@ -141,6 +165,7 @@ reshape_long2wide <- function(long_table,
     exp_df = merge(exp_df,fea_id_table_extend)
   }
 
+  colnames(exp_df) = suppressWarnings(stringr::str_conv(colnames(exp_df),"UTF-8")) %>% make.names
   return(as.data.frame(exp_df))
 
 }
@@ -357,10 +382,10 @@ make_se <- function (proteins_unique, columns, expdesign, log2transform = TRUE)
 #' "delim" will parse on the separator and requires the 'sep' parameter.
 #' @param chars Numeric(1),
 #' The number of characters to take at the end of the column headers
-#' as replicate number (only for mode == "char").
+#' as replicate number (only for mode = "char").
 #' @param sep Character(1),
 #' The separator used to parse the column header
-#' (only for mode == "delim").
+#' (only for mode = "delim").
 #' @param remove_prefix Logical(1),
 #' whether remove the prefix of expression columns.
 #' @param remove_suffix Logical(1),
@@ -390,7 +415,7 @@ make_se_parse <- function (proteins_unique, columns, mode = c("char", "delim"),
   if(is.numeric(columns)) columns = as.integer(columns)
   if(is.character(columns)){
     if(!all(columns %in% colnames(proteins_unique)))
-      stop("columns should be the columns in ", deparse(substitute(proteins_unique)), "but ", columns[!columns %in% colnames(proteins_unique)],"do not exist.")
+      stop("columns should be the columns in ", deparse(substitute(proteins_unique)), " but ", columns[!columns %in% colnames(proteins_unique)],"do not exist.")
     columns = which(colnames(proteins_unique) %in% columns)
   }else if(is.integer(columns)){
     assert_that(all(columns %in% 1:nrow(proteins_unique)))
@@ -538,7 +563,7 @@ normalize_vsn <- function (se)
 #' @export
 #' @importFrom MSnbase impute exprs
 #' @importFrom missForest missForest
-impute <- function (se, fun = c("bpca", "knn", "QRILC", "MLE", "MinDet",
+impute <- function (se, fun = c("QRILC", "bpca", "knn", "MLE", "MinDet",
                                 "MinProb", "man", "min", "zero", "mixed", "nbavg","RF", "GSimp"), ...)
 {
   assertthat::assert_that(inherits(se, "SummarizedExperiment"),
@@ -962,18 +987,27 @@ setGeneric("add_rejections", function(diff, alpha = 0.05, lfc = 1,thresholdmetho
 #' data(Silicosis_peptide)
 #' ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T)
 #'
-#' ## construct QFeatures object
+#' ## Construct QFeatures object
 #' pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = T, log2transform = T,mode = "delim")
-#' filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
-#' imp_pe <- QFeatures::addAssay(filt_pe, DEP2::impute(filt_pe[["peptideRaw"]], fun = "MinDet"), name = "peptideImp")
-#' norm_pe <- DEP2:::normalize_pe(imp_pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
 #'
-#' ## Summarize peptide value to protein quantity
-#' protein_pe <- DEP2::aggregate_pe(norm_pe, fcol = "Proteins", peptide_assay_name = "peptideNorm")
-#' class(protein_pe)
+#' ## Filter
+#' pe = filter_pe(pe_peptides,
+#' thr = 1,
+#' fraction = 0.3,
+#' filter_formula = ~ Reverse != '+' & Potential.contaminant !="+"
+#' )
+#'
+#' ## Impute & Normalize
+#' pe <- impute_pe(pe, fun = "QRILC", name = "peptideImp")
+#' pe <- normalize_pe(pe,method = "quantiles.robust", i = "peptideImp")
+#'
+#' ## Aggregate peptides
+#' prot <- aggregate_pe(pe, fcol = "Proteins", i = "peptideNorm")
+#' class(prot)
 #'
 #' ## Construct a SE object
-#' SE_pep <- pe2se(protein_pe)
+#' SE_pep <- pe2se(prot)
+#'
 #' ## Test for differentially expressed proteins
 #' diff_pep <- DEP2::test_diff(SE_pep,type = "control", control = "PBS", fdr.type = "Strimmer's qvalue(t)")
 #' dep_pep <- add_rejections(diff_pep)

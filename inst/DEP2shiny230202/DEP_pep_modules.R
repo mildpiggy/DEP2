@@ -1830,7 +1830,7 @@ DEP_pep_server_module <- function(id){
 
             withProgress(message = 'Aggregeting, please wait for a while', {
               protein <- DEP2::aggregate_pe(pe_norm, aggrefun = aggrefun, aggregate_Peptide_Type = input$aggregate_Peptide_Type,
-                                            fcol = fcol, peptide_assay_name = i, reserve = input$name)
+                                            fcol = fcol, i = i, reserve = input$name)
             })
             cat("Finished \n")
             protein

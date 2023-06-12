@@ -106,7 +106,7 @@ get_exdesign_parse <- function(label, mode = c("delim", "char"),
       mutate(condition = substr(label, 1, nchar(label) -
                                   chars), replicate = substr(label, nchar(label) +
                                                                1 - chars, nchar(label))) %>% unite(ID, condition,
-                                                                                                   replicate, remove = FALSE)
+                                                                                                   replicate, sep = "", remove = FALSE)
   }
   if (mode == "delim") {
     col_data <- data.frame(label = label, stringsAsFactors = FALSE) %>%
@@ -274,14 +274,12 @@ setMethod("add_rejections",
           }
 )
 
-add_rejections.DEGdata <- function (diff, alpha = 0.05, lfc = 1,thresholdmethod="intersect",curvature=1,x0_fold = 2)
+add_rejections.DEGdata <- function (diff, alpha = 0.05, lfc = 1,
+                                    thresholdmethod = "intersect",
+                                    curvature = 1,x0_fold = 2)
 {
-  test_result <- diff@test_result
-  # if (any(!c("name", "ID") %in% colnames(test_result))) {
-  #   stop("'name' and/or 'ID' columns are not present in '",
-  #        deparse(substitute(diff)), "'\nRun make_unique() and make_se() to obtain the required columns",
-  #        call. = FALSE)
-  # }
+  test_result <- diff@test_result %>% as.data.frame()
+
   if (length(grep("_p.adj|_diff", colnames(test_result))) < 1) {
     stop("'[contrast]_diff' and/or '[contrast]_p.adj' columns are not present in '",
          deparse(substitute(diff)), "'\nRun get_result() to obtain the required columns",
@@ -319,7 +317,7 @@ add_rejections.DEGdata <- function (diff, alpha = 0.05, lfc = 1,thresholdmethod=
         (p_reject & diff_reject)
       # test_result$contrast_significant <- test_result$significant
       # colnames(test_result)[ncol(test_result)] <- gsub("_p.adj", "_significant", colnames(test_result)[cols_p])
-      diff@test_result = test_result
+      diff@test_result = DataFrame(test_result)
     }
     if (length(cols_p) > 1) {
       p_reject <- test_result[, cols_p] <= alpha
@@ -330,10 +328,8 @@ add_rejections.DEGdata <- function (diff, alpha = 0.05, lfc = 1,thresholdmethod=
       sign_df <- cbind(sign_df, significant = apply(sign_df,
                                                     1, function(x) any(x)))
       colnames(sign_df) <- gsub("_p.adj", "_significant", colnames(sign_df))
-      sign_df <- cbind(name = test_result$name, as.data.frame(sign_df))
-      test_result <- left_join(test_result %>%as.data.frame(),
-                               sign_df, by = "name")
-      diff@test_result = test_result
+      test_result <- cbind(test_result, as.data.frame(sign_df))
+      diff@test_result = DataFrame(test_result)
     }
     rowData(diff) <- cbind(rowData(diff), diff@test_result)
     return(diff)
@@ -361,7 +357,7 @@ add_rejections.DEGdata <- function (diff, alpha = 0.05, lfc = 1,thresholdmethod=
 
       # colnames(test_result)[ncol(test_result)] <- gsub("_p.adj",
       #                                                  "_significant", colnames(test_result)[cols_p])
-      diff@test_result = test_result
+      diff@test_result = DataFrame(test_result)
     }
     if(length(cols_p) > 1){
       sign_df <- sapply(1:length(cols_p), function(i) {
@@ -374,18 +370,25 @@ add_rejections.DEGdata <- function (diff, alpha = 0.05, lfc = 1,thresholdmethod=
         contrast_significant <- ( -log10(test_result[,cols_p[i]]) > curvature/abs(test_result[,cols_diff[i]] - polar*x0) &
                                     ifelse((test_result[,cols_diff[i]] >= 0),test_result[,cols_diff[i]]>x0,test_result[,cols_diff[i]] < -x0) )
         contrast_significant[is.na(contrast_significant)] =FALSE
+        contrast_significant
       })
-      colnames(sign_df) =  gsub("_p.adj", "significant", colnames(test_result)[cols_p])
+      colnames(sign_df) =  gsub("_p.adj", "_significant", colnames(test_result)[cols_p])
       sign_df <- cbind(sign_df, significant = apply(sign_df,
                                                     1, function(x) any(x)))
-      sign_df <- cbind(name = test_result$name, as.data.frame(sign_df))
-      test_result <- left_join(test_result %>% as.data.frame(),
-                               sign_df, by = "name")
-      diff@test_result = test_result
-      diff@test_result = test_result
+      # sign_df <- cbind(name = test_result$name, as.data.frame(sign_df))
+      # test_result <- left_join(test_result %>% as.data.frame(),
+      #                          sign_df, by = "name")
+
+      test_result <- cbind(test_result, as.data.frame(sign_df))
+      diff@test_result = DataFrame(test_result)
     }
 
-    rowData(diff) <- cbind(diff[,!(colnames(diff) %in% colnames(diff@test_result))] , diff@test_result)
+    ## add the test_result to the rowData of DEGdata
+    rd = rowData(diff)
+    suffix = diff@test_result %>% colnames %>%gsub(".*_","_",.) %>% unique()
+    rd = rd[,-( grep( paste0(suffix,collapse = "|",sep = "$") , colnames(rd)) ) ]
+
+    rowData(diff) <- DataFrame(cbind(rd, diff@test_result))
     return(diff)
   }else stop("thresholdmethod should be one of 'intersect'/'curve'",
              call. = FALSE)
@@ -428,6 +431,143 @@ rlg_deg <- function(DEGdata, blind = FALSE, ...){
   DEGdata@rlg <- rlog(DEGdata,blind, ...) %>% assay
   return(DEGdata)
 }
+
+
+
+#' Count matrix to DESeqDataSet conversion using an experimental design
+#'
+#' make_dds creates a DESeqDataSet object from a gene counts matrix and experimental design table.
+#' The gene identifiers should in the first column of countData.
+#'
+#' @param countData Gene counts matrix or a data.frame contain counts data.
+#' @param expdesign Data.frame, Experimental design with 'label', 'condition' and 'replicate' information.
+#'
+#' @param design The design formula that transmitted to \code{\link[DESeq2]{DESeqDataSet}}
+#'
+#'
+#' @return
+#'
+#' A DESeqDataSet object.
+#'
+#' @export
+#'
+#' @examples
+#'
+#' \dontrun{
+#'
+#'  data(Silicosis_count)
+#'  colnames(Silicosis_count)
+#'
+#'  expdesign = get_exdesign_parse(colnames(Silicosis_count))
+#'  dds = make_dds(countData = Silicosis_count, expdesign = expdesign)
+#'
+#'  ## DESeq2 way, be same.
+#'  # DESeqDataSetFromMatrix(countData = Silicosis_count,colData = expdesign,
+#'                           design = as.formula("~ condition"))
+#'                          )
+#' }
+#'
+#'
+make_dds <- function(countData,
+                     # columns = NULL,
+                     expdesign,
+                     design = as.formula(~ condition)){
+  columns = NULL
+  assertthat::assert_that(is.null(columns)||is.character(columns)||is.numeric(columns),
+                          is.matrix(countData) || is.table(countData),
+                          is.data.frame(expdesign)
+  )
+
+  if(!is.null(columns)){
+    if(is.character(columns)) columns = which(colnames(counts) %in% columns)
+    countData = countData[,c(columns)]
+  }
+
+  if(!all(rownames(countData) %in% expdesign$label) ){
+    stop("The labels in expdesign don't cover all the columns of countData")
+  }
+
+  if(!all( c('label', 'condition', 'replicate' ) %in% colnames(expdesign) )){
+    stop("expdesign must contain 'label', 'condition' and 'replicate'.")
+  }
+
+  expdesign$condition = as.factor(expdesign$condition)
+  dds <- DESeqDataSetFromMatrix(countData = countData,colData = expdesign,
+                                design = design)
+
+  return(dds)
+}
+
+
+#' Count matrix to DESeqDataSet conversion by parsing from column names
+#'
+#' make_dds_parse creates a DESeqDataSet object from a gene counts matrix.
+#' The gene identifiers should in the first column of countData.
+#'
+#' @param countData
+#' @param mode
+#' @param chars
+#' @param sep
+#' @param remove_prefix remove the prefix of sample labels.
+#' @inheritParams make_dds
+#' @inheritParams make_se_parse
+#'
+#' @details
+#'
+#' Column name is splitted by delim or from the tail character(mode = "char").
+#' Detail rule can check \code{\link{get_exdesign_parse}})
+#'
+#' @return
+#'
+#' A DESeqDataSet object.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' data(Silicosis_count)
+#' colnames(Silicosis_count)
+#'
+#' dds = make_dds_parse(Silicosis_count, mode = "delim", sep = "_")
+#' colData(dds)
+#' }
+#'
+#'
+make_dds_parse <- function(countData,
+                           # columns = NULL,
+                           mode = c("char", "delim"),
+                           chars = 1,
+                           sep = "_",
+                           remove_prefix = F,
+                           design = as.formula(~ condition)){
+  columns = NULL
+  mode = match.arg(mode)
+  assertthat::assert_that(is.null(columns)||is.character(columns)||is.numeric(columns),
+                          is.matrix(countData) || is.table(countData),
+                          is.character(mode),
+                          is.numeric(chars), length(chars) == 1, is.character(sep),
+                          length(sep) == 1, is.logical(remove_prefix)
+  )
+
+  if(!is.null(columns)){
+    if(is.character(columns)) columns = which(colnames(counts) %in% columns)
+    countData = countData[,c(columns)]
+  }
+
+  expDesign = get_exdesign_parse(colnames(countData), mode=mode,
+                                 chars=chars, sep=sep,
+                                 remove_prefix=remove_prefix)
+  colnames(countData) = expDesign$label
+
+  expDesign$condition = as.factor(expDesign$condition)
+  dds <- DESeqDataSetFromMatrix(countData = countData,colData = expDesign,
+                                design = design
+  )
+
+
+  return(dds)
+}
+
 
 
 ## RNAseq workflow

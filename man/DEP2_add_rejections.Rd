@@ -61,18 +61,27 @@ dep <- add_rejections(diff, method = "curve")
 data(Silicosis_peptide)
 ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = T)
 
-## construct QFeatures object
+## Construct QFeatures object
 pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = T, log2transform = T,mode = "delim")
-filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
-imp_pe <- QFeatures::addAssay(filt_pe, DEP2::impute(filt_pe[["peptideRaw"]], fun = "MinDet"), name = "peptideImp")
-norm_pe <- DEP2:::normalize_pe(imp_pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
 
-## Summarize peptide value to protein quantity
-protein_pe <- DEP2::aggregate_pe(norm_pe, fcol = "Proteins", peptide_assay_name = "peptideNorm")
-class(protein_pe)
+## Filter
+pe = filter_pe(pe_peptides,
+thr = 1,
+fraction = 0.3,
+filter_formula = ~ Reverse != '+' & Potential.contaminant !="+"
+)
+
+## Impute & Normalize
+pe <- impute_pe(pe, fun = "QRILC", name = "peptideImp")
+pe <- normalize_pe(pe,method = "quantiles.robust", i = "peptideImp")
+
+## Aggregate peptides
+prot <- aggregate_pe(pe, fcol = "Proteins", i = "peptideNorm")
+class(prot)
 
 ## Construct a SE object
-SE_pep <- pe2se(protein_pe)
+SE_pep <- pe2se(prot)
+
 ## Test for differentially expressed proteins
 diff_pep <- DEP2::test_diff(SE_pep,type = "control", control = "PBS", fdr.type = "Strimmer's qvalue(t)")
 dep_pep <- add_rejections(diff_pep)

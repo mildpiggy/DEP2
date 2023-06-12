@@ -124,10 +124,10 @@ make_pe <- function(Peptide, columns,
 #' "delim" will parse on the separator and requires the 'sep' parameter.
 #' @param chars Numeric(1),
 #' The number of characters to take at the end of the column headers
-#' as replicate number (only for mode == "char").
+#' as replicate number (only for mode = "char").
 #' @param sep Character(1),
 #' The separator used to parse the column header
-#' (only for mode == "delim").
+#' (only for mode = "delim").
 #' @param remove_prefix Logical(1),
 #' whether remove the prefix of expression columns.
 #' @param remove_suffix Logical(1),
@@ -475,15 +475,62 @@ aggregateFeatures = function(object, i, fcol, name = "newAssay",
 }
 
 
+
+#' Impute a QFeatures object
+#'
+#' Impute the \code{i} assay in QFeatures object though [impute] function.
+#' The normalized assay is saved in the \code{name} assay.
+#'
+#' @param pe
+#' @param fun Character(1), imputation strategy, see \link[impute].
+#' @param i
+#' @param name Character(1), naming the new normalized assay. defaule is "peptideImp".
+#'
+#' @inheritParams normalize_pe
+#' @return
+#' A QFeatures with a imputed assay in giving \code{name}.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Load example peptide data
+#' data(Silicosis_peptide)
+#' ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = TRUE)
+#'
+#' # Construct QFeature object
+#' pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = TRUE, log2transform = TRUE,mode = "delim")
+#'
+#' # Filter, imputation
+#' pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
+#' pe <- impute_pe(pe, fun = "QRILC")
+#' }
+impute_pe <- function(pe,
+                      fun = c("QRILC", "bpca", "knn", "MLE", "MinDet",
+                              "MinProb", "man", "min", "zero", "mixed", "nbavg","RF", "GSimp"),
+                      i = "peptideRaw", name = "peptideImp"){
+  fun = match.arg(fun)
+  assertthat::assert_that(inherits(pe,"QFeatures"),
+                          length(i) == 1, is.character(name) && length(name) == 1)
+  if(is.character(i) && !i %in% names(pe)) stop("'i' should be one of exist assay in ", deparse(substitute(pe)),": ", paste(names(pe),collapse = ", "))
+  if(is.numeric(i) | is.integer(i)) assertthat::assert_that(i %in% 1:length(pe))
+
+  pe <- QFeatures::addAssay(pe,
+                            DEP2::impute(pe[[i]], fun = fun),
+                            name = name)
+  return(pe)
+}
+
 #' Normalize a QFeatures object
 #'
-#' Normalize a QFeatures object though [QFeatures::normalize] function
+#' Normalize the \code{i} assay in QFeatures object though [QFeatures::normalize] function.
+#' The normalized assay is saved in the \code{name} assay.
 #'
 #' @param pe A QFeature object
 #' @param method 	Character(1), normalisation method, one of "diff.median", "quantiles", "quantiles.robust" or "vsn".
 #' See \link[QFeatures]{normalize}.
-#' @param i 	A numeric vector or a character vector giving the index or the name, respectively, of the assay(s) to be processed.
-#' @param name  Character(1) naming the new normalized assay name.
+#' @param i 	A numeric or a character giving the index or the name, respectively, of the assay(s) to be processed.
+#' @param name  Character(1) naming the new normalized assay.
 #'
 #' @importFrom QFeatures normalize
 #'
@@ -497,17 +544,24 @@ aggregateFeatures = function(object, i, fcol, name = "newAssay",
 #' pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = TRUE, log2transform = TRUE,mode = "delim")
 #'
 #' # Filter, imputation
-#' filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
-#' imp_pe <- QFeatures::addAssay(filt_pe, DEP2::impute(filt_pe[["peptideRaw"]], fun = "MinDet"), name = "peptideImp")
+#' pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
+#' pe <- impute_pe(pe, fun = "QRILC", name = "peptideImp")
 #'
 #' # Normalization
-#' norm_pe <- normalize_pe(imp_pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
+#' pe <- normalize_pe(pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
 #' }
 #' @export
-normalize_pe <- function(pe, method = c("diff.median", "quantiles", "quantiles.robust" ,"vsn"), i = "peptideRaw", name = "peptideNorm"){
+normalize_pe <- function(pe, method = c("diff.median", "quantiles", "quantiles.robust" ,"vsn"), i = "peptideImp", name = "peptideNorm"){
   method = match.arg(method)
+
+  assertthat::assert_that(inherits(pe,"QFeatures"),
+                          length(i) == 1, is.character(name) && length(name) == 1)
+
   if(is.character(i) && !i %in% names(pe)) stop("'i' should be one of exist assay in ", deparse(substitute(pe)),": ", paste(names(pe),collapse = ", "))
   if(is.numeric(i) | is.integer(i)) assertthat::assert_that(i %in% 1:length(pe))
+
+  if(name %in% names(pe)) stop('"',name,'"', "already exist in pe")
+
   if(method == "vsn"){
     assay(pe[[i]]) = 2^assay(pe[[i]])
     pe_norm <- QFeatures::normalize(pe,
@@ -543,7 +597,7 @@ normalize_pe <- function(pe, method = c("diff.median", "quantiles", "quantiles.r
 #' @param aggregate_Peptide_Type Character in "Unique + Razor" or "Unique".
 #' Use what kind of peptides to summarise proteins. If choose "Unique", return output just save unique peptides in smallest proteingroups.
 #' @param fcol Character(1), defining how to summarise the features. Exist in \code{rowData(pe)}.
-#' @param peptide_assay_name Character(1), the name of aggregation result assay
+#' @param i Character(1), name of the assay to be aggregated.
 #' @param reserve Character, the column(s) which will reserve after aggregate, such as the columns store protein information can.
 #'
 #' @return
@@ -556,19 +610,23 @@ normalize_pe <- function(pe, method = c("diff.median", "quantiles", "quantiles.r
 #'
 #' # construct QFeatures object
 #' pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = TRUE, log2transform = TRUE,mode = "delim")
-#' filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
-#' imp_pe <- QFeatures::addAssay(filt_pe, DEP2::impute(filt_pe[["peptideRaw"]], fun = "MinDet"), name = "peptideImp")
-#' norm_pe <- DEP2:::normalize_pe(imp_pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
+#'
+#' # Filter, imputation
+#' pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
+#' pe <- impute_pe(pe, fun = "QRILC", name = "peptideImp")
+#'
+#' # Normalization
+#' pe <- normalize_pe(pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
 #'
 #' # Summarize peptide value to protein quantity
-#' protein_pe <- DEP2::aggregate_pe(norm_pe, fcol = "Proteins", peptide_assay_name = "peptideNorm")
+#' protein_pe <- DEP2::aggregate_pe(pe, fcol = "Proteins", i = "peptideNorm")
 #' class(protein_pe)
 #'
 #' }
 #' @export
 #'
 aggregate_pe <- function(pe, aggrefun = c("RobustSummary","medianPolish","totalMean"), aggregate_Peptide_Type = c("Unique + Razor", "Unique"),
-                         fcol, peptide_assay_name = "peptideNorm", reserve = "Gene.names"
+                         fcol, i = "peptideNorm", reserve = "Gene.names"
 ){
   aggregate_Peptide_Type <- match.arg(aggregate_Peptide_Type)
   assertthat::assert_that(class(pe) == "QFeatures", is.function(aggrefun)|is.character(aggrefun),
@@ -582,25 +640,25 @@ aggregate_pe <- function(pe, aggrefun = c("RobustSummary","medianPolish","totalM
                       RobustSummary = MsCoreUtils::robustSummary)
   }
 
-  if(!peptide_assay_name %in% names(pe))
-    stop("'peptide_assay_name' should be one of exist assay in ", deparse(substitute(pe)),": ", paste(names(pe),collapse = ", "))
+  if(!i %in% names(pe))
+    stop("'i' should be one of exist assay in ", deparse(substitute(pe)),": ", paste(names(pe),collapse = ", "))
 
   if(aggregate_Peptide_Type == "Unique"){
     ## just use the features in smallestUniqueGroups.
-    fil_formula <- as.formula( paste0("~",fcol," %in% smallestUniqueGroups(rowData(pe[['",peptide_assay_name ,"']])$",fcol,")") )
-    pe <- filter_pe(pe, filter_formula = fil_formula, assay_name =  peptide_assay_name )
+    fil_formula <- as.formula( paste0("~",fcol," %in% smallestUniqueGroups(rowData(pe[['",i ,"']])$",fcol,")") )
+    pe <- filter_pe(pe, filter_formula = fil_formula, assay_name =  i )
     print("aggregate by uniques peptides, filterFeatures finished")
-    # rowData(pe[[peptide_assay_name]])$smallestProteingroups <- rowData(pe[[peptide_assay_name]])[,fcol]
-    rowData(pe[[peptide_assay_name]])$smallestProteingroups <- rowData(pe[[peptide_assay_name]])[,fcol]
+    # rowData(pe[[i]])$smallestProteingroups <- rowData(pe[[i]])[,fcol]
+    rowData(pe[[i]])$smallestProteingroups <- rowData(pe[[i]])[,fcol]
     protein <- suppressWarnings(
       {aggregateFeatures(object = pe ,
-                         i = peptide_assay_name, fcol = fcol,
+                         i = i, fcol = fcol,
                          name = "protein",
                          fun = aggrefun,
                          na.rm = T,
                          reserve = reserve)}
       # QFeatures::aggregateFeatures(object = pe ,
-      #                              i = peptide_assay_name, fcol = fcol,
+      #                              i = i, fcol = fcol,
       #                              name = "protein",
       #                              fun = aggrefun,
       #                              na.rm = T)
@@ -609,17 +667,17 @@ aggregate_pe <- function(pe, aggrefun = c("RobustSummary","medianPolish","totalM
 
   }else if(aggregate_Peptide_Type == "Unique + Razor"){
     print("aggregate by Unique + Razor peptides")
-    pe <- Peptide_distribution(pe, i = peptide_assay_name,fcol = fcol)
+    pe <- Peptide_distribution(pe, i = i,fcol = fcol)
     print("peptides distribution finished")
     protein <- suppressWarnings({
       aggregateFeatures(object = pe ,
-                        i = peptide_assay_name, fcol = "smallestProteingroups",
+                        i = i, fcol = "smallestProteingroups",
                         name = "protein",
                         fun = aggrefun,
                         na.rm = T,
                         reserve = reserve)
       # QFeatures::aggregateFeatures(object = pe ,
-      #                              i = peptide_assay_name, fcol = "smallestProteingroups",
+      #                              i = i, fcol = "smallestProteingroups",
       #                              name = "protein",
       #                              fun = aggrefun,
       #                              na.rm = T)
@@ -655,12 +713,16 @@ aggregate_pe <- function(pe, aggrefun = c("RobustSummary","medianPolish","totalM
 #'
 #' # construct QFeatures object
 #' pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = TRUE, log2transform = TRUE,mode = "delim")
-#' filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
-#' imp_pe <- QFeatures::addAssay(filt_pe, DEP2::impute(filt_pe[["peptideRaw"]], fun = "MinDet"), name = "peptideImp")
-#' norm_pe <- DEP2:::normalize_pe(imp_pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
+#'
+#' # Filter, imputation
+#' pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
+#' pe <- impute_pe(pe, fun = "QRILC", name = "peptideImp")
+#'
+#' # Normalization
+#' pe <- normalize_pe(pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
 #'
 #' # Summarize peptide value to protein quantity
-#' protein_pe <- DEP2::aggregate_pe(norm_pe, fcol = "Proteins", peptide_assay_name = "peptideNorm")
+#' protein_pe <- DEP2::aggregate_pe(pe, fcol = "Proteins", i = "peptideNorm")
 #' class(protein_pe)
 #'
 #' # Construct a SE object

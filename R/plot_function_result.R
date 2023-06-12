@@ -570,7 +570,7 @@ setMethod("plot_heatmap",
       gsub("_diff", "", colnames(df)) %>%
       gsub("_vs_", " vs ", .)
     df <- as.matrix(df)
-    if(manual){
+    if(length(manual_contrast)>1){
       i = gsub("_vs_", " vs ", manual_contrast)
       ii = as.data.frame(df[ , i])
       colnames(ii) = i
@@ -1344,7 +1344,7 @@ plot_volcano <- function (object, contrast = get_contrast(object)[1],
     mutate(change = ifelse(significant, ifelse(x>0, 'up','down'), "stable"))
   name1 <- gsub("_vs_.*", "", contrast)
   name2 <- gsub(".*_vs_", "", contrast)
-  xlimit <- ceiling(max(c(abs(min(df$x)), abs(max(df$x)))))
+  xlimit <- ceiling(max(abs(df$x)))
 
   # label_trend =
   #   down_color = up_color = "black"

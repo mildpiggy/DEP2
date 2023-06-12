@@ -9,7 +9,7 @@ aggregate_pe(
   aggrefun = c("RobustSummary", "medianPolish", "totalMean"),
   aggregate_Peptide_Type = c("Unique + Razor", "Unique"),
   fcol,
-  peptide_assay_name = "peptideNorm",
+  i = "peptideNorm",
   reserve = "Gene.names"
 )
 }
@@ -26,7 +26,7 @@ Use what kind of peptides to summarise proteins. If choose "Unique", return outp
 
 \item{fcol}{Character(1), defining how to summarise the features. Exist in \code{rowData(pe)}.}
 
-\item{peptide_assay_name}{Character(1), the name of aggregation result assay}
+\item{i}{Character(1), name of the assay to be aggregated.}
 
 \item{reserve}{Character, the column(s) which will reserve after aggregate, such as the columns store protein information can.}
 }
@@ -44,12 +44,16 @@ ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = TRUE)
 
 # construct QFeatures object
 pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = TRUE, log2transform = TRUE,mode = "delim")
-filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
-imp_pe <- QFeatures::addAssay(filt_pe, DEP2::impute(filt_pe[["peptideRaw"]], fun = "MinDet"), name = "peptideImp")
-norm_pe <- DEP2:::normalize_pe(imp_pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
+
+# Filter, imputation
+pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
+pe <- impute_pe(pe, fun = "QRILC", name = "peptideImp")
+
+# Normalization
+pe <- normalize_pe(pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
 
 # Summarize peptide value to protein quantity
-protein_pe <- DEP2::aggregate_pe(norm_pe, fcol = "Proteins", peptide_assay_name = "peptideNorm")
+protein_pe <- DEP2::aggregate_pe(pe, fcol = "Proteins", i = "peptideNorm")
 class(protein_pe)
 
 }

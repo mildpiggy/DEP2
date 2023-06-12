@@ -36,12 +36,16 @@ ecols <- grep("Intensity.", colnames(Silicosis_peptide), value = TRUE)
 
 # construct QFeatures object
 pe_peptides <- make_pe_parse(Silicosis_peptide, columns = ecols, remove_prefix = TRUE, log2transform = TRUE,mode = "delim")
-filt_pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
-imp_pe <- QFeatures::addAssay(filt_pe, DEP2::impute(filt_pe[["peptideRaw"]], fun = "MinDet"), name = "peptideImp")
-norm_pe <- DEP2:::normalize_pe(imp_pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
+
+# Filter, imputation
+pe <- filter_pe(pe_peptides, thr = 1,fraction = 0.4, filter_formula = ~ Reverse != '+' & Potential.contaminant !="+" )
+pe <- impute_pe(pe, fun = "QRILC", name = "peptideImp")
+
+# Normalization
+pe <- normalize_pe(pe,method = "quantiles", i = "peptideImp", name = "peptideNorm")
 
 # Summarize peptide value to protein quantity
-protein_pe <- DEP2::aggregate_pe(norm_pe, fcol = "Proteins", peptide_assay_name = "peptideNorm")
+protein_pe <- DEP2::aggregate_pe(pe, fcol = "Proteins", i = "peptideNorm")
 class(protein_pe)
 
 # Construct a SE object

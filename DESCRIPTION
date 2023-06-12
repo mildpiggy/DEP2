@@ -1,6 +1,6 @@
 Package: DEP2
-Title: What the Package Does (One Line, Title Case)
-Version: 0.2.05.23
+Title: An analysis toolkits for mass spectrometry based proteomics data.
+Version: 0.3.06.12
 Authors@R: 
     c(
     person("Zhenhuan", "Feng", email = "feng_zhenhuan@gibh.ac.cn", role = c("cre", "aut")),
@@ -22,14 +22,15 @@ Suggests:
     knitr, BiocStyle, ggridges, magick,
     IHW, ashr, apeglm,
     shinyvalidate, shinyWidgets, shinythemes, shinyBS, shinyFeedback, markdown, dndselectr,
-    rmarkdown, shiny, colourpicker,
+    shiny (>= 1.6),rmarkdown, colourpicker,
     clusterProfiler, clusterProfiler.dplyr, ReactomePA, msigdbr,
     igraph, visNetwork, R.utils
 Imports: 
-    limma, MSnbase, imputeLCMD ,QFeatures, MsCoreUtils, DESeq2,
-    rlang, pak, methods, assertthat, S4Vectors, 
+    imputeLCMD (>= 2.0), QFeatures (>= 1.2.0),
+    DESeq2(>= 1.32.0),
+    rlang, pak (>= 0.3.1), methods, assertthat, S4Vectors, 
     purrr,  readr, dplyr, tidyr, tibble, data.table,
-    missForest, vsn, fdrtool, lazyeval, ComplexHeatmap,
+    missForest, vsn, fdrtool(>= 1.2.16), lazyeval, ComplexHeatmap,
     RColorBrewer, circlize, DT,  glmnet, ggplot2, 
     ggVennDiagram, TCseq, Rtsne, umap, abind
 Remotes:
@@ -39,5 +40,9 @@ biocViews: Proteomics, MassSpectrometry, DifferentialExpression, DataRepresentat
 VignetteBuilder: knitr
 Depends: 
     R (>= 4.1.0),
-    SummarizedExperiment (>= 1.11.5)
+    SummarizedExperiment (>= 1.11.5),
+    MsCoreUtils (>= 1.9.0),
+    MSnbase (>= 2.18.0),
+    limma (>= 3.48.0),
+    R6 (>= 2.5.0)
 Config/build/clean-inst-doc: FALSE

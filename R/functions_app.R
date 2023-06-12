@@ -8,7 +8,7 @@ app_version = 0503
 #' @export
 #' @examples
 #' library(DEP2)
-#' DEP2::run_app
+#' DEP2::run_app()
 run_app <- function() {
   check_depends <- check_shiny_depends()
 
