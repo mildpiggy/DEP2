@@ -1,7 +1,7 @@
-^DEP2\.Rproj$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^.*\.Rproj$
 ^\.Rproj\.user$
-^README\.Rmd$
-^LICENSE\.md$
 ^doc$
 ^Meta$
-^example_data$
