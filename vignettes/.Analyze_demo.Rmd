@@ -221,7 +221,7 @@ limma::plotDensities(assay(PEP_QF[["peptidesImp"]]))
 # str(temp)
 PEP_QF <- suppressWarnings(aggregate_pe(PEP_QF,
                                         aggrefun = "RobustSummary", aggregate_Peptide_Type = "Unique + Razor",
-                                        fcol = "Proteins", peptide_assay_name = "peptidesImp", reserve = "Gene.names"
+                                        fcol = "Proteins", i = "peptidesImp", reserve = "Gene.names"
                           ))
 
 experiments(PEP_QF)

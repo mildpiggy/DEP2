@@ -210,7 +210,7 @@ DEP_pep_sidebar_mod <-  function(id, labelname){
       uiOutput(ns("downloadButton")),
       h6(),
       tags$style(type="text/css", "#Save_RData {background-color:white;color: black;font-family: Source Sans Pro}"),
-      uiOutput(ns("downloadButton_for_save_RData")),
+      # uiOutput(ns("downloadButton_for_save_RData")),
       hr(),
       uiOutput(ns("downloadButton_for_log")),
       shinyBS::bsTooltip(ns("downloadTable"), "Choose a dataset to save, and here we offer four forms of datasets for downloading including results.txt, significant_proteins.txt, displayed_subset.txt, full_dataset.txt", "right", options = list(container = "body")),
@@ -242,14 +242,7 @@ DEP_pep_body_mod <- function(id){
       ),
       helpText("Please cite: "),
       fluidRow(
-        # box(numericInput("p",
-        #                  "adj. P value",
-        #                  min = 0.0001, max = 0.1, value = 0.05),
-        #     width = 2),
-        # box(numericInput("lfc",
-        #                  "Log2 fold change",
-        #                  min = 0, max = 10, value = 1),
-        #     width = 2),
+
         conditionalPanel(condition = paste0("input['",ns("threshold_method"),"']","=='intersect'"),
                          box(numericInput(ns("p"),
                                           "adj. P value",
@@ -270,12 +263,7 @@ DEP_pep_body_mod <- function(id){
                                           min = 1, max = 10, value = 1),
                              width = 2)
         ),
-        # box(uiOutput("p"),
-        #     uiOutput("curvature"), width = 2),
-        # box(uiOutput("lfc"),
-        #   uiOutput("x0_fold"), width = 2),
-        # uiOutput("curvature"),
-        # uiOutput("x0_fold"),
+
         infoBoxOutput(ns("significantBox")),
         box(radioButtons(ns("pres"),
                          "Data presentation",
@@ -342,25 +330,9 @@ DEP_pep_body_mod <- function(id){
                                fluidRow(
                                  box(uiOutput(ns("heatmap_cntrst")), width = 12)
                                ),
-                               # fluidRow(
-                               #   box(checkboxInput("manual_heatmap",
-                               #                     "Manual heatmap",
-                               #                     value = FALSE),
-                               #   # checkboxInput("same_trend",
-                               #   #                   "Same trend heatmap",
-                               #   #                   value = FALSE),
-                               #    uiOutput("heatmap_cntrst"), width = 12, collapsible = FALSE, collapsed = FALSE)
-                               #   #box(checkboxInput("manual_heatmap",
-                               #   #                  "Manual heatmap",
-                               #   #                  value = FALSE)),
-                               # ),
+
                                fluidRow(
-                                 # conditionalPanel(condition = paste0("!input['",ns("if_chooseToshow"),"']"),#&& input.peptidescol !== '' typeof input.peptidescol !== null
-                                 #                  box(numericInput(ns("k"),
-                                 #                                   "Kmeans",
-                                 #                                   min = 0, max = 15, value = 6),
-                                 #                      width = 4)
-                                 # ),
+
                                  box(numericInput(ns("k"),
                                                   "Kmeans",
                                                   min = 0, max = 15, value = 6),
@@ -377,18 +349,13 @@ DEP_pep_body_mod <- function(id){
                                ),
                                fluidRow(
                                  dropdownButton(
-                                   # selectizeInput("colorbar",
-                                   #      "colorbar",
-                                   #      choices = c("BrBG", "PiYG", "PRGn", "PuOr", "RdBu", "RdGy", "RdYlBu", "RdYlGn", "Spectral"),
-                                   #      selected = c("RdBu"), multiple = FALSE),
+
                                    conditionalPanel(condition = paste0("input['",ns("peptidescol"),"']"," !== ''"), # "input.peptidescol !== ''"
                                                     checkboxInput(ns("if_rowname_color"),
                                                                   "row color",
                                                                   value = FALSE)
                                    ),
-                                   # checkboxInput(ns("if_chooseToshow"),
-                                   #               "only display selected rows",
-                                   #               value = FALSE),
+
                                    uiOutput(ns("chooseToshow")),
 
                                    numericInput(ns("row_font_size"),
@@ -408,16 +375,7 @@ DEP_pep_body_mod <- function(id){
                                                  value = TRUE),
                                    uiOutput(ns("Custom_columns_order")),
                                    uiOutput(ns("mysplit")),
-                                   # conditionalPanel(condition = paste0("!input","['",ns("if_chooseToshow"),"']"), #"!input.if_chooseToshow"
-                                   #                  # checkboxInput(ns("if_mysplit"),
-                                   #                  #               "If mysplit",
-                                   #                  #               value = FALSE),
-                                   #                  uiOutput(ns("mysplit"))
-                                   # ),
-                                   # checkboxInput("if_mysplit",
-                                   #               "If mysplit",
-                                   #               value = FALSE),
-                                   # uiOutput("mysplit"),
+
                                    tooltip = tooltipOptions(title = "More parameters"),
                                    icon = icon("gear"),
                                    # status = "info",
@@ -489,17 +447,7 @@ DEP_pep_body_mod <- function(id){
                                                     uiOutput(ns("Peptides1")),
                                                     uiOutput(ns("Peptides2"))
                                    ),
-                                   # checkboxInput("if_peptide_color",
-                                   #               "peptide color",
-                                   #               value = FALSE),
-                                   # # column(width = 6,
-                                   # uiOutput("Peptides1"),
-                                   # uiOutput("Peptides2"),
-                                   # ),
-                                   # column(width = 6, uiOutput("Peptides2")),
-                                   # numericInput(ns("stroke"),
-                                   #              "point outside width",
-                                   #              min = 0, max = 5, value = 0.6),
+
                                    uiOutput(ns("selected_proteins")),
                                    numericInput(ns("showNum"),
                                                 "show number",
@@ -534,13 +482,7 @@ DEP_pep_body_mod <- function(id){
                                                                     value = FALSE),
                                                       width = 4)
                                  )
-                                 # box(checkboxInput("P_adj",
-                                 #                   "Adjusted p values",
-                                 #                   value = FALSE),
-                                 #     checkboxInput("Same_width",
-                                 #                   "Same width",
-                                 #                   value = FALSE),
-                                 #     width = 4)
+
                                ),
                                fluidRow(
                                  plotOutput(ns("custom_volcano"), height = 600),
@@ -671,12 +613,7 @@ DEP_pep_body_mod <- function(id){
                                     shinyBS::bsTooltip(ns("Tsne_perplexity"), "perplexity for t-SNE", "top", options = list(container = "body"))
                            ),
                            tabPanel(title = "Statistical plot",
-                                    # fluidRow(
-                                    #   box(uiOutput(ns("Volcano_cntrst_stastical_plot")), width = 8),
-                                    #   box(radioButtons(ns("stastical_plot_type"),
-                                    #                    "plot type",
-                                    #                    choices = c("x-y","histogram")), width = 4)
-                                    # ),
+
                                     fluidRow(
                                       box(selectInput(ns("stastical_plot_x"),
                                                       "plot statistics",
@@ -684,9 +621,7 @@ DEP_pep_body_mod <- function(id){
                                                       multiple = T,
                                                       selected = c("diff","t.stastic","p.val","p.adj")),
                                           width = 6),
-                                      # box(selectInput(ns("stastical_plot_y"),
-                                      #                 "y",
-                                      #                 choices = c("-log10.padj", "-log10.pval","padj","pval","t")), width = 6)
+
                                       box(uiOutput(ns("plot_stat_contrasts")),
 
                                           width = 6)

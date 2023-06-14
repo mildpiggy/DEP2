@@ -532,7 +532,7 @@ normalize_vsn <- function (se)
 #' Function used for data imputation based on \code{\link{manual_impute}}("man")
 #' , \code{\link[MSnbase]{impute,MSnSet-method}} and \code{\link[missForest]{missForest}}("RF").
 #' @param ... Additional arguments for imputation functions as depicted in
-#' \code{\link{manual_impute}}, \code{\link[missForest]{missForest}} and [MsCoreUtils::impute_matrix()].
+#' \code{\link{manual_impute}}, \code{\link[missForest]{missForest}} and \code{\link[MsCoreUtils]{impute_matrix}}.
 #' @return An imputed SummarizedExperiment object.
 #' @examples
 #' # Load example

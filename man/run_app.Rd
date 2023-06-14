@@ -10,6 +10,8 @@ run_app()
 Run the shiny application in DEP2
 }
 \examples{
-library(DEP2)
-DEP2::run_app
+\dontrun{
+DEP2::run_app()
+}
+
 }

@@ -478,11 +478,11 @@ aggregateFeatures = function(object, i, fcol, name = "newAssay",
 
 #' Impute a QFeatures object
 #'
-#' Impute the \code{i} assay in QFeatures object though [impute] function.
+#' Impute the \code{i} assay in QFeatures object though \link{impute} function.
 #' The normalized assay is saved in the \code{name} assay.
 #'
 #' @param pe
-#' @param fun Character(1), imputation strategy, see \link[impute].
+#' @param fun Character(1), imputation strategy, see \link{impute}.
 #' @param i
 #' @param name Character(1), naming the new normalized assay. defaule is "peptideImp".
 #'

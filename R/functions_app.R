@@ -7,8 +7,10 @@ app_version = 0503
 #' Run the shiny application in DEP2
 #' @export
 #' @examples
-#' library(DEP2)
+#' \dontrun{
 #' DEP2::run_app()
+#' }
+#'
 run_app <- function() {
   check_depends <- check_shiny_depends()
 

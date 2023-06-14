@@ -186,7 +186,7 @@ DEP_pg_sidebar_mod <-  function(id,labelname){
         uiOutput(ns("downloadButton")),
         h6(),
         tags$style(type="text/css", "#Save_RData {background-color:white;color: black;font-family: Source Sans Pro}"),
-        uiOutput(ns("downloadButton_for_save_RData")),
+        # uiOutput(ns("downloadButton_for_save_RData")),
         hr(),
         uiOutput(ns("downloadButton_for_log")),
         shinyBS::bsTooltip(ns("downloadTable"), "Choose a dataset to save, and here we offer four forms of datasets for downloading including results.txt, significant_proteins.txt, displayed_subset.txt, full_dataset.txt", "right", options = list(container = "body")),
@@ -1425,12 +1425,11 @@ DEP_pg_server_module <- function(id){
         if( !is.null(upload_log) & input$uploadmode == "fromLog" ){
           options_before_imp <- c("name", "id", "delim", "intensitycols",
                                   "peptidescol", "filt", "imputation")
-          # input11 <<- input
+
           check_opt_change <- options_before_imp %>% sapply(.,function(x){
             identical(input[[x]], upload_log()$inputVals()[[x]])
           })
 
-          # check_opt_change2 <<- check_opt_change
           if(all(check_opt_change)){ # if the option before imputation unchange, directly use the old imputation result
             my_imp = upload_log()$resultVals()$imp
             message("Use the imputation in log file!")
@@ -1522,7 +1521,6 @@ DEP_pg_server_module <- function(id){
           }
 
           if(input$contrasts == "all") {
-            # df <- df_all()
             df <- DEP2::test_diff(se = imp(), type = "all",
                                   fdr.type = FDR_type())
           }

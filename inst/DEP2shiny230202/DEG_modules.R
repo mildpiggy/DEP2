@@ -98,7 +98,7 @@ DEG_sidebar_mod <- function(id,labelname = "DEP-pg_sidabar"){
         bsCollapsePanel("RNAseq_settings", style = "primary",
                         uiOutput(ns("dds_design")),
                         uiOutput(ns("choose_expfac")),
-                        uiOutput(ns("whether_LRT")),
+                        # uiOutput(ns("whether_LRT")), ## hide the LRT test!!!!
                         uiOutput(ns("reduced_model")),
                         # uiOutput("choose_expfac1"),
                         # uiOutput("choose_expfac2"),
@@ -714,8 +714,10 @@ DEG_server_module <- function(id){
         )
         if(!is.null(expdesign())&& !is.null(input$choose_expfac) && input$choose_expfac != ""){
           choose_factor_num <- expdesign() %>% dplyr::select(input$choose_expfac) %>% unlist() %>% as.character() %>% unique() %>% length()
+          choose_expfac11 <<- input$choose_expfac
+          choose_factor_num11 <<- choose_factor_num
           if(choose_factor_num > 2)
-            return(checkboxInput("perform_LRT_test", "perform a LRT test", value = TRUE))
+            return(checkboxInput(ns("perform_LRT_test"), "perform a LRT test", value = TRUE))
         }
         # if(!is.null(input$file2) & choose_factor_num > 2) {
         #   # radioButtons("Test_for_RNAseq",
@@ -1027,22 +1029,19 @@ DEG_server_module <- function(id){
         # from log
         upload_log = upload_log()
         if(!is.null(upload_log) & input$uploadmode == "fromLog"){
-          # cat("a1")
-          my_countData <<- upload_log$resultVals()$countData
+          my_countData <- upload_log$resultVals()$countData
           # reset("transid_opts")
           return(my_countData)
         }else if( is.null(upload_log) & input$uploadmode == "fromLog"){
-          # cat("b1")
           reset("transid_opts")
           return(NULL)
         }
 
         # from table
         inFile <- input$file1
-        # cat("c1")
         if (is.null(inFile))
           return(NULL)
-        countData <- read.csv(inFile$datapath, sep = "\t", stringsAsFactors = F, header = T)
+        countData <- read.csv(inFile$datapath, sep = "\t", stringsAsFactors = F, header = T,row.names = NULL)
         row_name = countData[,1]
         countData = countData[ , -1]
         countData = as.matrix(countData)
@@ -1050,13 +1049,15 @@ DEG_server_module <- function(id){
 
         # transformit(FALSE)
         reset("transid_opts") ## reset the ID transformation options after counts file change
+        # countData111111 <<- countData
+
         return(countData)
       })
 
       expdesign <- reactive({
         # from log
         if(input$uploadmode == "fromLog" && !is.null(countData()) ){
-          # cat("aa \n")
+
           upload_log = upload_log()
 
           if(input$anno == "logexpdesign"){
@@ -1071,17 +1072,16 @@ DEG_server_module <- function(id){
 
           }
         }else if(input$uploadmode == "fromLog" && is.null(countData())){
-          # cat("bb")
           return(NULL)
         }
 
         # from table
         if(input$uploadmode == "fromTable"){
-          # cat("cc")
           inFile <- input$file2
           if ( input$anno == "columns" & (!is.null(countData())) ){
 
             countData <- countData()
+            countData11 <<- countData
             label = colnames(countData)
             expdesign <- get_exdesign_parse(label, mode = "delim", sep = "_",
                                             remove_prefix = F, remove_suffix = F)
@@ -1313,42 +1313,71 @@ DEG_server_module <- function(id){
 
 
         dds_1 <- reactive({
-          dds_1 <- DESeqDataSetFromMatrix(countData = countData(),colData = expdesign(), design = as.formula(paste0("~", paste(input$dds_design, collapse = " + "))))
-        })
+          dds_1 <- DESeqDataSetFromMatrix(countData = countData(),colData = expdesign(),
+                                          design = as.formula(paste0("~", paste(input$dds_design, collapse = " + "))))
+          dds_111 <- dds_1
+          })
 
         dds_filter <- reactive({
           dds_1 = dds_1()
+
           if(input$filter_missnum > ncol(dds_1)){
             filter_missnum =ncol(dds_1)
             warning("input filter missing number is to large, and reset to ",filter_missnum)
           }
+
           dds_filter <- filter_se(dds_1, rowsum_threshold = input$filter_rowsum, missnum = input$filter_missnum)
+          dds_filter11 <- dds_filter
         })
 
         dds <- reactive({
           withProgress(message = 'Running DEseq', value = 0.66, {
+
             choose_factor_num <- expdesign() %>% dplyr::select(input$choose_expfac) %>% unlist() %>% as.character() %>% unique() %>% length()
+            choose_factor_num111 <<- choose_factor_num
+
             if (input$nrcores == 1) {
+
               if(choose_factor_num > 2) {
-                if(input$perform_LRT_test) {
-                  DESeq(dds_filter(), test = "LRT", full = as.formula(paste0("~", paste(input$dds_design, collapse = " + "))), reduced = as.formula(paste0("~", paste(input$reduced_model, collapse = " + "))))
+
+                if(!is.null(input$perform_LRT_test) && input$perform_LRT_test) {
+
+                  if(is.null(input$reduced_model)){
+                    return(NULL)
+                  }
+
+                  dds <- DESeq(dds_filter(), test = "LRT",
+                               full = as.formula(paste0("~", paste(input$dds_design, collapse = " + "))),
+                               reduced = as.formula(paste0("~", paste(input$reduced_model, collapse = " + ")))
+                  )
                 } else {
-                  DESeq(dds_filter())
+                  dds <- DESeq(dds_filter())
                 }
               } else {
-                DESeq(dds_filter())
+                dds <- DESeq(dds_filter())
               }
             } else {
               if(choose_factor_num > 2) {
+
                 if(input$perform_LRT_test) {
-                  DESeq(dds_filter(), test = "LRT", full = as.formula(paste0("~", paste(input$dds_design, collapse = " + "))), reduced = as.formula(paste0("~", paste(input$reduced_model, collapse = " + "))), parallel = TRUE, BPPARAM = MulticoreParam(workers = input$nrcores))
+                  if(is.null(input$reduced_model)){
+                    return(NULL)
+                  }
+
+                  dds <- DESeq(dds_filter(), test = "LRT",
+                               full = as.formula(paste0("~", paste(input$dds_design, collapse = " + "))),
+                               reduced = as.formula(paste0("~", paste(input$reduced_model, collapse = " + "))),
+                               parallel = TRUE,
+                               BPPARAM = MulticoreParam(workers = input$nrcores)
+                  )
                 } else {
-                  DESeq(dds_filter(), parallel = TRUE, BPPARAM = MulticoreParam(workers = input$nrcores))
+                  dds <- DESeq(dds_filter(), parallel = TRUE, BPPARAM = MulticoreParam(workers = input$nrcores))
                 }
               } else {
-                DESeq(dds_filter(), parallel = TRUE, BPPARAM = MulticoreParam(workers = input$nrcores))
+                dds <- DESeq(dds_filter(), parallel = TRUE, BPPARAM = MulticoreParam(workers = input$nrcores))
               }
             }
+            dds111 <- dds
 
           })
         })
@@ -1363,6 +1392,7 @@ DEG_server_module <- function(id){
         ### differential test in DEseq2, generate a DEGdata
         diff <-  reactive({
           withProgress(message = 'Get results', value = 0.33, {
+
             diff <- DEP2:::get_res(dds = dds(),
                                    type = input$contrasts,
                                    control = input$control,
@@ -1399,7 +1429,6 @@ DEG_server_module <- function(id){
         deg <- reactive({
           deg <- DEP2::add_rejections(diff = diff(), alpha = input$p, lfc = input$lfc)
           returnval <- returnval(deg)
-          cat("deg")
 
           return(deg)
         })

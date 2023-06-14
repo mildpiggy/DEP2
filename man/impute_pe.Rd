@@ -15,7 +15,7 @@ impute_pe(
 \arguments{
 \item{pe}{A QFeature object}
 
-\item{fun}{Character(1), imputation strategy, see \link\link{impute}.}
+\item{fun}{Character(1), imputation strategy, see \link{impute}.}
 
 \item{i}{A numeric or a character giving the index or the name, respectively, of the assay(s) to be processed.}
 

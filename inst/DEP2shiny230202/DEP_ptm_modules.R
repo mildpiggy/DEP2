@@ -249,7 +249,7 @@ DEP_ptm_sidebar_mod <-  function(id,labelname){
       uiOutput(ns("downloadButton_ptm")),
       h6(),
       tags$style(type="text/css", "#Save_RData_ptm {background-color:white;color: black;font-family: Source Sans Pro}"),
-      uiOutput(ns("downloadButton_for_save_RData_ptm")),
+      # uiOutput(ns("downloadButton_for_save_RData_ptm")),
       hr(),
       uiOutput(ns("downloadButton_for_log")),
       shinyBS::bsTooltip(ns("downloadTable_ptm"), "Choose a dataset to save, and here we offer four forms of datasets for downloading including results.txt, significant_proteins.txt, displayed_subset.txt, full_dataset.txt", "right", options = list(container = "body")),
@@ -278,14 +278,7 @@ DEP_ptm_body_mod <- function(id){
               width = 9,
               helpText("Please cite: "),
               fluidRow(
-                # box(numericInput("p",
-                #                  "adj. P value",
-                #                  min = 0.0001, max = 0.1, value = 0.05),
-                #     width = 2),
-                # box(numericInput("lfc",
-                #                  "Log2 fold change",
-                #                  min = 0, max = 10, value = 1),
-                #     width = 2),
+
                 conditionalPanel(condition = paste0("input['",ns("threshold_method"),"']","== 'intersect'"), ## condition in mod
                                  box(numericInput(ns("p"),
                                                   "adj. P value",
@@ -306,12 +299,7 @@ DEP_ptm_body_mod <- function(id){
                                                   min = 1, max = 10, value = 1),
                                      width = 2)
                 ),
-                # box(uiOutput("p"),
-                #     uiOutput("curvature"), width = 2),
-                # box(uiOutput("lfc"),
-                #   uiOutput("x0_fold"), width = 2),
-                # uiOutput("curvature"),
-                # uiOutput("x0_fold"),
+
                 infoBoxOutput(ns("significantBox_ptm")),
                 box(radioButtons(ns("pres_ptm"),
                                  "Data presentation",
@@ -361,11 +349,7 @@ DEP_ptm_body_mod <- function(id){
                                           ),
                                           tabPanel(title = "Heatmap",
                                                    fluidRow(
-                                                     # column(width = 6,
-                                                     #        box(checkboxInput(ns("manual_heatmap_ptm"),
-                                                     #                          "Manual heatmap",
-                                                     #                          value = FALSE), width = 12)
-                                                     # ),
+
                                                      column(width = 6,
                                                             box(selectizeInput(ns("colorbar_ptm"),
                                                                                "colorbar",
@@ -376,18 +360,7 @@ DEP_ptm_body_mod <- function(id){
                                                    fluidRow(
                                                      box(uiOutput(ns("heatmap_cntrst_ptm")), width = 12)
                                                    ),
-                                                   # fluidRow(
-                                                   #   box(checkboxInput("manual_heatmap",
-                                                   #                     "Manual heatmap",
-                                                   #                     value = FALSE),
-                                                   #   # checkboxInput("same_trend",
-                                                   #   #                   "Same trend heatmap",
-                                                   #   #                   value = FALSE),
-                                                   #    uiOutput("heatmap_cntrst"), width = 12, collapsible = FALSE, collapsed = FALSE)
-                                                   #   #box(checkboxInput("manual_heatmap",
-                                                   #   #                  "Manual heatmap",
-                                                   #   #                  value = FALSE)),
-                                                   # ),
+
                                                    fluidRow(
                                                      conditionalPanel(condition = paste0("!input['",ns("if_chooseToshow_ptm"),"']"),#&& "!input.if_chooseToshow" input.peptidescol !== '' typeof input.peptidescol !== null
                                                                       box(numericInput(ns("k_ptm"),
@@ -411,10 +384,7 @@ DEP_ptm_body_mod <- function(id){
                                                    ),
                                                    fluidRow(
                                                      dropdownButton(
-                                                       # selectizeInput("colorbar",
-                                                       #      "colorbar",
-                                                       #      choices = c("BrBG", "PiYG", "PRGn", "PuOr", "RdBu", "RdGy", "RdYlBu", "RdYlGn", "Spectral"),
-                                                       #      selected = c("RdBu"), multiple = FALSE),
+
                                                        checkboxInput(ns("if_chooseToshow_ptm"),
                                                                      "only display selected rows",
                                                                      value = FALSE),
@@ -507,29 +477,7 @@ DEP_ptm_body_mod <- function(id){
                                                    ),
                                                    fluidRow(
                                                      box(
-                                                       # checkboxInput(ns("if_label_rectangle_ptm"),
-                                                       #               "label with rectangle",
-                                                       #               value = FALSE),
 
-                                                       # conditionalPanel(condition = paste0("input['",ns("peptidescol"),"']"," !== ''"), #"input.peptidescol !== ''",#&& input.peptidescol !== '' typeof input.peptidescol !== null
-                                                       #                  checkboxInput(ns("if_peptide_color"),
-                                                       #                                "peptide color",
-                                                       #                                value = FALSE),
-                                                       #                  # column(width = 6,
-                                                       #                  uiOutput(ns("Peptides1")),
-                                                       #                  uiOutput(ns("Peptides2"))
-                                                       # ),
-                                                       # checkboxInput("if_peptide_color",
-                                                       #               "peptide color",
-                                                       #               value = FALSE),
-                                                       # # column(width = 6,
-                                                       # uiOutput("Peptides1"),
-                                                       # uiOutput("Peptides2"),
-                                                       # ),
-                                                       # column(width = 6, uiOutput("Peptides2")),
-                                                       # numericInput(ns("stroke_ptm"),
-                                                       #              "point outside width",
-                                                       #              min = 0, max = 5, value = 0.6),
                                                        uiOutput(ns("selected_proteins_ptm")),
                                                        numericInput(ns("showNum_ptm"),
                                                                     "show number",
@@ -561,13 +509,7 @@ DEP_ptm_body_mod <- function(id){
                                                                                         value = FALSE),
                                                                           width = 4)
                                                      )
-                                                     # box(checkboxInput("P_adj",
-                                                     #                   "Adjusted p values",
-                                                     #                   value = FALSE),
-                                                     #     checkboxInput("Same_width",
-                                                     #                   "Same width",
-                                                     #                   value = FALSE),
-                                                     #     width = 4)
+
                                                    ),
                                                    fluidRow(
                                                      plotOutput(ns("custom_volcano_ptm"), height = 600),
@@ -1187,124 +1129,6 @@ DEP_ptm_server_module <- function(id, Omics_res){
         ))
       })
 
-      # output$Protein_level_correction_options <- renderUI({
-      #   options <- tagList(
-      #     radioButtons(
-      #       inputId = session$ns("correct_key"),
-      #       label = "The column correction based on",
-      #       choices = list("name" = "name", "id" = "ID"),
-      #       inline = TRUE
-      #       # status = "success",
-      #       # fill = TRUE
-      #     ),
-      #     radioButtons(
-      #       inputId = session$ns("unidentified_protein_treatment"),
-      #       label = "How to treat peptide whose proteins unidentified in corresponding proteomics",
-      #       choices = c("retain", "remove"),
-      #       inline = TRUE,
-      #       # status = "success",
-      #       # fill = TRUE
-      #     ),
-      #     radioButtons(
-      #       inputId = session$ns("correct_level"),
-      #       label = "Corresponding relationship between",
-      #       choices = list("condition to condition" = "condition", "repetition to repetition" = "label"),
-      #       inline = TRUE,
-      #       # status = "success",
-      #       # fill = TRUE
-      #     ),
-      #     shinyBS::bsTooltip(session$ns("correct_key"),
-      #                        "Match enriched-peptides quantity and corresponding proteomics based on Gene name or protein ID (both were set in the Columns options)",
-      #                        "top", options = list(container = "body")),
-      #     shinyBS::bsTooltip(session$ns("unidentified_protein_treatment"),
-      #                        "Some enriched peptides' proteins may lack effective quantity in corresponding proteomics. /n
-      #                          Choose remove to eliminate these peptides or choose retain to transmit the original peptide quantity(without correction)",
-      #                        "top", options = list(container = "body"))
-      #
-      #   )
-      #
-      #
-      # })
-
-
-      # output$Peptides1_ptm <- renderUI({
-      #   if(input$if_peptide_color_ptm) {
-      #     colourInput(inputId = "Peptides_1_ptm",
-      #                 label = "Peptides1",
-      #                 showColour = "both",
-      #                 palette = "square",
-      #                 value = "#A020F0")
-      #   }
-      # })
-
-      # output$Peptides2_ptm <- renderUI({
-      #   if(input$if_peptide_color_ptm) {
-      #     colourpicker::colourInput(inputId = "Peptides_2_ptm",
-      #                               label = "Peptides2",
-      #                               showColour = "both",
-      #                               palette = "square",
-      #                               value = "#0000FF")#
-      #   }
-      # })
-
-
-
-
-      # observe(
-      #   if(input$threshold_method == "intersect") {
-      #     # removeTab(inputId = "DEP_ptm_results_tabs", target = "DEP curve 1")
-      #     insertTab(inputId = "DEP_ptm_results_tabs",
-      #               tabPanel(title = "Volcano plot",
-      #                        fluidRow(
-      #                          box(uiOutput(session$ns("volcano_cntrst_ptm")), width = 9),
-      #                          box(numericInput(session$ns("fontsize_ptm"),
-      #                                           "Font size",
-      #                                           min = 0, max = 8, value = 4),
-      #
-      #                              width = 3)
-      #                        ),
-      #                        fluidRow(
-      #                          box(checkboxInput(session$ns("my_breaks_ptm"),
-      #                                            "My breaks",
-      #                                            value = FALSE),
-      #                              multiInput(session$ns("mybreaks_ptm"),"Mybreaks",choices = seq(-40, 40, 0.5)),
-      #                              numericInput(session$ns("Volcano_Width_ptm"),
-      #                                           "width",
-      #                                           min = 1, max = 30, value = 7),
-      #                              numericInput(session$ns("Volcano_Height_ptm"),
-      #                                           "height",
-      #                                           min = 1, max = 30, value = 7),
-      #                              #selectizeInput("mybreaks_ptm","Mybreaks",choices = seq(-40, 40, 1), multiple = TRUE, size = 10),
-      #                              width = 8, collapsible = TRUE, collapsed = TRUE),
-      #                          box(checkboxInput(session$ns("check_names_ptm"),
-      #                                            "Display names",
-      #                                            value = FALSE),
-      #                              checkboxInput(session$ns("p_adj_ptm"),
-      #                                            "Adjusted p values",
-      #                                            value = FALSE),
-      #                              checkboxInput(session$ns("same_width_ptm"),
-      #                                            "Same width",
-      #                                            value = FALSE),
-      #                              width = 4)),
-      #                        # fluidRow(
-      #                        #   plotOutput(session$ns("volcano_ptm"), height = 600),
-      #                        #   downloadButton(session$ns('downloadVolcano_ptm'), 'Save volcano')
-      #                        # ),
-      #                        shinyBS::bsTooltip(session$ns("volcano_cntrst_ptm"), "Choose the contrast to plot", "top", options = list(container = "body")),
-      #                        shinyBS::bsTooltip(session$ns("fontsize_ptm"), "Set the size of name labels", "top", options = list(container = "body")),
-      #                        shinyBS::bsTooltip(session$ns("my_breaks_ptm"), "Whether set the breaks of x axis by yourself", "top", options = list(container = "body")),
-      #                        shinyBS::bsTooltip(session$ns("mybreaks_ptm"), "Choose the breaks of x axis, act when [My breaks] is TRUE", "top", options = list(container = "body")),
-      #                        shinyBS::bsTooltip(session$ns("Volcano_Width_ptm"), "Width of the figure to export", "top", options = list(container = "body")),
-      #                        shinyBS::bsTooltip(session$ns("Volcano_Height_ptm"), "Height of the figure to export", "top", options = list(container = "body")),
-      #                        shinyBS::bsTooltip(session$ns("check_names_ptm"), "Whether or not to plot names", "top", options = list(container = "body")),
-      #                        shinyBS::bsTooltip(session$ns("p_adj_ptm"), "Whether or not to use adjusted p values", "top", options = list(container = "body")),
-      #                        shinyBS::bsTooltip(session$ns("same_width_ptm"), "Whether the x axis to have the same width from 0", "top", options = list(container = "body"))
-      #               ),
-      #               target = "Heatmap", position = "after"
-      #     )
-      #
-      #   }
-      # )
 
       # observeEvents upon uploadmode and log_file. fromLog -----------------------------------------------------------------
 
@@ -1621,7 +1445,6 @@ DEP_ptm_server_module <- function(id, Omics_res){
       # filt0
       filt <- reactive({
         data <- data()
-        # data111 <<- data
         cols <- which(colnames(data) %in% input$intensitycols)
         data[,cols] = apply(data[,cols], 2, function(x){
           x[!(!grepl("[A-z]",x) & grepl("\\d",x))] = 0
@@ -1687,8 +1510,8 @@ DEP_ptm_server_module <- function(id, Omics_res){
         # filter by missing number
         thr <- ifelse(is.na(input$thr), 0, input$thr)
         my_filt <- DEP2::filter_se(se,thr = thr, filter_formula = filter_formula2) ## filter the location prosibility or other scores
-        filter_formula2
-        my_filt111 <<- my_filt
+
+        return(my_filt)
       })
 
       iv1 <- InputValidator$new()
@@ -1706,20 +1529,6 @@ DEP_ptm_server_module <- function(id, Omics_res){
           return(input$order)
         return(NULL)
       })
-
-      # filt <- reactive({
-      #   filt = filt0()
-      #
-      #   if(is.null(the_order())){
-      #     return(filt)
-      #   }else{
-      #
-      #     filt@colData$condition = factor(filt@colData$condition, levels = the_order())
-      #     filt = filt[,order(filt@colData$condition)]
-      #     # filt@colData = filt@colData %>% as.data.frame() %>% arrange(., condition) %>% DataFrame()
-      #     return(filt)
-      #   }
-      # })
 
       norm <- reactive({
         my_norm <- normalize_vsn(filt())
@@ -1741,8 +1550,6 @@ DEP_ptm_server_module <- function(id, Omics_res){
             identical(input[[x]], upload_log()$inputVals()[[x]])
           })
 
-          # check_opt_change2 <<- check_opt_change
-          # input11 <<- input
           if(all(check_opt_change)){ # if the option before imputation unchange, directly use the old imputation result
             my_imp = upload_log()$resultVals()$imp
             message("Use the imputation in log file!")

@@ -92,7 +92,7 @@ if(check_PPI_depends()){
 
   ## visNetwork network
   PPInetwork(PPI_res, returntype = "visNetwork")
-}
+  }
 }
 
 }
