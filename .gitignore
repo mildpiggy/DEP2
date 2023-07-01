@@ -11,4 +11,4 @@
 /logo
 inst/doc
 old_vignetees/
-/vignettes/figs/.*.eddx
+*.eddx
