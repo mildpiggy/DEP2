@@ -123,6 +123,7 @@ test_PPI <- function(x,
     filter(!is.na(ENTREZID)) %>% filter(!duplicated(ENTREZID))
   if(nrow(ids) < 2){
     stop("No giving genes/proteins map in the database, please check your input!")
+    # return("No mapped genes")
   }
 
 
@@ -307,7 +308,11 @@ downloadAbsentFile <- function(urlStr, oD = tempdir()){
   fristDownload = F
   if(! file.exists(temp) || file.info(temp)$size==0){
     cat("Download ", fileName," to ",oD,"\n")
-    download.file(urlStr,temp2)
+    # download.file(urlStr,temp2, timeout = 400)
+    downloader::download(urlStr,
+                         temp2, timeout = 400)
+    # curl::curl_download(urlStr,
+    #                     temp2,quiet = FALSE)
     file.rename(temp2,temp)
     fristDownload = T
   }
