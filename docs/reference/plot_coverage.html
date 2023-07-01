@@ -12,7 +12,7 @@ of the protein coverage in all samples."><meta property="og:image" content="/log
     
     <a class="navbar-brand me-2" href="../index.html">DEP2</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.06.12</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.06.13</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,10 +26,11 @@ of the protein coverage in all samples."><meta property="og:image" content="/log
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/app_demo.html">DEP2 Application Guide</a>
-    <a class="dropdown-item" href="../articles/Data_import.html">Data import</a>
-    <a class="dropdown-item" href="../articles/DEP2_analysis2.html">DEP2 analysis workflow</a>
-    <a class="dropdown-item" href="../articles/Quick_start.html">Quick start</a>
+    <a class="dropdown-item" href="../articles/01_Quick_start.html">Quick start</a>
+    <a class="dropdown-item" href="../articles/02_Data_import.html">Data import</a>
+    <a class="dropdown-item" href="../articles/03_DEP2_analysis.html">DEP2 analysis workflow</a>
+    <a class="dropdown-item" href="../articles/04_app_demo.html">DEP2 Application Guide</a>
+    <a class="dropdown-item" href="../articles/05_Benchmark_on_spike_in_data.html">A benchmark on spike-in data</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -104,7 +105,7 @@ barplot is based on are returned.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Filter and plot coverage</span></span></span>
 <span class="r-in"><span><span class="va">filt</span> <span class="op">&lt;-</span> <span class="fu">filter_missval</span><span class="op">(</span><span class="va">se</span>, thr <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in inherits(se, "SummarizedExperiment"):</span> object 'se' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in filter_missval(se, thr = 0):</span> could not find function "filter_missval"</span>
 <span class="r-in"><span><span class="fu">plot_coverage</span><span class="op">(</span><span class="va">filt</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in inherits(se, "SummarizedExperiment"):</span> object 'filt' not found</span>
 </code></pre></div>

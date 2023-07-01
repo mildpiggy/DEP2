@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">DEP2</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.06.12</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.06.13</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,10 +48,11 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/app_demo.html">DEP2 Application Guide</a>
-    <a class="dropdown-item" href="../articles/Data_import.html">Data import</a>
-    <a class="dropdown-item" href="../articles/DEP2_analysis2.html">DEP2 analysis workflow</a>
-    <a class="dropdown-item" href="../articles/Quick_start.html">Quick start</a>
+    <a class="dropdown-item" href="../articles/01_Quick_start.html">Quick start</a>
+    <a class="dropdown-item" href="../articles/02_Data_import.html">Data import</a>
+    <a class="dropdown-item" href="../articles/03_DEP2_analysis.html">DEP2 analysis workflow</a>
+    <a class="dropdown-item" href="../articles/04_app_demo.html">DEP2 Application Guide</a>
+    <a class="dropdown-item" href="../articles/05_Benchmark_on_spike_in_data.html">A benchmark on spike-in data</a>
   </div>
 </li>
       </ul>
@@ -77,13 +78,13 @@ Feng</h4>
                         
       
       
-      <div class="d-none name"><code>Quick_start.Rmd</code></div>
+      <div class="d-none name"><code>01_Quick_start.Rmd</code></div>
     </div>
 
     
         <div class="abstract">
       <p class="abstract">Abstract</p>
-      <p>This vigenette gave an outline of DEP2 proteomics analysis
+      <p>This vignette gives an overview of the DEP2 analysis
       pipeline.</p>
     </div>
     
@@ -91,26 +92,27 @@ Feng</h4>
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
 <p>DEP2 provides a differentially expressed/enriched analysis toolkit
-for mass spectrometry based quantitative proteomics data via limma <span class="citation">(Ritchie et al. 2015)</span>, upgraded from a previous
-package DEP <span class="citation">(Zhang et al. 2018)</span>. This
-package provides an integrated workflow for proteomics analysis,
-including data processing, missing value imputation, hypothesis test,
-visualization and downstream functional exploration.</p>
-<p>Now, DEP2 provide three types of differential proteomics
-analysis:</p>
+for mass spectrometry based quantitative proteomics data utilizing the
+limma package for statistical analysis <span class="citation">(Ritchie
+et al. 2015)</span>. DEP2 is an upgraded version of the previous package
+DEP <span class="citation">(Zhang et al. 2018)</span> and provides a
+comprehensive workflow for proteomics analysis, encompassing data
+processing, missing value imputation, hypothesis test, visualization and
+downstream functional exploration.</p>
+<p>DEP2 provide three types of differential proteomics analysis:</p>
 <ol style="list-style-type: decimal">
 <li><p>The pipeline for proteins-level expression/enrichment analysis,
-started from protein-level quantity.</p></li>
+starting with protein-level quantity data.</p></li>
 <li><p>The pipeline for proteins-level expression/enrichment analysis,
-started from peptide-level quantity.</p></li>
-<li><p>The pipeline for post-translation modification (PTM) specified
-proteomics, performed upon modified peptides quantity.</p></li>
+starting with peptide-level quantity data.</p></li>
+<li><p>The pipeline for post-translation modification(PTM)-specified
+proteomics, performed upon modified peptides quantities.</p></li>
 </ol>
-<p>Besides, DEP2 also packaged a RNA-seq data analysis pipeline from
-<em><a href="https://bioconductor.org/packages/3.16/DESeq2" class="external-link">DESeq2</a></em>.</p>
+<p>In addition, DEP2 also includes a packaged RNA-seq data analysis
+pipeline from the <em><a href="https://bioconductor.org/packages/3.16/DESeq2" class="external-link">DESeq2</a></em>.</p>
 </div>
 <div class="section level2">
-<h2 id="load-required-packages">Load required packages<a class="anchor" aria-label="anchor" href="#load-required-packages"></a>
+<h2 id="load-required-packages">Load Required Packages<a class="anchor" aria-label="anchor" href="#load-required-packages"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">DEP2</span><span class="op">)</span></span>
@@ -119,36 +121,39 @@ proteomics, performed upon modified peptides quantity.</p></li>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jokergoo/ComplexHeatmap" class="external-link">ComplexHeatmap</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="example-data">Example data<a class="anchor" aria-label="anchor" href="#example-data"></a>
+<h2 id="example-data">Example Data<a class="anchor" aria-label="anchor" href="#example-data"></a>
 </h2>
-<p>We demonstrate DEP2 pipelines using the data from a multiple-omics
-study of silicosis mouse model(Wang et al. 2022), which are built-in
-data in the package. The data in table format is also available from the
-repository (github.com/mildpiggy/OmicsExample).</p>
+<p>In this section, we showcase the utilization of the DEP2 pipelines by
+employing data from a multiple-omics study of a silicosis mouse model
+(Wang et al., 2022). which are built-in data in the package. These
+datasets are included as built-in data within the DEP2 package.
+Additionally, the data can be accessed in table format from the
+repository at github.com/mildpiggy/OmicsExample.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">## The proteomics data (proteingroup.txt output from MaxQuant).</span></span>
+<code class="sourceCode R"><span><span class="co">## The proteomics data represented in protein-level format (proteingroup.txt output from MaxQuant).</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Silicosis_pg</span><span class="op">)</span> </span>
 <span></span>
-<span><span class="co">## The proteomics data in peptide-level (peptides.txt output from MaxQuant).</span></span>
+<span><span class="co">## The proteomics data represented in peptide-level format (peptides.txt output from MaxQuant).</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Silicosis_peptide</span><span class="op">)</span> </span>
 <span></span>
-<span><span class="co">## The the experiment design table annotating samples.</span></span>
+<span><span class="co">## Experiment design table providing annotations for the samples.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Silicosis_ExpDesign</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">## The Phosphoproteomics data (Phospho(STY)Sites.txt output from MaxQuant).</span></span>
+<span><span class="co">## Phosphoproteomics data (Phospho(STY)Sites.txt output from MaxQuant).</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Silicosis_phos</span><span class="op">)</span> </span>
 <span></span>
-<span><span class="co">## The RNA-seq counts data</span></span>
+<span><span class="co">## RNA-seq counts data.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Silicosis_counts</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="get-start">Get start<a class="anchor" aria-label="anchor" href="#get-start"></a>
+<h2 id="get-start">Get Start<a class="anchor" aria-label="anchor" href="#get-start"></a>
 </h2>
-<p>The four pipeline can perform step by step as follow</p>
+<p>The four pipelines can be executed step-by-step as outlined
+below:</p>
 <div class="section level3">
-<h3 id="proteingroup-workflow">Proteingroup workflow<a class="anchor" aria-label="anchor" href="#proteingroup-workflow"></a>
+<h3 id="proteingroup-workflow">Proteingroup Workflow<a class="anchor" aria-label="anchor" href="#proteingroup-workflow"></a>
 </h3>
-<p>The conventional workflow began from protein-level data.</p>
+<p>The conventional workflow starts with protein-level data.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## 1. Construct SummarizedExperiement</span></span>
 <span><span class="va">unique_pg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_unique.html">make_unique</a></span><span class="op">(</span><span class="va">Silicosis_pg</span>, names <span class="op">=</span> <span class="st">"Gene.names"</span>, ids <span class="op">=</span> <span class="st">"Protein.IDs"</span><span class="op">)</span></span>
@@ -176,9 +181,9 @@ repository (github.com/mildpiggy/OmicsExample).</p>
 <span><span class="va">dep</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/DEP2_add_rejections.html">add_rejections</a></span><span class="op">(</span><span class="va">diff</span>, alpha <span class="op">=</span> <span class="fl">0.05</span>, lfc <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="ptm-peptides-workflow">PTM-peptides workflow<a class="anchor" aria-label="anchor" href="#ptm-peptides-workflow"></a>
+<h3 id="ptm-peptides-workflow">PTM-Peptides Workflow<a class="anchor" aria-label="anchor" href="#ptm-peptides-workflow"></a>
 </h3>
-<p>The workflow for modified peptides data.</p>
+<p>This workflow is designed for modified peptide data.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## 1. Construct SummarizedExperiement</span></span>
 <span><span class="va">unique_ptm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_unique_ptm.html">make_unique_ptm</a></span><span class="op">(</span><span class="va">Silicosis_phos</span>, </span>
@@ -210,9 +215,9 @@ repository (github.com/mildpiggy/OmicsExample).</p>
 <span><span class="va">dep_ptm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/DEP2_add_rejections.html">add_rejections</a></span><span class="op">(</span><span class="va">diff_ptm</span>, alpha <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="peptides-aggregation-workflow">Peptides aggregation workflow<a class="anchor" aria-label="anchor" href="#peptides-aggregation-workflow"></a>
+<h3 id="peptides-aggregation-workflow">Peptides Aggregation Workflow<a class="anchor" aria-label="anchor" href="#peptides-aggregation-workflow"></a>
 </h3>
-<p>The peptide to protein aggregation workflow.</p>
+<p>This workflow aggregates peptides to proteins.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## 1. Construct SummarizedExperiement</span></span>
 <span><span class="va">ecols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"Intensity."</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">Silicosis_peptide</span><span class="op">)</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -246,9 +251,7 @@ repository (github.com/mildpiggy/OmicsExample).</p>
 <span></span>
 <span><span class="co">## 7. Differential test</span></span>
 <span><span class="va">diff_pep</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/test_diff.html">test_diff</a></span><span class="op">(</span><span class="va">se</span>,type <span class="op">=</span> <span class="st">"control"</span>, control <span class="op">=</span> <span class="st">"PBS"</span><span class="op">)</span></span>
-<span><span class="va">dep_pep</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/DEP2_add_rejections.html">add_rejections</a></span><span class="op">(</span><span class="va">diff_pep</span>, alpha <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/get_signicant.html">get_signicant</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">dep_pep</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/DEP2_add_rejections.html">add_rejections</a></span><span class="op">(</span><span class="va">diff_pep</span>, alpha <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="rna-seq-workflow">RNA-seq workflow<a class="anchor" aria-label="anchor" href="#rna-seq-workflow"></a>
@@ -280,7 +283,7 @@ RNA-seq data (gene counts).</p>
 <span><span class="va">deg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/DEP2_add_rejections.html">add_rejections</a></span><span class="op">(</span><span class="va">diff</span>, alpha <span class="op">=</span> <span class="fl">0.01</span>, lfc <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="result-visualization-and-table-export">Result visualization and table export<a class="anchor" aria-label="anchor" href="#result-visualization-and-table-export"></a>
+<h3 id="result-visualization-and-table-export">Result Visualization and Table Export<a class="anchor" aria-label="anchor" href="#result-visualization-and-table-export"></a>
 </h3>
 <p>DEP2 provides functions to visualize differential test results.</p>
 <p><code>plot_heatmap</code> can draw a <em>ComplexHeatmap</em> upon SE
@@ -300,7 +303,7 @@ or DEGdata object out from <code>add_rejections</code>.</p>
 <span>                   kmeans <span class="op">=</span> <span class="cn">T</span>,        <span class="co"># kmeans cluster rows</span></span>
 <span>                   col_limit <span class="op">=</span> <span class="fl">4</span>      <span class="co"># limit of the color scale</span></span>
 <span>                   <span class="op">)</span>     </span></code></pre></div>
-<p><img src="Quick_start_files/figure-html/heatmap1-1.png" width="700"></p>
+<p><img src="01_Quick_start_files/figure-html/heatmap1-1.png" width="700"></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## Heatmap on contrast log2 foldchange</span></span>
@@ -309,7 +312,7 @@ or DEGdata object out from <code>add_rejections</code>.</p>
 <span>                   cluster_column <span class="op">=</span> <span class="cn">F</span>,</span>
 <span>                   kmeans <span class="op">=</span> <span class="cn">T</span>, </span>
 <span>                   col_limit <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Quick_start_files/figure-html/heatmap1-2.png" width="700"></p>
+<p><img src="01_Quick_start_files/figure-html/heatmap1-2.png" width="700"></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## Manual contrast</span></span>
@@ -318,7 +321,7 @@ or DEGdata object out from <code>add_rejections</code>.</p>
 <span>                   cluster_column <span class="op">=</span> <span class="cn">F</span>,</span>
 <span>                   kmeans <span class="op">=</span> <span class="cn">T</span>,        </span>
 <span>                   col_limit <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Quick_start_files/figure-html/heatmap1-3.png" width="700"></p>
+<p><img src="01_Quick_start_files/figure-html/heatmap1-3.png" width="700"></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## Change color panel </span></span>
@@ -328,28 +331,28 @@ or DEGdata object out from <code>add_rejections</code>.</p>
 <span>                   cluster_column <span class="op">=</span> <span class="cn">F</span>,</span>
 <span>                   kmeans <span class="op">=</span> <span class="cn">T</span>,</span>
 <span>                   col_limit <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Quick_start_files/figure-html/heatmap1-4.png" width="700"></p>
+<p><img src="01_Quick_start_files/figure-html/heatmap1-4.png" width="700"></p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span></span>
-<span><span class="co">## Parameters in ComplexHeatmap::Heatmap is available</span></span>
+<span><span class="co">## Parameters in ComplexHeatmap::Heatmap are available</span></span>
 <span><span class="va">ht</span> <span class="op">&lt;-</span> <span class="fu">DEP2</span><span class="fu">::</span><span class="fu"><a href="../reference/plot_heatmap.html">plot_heatmap</a></span><span class="op">(</span><span class="va">dep</span>,</span>
 <span>                         cluster_column <span class="op">=</span> <span class="cn">F</span>,</span>
 <span>                         kmeans <span class="op">=</span> <span class="cn">T</span>,</span>
 <span>                         cluster_rows <span class="op">=</span> <span class="cn">F</span></span>
 <span>                         <span class="op">)</span></span></code></pre></div>
-<p><img src="Quick_start_files/figure-html/heatmap1-5.png" width="700"></p>
+<p><img src="01_Quick_start_files/figure-html/heatmap1-5.png" width="700"></p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## Heatmap can be saved as follow</span></span>
 <span><span class="co"># pdf("ht.pdf")</span></span>
 <span><span class="co"># ht</span></span>
 <span><span class="co"># dev.off()</span></span></code></pre></div>
-<p>Volcano plot is another common figure in omics study, which can be
-drawn by <code>plot_volcano</code> as follow.</p>
+<p>Another common figure in omics study is the volcano plot, which can
+be created using <code>plot_volcano</code>.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_volcano.html">plot_volcano</a></span><span class="op">(</span><span class="va">dep</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Quick_start_files/figure-html/volcano2-1.png" width="700"></p>
+<p><img src="01_Quick_start_files/figure-html/volcano2-1.png" width="700"></p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span></span>
@@ -360,7 +363,7 @@ drawn by <code>plot_volcano</code> as follow.</p>
 <span><span class="co">#&gt; Warning: Removed 40 rows containing missing values (`geom_point()`).</span></span>
 <span><span class="co">#&gt; Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider</span></span>
 <span><span class="co">#&gt; increasing max.overlaps</span></span></code></pre></div>
-<p><img src="Quick_start_files/figure-html/volcano2-2.png" width="700"></p>
+<p><img src="01_Quick_start_files/figure-html/volcano2-2.png" width="700"></p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
@@ -368,17 +371,18 @@ drawn by <code>plot_volcano</code> as follow.</p>
 <span><span class="co">#&gt; Scale for <span style="color: #00BB00;">x</span> is already present.</span></span>
 <span><span class="co">#&gt; Adding another scale for <span style="color: #00BB00;">x</span>, which will replace the existing scale.</span></span>
 <span><span class="co">#&gt; Warning: Removed 40 rows containing missing values (`geom_point()`).</span></span></code></pre></div>
-<p><img src="Quick_start_files/figure-html/volcano2-3.png" width="700"></p>
+<p><img src="01_Quick_start_files/figure-html/volcano2-3.png" width="700"></p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="co"># ggplot2::ggsave(filename = "volcano.png") #export to file</span></span></code></pre></div>
-<p>It is easy to export table from S4 object that inherits SE class.
-Functions like <code><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">SummarizedExperiment::colData</a></code> and
-<code>rowData</code> can easily extract message in object. DEP2 contains
-<code>get_significant</code> and <code>get_df_wide</code> to generate
-significant result table or full dataset from analysis result.</p>
+<span><span class="co"># ggplot2::ggsave(filename = "volcano.png") # export to file</span></span></code></pre></div>
+<p>Exporting a table from an S4 object that inherits SE class is
+straightforward. Functions like
+<code><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">SummarizedExperiment::colData</a></code> and <code>rowData</code> can
+easily extract information from the object. DEP2 contains
+<code>get_significant</code> and <code>get_df_wide</code> to generate a
+significant result table or full dataset from the analysis result.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">## significant table</span></span>
+<code class="sourceCode R"><span><span class="co">## Significant table</span></span>
 <span><span class="va">sig_tb</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_signicant.html">get_signicant</a></span><span class="op">(</span><span class="va">dep</span>,</span>
 <span>                        return_type <span class="op">=</span> <span class="st">"table"</span> </span>
 <span>                        <span class="op">)</span></span>
@@ -387,7 +391,7 @@ significant result table or full dataset from analysis result.</p>
 <span>                                  contrasts <span class="op">=</span> <span class="st">"W6_vs_PBS"</span></span>
 <span>                                  <span class="op">)</span></span>
 <span></span>
-<span><span class="co">## full table</span></span>
+<span><span class="co">## Full table</span></span>
 <span><span class="va">full_tb</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_df_wide.html">get_df_wide</a></span><span class="op">(</span><span class="va">dep</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">sig_tb</span><span class="op">)</span></span>
@@ -411,11 +415,11 @@ significant result table or full dataset from analysis result.</p>
 <span><span class="co">#&gt; Matrix products: default</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; locale:</span></span>
-<span><span class="co">#&gt; [1] LC_COLLATE=Chinese (Simplified)_China.utf8 </span></span>
-<span><span class="co">#&gt; [2] LC_CTYPE=Chinese (Simplified)_China.utf8   </span></span>
-<span><span class="co">#&gt; [3] LC_MONETARY=Chinese (Simplified)_China.utf8</span></span>
-<span><span class="co">#&gt; [4] LC_NUMERIC=C                               </span></span>
-<span><span class="co">#&gt; [5] LC_TIME=Chinese (Simplified)_China.utf8    </span></span>
+<span><span class="co">#&gt; [1] LC_COLLATE=English_United States.utf8 </span></span>
+<span><span class="co">#&gt; [2] LC_CTYPE=English_United States.utf8   </span></span>
+<span><span class="co">#&gt; [3] LC_MONETARY=English_United States.utf8</span></span>
+<span><span class="co">#&gt; [4] LC_NUMERIC=C                          </span></span>
+<span><span class="co">#&gt; [5] LC_TIME=English_United States.utf8    </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; attached base packages:</span></span>
 <span><span class="co">#&gt; [1] grid      stats4    stats     graphics  grDevices utils     datasets </span></span>
@@ -424,7 +428,7 @@ significant result table or full dataset from analysis result.</p>
 <span><span class="co">#&gt; other attached packages:</span></span>
 <span><span class="co">#&gt;  [1] org.Mm.eg.db_3.16.0         AnnotationDbi_1.60.0       </span></span>
 <span><span class="co">#&gt;  [3] ComplexHeatmap_2.14.0       ggplot2_3.4.1              </span></span>
-<span><span class="co">#&gt;  [5] dplyr_1.1.0                 DEP2_0.3.06.12             </span></span>
+<span><span class="co">#&gt;  [5] dplyr_1.1.0                 DEP2_0.3.06.13             </span></span>
 <span><span class="co">#&gt;  [7] R6_2.5.1                    limma_3.54.1               </span></span>
 <span><span class="co">#&gt;  [9] MSnbase_2.24.2              ProtGenerics_1.30.0        </span></span>
 <span><span class="co">#&gt; [11] mzR_2.32.0                  Rcpp_1.0.10                </span></span>

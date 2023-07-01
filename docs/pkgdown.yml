@@ -2,9 +2,10 @@ pandoc: 2.19.2
 pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
-  app_demo: app_demo.html
-  Data_import: Data_import.html
-  DEP2_analysis2: DEP2_analysis2.html
-  Quick_start: Quick_start.html
-last_built: 2023-06-14T05:48Z
+  01_Quick_start: 01_Quick_start.html
+  02_Data_import: 02_Data_import.html
+  03_DEP2_analysis: 03_DEP2_analysis.html
+  04_app_demo: 04_app_demo.html
+  05_Benchmark_on_spike_in_data: 05_Benchmark_on_spike_in_data.html
+last_built: 2023-07-01T14:29Z
 

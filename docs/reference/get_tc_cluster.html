@@ -12,7 +12,7 @@ timeclust()"><meta property="og:image" content="/logo.png"><!-- mathjax --><scri
     
     <a class="navbar-brand me-2" href="../index.html">DEP2</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.06.12</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.06.13</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,10 +26,11 @@ timeclust()"><meta property="og:image" content="/logo.png"><!-- mathjax --><scri
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/app_demo.html">DEP2 Application Guide</a>
-    <a class="dropdown-item" href="../articles/Data_import.html">Data import</a>
-    <a class="dropdown-item" href="../articles/DEP2_analysis2.html">DEP2 analysis workflow</a>
-    <a class="dropdown-item" href="../articles/Quick_start.html">Quick start</a>
+    <a class="dropdown-item" href="../articles/01_Quick_start.html">Quick start</a>
+    <a class="dropdown-item" href="../articles/02_Data_import.html">Data import</a>
+    <a class="dropdown-item" href="../articles/03_DEP2_analysis.html">DEP2 analysis workflow</a>
+    <a class="dropdown-item" href="../articles/04_app_demo.html">DEP2 Application Guide</a>
+    <a class="dropdown-item" href="../articles/05_Benchmark_on_spike_in_data.html">A benchmark on spike-in data</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -174,58 +175,58 @@ It can be a palette name in "RdBu", "RdYlBu", "RdYlGn", "BrBG", "PiYG", "PRGn", 
 <span class="r-plt img"><img src="get_tc_cluster-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">TC</span><span class="op">$</span><span class="va">res</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            name Timecourse_cluster         mebership              PBS_1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Bud13     Bud13                  5 0.816469829483171   1.56035928514759</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Ca2         Ca2                  5 0.543305186132737   1.69065263119243</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Ceacam2 Ceacam2                  2 0.387073950505952 -0.432571127595537</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Cldn18   Cldn18                  3 0.630178310279397   1.23958646631143</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Dhx58     Dhx58                  4 0.635174288844044  -2.06544095513807</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Dnmt3a   Dnmt3a                  6 0.858704318457535 -0.904896251325493</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                      PBS_2             PBS_3              PBS_4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Bud13     1.31338267689146  0.85260490474823   1.45788116199869</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Ca2       1.41759313041917  1.21867872572313  0.871398543111241</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Ceacam2  -0.70784758510009 -1.04812060321445 -0.410855672269847</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Cldn18    1.14834276230685  1.17683392038859  0.649627636229972</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Dhx58    -1.96084347617414 -2.93920556318203   -3.1943284449183</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Dnmt3a  -0.939565872453983 -1.17776444420126 -0.906231190648128</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> C1qbp     C1qbp                  1 0.848089499113358   0.42853375934282</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Ca2         Ca2                  6 0.432158343542971   1.69065263119243</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Ceacam2 Ceacam2                  2 0.259016466828542 -0.449463777724571</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Cldn18   Cldn18                  4 0.700413746502616   1.23958646631143</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Dhx58     Dhx58                  3 0.716951876306807  -2.06544095513807</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Dnmt3a   Dnmt3a                  5 0.376789348697439 -0.904896251325493</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                      PBS_2              PBS_3              PBS_4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> C1qbp   -0.187258741421434  0.432869956692702 -0.567464433377811</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Ca2       1.41759313041917   1.21867872572313  0.871398543111241</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Ceacam2 -0.898168447726292 -0.929694815095655 -0.707934167784664</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Cldn18    1.14834276230685   1.17683392038859  0.649627636229972</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Dhx58    -1.96084347617414  -2.93920556318203   -3.1943284449183</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Dnmt3a  -0.939565872453983  -1.17776444420126 -0.906231190648128</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       W2_1               W2_3                W2_4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Bud13     0.20211808551781   0.59794179427799   0.543987480666512</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> C1qbp    0.523820657822899 -0.195800737390329  -0.357238457692461</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Ca2      0.098613225762044 0.0159171430763649 -0.0158498148229711</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Ceacam2 -0.897318540348206 -0.726333615971768  -0.774356761023586</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Ceacam2 -0.222493372729822  -1.00136103429229  -0.714425296125487</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cldn18  -0.360596970057863 -0.471876239209223  -0.425512056260203</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dhx58    0.746457200193323   1.24456979871952   0.821772070624508</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dnmt3a   0.783357254120432   1.08808001389563   0.868693353844201</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       W2_5                W4_2               W4_3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Bud13    0.882158476611483 -0.0220536592510356 -0.402722336528775</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Ca2      0.100742763687713   -0.37424848888098 -0.119820470177196</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Ceacam2 -0.875959623624748  -0.695914817816373   -1.0003065333864</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Cldn18  -0.288477991839173   0.330153178862005  0.239899871574366</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Dhx58     1.03333640641944    1.13127573675512  0.192532251407595</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Dnmt3a    0.74997846619716   0.583297318826034 -0.395325255498001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                       W2_5               W4_2               W4_3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> C1qbp   0.0704034637621156 -0.153803652916903 -0.477033943204717</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Ca2      0.100742763687713  -0.37424848888098 -0.119820470177196</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Ceacam2 -0.841249110868695 -0.975549875565804 -0.127421590254698</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Cldn18  -0.288477991839173  0.330153178862005  0.239899871574366</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Dhx58     1.03333640641944   1.13127573675512  0.192532251407595</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Dnmt3a    0.74997846619716  0.583297318826034 -0.395325255498001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       W4_4                W4_5                W6_2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Bud13   -0.434553290510795  -0.683490189413508  -0.860736449499814</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> C1qbp    -1.23335747821993   -1.16027372059566  -0.435429007783846</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Ca2     -0.181299577487948 -0.0116517269610839  -0.460001709658762</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Ceacam2  -0.33983476977005  -0.305634330850388    1.25843696578542</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Ceacam2 -0.646871895602413  -0.583614790318002    1.24383623992504</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cldn18   0.199424707360592   0.567415080217046  -0.619790712033534</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dhx58    0.716047237780469 0.00185594051893645   0.123212926214723</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dnmt3a   0.277692440227106  -0.312137949657199 -0.0517147839181789</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       W6_3               W6_4               W6_6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Bud13    -1.01723504234523 -0.958653853506505  -1.30140695765369</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> C1qbp   -0.783752546094565 -0.471773538467584  -2.22876876814158</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Ca2     -0.530563532665759 -0.776238614295799 -0.539418285530573</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Ceacam2     1.532503565133    1.3100149923963   1.19202387304235</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Ceacam2   1.51790283927262   1.29541426653592   1.17742314718197</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cldn18  -0.783321687943669 -0.794706626067537 -0.405821220765937</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dhx58    0.734945929150886  0.642967460601366  0.555262089321882</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dnmt3a   0.477148540207022  0.228572037733059  0.393591813383914</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       W9_2                W9_4               W10_2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Bud13   -0.485068767139698  -0.362088387674746   -0.56069195936432</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> C1qbp    -0.76671547392403   -0.33398606713147    3.89567992861157</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Ca2     -0.163821633610752  -0.476498689126373  -0.713390780262195</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Ceacam2  0.316427703758286    1.05114535432284   0.855594498393224</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Ceacam2  0.301826977897907    1.03654462846246   0.840993772532844</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cldn18   -0.12975749919633 -0.0287980472910263  -0.414560565381208</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dhx58    0.393764307310281   0.481596331711717   0.840155068871187</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dnmt3a  -0.439023661513282  -0.228788607020643 -0.0366646751473709</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       W10_4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Bud13    -0.321732972971667</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> C1qbp      4.00134880013019</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Ca2       -1.05079283949163</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Ceacam2   0.698907028139995</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Ceacam2   0.684306302279616</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cldn18   -0.828064007205178</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dhx58     0.500067683811611</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dnmt3a  -0.0582985470510309</span>

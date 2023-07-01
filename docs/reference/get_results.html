@@ -12,7 +12,7 @@ on which differential analysis was performed."><meta property="og:image" content
     
     <a class="navbar-brand me-2" href="../index.html">DEP2</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.06.12</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.06.13</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,10 +26,11 @@ on which differential analysis was performed."><meta property="og:image" content
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/app_demo.html">DEP2 Application Guide</a>
-    <a class="dropdown-item" href="../articles/Data_import.html">Data import</a>
-    <a class="dropdown-item" href="../articles/DEP2_analysis2.html">DEP2 analysis workflow</a>
-    <a class="dropdown-item" href="../articles/Quick_start.html">Quick start</a>
+    <a class="dropdown-item" href="../articles/01_Quick_start.html">Quick start</a>
+    <a class="dropdown-item" href="../articles/02_Data_import.html">Data import</a>
+    <a class="dropdown-item" href="../articles/03_DEP2_analysis.html">DEP2 analysis workflow</a>
+    <a class="dropdown-item" href="../articles/04_app_demo.html">DEP2 Application Guide</a>
+    <a class="dropdown-item" href="../articles/05_Benchmark_on_spike_in_data.html">A benchmark on spike-in data</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -113,54 +114,54 @@ containing all results variables from the performed analysis.</p>
 <span class="r-in"><span><span class="va">significant_proteins</span> <span class="op">&lt;-</span> <span class="va">results</span><span class="op">[</span><span class="va">results</span><span class="op">$</span><span class="va">significant</span>,<span class="op">]</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">significant_proteins</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      name     ID W10_vs_PBS_p.val W2_vs_PBS_p.val W4_vs_PBS_p.val</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1    Acp5 Q05117     1.411753e-05    5.910320e-04    4.778377e-03</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Adamts8 P57110     2.309899e-01    4.039742e-02    2.257890e-02</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3    Add2 Q9QYB8     2.040945e-03    6.075769e-03    2.625233e-04</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4    Aif1 O70200     5.802446e-06    7.746131e-08    1.653705e-07</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  Alox12 P39655     3.538216e-03    3.931429e-03    4.797644e-03</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6    Ank1 Q02357     2.101053e-04    4.827071e-04    1.665076e-05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    Acp5 Q05117     1.416195e-05    5.921734e-04    4.784585e-03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Adamts8 P57110     1.140028e-01    3.477979e-02    1.377103e-02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    Add2 Q9QYB8     7.760035e-04    5.569760e-03    1.603777e-04</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4    Aif1 O70200     1.010508e-05    1.183369e-07    2.738842e-07</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  Alox12 P39655     3.543891e-03    3.937599e-03    4.804864e-03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6    Ank1 Q02357     2.106330e-04    4.837837e-04    1.670719e-05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   W6_vs_PBS_p.val W9_vs_PBS_p.val W10_vs_PBS_p.adj W2_vs_PBS_p.adj</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1    2.099730e-04    3.195635e-04         0.000719        2.44e-03</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2    8.781493e-04    9.696470e-03         0.194000        4.54e-02</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3    2.525880e-03    9.264588e-03         0.009990        1.18e-02</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4    5.411303e-06    3.620109e-04         0.000479        1.09e-05</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5    1.476969e-04    5.409628e-03         0.013400        8.67e-03</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6    7.312273e-05    7.952478e-05         0.002970        2.12e-03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    2.104472e-04    3.202425e-04         0.000683        2.42e-03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2    5.270743e-04    6.742781e-03         0.115000        4.04e-02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    1.118517e-03    3.098799e-03         0.005680        1.10e-02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4    1.338670e-05    9.721621e-04         0.000561        1.27e-05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5    1.480918e-04    5.417558e-03         0.012900        8.55e-03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6    7.333286e-05    7.975099e-05         0.002820        2.11e-03</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   W4_vs_PBS_p.adj W6_vs_PBS_p.adj W9_vs_PBS_p.adj W10_vs_PBS_significant</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1        1.32e-02        0.001170         0.00290                   TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2        3.63e-02        0.002820         0.02260                  FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3        2.26e-03        0.005810         0.02190                   TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4        3.51e-05        0.000140         0.00310                   TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5        1.32e-02        0.000920         0.01530                  FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6        4.78e-04        0.000607         0.00138                   TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1        1.32e-02        0.001180         0.00289                   TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2        2.61e-02        0.002030         0.01750                  FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3        1.70e-03        0.003400         0.01070                   TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4        4.18e-05        0.000222         0.00544                   TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5        1.32e-02        0.000931         0.01510                  FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6        4.80e-04        0.000610         0.00133                   TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   W2_vs_PBS_significant W4_vs_PBS_significant W6_vs_PBS_significant</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1                 FALSE                 FALSE                 FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2                 FALSE                 FALSE                  TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3                 FALSE                  TRUE                 FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4                  TRUE                  TRUE                  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                  TRUE                  TRUE                 FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5                 FALSE                 FALSE                  TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6                 FALSE                  TRUE                  TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   W9_vs_PBS_significant significant W10_vs_PBS_ratio W2_vs_PBS_ratio</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1                 FALSE        TRUE             2.26            1.29</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                 FALSE        TRUE             1.23            1.79</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3                 FALSE        TRUE            -2.28           -1.60</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4                 FALSE        TRUE             2.74            3.10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                 FALSE        TRUE             1.55            1.75</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                 FALSE        TRUE            -2.47           -1.57</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                 FALSE        TRUE             2.41            2.78</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5                 FALSE        TRUE            -1.80           -1.45</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6                  TRUE        TRUE            -2.35           -1.76</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   W4_vs_PBS_ratio W6_vs_PBS_ratio W9_vs_PBS_ratio PBS_centered W10_centered</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1           0.994            1.44            1.69        -1.14        1.120</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2           2.030            3.26            2.89        -1.83       -0.599</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3          -2.350           -1.81           -1.84         1.57       -0.716</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4           2.940            2.25            1.87        -2.12        0.618</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2           2.090            3.25            2.88        -1.86       -0.309</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3          -2.390           -1.94           -2.09         1.63       -0.840</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4           2.610            1.92            1.55        -1.86        0.554</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5          -1.410           -2.12           -1.70         1.35       -0.457</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6          -2.420           -2.12           -2.58         1.75       -0.593</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   W2_centered W4_centered W6_centered W9_centered</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1     0.15100     -0.1470       0.300       0.549</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2    -0.03470      0.2000       1.430       1.060</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3    -0.03730     -0.7880      -0.247      -0.273</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4     0.98400      0.8190       0.129      -0.247</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5    -0.10500     -0.0643      -0.773      -0.351</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6    -0.00249     -0.6710      -0.370      -0.826</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     0.15100     -0.1470      0.3000       0.549</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2    -0.11500      0.2300      1.3900       1.020</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3     0.06670     -0.7540     -0.3020      -0.451</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4     0.92000      0.7550      0.0644      -0.312</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5    -0.10500     -0.0643     -0.7730      -0.351</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6    -0.00249     -0.6710     -0.3700      -0.826</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

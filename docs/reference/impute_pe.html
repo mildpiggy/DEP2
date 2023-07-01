@@ -12,7 +12,7 @@ The normalized assay is saved in the name assay."><meta property="og:image" cont
     
     <a class="navbar-brand me-2" href="../index.html">DEP2</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.06.12</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.06.13</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,10 +26,11 @@ The normalized assay is saved in the name assay."><meta property="og:image" cont
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/app_demo.html">DEP2 Application Guide</a>
-    <a class="dropdown-item" href="../articles/Data_import.html">Data import</a>
-    <a class="dropdown-item" href="../articles/DEP2_analysis2.html">DEP2 analysis workflow</a>
-    <a class="dropdown-item" href="../articles/Quick_start.html">Quick start</a>
+    <a class="dropdown-item" href="../articles/01_Quick_start.html">Quick start</a>
+    <a class="dropdown-item" href="../articles/02_Data_import.html">Data import</a>
+    <a class="dropdown-item" href="../articles/03_DEP2_analysis.html">DEP2 analysis workflow</a>
+    <a class="dropdown-item" href="../articles/04_app_demo.html">DEP2 Application Guide</a>
+    <a class="dropdown-item" href="../articles/05_Benchmark_on_spike_in_data.html">A benchmark on spike-in data</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -59,7 +60,8 @@ The normalized assay is saved in the <code>name</code> assay.</p>
 <span>  fun <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"QRILC"</span>, <span class="st">"bpca"</span>, <span class="st">"knn"</span>, <span class="st">"MLE"</span>, <span class="st">"MinDet"</span>, <span class="st">"MinProb"</span>, <span class="st">"man"</span>, <span class="st">"min"</span>, <span class="st">"zero"</span>,</span>
 <span>    <span class="st">"mixed"</span>, <span class="st">"nbavg"</span>, <span class="st">"RF"</span>, <span class="st">"GSimp"</span><span class="op">)</span>,</span>
 <span>  i <span class="op">=</span> <span class="st">"peptideRaw"</span>,</span>
-<span>  name <span class="op">=</span> <span class="st">"peptideImp"</span></span>
+<span>  name <span class="op">=</span> <span class="st">"peptideImp"</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -79,6 +81,10 @@ The normalized assay is saved in the <code>name</code> assay.</p>
 
 <dt>name</dt>
 <dd><p>Character(1), naming the new normalized assay. defaule is "peptideImp".</p></dd>
+
+
+<dt>...</dt>
+<dd><p>Other parameters to be passed to <a href="impute.html">impute</a> function.</p></dd>
 
 </dl></div>
     <div class="section level2">

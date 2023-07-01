@@ -4,19 +4,22 @@
     <loc>/404.html</loc>
   </url>
   <url>
-    <loc>/articles/app_demo.html</loc>
+    <loc>/articles/01_Quick_start.html</loc>
   </url>
   <url>
-    <loc>/articles/Data_import.html</loc>
+    <loc>/articles/02_Data_import.html</loc>
   </url>
   <url>
-    <loc>/articles/DEP2_analysis2.html</loc>
+    <loc>/articles/03_DEP2_analysis.html</loc>
+  </url>
+  <url>
+    <loc>/articles/04_app_demo.html</loc>
+  </url>
+  <url>
+    <loc>/articles/05_Benchmark_on_spike_in_data.html</loc>
   </url>
   <url>
     <loc>/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>/articles/Quick_start.html</loc>
   </url>
   <url>
     <loc>/authors.html</loc>
@@ -62,6 +65,9 @@
   </url>
   <url>
     <loc>/reference/get_contrast.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_df_long.html</loc>
   </url>
   <url>
     <loc>/reference/get_df_wide.html</loc>
