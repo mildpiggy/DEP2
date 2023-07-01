@@ -8,7 +8,7 @@ output:
   BiocStyle::html_document:
     toc_float: true
 abstract: |
-  This vigenette introduce the how DEP2 receives upstream quantitative results from MaxQuant, DIA-NN, 
+  This vigenette introduces how DEP2 receives results from upstream quantitative tools like MaxQuant, DIA-NN, 
   Spectronaut, or Fragpipe.
 vignette: |
   %\VignetteIndexEntry{DEP2: Data import}
@@ -28,17 +28,16 @@ library(BiocStyle)
 
 # Introduction
 
-`DEP2` use the `make_unique` function to format protein/PTM-peptide-level table and load them into S4 objects via `make_se/pe` function.The parameters in these functions are adjustable to suit different result tables out from search and quantitative software. Here we demonstrate the workflow and detail on inputs from four quantitative software.
+The `DEP2` package utilizes the `make_unique` function to format protein/PTM-peptide-level tables and then imports them into S4 objects via `make_se/pe` function. The parameters in these functions can be adjusted to accommodate different result tables generated from search and quantitative software. Here, we present the workflow and provide detailed information on the inputs from four different quantitative software programs.
 
-# Example data acquirement
+# Example data
 
-Here, we use a benchmark proteomics data by spiking Yeast and E.coli lysate into Hela background. Raw data is acquired through an Orbitrap Fusion Lumos Tribrid equipment in either DDA or DIA mode. The DDA data is search and quantified by MaxQuant or FragPipe respectively . And the DIA data is analysed search by DIA-NN or Spectronaut (library-free mode).
+We obtained a benchmark proteomics dataset by spiking Yeast and E.coli lysate into a Hela background. The raw data was obtained using an Orbitrap Fusion Lumos Tribrid equipment in either DDA or DIA mode. The DDA data was searched and quantified using MaxQuant or FragPipe, while the DIA data was analyzed using DIA-NN or Spectronaut in library-free mode.
 
-The example tables is available in this [repository](https://github.com/mildpiggy/OmicsExample).
+The example tables used in this paper can be found in this in this [repository](https://github.com/mildpiggy/OmicsExample).
 
-```{r download,eval=FALSE}
-# Download OmicsExample and uncompress firstly
-
+```{r workplace,eval=FALSE}
+# Download OmicsExample firstly
 # Change the path to Omics Example
 example_path = "the/path/to/OmicsExample"
 knitr::opts_knit$set(
@@ -48,24 +47,23 @@ knitr::opts_knit$set(
 library(DEP2)
 ```
 
-```{r workplace,include=FALSE}
+```{r workplace0,include=FALSE}
 example_path = "../example_data/OmicsExample/"
 knitr::opts_knit$set(
   root.dir = example_path
   )
-
 library(DEP2)
 ```
 
-# Construct S4 object
+# Constructing S4 object
 
-The DEP2 analysis workflow is build upon S4 object. Therefore the first step is to format table and convert it into S4 container.
+The DEP2 analysis workflow is build upon S4 object, so the initial step is to format the table and convert it into an S4 container.
 
-## Convert SE from protein-level data
+## Converting protein-level data into SE format
 
-For protein-level data, use gene/protein as feature identifier. The entire workflow around the *SummarizedExperiment* object. For different input data, DEP2 provides `make_unique` and `make_unique_ptm` to format feature identifier in proteomics result. `make_unqiue` function clean identifiers, keep the first name/id in each group, and make repeated identifiers unique by add suffix ('ProXXX', 'ProXXX.1', 'ProXXX.2'). Repeated identifiers are common when library search is performed with isoforms or unreviewed sequences. Parameter *names* and *ids* should be gene/protein names or ids. And in the output, unique identifiers are saved in the new columns "name" and "id". Then, `make_se` could convert 'uniqued' table into *SE* object.
+For protein-level data, the gene name or protein ID should be used as the feature identifier. DEP2 provides `make_unique` and `make_unique_ptm` functions to format the feature identifiers in proteomics results. The `make_unique` function cleans the identifiers, keeps the first name/ID in each group, and makes repeated identifiers unique by adding a suffix ('ProXXX', 'ProXXX.1', 'ProXXX.2'). Repeated identifiers are common when library search is performed with isoforms or unreviewed sequences. The *names* and *ids* parameters should be gene/protein names or IDs. The unique identifiers are saved in the new columns "name" and "id". Then, the `make_se` function can convert the 'uniqued' table into a *SE* object.
 
-### From MaxQuant proteinGroups
+### Conversion from MaxQuant proteinGroups
 
 In this pipeline, DEP2 use the table `proteinGroups.txt` as input.
 
@@ -76,7 +74,7 @@ mq_pgfile <- "./A_spikeIn/MaxQuant_output/proteinGroups.txt.gz"
 pg <- read.csv(mq_pgfile,sep = "\t")
 ```
 
-The *names* and *ids* are in the columns "Gene.names" and "Gene.names".
+The *names* and *ids* are in the columns "Gene.names" and "Gene.names", respectively.
 
 ```{r, mq_uni}
 ## Generate unique names and ids
@@ -85,14 +83,14 @@ unique_pg <- make_unique(pg,
                          ids = "Protein.IDs"   #protein
                          )
 
-## new columns name and id, which is necessary to make_se
+## New columns "name" and "id", which is necessary to function make_se
 head(unique_pg[,c("name","ID","Gene.names","Protein.IDs")])
 ```
 
-In this pipeline DEP2 uses SE object as the container to store expression assay, features information (row data) and experiment design (columns data). After `make_unique` identifiers, DEP2 provides `make_se`/`make_se_parse` to convert *SummarizedExperiment* object. The former required an input experiment design table to annotate samples, which must contain three columns 'label', 'condition' and 'replicate'. While the 'parse' function could automatically assign experiment design by parsing abundance assay column names.
+In this pipeline DEP2 uses SE object as the container to store expression assay, features information (row data) and experiment design (columns data). After `make_unique` identifiers, DEP2 provides the `make_se`/`make_se_parse` functions to convert *SummarizedExperiment* object. The former required an input experiment design table to annotate samples, which must contain three columns: 'label', 'condition', and 'replicate'. The 'parse' functions can automatically assign experiment design table by parsing the column names of the abundance assay.
 
 ```{r mq_se}
-# Expression col in the input data
+## Expression columns in the input data
 ecols <- grep("LFQ.intensity.", colnames(unique_pg))
 
 ## Experiment design table
@@ -100,14 +98,14 @@ expDesign_file <- "./A_spikeIn/MaxQuant_output/expdesign.txt.gz"
 expdesign <- read.table(expDesign_file, sep = "\t", header = T)
 expdesign
 
-## Convert se with expdesign table
+## Convert SE with expdesign table
 se <- make_se(unique_pg, columns = ecols, expdesign = expdesign)
 
-## Convert se with expdesign table
+## Convert SE with expdesign table using parse function
 se <- make_se_parse(unique_pg, columns = ecols, mode = "delim")
 ```
 
-How experiment design is extracted from colnames through
+How experiment design is extracted from colnames:
 
 ```{r get_exdesign}
 ## How experiment design is extracted from colnames. Split by delim or by character number 
@@ -120,9 +118,10 @@ sample_names = c("Quantity.A1","Quantity.A2","Quantity.B1",
 get_exdesign_parse(sample_names,mode = "char", chars = 1, remove_prefix = TRUE)
 ```
 
-### From FragPipe combined_protein
+### Conversion from FragPipe combined_protein
 
-In this pipeline, DEP2 use the table `combined_protein.tsv` from FragPipe as input.
+Next, we use the table `combined_protein.tsv` from FragPipe as input.
+
 
 ```{r FragP}
 # Load combined_protein.tsv table
@@ -144,7 +143,7 @@ unique_FragP_pg <- make_unique(FragP_pg,
 head(unique_FragP_pg[,c("name", "ID", "Gene", "Protein.ID")])
 ```
 
-**Convert SE**. Here, We used the "MaxLFQ Intensity" values. "Intesity" is also practicable, but may bring some effect on test result.
+**Convert SE**. Here, We used the "MaxLFQ Intensity" values. "Intesity" is also practicable, but may bring some effect on the test result.
 
 ```{r FragP_se_frg}
 ## Expression col in the combined_protein.tsv
@@ -163,13 +162,13 @@ colData(se)
 colnames(se)
 ```
 
-### From DIA-NN result
+### Conversion from DIA-NN result
 
-As in the example above, `make_se` and `make_se_parse` accept wide-format table which each row means a features (a protein or a proteingroup), and rows contain the identification information and quantification information of samples. However, the long-format tables are also widely used in many cases. For example the *report.tsv* output from DIA-NN or the *MSstats* output. Function `reshape_long2wide` can turn long-format into wide table. Next, we will show the difference between handling wide- or long-table.
+As in the example above, `make_se` and `make_se_parse` accept wide-format tables which each row represents a features (a protein or a proteingroup), and rows contain the identification information and quantification information of samples. However, long-format tables are also widely used in many cases, such as the *report.tsv* output from DIA-NN or the *MSstats* output. Function `reshape_long2wide` can turn long-format tables into wide tables. Next, we will show the difference between handling wide- or long-tables.
 
 #### Wide table output
 
-The *report.pg_matrix.tsv* from DIA-NN is a wide-format table similar to proteinGroups.
+The *report.pg_matrix.tsv* from DIA-NN is a wide-format table similar to *proteinGroups*.
 
 ```{r diann_load1}
 # Load combined_protein.tsv table
@@ -178,7 +177,7 @@ Diann_pgfile <- "./A_spikeIn/Diann_output/report.pg_matrix.tsv.gz"
 Diann_pg <- read.csv(Diann_pgfile,sep = "\t", fileEncoding="latin1")
 ```
 
-**Unique identifier**. The *names* and *Protein.Group* are in the columns "Genes" and "Protein.Group".
+**Unique identifier**. The *name* and *ids* are in the columns "Genes" and "Protein.Group".
 
 ```{r unique2}
 ## Generate unique names and ids
@@ -187,11 +186,11 @@ unique_diann_pg <- make_unique(Diann_pg,
                                ids = "Protein.Group"   #protein
                                )
 
-## new columns name and id, which is necessary to make_se
+## New columns ”name“ and "ID", which is necessary to make_se
 head(unique_diann_pg[,c("name", "ID", "Genes", "Protein.Group")])
 ```
 
-**Convert SE**. The expression columns is directly named by the file names of samples. We recommend to renamed the columns or renamed the MS files before DIAN-NN search.
+**Convert SE**. The expression columns are directly named by the file names of samples. We recommend to renaming the columns or renaming the MS files before DIAN-NN search.
 
 ```{r make_se_diann1}
 ## Expression col in the DIA-NN report.pg_matrix
@@ -213,7 +212,7 @@ colnames(se)
 
 #### Long table output
 
-Unlike the above cases, the **report.tsv** from DIA-NN is in long-format. `reshape_long2wide` can reshape long tables to wide-format, before *SE* construct.
+Unlike the above cases, the **report.tsv** from DIA-NN is in long format. Function `reshape_long2wide` can reshape long tables to wide format, before constructing *SE* object.
 
 ```{r diann_load2}
 ## Load combined_protein.tsv table
@@ -222,13 +221,11 @@ Diann_repfile <- "./A_spikeIn/Diann_output/report.tsv.gz"
 Diann_rep <- read.csv(Diann_repfile,sep = "\t") #
 dim(Diann_rep) # 390479 rows, each row is a precursor.
 
-## filter out proteingroups exceed the threshold value
+## Filter out proteingroups exceeding the threshold value
 Diann_rep = dplyr::filter(Diann_rep, PG.Q.Value < 0.01)
 
 
-## report.tsv store both Precursor- and PG-level quality
-colnames(Diann_rep)
-
+## Table report.tsv stores both Precursor- and PG-level quality
 DT::datatable(head(Diann_rep), options = list(scrollX = T,pageLength = 6))
 ```
 
@@ -248,13 +245,13 @@ Diann_rep_wided = reshape_long2wide(Diann_rep,
 
 ```
 
-The reshaping result, 'Genes' was in a columns, while 'Protein.Q.Value' was extended to 6 columns. Variates in *shrink_ident_cols* will be converted in a string pasted from all values of each feature and separated by ';'. *extend_ident_cols* will be extend to mulitiple columns containing the values in each sample (like "Q.Value").
+The reshaping result has 'Genes' in a column and extends the 'Protein.Q.Value' to 6 columns, each representing a different sample. The variables in *shrink_ident_cols* are combined into a string by concatenating all the values for each feature and separating them with a ';'. The variables in *extend_ident_cols* are expanded into multiple columns, with each column containing the values for each sample (e.g., "Q.Value").
 
 ```{r DT_wide}
 DT::datatable(head(Diann_rep_wided,3), options = list(scrollX = T,pageLength = 3))
 ```
 
-**Unique identifier**. The *names* and *Protein.Group* are in the columns "Genes" and "Protein.Group".
+**Unique identifier**. The *names* and *ids* are in the columns "Genes" and "Protein.Group".
 
 ```{r diann_unique1}
 ## Generate unique names and ids
@@ -267,7 +264,7 @@ unique_diann_pg2 <- make_unique(Diann_rep_wided,
 head(unique_diann_pg2[,c("name", "ID", "Genes", "Protein.Group")],4)
 ```
 
-**Convert SE**. The expression columns is directly named by the file names of samples.
+**Convert SE**. The expression columns are also directly named by the file names of samples.
 
 ```{r make_se_diann3}
 ## Expression col in the DIA-NN report.pg_matrix
@@ -290,21 +287,20 @@ colnames(se)
 ```
 
 
-### From spectronaut
+### Conversion from Spectronaut Report
 
-Spectronaut can customize output table. Here we take the software build-in MSstats style (long-format) table as example.
+Spectronaut offers the ability to customize the output table. In this example, we will use the built-in MSstats style table, which is in a long-format.
 
 ```{r spe_load1}
 Spe_repfile <- "./A_spikeIn/Spectronaut_output/DIA_MSStats_Report.xls.gz"
-Spe_rep <- read.csv(Spe_repfile,sep = "\t") #
+Spe_rep <- read.csv(Spe_repfile,sep = "\t") 
 dim(Spe_rep) # 318132 rows, each row is a precursor.
 
 ## Store both Precursor-, Peptides- and PG-level quality
 DT::datatable(head(Spe_rep), options = list(scrollX = T,pageLength = 6))
 ```
 
-**Reshape** long-table.
-
+**Reshape** long table.
 
 ```{r spe_resha}
 Spe_rep_wided = reshape_long2wide(Spe_rep,
@@ -322,28 +318,28 @@ Spe_rep_wided = reshape_long2wide(Spe_rep,
 DT::datatable(head(Spe_rep_wided), options = list(scrollX = T,pageLength = 6))
 ```
 
-**Unique identifier**. The *names* and *Protein.Group* are in the columns "Genes" and "Protein.Group".
+**Unique identifier**. The *names* and *Protein.Group* are located in the "Genes" and "Protein.Group" columns.
 
-```{r diann_unique2}
+```{r spe_unique2}
 ## Generate unique names and ids
-unique_spe_pg2 <- make_unique(Spe_rep_wided, 
-                              name = "PG.Genes",  #gene 
-                              ids = "PG.ProteinGroups"   #protein
-                              )
+unique_spe_pg <- make_unique(Spe_rep_wided, 
+                             name = "PG.Genes",  #gene 
+                             ids = "PG.ProteinGroups"   #protein
+                             )
 
 ## new columns name and id, which is necessary to make_se
-head(unique_spe_pg2[,c("name", "ID", "PG.Genes", "PG.ProteinGroups")],4)
+head(unique_spe_pg[,c("name", "ID", "PG.Genes", "PG.ProteinGroups")],4)
 ```
 
 **Convert SE**. The expression columns is directly named by the file names of samples.
 
 ```{r make_se_diann2}
-## Expression col in the Spectronaut output
+## Expression columns in the Spectronaut output
 ecols <- 2:7
-colnames(unique_spe_pg2)[ecols]
+colnames(unique_spe_pg)[ecols]
 
 ## Convert SE with expdesign table
-se <- make_se_parse(unique_spe_pg2, 
+se <- make_se_parse(unique_spe_pg, 
                     columns = ecols, 
                     mode = "delim",
                     remove_prefix = TRUE,   ## remove the file prefix 
@@ -356,15 +352,15 @@ colnames(se)
 ```
 
 
-## Convert SE from peptide-level data
+## Converting peptide-level data to a QFeatures object
 
-DEP2 also provides a pipeline to aggregate and summarise peptide quantity into protein-level with package `QFeature`. The protein-level quantities we used in preceding section are count by upstream software, and mostly are summarise in the maxLFQ algorithm. Through the peptide-to-protein analysis pipeline, DEP2 re-aggregates the protein quantities with kinds of aggregation strategies. 
+DEP2 provides a pipeline, using the QFeature package, to aggregate and summarize peptide quantities into protein-level.The protein-level quantities used in the preceding section were counted by upstream software and mostly summarized using the maxLFQ algorithm. DEP2 offers other aggregation strategies in this peptide-to-protein analysis pipeline.
 
-The first step is to load in peptide-level data into *QFeatures* class via function `make_pe` or `make_pe_pars`.
+The following code snippet demonstrates the conversion of peptide-level data to a QFeatures object using different software outputs.
 
-### From MaxQuant peptides
+### Conversion from MaxQuant peptides
 
-Here, we use the *peptides.txt* in the MaxQuant txt directory.
+The first step is to load in peptide-level data into *QFeatures* class via the `make_pe` or `make_pe_pars` function. We start by reading the peptides.txt file from the MaxQuant txt directory. 
 
 ```{r MQ_pep}
 mq_pepfile <- "./A_spikeIn/MaxQuant_output/peptides.txt.gz"
@@ -372,16 +368,18 @@ mq_pepfile <- "./A_spikeIn/MaxQuant_output/peptides.txt.gz"
 mq_pep <- read.csv(mq_pepfile,sep = "\t")
 ```
 
-Convert a `QFeatures` object
+To convert the data into a `QFeatures` object, we extract the 'intensity' columns.
 
 ```{r MQ_pep2}
-ecols <- grep("Intensity.", colnames(mq_pep))
+ecols <- grep("Intensity.", colnames(mq_pep)) ## the peptides intensity cols
 mq_pe <- make_pe(mq_pep, columns = ecols, expdesign = expdesign)
 mq_pe
 ```
 
 
-### From FragPipe combined_peptides
+### Conversion from FragPipe combined_peptides
+
+Next, we process the combined_peptide.tsv file generated by FragPipe.
 
 ```{r Fragp_pep1}
 FragP_pepfile <- "./A_spikeIn/FragPipe_output/combined_peptide.tsv.gz"
@@ -389,10 +387,10 @@ FragP_pepfile <- "./A_spikeIn/FragPipe_output/combined_peptide.tsv.gz"
 FragP_pep <- read.csv(FragP_pepfile,sep = "\t")
 ```
 
-Convert a `QFeatures` object. We use the intensity columns.
+We use the 'Intensity' columns as expression columns.
 
 ```{r Frag_pe1}
-ecols <- grep("[0-9].Intensity", colnames(FragP_pep),value = T)
+ecols <- grep("[0-9].Intensity", colnames(FragP_pep),value = T)  ## the peptides intensity cols
 
 FragP_pe <- make_pe_parse(FragP_pep, columns = ecols, 
                           mode = "delim", 
@@ -402,10 +400,9 @@ colData(FragP_pe)
 ```
 
 
-### From DIA-NN report
+### Conversion from DIA-NN report
 
-**Reshape** the peptide quantities into a wide table, here the 'Stripped.Sequence' could be the peptide ids. Stripped peptides possibly have more than one precursors because the variable modification or different charge state. For these peptides, `reshape_long2wide` keeps the max expression values.
-
+We **reshape** the peptide quantities into a wide table using the `reshape_long2wide` function. The 'Stripped.Sequence' column represents the peptide IDs. A stripped peptide may have multiple precursors due to variable modifications or different charge states. For these peptides, the function retains the maximum expression values.
 
 ```{r diann_pep1}
 
@@ -437,9 +434,9 @@ pe <- make_pe_parse(Diann_pep_wided, columns = ecols,
 
 ```
 
-### From Spectronaut 
+### Conversion from Spectronaut result
 
-The Spectronaut also store the peptide-level quantity.
+The Spectronaut result also store the peptide-level quantities.
 
 ```{r spe_load2}
 Spe_repfile <- "./A_spikeIn/Spectronaut_output/DIA_MSStats_Report.xls.gz"
@@ -450,7 +447,7 @@ dim(Spe_rep) # 318132 rows, each row is a precursor.
 DT::datatable(head(Spe_rep), options = list(scrollX = T,pageLength = 6))
 ```
 
-**Reshape** long-table.
+**Reshape** the long-table.
 
 
 ```{r spe_resha2}
@@ -462,7 +459,6 @@ Spe_rep_wided2 = reshape_long2wide(Spe_rep,
                                    remove_sample_prefix = TRUE,    # remove prefix in sample_col
                                    remove_sample_suffix = FALSE  
                                    )
-
 ```
 
 Convert *QFeatures* object
