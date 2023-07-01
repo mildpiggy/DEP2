@@ -445,19 +445,28 @@ PPI_server_module <- function(id, Omics_res) {
 
           check_ppi <- reactive({
             print("check ppi data")
-
-            try(DEP2::load_PPIdata(input$organism), silent = TRUE)
+            input$String_annalysis
+            isolate({
+              theorganism = input$organism
+            })
+            try(DEP2::load_PPIdata(theorganism), silent = TRUE)
           })
 
           links <- reactive({
             print("Searching links.")
-            links <- DEP2::test_PPI(gene_name()$name, species = input$organism,
-                                          choose_scores = input$chooseScore, score_cutoff = 400)
-            links
+            input$String_annalysis
+            isolate({
+              thename = gene_name()$name
+            })
+            links <- DEP2::test_PPI(thename, species = input$organism,
+                                    choose_scores = input$chooseScore, score_cutoff = 400)
+            # validate(need((!is.character(links) )&& links != "No mapped genes", "No genes can be mapped to database. Check your input or select organism."))
+            return(links)
           })
           links2 <- reactive({
-            print("Filter links.")
             links2 <- dplyr::filter(links(), combined_score >= input$scorecutoff)
+            print("Filter links.")
+            return(links2)
           })
 
 
