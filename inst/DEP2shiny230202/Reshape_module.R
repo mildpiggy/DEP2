@@ -61,6 +61,16 @@ Reshape_body_mod <- function(id, label = "Reshape_body") {
     mainPanel(
       tabName = id,
       width = 8,
+      ## ** The style of busy tooltip ----
+      tags$head(tags$style(type="text/css", "
+                        #loadmessage {
+                        top: 0px; left: 0px;
+                        width: 100%; padding: 5px 0px 5px 0px;
+                        text-align: center; font-weight: bold;
+                        font-size: 100%; color: #000000;
+                        background-color: #FFC1C1; z-index: 105;}")), ##  提示条的样式
+      conditionalPanel(condition="$('html').hasClass('shiny-busy')",
+                       tags$div("calculating...please wait...",id="loadmessage")),
       tabsetPanel(
         tabPanel(
           "Input table",
@@ -229,7 +239,7 @@ Reshape_Server <- function(id, Omics_res) {
       output$input_table <- renderDataTable({
         if(!is.null(long_table())){
           thedata <- long_table()
-          trim_table_character(thedata, length_lim = 14)
+          suppressWarnings(trim_table_character(thedata, length_lim = 14))
         }else{
           NULL
         }
@@ -239,7 +249,7 @@ Reshape_Server <- function(id, Omics_res) {
       output$unique_table <- renderDataTable({
         if(!is.null(unique_table())){
           thedata <- unique_table()
-          trim_table_character(thedata, length_lim = 14)
+          suppressWarnings(trim_table_character(thedata, length_lim = 14))
         }else{
           NULL
         }
@@ -264,8 +274,37 @@ trim_table_character <- function(thedata,length_lim = 14){
   classes <- 1:ncol(thedata) %>% sapply(function(x){
     class(thedata[,x])
   })
-  thedata[which(classes == "character")] = thedata[which(classes == "character")] %>% apply(.,2,function(x,len_limit){
-    x <- ifelse(stringr::str_length(x) > len_limit, paste0(stringr::str_sub(x,1,len_limit),"..."),x)
-  },len_limit = length_lim)
-  thedata
+  character_cols = which(classes == "character")
+
+
+  if(length(character_cols) > 1){
+    thedata[,character_cols] = thedata[,character_cols] %>% apply(.,2,function(x,len_limit){
+      # x111 <<- x
+      # x = x111
+      x = thedata[,1]
+      t_df <- data.frame(ori = unique(x))
+      t_df$trans_code = stringr::str_conv(t_df$ori,"UTF-8")
+      t_df$trans_char = ifelse(stringr::str_length(t_df$trans_code) > len_limit,
+                               paste0(stringr::str_sub(t_df$trans_code,1,len_limit),"..."),
+                               t_df$trans_code)
+      x <- t_df$trans_char[match(x,t_df$ori)]
+
+      return(x)
+    },len_limit = length_lim)
+  }else if(length(character_cols) == 1){
+    x = thedata[,character_cols]
+
+    t_df <- data.frame(ori = unique(x))
+    t_df$trans_code = stringr::str_conv(t_df$ori,"UTF-8")
+    t_df$trans_char = ifelse(stringr::str_length(t_df$trans_code) > len_limit,
+                             paste0(stringr::str_sub(t_df$trans_code,1,len_limit),"..."),
+                             t_df$trans_code)
+    x <- t_df$trans_char[match(x,t_df$ori)]
+    thedata[,character_cols] = x
+
+    # x = stringr::str_conv(x,"UTF-8")
+    # thedata[,character_cols] =  ifelse(stringr::str_length(x) > len_limit, paste0(stringr::str_sub(x,1,len_limit),"..."),x)
+  }
+
+  return(thedata)
 }
