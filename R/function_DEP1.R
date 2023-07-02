@@ -170,6 +170,72 @@ get_df_wide <- function(se) {
   return(wide)
 }
 
+#' Generate a long data.frame from a SummarizedExperiment
+#'
+#' \code{get_df_long} generate a wide data.frame from a SummarizedExperiment.
+#'
+#' @param se SummarizedExperiment,
+#' Proteomics data (output from \code{\link{make_se}()} or
+#' \code{\link{make_se_parse}()}).
+#' @return A data.frame object
+#' containing all data in a wide format,
+#' where each row represents a single measurement.
+#' @examples
+#' # Load example
+#' data(Silicosis_pg)
+#' data_unique <- make_unique(Silicosis_pg, "Gene.names", "Protein.IDs", delim = ";")
+#'
+#' # Make SummarizedExperiment
+#' ecols <- grep("LFQ.", colnames(data_unique))
+#' se <- make_se_parse(data_unique, ecols, mode = "delim", sep = "_")
+#' # Filter and normalize
+#' filt <- filter_se(se, thr = 0, fraction = 0.4, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
+#' norm <- normalize_vsn(filt)
+#' imputed <- impute(norm, fun = "MinDet")
+#' diff <- test_diff(imputed,type = "control", control = "PBS")
+#' dep <- add_rejections(diff)
+#'
+#' long <- get_df_long(dep)
+#' colnames(long)
+#' @export
+get_df_long <- function(se) {
+  # Show error if inputs are not the required classes
+  assertthat::assert_that(inherits(se, "SummarizedExperiment"))
+
+  # Show error if inputs do not contain required columns
+  if (!"name" %in% colnames(rowData(se, use.names = FALSE))) {
+    stop("'name' column is not present in '",
+         deparse(substitute(se)),
+         "'\nRun make_unique() and make_se() to obtain the required columns",
+         call. = FALSE)
+  }
+
+  # Extract column data
+  col_data <- colData(se) %>%
+    data.frame() %>%
+    rownames_to_column() %>%
+    select(-ID)
+  # Extract row data
+  row_data <- rowData(se, use.names = FALSE) %>%
+    data.frame()
+  # Extract assay data
+  assay_data <- assay(se) %>%
+    data.frame() %>%
+    rownames_to_column()
+  colnames(assay_data)[1] <- "name"
+
+  # Transform assay_data in long format
+  long_assay <- assay_data %>%
+    gather("rowname", "intensity", -name)
+
+  # Merge row and assay data into a wide data.frame
+  long <- long_assay %>%
+    full_join(col_data, ., by = "rowname") %>%
+    select(-rowname) %>%
+    full_join(., row_data, by = "name")
+
+  return(long)
+}
 
 #' Plot protein overlap between samples
 #'

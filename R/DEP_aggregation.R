@@ -485,6 +485,7 @@ aggregateFeatures = function(object, i, fcol, name = "newAssay",
 #' @param fun Character(1), imputation strategy, see \link{impute}.
 #' @param i
 #' @param name Character(1), naming the new normalized assay. defaule is "peptideImp".
+#' @param ... Other parameters to be passed to \link{impute} function.
 #'
 #' @inheritParams normalize_pe
 #' @return
@@ -508,7 +509,7 @@ aggregateFeatures = function(object, i, fcol, name = "newAssay",
 impute_pe <- function(pe,
                       fun = c("QRILC", "bpca", "knn", "MLE", "MinDet",
                               "MinProb", "man", "min", "zero", "mixed", "nbavg","RF", "GSimp"),
-                      i = "peptideRaw", name = "peptideImp"){
+                      i = "peptideRaw", name = "peptideImp", ...){
   fun = match.arg(fun)
   assertthat::assert_that(inherits(pe,"QFeatures"),
                           length(i) == 1, is.character(name) && length(name) == 1)
@@ -516,7 +517,7 @@ impute_pe <- function(pe,
   if(is.numeric(i) | is.integer(i)) assertthat::assert_that(i %in% 1:length(pe))
 
   pe <- QFeatures::addAssay(pe,
-                            DEP2::impute(pe[[i]], fun = fun),
+                            DEP2::impute(pe[[i]], fun = fun, ...),
                             name = name)
   return(pe)
 }

@@ -591,7 +591,7 @@ impute <- function (se, fun = c("QRILC", "bpca", "knn", "MLE", "MinDet",
     if(! "parallelize" %in% names(args) )
       args[["parallelize"]] = "variables"
     args$xmis = assay(se)
-    doParallel::registerDoParallel(cores=min(4,parallel::detectCores()-2)) ## Used 4 cores
+    doParallel::registerDoParallel(cores=min(6, parallel::detectCores()-2)) ## Used 4 cores
     assay(se) <- do.call(missForest::missForest, args)$ximp
     doParallel::stopImplicitCluster()
   }else if(fun == "GSimp"){

@@ -640,12 +640,13 @@ write.csv(protein_info,"./A_spikeIn/protein_info.csv",row.names = F)
 ```
 -->
 
+<!--
 # Session information
 
 ```{r sessioninfo, echo=FALSE}
 sessionInfo()
 ```
-
+-->
 
 
 

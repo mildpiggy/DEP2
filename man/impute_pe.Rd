@@ -9,7 +9,8 @@ impute_pe(
   fun = c("QRILC", "bpca", "knn", "MLE", "MinDet", "MinProb", "man", "min", "zero",
     "mixed", "nbavg", "RF", "GSimp"),
   i = "peptideRaw",
-  name = "peptideImp"
+  name = "peptideImp",
+  ...
 )
 }
 \arguments{
@@ -20,6 +21,8 @@ impute_pe(
 \item{i}{A numeric or a character giving the index or the name, respectively, of the assay(s) to be processed.}
 
 \item{name}{Character(1), naming the new normalized assay. defaule is "peptideImp".}
+
+\item{...}{Other parameters to be passed to \link{impute} function.}
 }
 \value{
 A QFeatures with a imputed assay in giving \code{name}.

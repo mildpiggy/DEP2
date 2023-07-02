@@ -1,6 +1,6 @@
 Package: DEP2
 Title: An analysis toolkits for mass spectrometry based proteomics data.
-Version: 0.3.06.13
+Version: 0.3.7.1
 Authors@R: 
     c(
     person("Zhenhuan", "Feng", email = "feng_zhenhuan@gibh.ac.cn", role = c("cre", "aut")),
