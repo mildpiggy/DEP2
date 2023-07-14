@@ -1,5 +1,17 @@
 `%<>%` <- magrittr::`%<>%`
 
+
+
+#' Species information table
+#'
+#' Record the species names IDs and their org database package.
+#'
+#' @return
+#' a data.frame
+#'
+#' @export
+#'
+#' @examples
 annoSpecies_df <- function(){
   annoSpecies_df <-
     data.frame(
@@ -41,22 +53,30 @@ annoSpecies_df <- function(){
   annoSpecies_df$speciesID[is.na(annoSpecies_df$speciesID)] = ""
   rownames(annoSpecies_df) <- annoSpecies_df$species
 
+  ## filter out some unusual species
+  annoSpecies_df = annoSpecies_df[which(annoSpecies_df$msigdbr_species != ""),]
+  species_order = c("Human","Mouse", "Rat", "Yeast", "Pig", "Zebrafish")
+  species_order = c(species_order, annoSpecies_df$species[!annoSpecies_df$species %in% species_order])
+  annoSpecies_df = annoSpecies_df[match(species_order,annoSpecies_df$species),]
+
   return(annoSpecies_df)
 }
 
 annoSpecies_df2 <- function(){
   theannoSpecies_df <- DEP2:::annoSpecies_df()
   pkg <- theannoSpecies_df$pkg
-  installed <- pkg[-1] %>% sapply(.,function(x){rlang::is_installed(x)})
-  theannoSpecies_df[1+which(installed),]
+  # installed <- pkg[-1] %>% sapply(.,function(x){rlang::is_installed(x)})
+  # theannoSpecies_df[1+which(installed),]
+  installed <- pkg %>% sapply(.,function(x){rlang::is_installed(x)})
+  theannoSpecies_df[which(installed),]
 }
-DEP2:::annoSpecies_df()
+# DEP2:::annoSpecies_df()
 
 #' ID transform SE or DEGdata
 #'
 #' Transform ID for SummarizedExperiment or DEGdata according origin ID.
 #' The annotation package of certain species must be installed. Using \code{annoSpecies_df}
-#' to check species names and
+#' to check species names and the required packages.
 #'
 #' @param x SummarizedExperiment object from \code{\link{make_se}()}) or \code{\link{make_pe}()}),
 #' or a DEGdata object from \code{\link{test_diff_deg}()}).
@@ -115,7 +135,10 @@ ID_transform <- function(x, from_columns = "rownames", fromtype = "ENSEMBL", spe
   columns <- keytypes(anno_db)
   columns <- intersect(c("SYMBOL", "ENTREZID", "UNIPROT", "ENSEMBL"), columns)
   # columns <- columns[which(columns != input$idtype)]
-  ann <- AnnotationDbi::select(anno_db, keys = ids, column = columns, keytype = fromtype, multiVals = "first")
+  ann <- try(AnnotationDbi::select(anno_db, keys = ids, column = columns, keytype = fromtype, multiVals = "first"))
+  if(class(ann) == "try-error"){
+    stop("Mapping ID failed, please check your input")
+  }
 
   ann = ann[!duplicated(ann[, fromtype]), ]
   ann2 = ann[match(ids,ann[, fromtype]),]

@@ -1206,8 +1206,9 @@ DEP_ptm_server_module <- function(id, Omics_res){
           updateRadioButtons(session = session,
                              inputId = "anno",
                              label = "Sample annotation",
-                             choices = list("Parse from columns" = "columns",
-                                            "Use ExpDesign in log" = "logexpdesign"),
+                             choices = list(
+                               # "Parse from columns" = "columns",
+                               "Use ExpDesign in log" = "logexpdesign"),
                              selected = "logexpdesign"
           )
         }

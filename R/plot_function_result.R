@@ -786,7 +786,7 @@ setMethod("plot_heatmap",
 
   message("deg heatmap")
   ## exctract signicant protein
-  filtered <- get_signicant(object, contrast = manual_contrast)
+  filtered <- get_signicant(object, contrast = manual_contrast, return_type = "subset")
 
   ## choose portion to plot
   if(!is.null(chooseToshow)){
@@ -798,6 +798,7 @@ setMethod("plot_heatmap",
   }
 
   ntf = filtered@ntf
+  rownames(ntf) = rownames(filtered)
   if(all(dim(ntf) == c(0,0))){
     stop("The ntf slot is empty, please run test_diff_deg, or assign it by a normalized assay")
   }
@@ -805,8 +806,6 @@ setMethod("plot_heatmap",
     stop("The size of ntf is uncorrect.")
   }
   colname <- colnames(ntf)
-
-
 
   # Check for missing values
   if(!is.null(manual_contrast)){
@@ -1486,7 +1485,7 @@ plot_volcano <- function (object, contrast = get_contrast(object)[1],
 plot_multi_heatmap <- function(omics_list, choose_name, to_upper = FALSE,
                                color = c("RdBu", "RdYlBu", "RdYlGn", "BrBG", "PiYG", "PRGn", "PuOr", "RdGy", "Spectral"),
                                col_limit = 6,
-                               width = 7, height = 10, row_font_size = 5,
+                               width = 7, height = 10, row_font_size = 5, col_font_size = 11,
                                ...){
   assertthat::assert_that(class(omics_list) == "list", length(omics_list) > 0,
                           is.character(choose_name),
@@ -1494,7 +1493,12 @@ plot_multi_heatmap <- function(omics_list, choose_name, to_upper = FALSE,
                           )
   color <- match.arg(color)
   ht_list <- lapply(omics_list,function(x){
-    ht_mat = assay(x)
+    if(class(x) == "DEGdata"){
+      ht_mat = x@ntf
+      rownames(ht_mat) = rownames(x)
+    }else if(class(x) == "SummarizedExperiment"){
+      ht_mat = assay(x)
+    }
     if(to_upper)
       rownames(ht_mat) = rownames(ht_mat) %>% toupper() %>% make.names()
     return(ht_mat)
@@ -1528,6 +1532,7 @@ plot_multi_heatmap <- function(omics_list, choose_name, to_upper = FALSE,
                                    cluster_columns = F,
                                    column_title = names(ht_list2)[x],
                                    row_names_gp = gpar(fontsize = row_font_size),
+                                   column_names_gp = gpar(fontsize = col_font_size),
                                    name = names(ht_list2)[x],
                                    heatmap_legend_param = list(title = names(ht_list2)[x] ),
                                    ...)

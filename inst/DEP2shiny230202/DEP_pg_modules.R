@@ -1111,8 +1111,9 @@ DEP_pg_server_module <- function(id){
           updateRadioButtons(session = session,
                              inputId = "anno",
                              label = "Sample annotation",
-                             choices = list("Parse from columns" = "columns",
-                                            "Use ExpDesign in log" = "logexpdesign"),
+                             choices = list(
+                               # "Parse from columns" = "columns",
+                               "Use ExpDesign in log" = "logexpdesign"),
                              selected = "logexpdesign"
           )
         }
@@ -1290,7 +1291,7 @@ DEP_pg_server_module <- function(id){
         # from log
         upload_log = upload_log()
         if(!is.null(upload_log) & input$uploadmode == "fromLog"){
-          my_data <<- upload_log$resultVals()$data
+          my_data <- upload_log$resultVals()$data
           return(my_data)
         }else if( is.null(upload_log) & input$uploadmode == "fromLog"){
           # cat("Initiate: log file is null \n")

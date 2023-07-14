@@ -238,7 +238,7 @@ DEP_pep_body_mod <- function(id){
                         font-size: 100%; color: #000000;
                         background-color: #FFC1C1; z-index: 105;}")), ## 提示条的样式
                conditionalPanel(condition="$('html').hasClass('shiny-busy')",
-                                tags$div("calculating...please wait...",id="loadmessage"))
+                                tags$div("Calculating...Please wait...",id="loadmessage"))
       ),
       helpText("Please cite: "),
       fluidRow(
@@ -1169,8 +1169,9 @@ DEP_pep_server_module <- function(id){
           updateRadioButtons(session = session,
                              inputId = "anno",
                              label = "Sample annotation",
-                             choices = list("Parse from columns" = "columns",
-                                            "Use ExpDesign in log" = "logexpdesign"),
+                             choices = list(
+                               # "Parse from columns" = "columns",
+                               "Use ExpDesign in log" = "logexpdesign"),
                              selected = "logexpdesign"
           )
         }

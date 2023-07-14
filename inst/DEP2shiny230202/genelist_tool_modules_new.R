@@ -165,7 +165,7 @@ exctract_genelist_Server <- function(id, ID, Omics_Serv_res, suffix = ""){
                      )
                    }
 
-                   if(!is.null(sig_res()) && !is.na(sig_res()) &&nrow(sig_res()) > 0){
+                   if(!is.null(sig_res()) && !all(is.na(sig_res())) && nrow(sig_res()) > 0){
                      return(
                        tagList(
                          bsButton(ns("table_bttn"),label = paste0("candidate list: ",nrow(sig_res())),
@@ -265,11 +265,15 @@ exctract_genelist_Server <- function(id, ID, Omics_Serv_res, suffix = ""){
 
                  }else if(omictype == "RNAseq"){
                    sig_res <- reactive({
-                     the_res = test_res()@test_result %>% as.data.frame()
-                     gene_info = test_res()@geneinfo
-                     if(nrow(gene_info) == 0)
-                       return(NULL)
-                     the_res$name = gene_info$SYMBOL
+                     res <- test_res()
+                     the_res = res@test_result %>% as.data.frame()
+
+                     # gene_info = res@geneinfo
+                     # if(nrow(gene_info) == 0)
+                     #   return(NULL)
+                     # the_res$name = gene_info$SYMBOL
+
+                     the_res$name = rownames(res)
 
                      the_res_save <- the_res
                      thecontrast = input$contrast
@@ -569,7 +573,7 @@ genelist_tool_Server <- function(id, Omics_res){
             if(length(x) > 0 ){
               for (i in 1:length(x)) {
                 the_res = x[[i]]()
-                if(!is.na(the_res) && !is.null(the_res) && nrow(the_res) > 0 ){
+                if(!all(is.na(the_res)) && !is.null(the_res) && nrow(the_res) > 0 ){
                   the_results = c(the_results,the_res$name)
                 }
               }
@@ -1023,6 +1027,8 @@ genelist_tool_Server <- function(id, Omics_res){
                                        color = input$heatmap_color,col_limit = input$heatmap_color_limit,
                                        width = input$heatmap_width,
                                        height = input$heatmap_height,
+                                       row_font_size = input$row_font_size,
+                                       col_font_size = input$col_font_size,
                                        km = input$k)
 
         multi_ht

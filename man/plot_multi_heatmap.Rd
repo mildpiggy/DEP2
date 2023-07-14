@@ -14,6 +14,7 @@ plot_multi_heatmap(
   width = 7,
   height = 10,
   row_font_size = 5,
+  col_font_size = 11,
   ...
 )
 }

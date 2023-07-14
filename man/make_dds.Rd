@@ -23,17 +23,16 @@ The gene identifiers should in the first column of countData.
 \examples{
 
 \dontrun{
+data(Silicosis_count)
+colnames(Silicosis_count)
 
- data(Silicosis_count)
- colnames(Silicosis_count)
+expdesign = get_exdesign_parse(colnames(Silicosis_count))
+dds = make_dds(countData = Silicosis_count, expdesign = expdesign)
 
- expdesign = get_exdesign_parse(colnames(Silicosis_count))
- dds = make_dds(countData = Silicosis_count, expdesign = expdesign)
-
- ## DESeq2 way, be same.
- # DESeqDataSetFromMatrix(countData = Silicosis_count,colData = expdesign,
-                          design = as.formula("~ condition"))
-                         )
+## DESeq2 way, be same.
+# DESeqDataSetFromMatrix(countData = Silicosis_count,colData = expdesign,
+                         design = as.formula("~ condition"))
+                        )
 }
 
 

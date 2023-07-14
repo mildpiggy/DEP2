@@ -33,8 +33,15 @@ PPI_sidebar_mod <-  function(id,label="PPI_sidabar"){
       selectInput(ns("organism"),
                   "Select organism",
                   choices=
-                    c("Anopheles", "Arabidopsis", "Bovine", "Worm", "Canine", "Fly", "Zebrafish", "E coli strain K12", "Chicken", "Human", "Mouse", "Rhesus", "Malaria", "Chimp", "Rat", "Yeast", "Streptomyces coelicolor", "Pig", "Toxoplasma gondii", "Xenopus")
-                  ,
+                    intersect(
+                      c("Anopheles", "Arabidopsis", "Bovine",
+                        "Worm", "Canine", "Fly", "Zebrafish",
+                        "E coli strain K12", "Chicken", "Human", "Mouse",
+                        "Rhesus", "Malaria", "Chimp", "Rat", "Yeast", "Streptomyces coelicolor",
+                        "Pig", "Toxoplasma gondii", "Xenopus"),
+                      DEP2:::annoSpecies_df2()$species
+                    )
+                   ,
                   selected="Human"),
       # actionButton("load_PPIdata","Load Datas First!"),
       helpText("choose organism string data to load", br(),"If it doesn't exist, app will give messages on the body", br(),"please download files from string following them first"),
@@ -66,7 +73,12 @@ PPI_sidebar_mod <-  function(id,label="PPI_sidabar"){
       # shinyBS::bsTooltip(ns("import_from_genelist_tool_for_ppi"), "Import genes from the gene list tool options", "top", options = list(container = "body")),
       # shinyBS::bsTooltip(ns("genelist_tool_for_ppi"), "Choose the gene list from gene list tool options", "right", options = list(container = "body")),
       shinyBS::bsTooltip(ns("text_input_for_PPI"), "Paste gene list here", "top", options = list(container = "body")),
-      shinyBS::bsTooltip(ns("organism"), "Select the organism", "right", options = list(container = "body")),
+      shinyBS::bsTooltip(ns("organism"),
+                         "Select the organism.The selection is limmited by the installed species annotation package.
+                         ou can extend the selection by runing check_organismDB_depends in the Console before run app.
+                         Additionally, when the local string database of certain speices is absent,
+                         the module will try to download from web and store data in local.",
+                         "right", options = list(container = "body")),
       shinyBS::bsTooltip(ns("chooseScore"), "Select which type of evidence will contribute to the prediction of the score under the active interaction sources", "right", options = list(container = "body")),
       shinyBS::bsTooltip(ns("scorecutoff"), "Minimum required interaction score. The minimum required interaction score puts a threshold on the confidence score, such that only interaction above this score are included in the predicted network. Confidence limits are as follows: low confidence - 0.15 (or better); medium confidence - 0.4; high confidence - 0.7; highest confidence - 0.9", "right", options = list(container = "body")),
       shinyBS::bsTooltip(ns("String_annalysis"), "Click on it to analyze", "right", options = list(container = "body")),
@@ -96,7 +108,7 @@ PPI_body_mod <- function(id, label = "PPI_body") {
                         font-size: 100%; color: #000000;
                         background-color: #FFC1C1; z-index: 105;}")), ##  提示条的样式
                conditionalPanel(condition="$('html').hasClass('shiny-busy')",
-                                tags$div("calculating...please wait...",id="loadmessage")),
+                                tags$div("Calculating...Please wait...",id="loadmessage")),
                ## ** Network options ----
                fluidRow(height=30,
                         column(width = 3,

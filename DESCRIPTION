@@ -1,6 +1,6 @@
 Package: DEP2
 Title: An analysis toolkits for mass spectrometry based proteomics data.
-Version: 0.3.7.1
+Version: 0.3.7.3
 Authors@R: 
     c(
     person("Zhenhuan", "Feng", email = "feng_zhenhuan@gibh.ac.cn", role = c("cre", "aut")),
@@ -19,11 +19,12 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Suggests: 
     testthat (>= 3.0.0),
-    knitr, BiocStyle, ggridges, magick,
+    knitr, BiocStyle, ggridges, ggsignif, magick, pROC,
     IHW, ashr, apeglm,
-    shinyvalidate, shinyWidgets, shinythemes, shinyBS, shinyFeedback, markdown, dndselectr,
-    shiny (>= 1.6),rmarkdown, colourpicker,
-    clusterProfiler, clusterProfiler.dplyr, ReactomePA, msigdbr,
+    shiny (>= 1.6), shinydashboard, shinyvalidate, shinyWidgets, shinythemes, shinyBS, shinyFeedback, 
+    markdown, dndselectr, rmarkdown, colourpicker,
+    clusterProfiler, clusterProfiler.dplyr, ReactomePA, msigdbr, dbplyr,
+    org.Mm.eg.db, org.Hs.eg.db,
     igraph, visNetwork, R.utils
 Imports: 
     imputeLCMD (>= 2.0), QFeatures (>= 1.2.0),

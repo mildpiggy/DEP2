@@ -77,7 +77,11 @@ ORA_sidebar_mod <-  function(id,label="ORA_sidabar"){
       shinyBS::bsTooltip(ns("genelist_tool_for_ORA"), "Choose the gene list from gene list tool options", "top", options = list(container = "body")),
       shinyBS::bsTooltip(ns("text_input_for_ORA"), "Paste your gene list here", "right", options = list(container = "body")),
       shinyBS::bsTooltip(ns("type_for_ORA"), "Select database, supporting GO, KEGG, reactome pathway and MsigDB database", "right", options = list(container = "body")),
-      shinyBS::bsTooltip(ns("organism_for_ORA"), "Select the organism. Note that: GO and KEGG support 21 organisms, while reactome supporting 7 organisms. When your selected database includes reactome, it will only appears 7 organisms those are supported by reactome. The others support 3 organisms", "right", options = list(container = "body")),
+      shinyBS::bsTooltip(ns("organism_for_ORA"),
+                         "Select the organism. The selection is limmited by the installed species annotation package.
+                         ou can extend the selection by runing check_organismDB_depends in the Console before run app.",
+                         # "Select the organism. Note that: GO and KEGG support 21 organisms, while reactome supporting 7 organisms. When your selected database includes reactome, it will only appears 7 organisms those are supported by reactome. The others support 3 organisms",
+                         "right", options = list(container = "body")),
       shinyBS::bsTooltip(ns("df_with_lg2fc"), "Whether your gene list with log2 fold change", "right", options = list(container = "body")),
       shinyBS::bsTooltip(ns("analyze_for_ORA"), "Click on it to analyze", "right", options = list(container = "body"))
     )
@@ -101,7 +105,7 @@ ORA_body_mod <- function(id, label = "ORA_body") {
                         font-size: 100%; color: #000000;
                         background-color: #FFC1C1; z-index: 105;}")), ## 提示条的样式
                conditionalPanel(condition="$('html').hasClass('shiny-busy')",
-                                tags$div("calculating...please wait...",id="loadmessage"))
+                                tags$div("Calculating...Please wait...",id="loadmessage"))
       ),
       uiOutput(ns("ORA_tabsetPanel"))
     )
@@ -128,7 +132,7 @@ ORA_server_module2 <- function(id, Omics_res) {
 
       ns = session$ns
 
-      annoSpecies_df <- DEP2:::annoSpecies_df()
+      annoSpecies_df <- DEP2:::annoSpecies_df2()
       # annoSpecies_df_for_reactome <- DEP2:::annoSpecies_df()
 
       #* organism selection ----

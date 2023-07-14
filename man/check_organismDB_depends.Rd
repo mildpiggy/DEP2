@@ -9,7 +9,8 @@ check_organismDB_depends(organism, install = T)
 \arguments{
 \item{organism}{Character(1), the organism name, could be one of c(
 "Chicken", "Human", "Mouse", "Fly", "Rat", "Yeast"). Other species with
-\href{http://bioconductor.org/packages/release/BiocViews.html#___OrgDb}{OrgDb} are also optional.}
+\href{http://bioconductor.org/packages/release/BiocViews.html#___OrgDb}{OrgDb} are also optional.
+More information can see \link{annoSpecies_df}}
 
 \item{install}{logic(1). Whether install if organism annotation db package is missed.}
 }

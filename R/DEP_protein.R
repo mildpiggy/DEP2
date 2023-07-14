@@ -961,6 +961,7 @@ setGeneric("add_rejections", function(diff, alpha = 0.05, lfc = 1,thresholdmetho
 #' decide the x0 ratio to the standard deviations of L2FC. The x0 usually is set to 1(medium confidence) or 2(high confidence) standard deviations.
 #' @return A SummarizedExperiment object
 #' annotated with logical columns indicating significant proteins.
+#'
 #' @examples
 #' \dontrun{
 #' # For proteomics data -----

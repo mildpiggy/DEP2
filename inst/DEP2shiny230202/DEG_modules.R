@@ -76,24 +76,6 @@ DEG_sidebar_mod <- function(id,labelname = "DEP-pg_sidabar"){
                                                     "Use Experimental Design" = "expdesign"),
                                      selected = "columns")
         ),
-        bsCollapsePanel("ID Transformation", style = "primary",
-                        div(id = ns("transid_opts"),
-                            checkboxInput(ns("transid_for_RNAseq"), "ID transformation", value = FALSE),
-                            conditionalPanel(paste0("input['",ns("transid_for_RNAseq"),"']"),
-                                             selectInput(ns("species_select"),
-                                                         label = "Select species",
-                                                         choices = DEP2:::annoSpecies_df()$species, selected = ""
-                                             )),
-                            conditionalPanel(paste0("input['",ns("transid_for_RNAseq"),"']"),
-                                             checkboxInput(ns("set_no_map_to_rowname"), "Keep no-mapping to rowname", value = TRUE)),
-                            conditionalPanel(paste0("input['",ns("transid_for_RNAseq"),"']"),
-                                             uiOutput(ns("ui_idtype")))
-                        )
-
-                        # uiOutput(ns("ui_set_no_map_to_rowname")),
-                        # uiOutput(ns("ui_selectspecies")),
-                        # uiOutput(ns("ui_idtype"))
-        ),
         # uiOutput(ns("ui_ID_transformation")),
         bsCollapsePanel("RNAseq_settings", style = "primary",
                         uiOutput(ns("dds_design")),
@@ -108,10 +90,29 @@ DEG_sidebar_mod <- function(id,labelname = "DEP-pg_sidabar"){
                         numericInput(ns("filter_missnum"), "Threshold of missing number", min = 0, max = 10000, value = 2)
                         # numericInput(ns("thr"), "Allowed max.miss.num at least one condition", min = 0, max = 20, value = 3)
         ),
+        bsCollapsePanel("ID Transformation", style = "primary",
+                        div(id = ns("transid_opts"),
+                            checkboxInput(ns("transid_for_RNAseq"), "ID transformation", value = FALSE),
+                            conditionalPanel(paste0("input['",ns("transid_for_RNAseq"),"']"),
+                                             selectInput(ns("species_select"),
+                                                         label = "Select species",
+                                                         choices = DEP2:::annoSpecies_df2()$species, selected = NULL
+                                             )),
+                            # conditionalPanel(paste0("input['",ns("transid_for_RNAseq"),"']"),
+                            #                  checkboxInput(ns("set_no_map_to_rowname"), "Keep row if ID no-mapping", value = TRUE)),
+                            conditionalPanel(paste0("input['",ns("transid_for_RNAseq"),"']"),
+                                             uiOutput(ns("ui_idtype")))
+                        )
+
+                        # uiOutput(ns("ui_set_no_map_to_rowname")),
+                        # uiOutput(ns("ui_selectspecies")),
+                        # uiOutput(ns("ui_idtype"))
+        ),
         bsCollapsePanel("Result options", style = "primary",
                         checkboxInput(ns("independent_filtering"), "Independent filtering", value = TRUE),
-                        checkboxInput(ns("Shrink_lfc"), "Shrink lfc", value = FALSE),
-                        checkboxInput(ns("Use_IHW"), "Use IHW", value = FALSE)
+                        checkboxInput(ns("Shrink_lfc"), "Shrink lfc", value = FALSE)
+                        # ,
+                        # checkboxInput(ns("Use_IHW"), "Use IHW", value = FALSE)
         ),
         open = "Files"
       ),
@@ -129,6 +130,7 @@ DEG_sidebar_mod <- function(id,labelname = "DEP-pg_sidabar"){
       tags$style(type="text/css", "#download_DERNAseq {background-color:white;color: black;font-family: Source Sans Pro}"),
       uiOutput(ns("downloadTable_for_DERNAseq")),
       uiOutput(ns("downloadButton_for_DERNAseq")),
+      br(),br(),
       uiOutput(ns("downloadButton_for_log")),
       shinyBS::bsTooltip(ns("dds_design"), "Select your design, and it can be multi-factor", "right", options = list(container = "body")),
       shinyBS::bsTooltip(ns("choose_expfac"), "Choose the contrast to build upon", "right", options = list(container = "body")),
@@ -150,7 +152,11 @@ DEG_sidebar_mod <- function(id,labelname = "DEP-pg_sidabar"){
       shinyBS::bsTooltip(ns("ui_nrcores"), "Choose how many cores to use for computing", "right", options = list(container = "body")),
       shinyBS::bsTooltip(ns("analyze_for_DERNAseq"), "Click on it to analyze", "right", options = list(container = "body")),
       shinyBS::bsTooltip(ns("downloadTable_for_DERNAseq"), "Choose a dataset to save, and here we offer two forms of datasets for downloading including full_results.txt, significant_results.txt", "right", options = list(container = "body")),
-      shinyBS::bsTooltip(ns("downloadButton_for_DERNAseq"), "Click on it to download the result table", "right", options = list(container = "body"))
+      shinyBS::bsTooltip(ns("downloadButton_for_DERNAseq"), "Click on it to download the result table", "right", options = list(container = "body")),
+
+      shinyBS::bsTooltip(ns("species_select"), "Select the species of ID. Available chioces is depend on
+                         the existed annotation package in the R environment.
+                         Your can run check_organismDB_depends to install the annotation package for wantted package", "right", options = list(container = "body"))
 
     )
   )
@@ -160,14 +166,24 @@ DEG_body_mod <- function(id){
   ns = NS(id)
   tagList(
     mainPanel(
+      fluidRow(tags$head(tags$style(type="text/css", "
+                        #loadmessage {
+                        top: 0px; left: 0px;
+                        width: 100%; padding: 5px 0px 5px 0px;
+                        text-align: center; font-weight: bold;
+                        font-size: 100%; color: #000000;
+                        background-color: #FFC1C1; z-index: 105;}")), ## 提示条的样式
+               conditionalPanel(condition="$('html').hasClass('shiny-busy')",
+                                tags$div("Calculating...Please wait...",id="loadmessage"))
+      ),
       fluidRow(
         box(numericInput(ns("p"),
                          "adj. P value",
-                         min = 0.0001, max = 0.1, value = 0.05),
+                         min = 0.0001, max = 0.1, value = 0.01),
             width = 2),
         box(numericInput(ns("lfc"),
                          "Log2 fold change",
-                         min = 0, max = 10, value = 1),
+                         min = 0, max = 10, value = 2),
             width = 2),
         infoBoxOutput(ns("significantBox_for_DERNAseq")),
         box(radioButtons(ns("pres_for_RNAseq"),
@@ -681,10 +697,10 @@ DEG_server_module <- function(id){
       })
 
       output$dds_design <- renderUI({
-        expdesign_1 <- expdesign()
+        # expdesign_1 <- expdesign()
+
         if(!is.null(expdesign())) {
           expdesign <- expdesign()
-          expdesign111 <<- expdesign()
           ddschoices = which( (expdesign %>% apply(., 2, function(x){length(unique(x))})) < nrow(expdesign) )
           shiny::validate(need(
             length(ddschoices) > 0,
@@ -705,7 +721,6 @@ DEG_server_module <- function(id){
       })
 
       output$whether_LRT <- renderUI({
-        expdesign11 <<- expdesign()
         shiny::validate(
           need(
             !is.null(expdesign()),
@@ -714,8 +729,6 @@ DEG_server_module <- function(id){
         )
         if(!is.null(expdesign())&& !is.null(input$choose_expfac) && input$choose_expfac != ""){
           choose_factor_num <- expdesign() %>% dplyr::select(input$choose_expfac) %>% unlist() %>% as.character() %>% unique() %>% length()
-          choose_expfac11 <<- input$choose_expfac
-          choose_factor_num11 <<- choose_factor_num
           if(choose_factor_num > 2)
             return(checkboxInput(ns("perform_LRT_test"), "perform a LRT test", value = TRUE))
         }
@@ -782,8 +795,8 @@ DEG_server_module <- function(id){
           # conditionalPanel(condition = paste0("input['",ns("choose_expfac"),"']"," != ''"),
           # if( (!is.null(upload_log())) & input$uploadmode == "fromLog"){
           #   selected = upload_log()$inputVals()$control
-          #   selected11 <<- selected
-          #   choices11 <<- expdesign %>% dplyr::select(input$choose_expfac) %>% unlist() %>% as.character()
+          #   selected11 <- selected
+          #   choices11 <- expdesign %>% dplyr::select(input$choose_expfac) %>% unlist() %>% as.character()
           # }else{
           #   selected = NULL
           # }
@@ -864,12 +877,16 @@ DEG_server_module <- function(id){
 
         cat("Update options 1 \n")
         Option_to_updata <- c("transid_for_RNAseq",
-                              "independent_filtering", "Shrink_lfc","Use_IHW") # CheckboxInput
+                              "independent_filtering", "Shrink_lfc"
+                              # ,"Use_IHW"
+                              ) # CheckboxInput
         for(i in Option_to_updata){
           updateCheckboxInput(session = session, inputId = i,
                               value = upload_log()$inputVals()[[i]] )
         }
+        message("Update options 1 finished \n")
 
+        cat("Update options 2 \n")
         Option_to_updata2 <- c("filter_rowsum","filter_missnum") # NumericInput
         for(i in Option_to_updata2){
           updateNumericInput(session = session, inputId = i,
@@ -887,9 +904,8 @@ DEG_server_module <- function(id){
           updateSelectInput(session = session, inputId = i,
                                selected = upload_log()$inputVals()[[i]] )
         }
-
+        message("Update options 2 finished \n")
         Columns_to_updata = Columns_to_updata(1)
-        message("Update options 1 finished \n")
       },ignoreNULL = T,ignoreInit = T)
 
       observeEvent(
@@ -907,7 +923,6 @@ DEG_server_module <- function(id){
 
             column_opt = c("dds_design", "choose_expfac","control")
             for(i in column_opt){
-              # upload_log22 <<- upload_log()
               updateSelectizeInput(session = session, inputId = i,
                                    selected = upload_log()$inputVals()[[i]] )
 
@@ -940,7 +955,6 @@ DEG_server_module <- function(id){
 
       ## updata anno option according uploadmode
       observe({
-        # uploadmode11 <<- input$uploadmode
         # cat("uploadmode shift")
         if(input$uploadmode == "fromTable"){
           updateRadioButtons(session = session,
@@ -954,8 +968,9 @@ DEG_server_module <- function(id){
           updateRadioButtons(session = session,
                              inputId = "anno",
                              label = "Sample annotation",
-                             choices = list("Parse from columns" = "columns",
-                                            "Use ExpDesign in log" = "logexpdesign"),
+                             choices = list(
+                               # "Parse from columns" = "columns",
+                               "Use ExpDesign in log" = "logexpdesign"),
                              selected = "logexpdesign"
           )
         }
@@ -981,7 +996,6 @@ DEG_server_module <- function(id){
           cat("Read infile_log\n")
           upload_log <- readRDS(logFile$datapath)
 
-          upload_log111 <<- upload_log
           if( upload_log$appVersion == DEP2:::app_version && inherits(upload_log,"transcriptome_log") ){
             sendSweetAlert(
               session = shiny::getDefaultReactiveDomain(),
@@ -1041,15 +1055,19 @@ DEG_server_module <- function(id){
         inFile <- input$file1
         if (is.null(inFile))
           return(NULL)
-        countData <- read.csv(inFile$datapath, sep = "\t", stringsAsFactors = F, header = T,row.names = NULL)
+        # countData <- read.csv(inFile$datapath, sep = "\t", stringsAsFactors = F, header = T,row.names = NULL)
+        countData <- fread(inFile$datapath, stringsAsFactors = F, header = "auto")
+        countData <- as.data.frame(countData)
+
         row_name = countData[,1]
         countData = countData[ , -1]
         countData = as.matrix(countData)
         rownames(countData) = row_name
 
         # transformit(FALSE)
-        reset("transid_opts") ## reset the ID transformation options after counts file change
-        # countData111111 <<- countData
+
+        ## reset the ID transformation options after counts file change
+        reset("transid_opts")
 
         return(countData)
       })
@@ -1078,17 +1096,18 @@ DEG_server_module <- function(id){
         # from table
         if(input$uploadmode == "fromTable"){
           inFile <- input$file2
-          if ( input$anno == "columns" & (!is.null(countData())) ){
 
+          if ( input$anno == "columns" & (!is.null(countData())) ){
             countData <- countData()
-            countData11 <<- countData
             label = colnames(countData)
             expdesign <- get_exdesign_parse(label, mode = "delim", sep = "_",
                                             remove_prefix = F, remove_suffix = F)
-
           }else if(input$anno == "expdesign" & (!is.null(inFile)) & (!is.null(countData())) ){
-            expdesign <- read.csv(inFile$datapath, header = TRUE,
-                                  sep = "\t", stringsAsFactors = FALSE) %>%
+            # expdesign <- read.csv(inFile$datapath, header = TRUE,
+            #                       sep = "\t", stringsAsFactors = FALSE) %>%
+            #   mutate(id = row_number())
+            expdesign <- fread(inFile$datapath, stringsAsFactors = F,row.names = NULL) %>%
+              as.data.frame() %>%
               mutate(id = row_number())
           }else{
             return(NULL)
@@ -1112,30 +1131,40 @@ DEG_server_module <- function(id){
         #   }
         # }
 
-        my_expdesign <<- expdesign
         return(expdesign)
-
-
-
-
       })
 
 
 
 
       returnval <- reactiveVal()
+
       #### analyze event ----
       observeEvent(input$analyze_for_DERNAseq, {
+
         ## check inputs
-        if(is.null(input$file1)) {
-          sendSweetAlert(
-            session = shiny::getDefaultReactiveDomain(),
-            title = "warning !",
-            text = "Please upload Countmatrix first.",
-            type = "warning"
-          )
+        if(input$uploadmode == "fromTable"){
+          if(is.null(input$file1)) {
+            sendSweetAlert(
+              session = shiny::getDefaultReactiveDomain(),
+              title = "warning !",
+              text = "Please upload Countmatrix first.",
+              type = "warning"
+            )
+          }
+          req(!is.null(input$file1))
+        }else if(input$uploadmode == "fromLog"){
+          if(is.null(input$file_log)) {
+            sendSweetAlert(
+              session = shiny::getDefaultReactiveDomain(),
+              title = "warning !",
+              text = "Please upload logrds file first.",
+              type = "warning"
+            )
+          }
+          req(!is.null(input$file_log))
         }
-        req(!is.null(input$file1))
+
 
         if(is.null(input$dds_design) || input$dds_design == "") {
           sendSweetAlert(
@@ -1313,12 +1342,52 @@ DEG_server_module <- function(id){
 
 
         dds_1 <- reactive({
+          upload_log = upload_log()
+
+          # load from log
+          if( !is.null(upload_log) && input$uploadmode == "fromLog" ){
+            options_before_dds1 = c("dds_design")
+
+            check_opt_change <- options_before_dds1 %>% sapply(.,function(x){
+              identical(input[[x]], upload_log$inputVals()[[x]])
+            })
+
+            if(all(check_opt_change)){ # if the option before imputation unchange, directly use the old imputation result
+              dds_1 = upload_log$resultVals()$dds_1
+              message("Use the dds1 in log file!")
+              return(dds_1)
+            }
+          }else if(is.null(upload_log) && input$uploadmode == "fromLog"){
+            return(NULL)
+          }
+
+          # from table or options changed
           dds_1 <- DESeqDataSetFromMatrix(countData = countData(),colData = expdesign(),
                                           design = as.formula(paste0("~", paste(input$dds_design, collapse = " + "))))
-          dds_111 <- dds_1
-          })
+          return(dds_1)
+        })
 
         dds_filter <- reactive({
+
+          # upload_log = upload_log()
+          # # from log
+          # if( !is.null(upload_log) & input$uploadmode == "fromLog" ){
+          #   options_before_filt = c("dds_design","filter_rowsum","filter_missnum")
+          #
+          #   check_opt_change <- options_before_filt %>% sapply(.,function(x){
+          #     identical(input[[x]], upload_log$inputVals()[[x]])
+          #   })
+          #
+          #   if(all(check_opt_change)){ # if the option before imputation unchange, directly use the old imputation result
+          #     dds_filter = upload_log$resultVals()$dds_filter
+          #     message("Use the dds_filter in log file!")
+          #     return(dds_filter)
+          #   }
+          # }else if(is.null(upload_log) && input$uploadmode == "fromLog"){
+          #   return(NULL)
+          # }
+
+          # from table or options changed
           dds_1 = dds_1()
 
           if(input$filter_missnum > ncol(dds_1)){
@@ -1327,14 +1396,32 @@ DEG_server_module <- function(id){
           }
 
           dds_filter <- filter_se(dds_1, rowsum_threshold = input$filter_rowsum, missnum = input$filter_missnum)
-          dds_filter11 <- dds_filter
+          return(dds_filter)
         })
 
         dds <- reactive({
           withProgress(message = 'Running DEseq', value = 0.66, {
+            # from log
+            upload_log = upload_log()
+            if( !is.null(upload_log) & input$uploadmode == "fromLog" ){
+              options_before_dds = c("dds_design","filter_rowsum","filter_missnum",
+                                      "choose_expfac","perform_LRT_test","reduced_model")
+              check_opt_change <- options_before_dds %>% sapply(.,function(x){
+                identical(input[[x]], upload_log$inputVals()[[x]])
+              })
 
-            choose_factor_num <- expdesign() %>% dplyr::select(input$choose_expfac) %>% unlist() %>% as.character() %>% unique() %>% length()
-            choose_factor_num111 <<- choose_factor_num
+              if(all(check_opt_change)){
+                dds = upload_log$resultVals()$dds
+                message("Use the dds in log file!")
+                return(dds)
+              }
+            }else if(is.null(upload_log) && input$uploadmode == "fromLog"){
+              return(NULL)
+            }
+
+            # from table or options changed
+            choose_factor_num <- expdesign() %>% dplyr::select(input$choose_expfac) %>%
+              unlist() %>% as.character() %>% unique() %>% length()
 
             if (input$nrcores == 1) {
 
@@ -1377,7 +1464,7 @@ DEG_server_module <- function(id){
                 dds <- DESeq(dds_filter(), parallel = TRUE, BPPARAM = MulticoreParam(workers = input$nrcores))
               }
             }
-            dds111 <- dds
+            dds <- dds
 
           })
         })
@@ -1393,12 +1480,50 @@ DEG_server_module <- function(id){
         diff <-  reactive({
           withProgress(message = 'Get results', value = 0.33, {
 
+            isolate({
+              transformit_it <- transformit()
+              fromtype = input$idtype
+              species = input$species_select
+            })
+
+            # from log
+            upload_log = upload_log()
+            if( !is.null(upload_log) & input$uploadmode == "fromLog" ){
+              options_before_diff = c("dds_design","filter_rowsum","filter_missnum",
+                                     "choose_expfac","perform_LRT_test","reduced_model",
+                                     "contrasts","contrasts","test_manual_for_RNAseq",
+                                     "independent_filtering","Shrink_lfc")
+              check_opt_change <- options_before_diff %>% sapply(.,function(x){
+                x1111 <<- x
+                identical(input[[x]], upload_log$inputVals()[[x]])
+              })
+
+              check_opt_change2 = identical(transformit_it, upload_log$transformit) &&
+                identical(input[["idtype"]], upload_log$inputVals()[["idtype"]]) &&
+                identical(input[["species"]], upload_log$inputVals()[["species"]])
+
+              check_opt_change111 <<- check_opt_change
+              check_opt_change222 <<- check_opt_change2
+
+              if(all(check_opt_change) & check_opt_change2){
+                message("Use the diff in log file000!")
+                temp1111 <<- upload_log$resultVals()
+                diff = upload_log$resultVals()$diff
+                message("Use the diff in log file!")
+                return(diff)
+              }
+            }else if(is.null(upload_log) && input$uploadmode == "fromLog"){
+              return(NULL)
+            }
+
+            # from table or options changed
             diff <- DEP2:::get_res(dds = dds(),
                                    type = input$contrasts,
                                    control = input$control,
                                    test_contrasts = input$test_manual_for_RNAseq,
                                    contrast_upon = input$choose_expfac,
-                                   filter_ihw = input$Use_IHW,
+                                   # filter_ihw = input$Use_IHW,
+                                   filter_ihw = F,
                                    independentFiltering = input$independent_filtering,
                                    lfcshark = input$Shrink_lfc)
             message("Get results finished.")
@@ -1407,14 +1532,13 @@ DEG_server_module <- function(id){
             diff <- DEP2::ntf_deg(diff)
             message("rlg & ntf finished.")
 
-            isolate({transformit_it <- transformit()})
 
             input$analyze_for_DERNAseq
             if(transformit_it){
               # incProgress(2/3,message = "Transforming ID")
               message("Transforming ID")
               withProgress(message = "Transforming ID, please wait!",value = 0.5,{
-                diff <- DEP2::ID_transform(diff, from_columns = "rownames", fromtype = input$idtype, species = "Human", replace_rowname = "SYMBOL")
+                diff <- DEP2::ID_transform(diff, from_columns = "rownames", fromtype = fromtype, species = species, replace_rowname = "SYMBOL")
               })
               # cat("finished \n")
             }
@@ -1480,6 +1604,7 @@ DEG_server_module <- function(id){
                                              reactive_vals = list(
                                                countData = countData(),
                                                expdesign = expdesign(),
+                                               transformit = transformit(),
                                                returnval = returnval(),
                                                dds_1 = dds_1(),
                                                dds = dds(),
@@ -1490,7 +1615,6 @@ DEG_server_module <- function(id){
                                              ),
                                              app_version = DEP2:::app_version
               )
-              thelog11 <<- thelog
               saveRDS(thelog, file = file)
             })
           }

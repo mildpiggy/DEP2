@@ -34,7 +34,7 @@ Rownames of object are replaced according replace_rowname.
 \description{
 Transform ID for SummarizedExperiment or DEGdata according origin ID.
 The annotation package of certain species must be installed. Using \code{annoSpecies_df}
-to check species names and
+to check species names and the required packages.
 }
 \examples{
 \dontrun{

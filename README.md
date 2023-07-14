@@ -16,10 +16,11 @@ peptide-level quantity data, and modification-specific proteomics
 (quantities of modified peptides). DEP2 not only encompasses functions
 for data processing, hypothesis testing (via limma), and visualization
 but also incorporates a pipeline for aggregating peptides into proteins.
-To reduced the barrier in omics analysis, downstream functional
-exploration are packaged as suites, including functional enrichment,
+To reduce the barrier in omics analysis, downstream functional
+explorations are packaged as suites, including functional enrichment,
 timecourse cluster and protein-protein interaction network. DEP2 also
-contains an easy-used shiny application designed with modularization.
+contains an an easy-to-use shiny application designed with
+modularization.
 
 ## Installation
 
@@ -31,16 +32,16 @@ using the following command:
 devtools::install_github("mildpiggy/DEP2")
 ```
 
-Please note that DEP2 required an R version higher than 4.1.0. We
+Please note that DEP2 requires an R version higher than 4.1.0. We
 recommend installing the latest R version from scratch to avoid any
-compatibility issues with dependent packages.  
-Additionally, for Apple Mac, please make sure to have the
+compatibility issues with dependent packages. Additionally, for Apple
+Mac, please make sure to have the
 [Fortran](https://mac.r-project.org/tools/) compiler installed as it is
 necessary for some dependencies.
 
 ## Check the suggested packages required in analysis
 
-By default, DEP2 installs with the essential dependent packages.
+By default, DEP2 is installed with the essential dependent packages.
 However, certain analysis modules may require additional suggested
 packages. Users can run the following commands to complete the
 functionality of DEP2:
@@ -71,7 +72,7 @@ devtools::install_github("mildpiggy/DEP2", dependencies = TRUE)
 
 ## Run shiny application
 
-To run the built-in shiny application, use the run_app function:
+To run the built-in shiny application, use the run\_app function:
 
 ``` r
 library(DEP2)

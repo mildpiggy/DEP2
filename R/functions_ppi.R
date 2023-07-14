@@ -301,6 +301,16 @@ PPInetwork <- function(PPIlinks, layoutway = "layout_components",nodecolor = "#2
 
 
 # download a file when it is not already present. From STRINGdb package.
+
+#' Title
+#'
+#' @param urlStr
+#' @param oD
+#'
+#' @return
+#' @export
+#'
+#' @importFrom downloader download
 downloadAbsentFile <- function(urlStr, oD = tempdir()){
   fileName = tail(strsplit(urlStr, "/")[[1]], 1)
   temp <- paste(oD,"/", fileName,sep="")
