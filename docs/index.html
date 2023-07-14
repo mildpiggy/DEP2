@@ -43,7 +43,7 @@
     
     <a class="navbar-brand me-2" href="index.html">DEP2</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.06.13</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.7.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -82,11 +82,7 @@
 <img src="logo.png" class="logo" alt=""><h1 id="dep2">DEP2<a class="anchor" aria-label="anchor" href="#dep2"></a>
 </h1>
 </div>
-<!-- badges: start -->
-<!-- badges: end -->
-<!-- <img src="logo.png" alt="logo" width="300"/> -->
-<!-- ![logo](./logo.png) -->
-<p>DEP2 is a comprehensive analysis toolkit developed from the previous package DEP for mass spectrometry based proteomics data. It offers differential expression/enrichment analysis pipelines for various types of data, such as protein-level quantity (e.g. proteingroup), peptide-level quantity data, and modification-specific proteomics (quantities of modified peptides). DEP2 not only encompasses functions for data processing, hypothesis testing (via limma), and visualization but also incorporates a pipeline for aggregating peptides into proteins. To reduced the barrier in omics analysis, downstream functional exploration are packaged as suites, including functional enrichment, timecourse cluster and protein-protein interaction network. DEP2 also contains an easy-used shiny application designed with modularization.</p>
+<!-- badges: start --><!-- badges: end --><!-- <img src="logo.png" alt="logo" width="300"/> --><!-- ![logo](./logo.png) --><p>DEP2 is a comprehensive analysis toolkit developed from the previous package DEP for mass spectrometry based proteomics data. It offers differential expression/enrichment analysis pipelines for various types of data, such as protein-level quantity (e.g. proteingroup), peptide-level quantity data, and modification-specific proteomics (quantities of modified peptides). DEP2 not only encompasses functions for data processing, hypothesis testing (via limma), and visualization but also incorporates a pipeline for aggregating peptides into proteins. To reduce the barrier in omics analysis, downstream functional explorations are packaged as suites, including functional enrichment, timecourse cluster and protein-protein interaction network. DEP2 also contains an an easy-to-use shiny application designed with modularization.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -94,13 +90,12 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"mildpiggy/DEP2"</span><span class="op">)</span></span></code></pre></div>
-<p>Please note that DEP2 required an R version higher than 4.1.0. We recommend installing the latest R version from scratch to avoid any compatibility issues with dependent packages.<br>
-Additionally, for Apple Mac, please make sure to have the <a href="https://mac.r-project.org/tools/" class="external-link">Fortran</a> compiler installed as it is necessary for some dependencies.</p>
+<p>Please note that DEP2 requires an R version higher than 4.1.0. We recommend installing the latest R version from scratch to avoid any compatibility issues with dependent packages. Additionally, for Apple Mac, please make sure to have the <a href="https://mac.r-project.org/tools/" class="external-link">Fortran</a> compiler installed as it is necessary for some dependencies.</p>
 </div>
 <div class="section level2">
 <h2 id="check-the-suggested-packages-required-in-analysis">Check the suggested packages required in analysis<a class="anchor" aria-label="anchor" href="#check-the-suggested-packages-required-in-analysis"></a>
 </h2>
-<p>By default, DEP2 installs with the essential dependent packages. However, certain analysis modules may require additional suggested packages. Users can run the following commands to complete the functionality of DEP2:</p>
+<p>By default, DEP2 is installed with the essential dependent packages. However, certain analysis modules may require additional suggested packages. Users can run the following commands to complete the functionality of DEP2:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">DEP2</span><span class="op">)</span></span>
 <span></span>

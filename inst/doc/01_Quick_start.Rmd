@@ -52,7 +52,7 @@ library(ComplexHeatmap)
 
 # Example Data
 
-In this section, we showcase the utilization of the DEP2 pipelines by employing data from a multiple-omics study of a silicosis mouse model (Wang et al., 2022). which are built-in data in the package. These datasets are included as built-in data within the DEP2 package. Additionally, the data can be accessed in table format from the repository at github.com/mildpiggy/OmicsExample.
+In this section, we showcase the utilization of the DEP2 pipelines by employing data from a multiple-omics study of a silicosis mouse model (Wang et al., 2022), which are built-in data in the package. These datasets are included as built-in data within the DEP2 package. Additionally, the data can be accessed in table format from the repository at github.com/mildpiggy/OmicsExample.
 
 ```{r example data}
 ## The proteomics data represented in protein-level format (proteingroup.txt output from MaxQuant).

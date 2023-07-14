@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">DEP2</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.06.13</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.7.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,8 +73,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>A benchmark on spike-in data</h1>
-                        <h4 data-toc-skip class="author">Zhenhuan
-Feng</h4>
+                        <h4 data-toc-skip class="author">Zhenhuan Feng</h4>
                         
       
       
@@ -94,11 +93,7 @@ Feng</h4>
 <div class="section level2">
 <h2 id="abstract">Abstract<a class="anchor" aria-label="anchor" href="#abstract"></a>
 </h2>
-<p>Here, we will compare the analysis result between DEP2 and Perseus
-using a benchmark dataset. The dataset contains two concentration groups
-in which Yeast and E.coli proteome were spiked into a human background.
-The example tables is available in this <a href="https://github.com/mildpiggy/OmicsExample" class="external-link">repository</a>. The
-ratio of proteomes between species is as follows:</p>
+<p>Here, we will compare the analysis result between DEP2 and Perseus using a benchmark dataset. The dataset contains two concentration groups in which Yeast and E. coli proteome were spiked into a human background. The example tables are available in this <a href="https://github.com/mildpiggy/OmicsExample" class="external-link">repository</a>. The ratios of proteomes between species are as follows:</p>
 <table class="table">
 <thead><tr class="header">
 <th>Group</th>
@@ -117,7 +112,7 @@ ratio of proteomes between species is as follows:</p>
 <td>0.12</td>
 </tr>
 <tr class="odd">
-<td>E.coli</td>
+<td>E. coli</td>
 <td>0.06</td>
 <td>0.18</td>
 </tr>
@@ -147,24 +142,9 @@ ratio of proteomes between species is as follows:</p>
 <div class="section level2">
 <h2 id="analysis-workflows">Analysis workflows<a class="anchor" aria-label="anchor" href="#analysis-workflows"></a>
 </h2>
-<p>We measured the spike-in data using both Data-independent acquisition
-(DIA) and Data-dependent acquisition (DDA) individually. The DDA raw
-data is searched and quantified by MaxQuant, while DIA data is searched
-by Spectronaut in library-free method. In this study, our main focus is
-on comparing the performance of DEP2 workflows and Perseus on the DDA
-results obtained from MaxQuant. Additionally, we also included the DEP2
-DIA pipeline for comparison.</p>
-<p>To ensure data credibility, we only considered proteingroups that
-were identified by more than one fragment (peptide). The details of each
-analysis pipeline can be found in the following table and code
-blocks:</p>
+<p>We measured the spike-in data using both Data-independent acquisition (DIA) and Data-dependent acquisition (DDA) individually. The DDA raw data is searched and quantified by MaxQuant, while DIA data is searched by Spectronaut in library-free method. In this study, our main focus is on comparing the performance of DEP2 workflows and Perseus on the DDA results obtained from MaxQuant. Additionally, we also included the DEP2 DIA pipeline for comparison.</p>
+<p>To ensure data credibility, we only considered proteingroups that were identified by more than one fragment (peptide). The details of each analysis pipeline can be found in the following table and code blocks:</p>
 <table class="table">
-<colgroup>
-<col width="19%">
-<col width="32%">
-<col width="28%">
-<col width="19%">
-</colgroup>
 <thead><tr class="header">
 <th>Pipelines label</th>
 <th>MS acquisition &amp; Search software</th>
@@ -201,9 +181,7 @@ blocks:</p>
 <div class="section level3">
 <h3 id="dda-protein-dep2-workflow-">DDA-Protein-DEP2 workflow.<a class="anchor" aria-label="anchor" href="#dda-protein-dep2-workflow-"></a>
 </h3>
-<p>This workflow represents the classical pipeline in DEP2 that has been
-modified from the DEP package, specifically designed for proteingroups
-results.</p>
+<p>This workflow represents the classical pipeline in DEP2 that has been modified from the DEP package, specifically designed for proteingroups results.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mq_pgfile</span> <span class="op">&lt;-</span> <span class="st">"./A_spikeIn/MaxQuant_output/proteinGroups.txt.gz"</span></span>
 <span><span class="va">pg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">mq_pgfile</span>,sep <span class="op">=</span> <span class="st">"\t"</span><span class="op">)</span></span>
@@ -232,8 +210,7 @@ results.</p>
 <div class="section level3">
 <h3 id="dda-peptide-dep2-workflow-">DDA-Peptide-DEP2 workflow.<a class="anchor" aria-label="anchor" href="#dda-peptide-dep2-workflow-"></a>
 </h3>
-<p>This pipeline bypass the MaxLFQ summarization and instead performs
-re-aggregation of protein intensity based on peptide quantities.</p>
+<p>This pipeline bypass the MaxLFQ summarization and instead performs re-aggregation of protein intensity based on peptide quantities.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mq_pepfile</span> <span class="op">&lt;-</span> <span class="st">"./A_spikeIn/MaxQuant_output/peptides.txt.gz"</span></span>
 <span><span class="va">mq_pep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">mq_pepfile</span>,sep <span class="op">=</span> <span class="st">"\t"</span><span class="op">)</span></span>
@@ -264,7 +241,7 @@ re-aggregation of protein intensity based on peptide quantities.</p>
 <div class="section level3">
 <h3 id="dda-protein-perseus">DDA-Protein-Perseus<a class="anchor" aria-label="anchor" href="#dda-protein-perseus"></a>
 </h3>
-<p>Processing the Perseus analysis output for subsequent comparison.</p>
+<p>Process the Perseus analysis output for subsequent comparison.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## The differetial test result of Perseus</span></span>
 <span><span class="va">Perseus_resfile</span> <span class="op">&lt;-</span> <span class="st">"./A_spikeIn/MaxQuant_output/Perseus_test_res.txt.gz"</span></span>
@@ -295,8 +272,7 @@ re-aggregation of protein intensity based on peptide quantities.</p>
 <div class="section level3">
 <h3 id="dia-protein-dep2">DIA-Protein-DEP2<a class="anchor" aria-label="anchor" href="#dia-protein-dep2"></a>
 </h3>
-<p>This workflow is similar to the first one, but it is applied to DIA
-data from Spectonaut instead of DDA results.</p>
+<p>This workflow is similar to the first one, but it is applied to DIA data from Spectonaut instead of DDA results.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Spe_repfile</span> <span class="op">&lt;-</span> <span class="st">"./A_spikeIn/Spectronaut_output/DIA4_MSStates_Report_new_noimpu.xls"</span></span>
 <span><span class="va">Spe_rep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">Spe_repfile</span>,sep <span class="op">=</span> <span class="st">"\t"</span><span class="op">)</span> </span>
@@ -345,9 +321,7 @@ data from Spectonaut instead of DDA results.</p>
 <div class="section level2">
 <h2 id="result-comparation">Result Comparation<a class="anchor" aria-label="anchor" href="#result-comparation"></a>
 </h2>
-<p>Missing values(MVs) are ubiquitous in label-free proteomics data,
-particularly in DDA methods. In comparison to the DDA method, DIA not
-only identity more proteins but also contains fewer MVs.</p>
+<p>Missing values(MVs) are ubiquitous in label-free proteomics data, particularly in DDA methods. In comparison to the DDA method, DIA not only identity more proteins but also contains fewer MVs.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="fu"><a href="../reference/plot_coverage.html">plot_coverage</a></span><span class="op">(</span><span class="va">se</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"DDA"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fu"><a href="../reference/plot_coverage.html">plot_coverage</a></span><span class="op">(</span><span class="va">se_dia</span><span class="op">)</span>  <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"DIA"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="op">(</span><span class="fu"><a href="../reference/plot_coverage.html">plot_coverage</a></span><span class="op">(</span><span class="va">filt</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"DDA-filtered"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fu"><a href="../reference/plot_coverage.html">plot_coverage</a></span><span class="op">(</span><span class="va">filt_dia</span><span class="op">)</span>  <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"DIA-filtered"</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
@@ -366,78 +340,39 @@ only identity more proteins but also contains fewer MVs.</p>
 <span>              set_size <span class="op">=</span> <span class="fl">2.5</span>,</span>
 <span>              label_size <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <p><img src="05_Benchmark_on_spike_in_data_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
-<p>Missing values can decrease the power of statistical tests,
-potentially leading to false positives. To mitigate this issue, DEP2
-filter out low-quanlity features with too many missing values through
-function <code>filter_pe</code>/<code>filter_se</code>. Both the Perseus
-and Protein-DEP2 pipelines consider an equal number of proteins due to
-employing the same filter cutoff. While the Peptide-Aggregation workflow
-also retains a closed number of features. As expected, DIA outperforms
-DDA in terms of data coverage and retains the highest number of
-features.</p>
-<p>For the remaining missing values in features, DEP2 provides a range
-of imputation strategies (<code><a href="../reference/impute.html">DEP2::impute</a></code>). In contrast,
-Perseus software only offers one method of imputation. Although Perseus
-can call the impute functions in the imputeLCMD package, this process is
-counter-intuitive and requires an R executable program in the
-system.</p>
+<p>Missing values can decrease the power of statistical tests, potentially leading to false positives. To mitigate this issue, DEP2 filter out low-quanlity features with too many missing values through function <code>filter_pe</code>/<code>filter_se</code>. Both the Perseus and Protein-DEP2 pipelines consider an equal number of proteins due to employing the same filter cutoff. While the Peptide-Aggregation workflow also retains a closed number of features. As expected, DIA outperforms DDA in terms of data coverage and retains the highest number of features.</p>
+<!-- For the remaining missing values in features, DEP2 provides a range of imputation strategies (`DEP2::impute`). In contrast, Perseus software only offers one method of imputation. Although Perseus can call the impute functions in the imputeLCMD package, this process is counter-intuitive and requires an R executable program in the system. -->
 <div class="section level3">
 <h3 id="imputation-accuracy">Imputation accuracy<a class="anchor" aria-label="anchor" href="#imputation-accuracy"></a>
 </h3>
-<p>In proteomics experiments, both random and systematic errors, as well
-as missing values, have a significant impact on the accuracy of protein
-quantification. Therefore, it is crucial to have an efficient data
-processing pipeline that minimizes the effects of systematic errors and
-missing values on the results.Despite filtering out features with
-excessive missing values, a range of missing values still remains in the
-assay. For the remaining missing values, DEP2 offers a variety of
-imputation strategies (<code><a href="../reference/impute.html">DEP2::impute</a></code>). In contrast, the
-Perseus software only offers one method of imputation. Additionally,
-Perseus also can call the impute functions in the imputeLCMD package.
-However, this process is counter-intuitive and requires an R executable
-program in the system.</p>
-<p>In this spike-in sample experiment, the protein concentrations of
-three species are precisely controlled. The E.coli proteome should
-exhibit a fold change (group B vs A) of 3, the YEAST proteome should
-have a fold change of 1/2, while the human background remains unchanged.
-By comparing the actual differences with the theoretical fold change, we
-can evaluate the ability of the four pipelines to restore missing values
-and minimize errors.</p>
-<p>Among these four pipelines, DDA-Protein-DEP2 achieves the highest
-accuracy in fold change, with the global fold changes closely aligning
-with the theoretical line. Furthermore, the fold changes of each species
-are more consistent, resulting in a reduced number of outliers compared
-to the Perseus pipeline. This highlights the effectiveness of the
-MissForest imputation method. In contrast, Perseus yields fold changes
-that are markedly lower than the theoretical line. The results in the
-Peptide-aggregation pipeline are similar to those of DDA-Protein-DEP2.
-DIA-Protein-DEP2 exhibits slightly amplified fold changes but also has
-smaller interquartile ranges.</p>
+<p>In proteomics experiments, both random and systematic errors, as well as missing values, have a significant impact on the accuracy of protein quantification. Therefore, it is crucial to have an efficient data processing pipeline that minimizes the effects of systematic errors and missing values on the results.Despite filtering out features with excessive missing values, a range of missing values still remains in the assay. For the remaining missing values, DEP2 offers a variety of imputation strategies (<code><a href="../reference/impute.html">DEP2::impute</a></code>). In contrast, the Perseus software only offers one method of imputation. Additionally, Perseus can also call the impute functions in the imputeLCMD package. However, this process is counter-intuitive and requires an R executable program in the system.</p>
+<p>In this spike-in sample experiment, the protein concentrations of three species are precisely controlled. The E. coli proteome should exhibit a fold change (group B vs A) of 3, the YEAST proteome should have a fold change of 1/2, while the human background remains unchanged. By comparing the actual differences with the theoretical fold change, we can evaluate the ability of the four pipelines to restore missing values and minimize errors.</p>
+<p>Among these four pipelines, DDA-Protein-DEP2 achieves the highest accuracy in fold change, with the global fold changes closely aligning with the theoretical line. Furthermore, the fold changes of each species are more consistent, resulting in a reduced number of outliers compared to the Perseus pipeline. This highlights the effectiveness of the MissForest imputation method. In contrast, Perseus yields fold changes that are markedly lower than the theoretical line. The results in the Peptide-aggregation pipeline are similar to those of DDA-Protein-DEP2. DIA-Protein-DEP2 exhibits slightly amplified fold changes but also has smaller interquartile ranges.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">protein_info</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="st">"./A_spikeIn/protein_info.csv"</span><span class="op">)</span></span>
-<span><span class="va">protein_info2</span> <span class="op">=</span> <span class="va">protein_info</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">ID</span>,<span class="va">spe</span>,<span class="va">ox</span><span class="op">)</span></span>
+<span><span class="va">protein_info2</span> <span class="op">=</span> <span class="va">protein_info</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">ID</span>,<span class="va">spe</span>,<span class="va">ox</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">PG_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_df_wide.html">get_df_wide</a></span><span class="op">(</span><span class="va">dep</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="va">as.data.frame</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>  </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span> meanQuant <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">.</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">matches</a></span><span class="op">(</span><span class="st">"^(A1|B1)_(1|2|3)$"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span> meanQuant <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">.</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">matches</a></span><span class="op">(</span><span class="st">"^(A1|B1)_(1|2|3)$"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">name</span>, <span class="va">ID</span>, L2FC <span class="op">=</span> <span class="va">B1_vs_A1_diff</span>, pval <span class="op">=</span> <span class="va">B1_vs_A1_p.val</span>, qval <span class="op">=</span> <span class="va">B1_vs_A1_p.adj</span>, t.statistic <span class="op">=</span> <span class="va">B1_vs_A1_t.stastic</span>, <span class="va">meanQuant</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">protein_info2</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">assay</a></span><span class="op">(</span><span class="va">dep</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">PEP_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_df_wide.html">get_df_wide</a></span><span class="op">(</span><span class="va">dep_pep</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="va">as.data.frame</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>  </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span> meanQuant <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">.</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">matches</a></span><span class="op">(</span><span class="st">"^(A1|B1)_(1|2|3)$"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span> meanQuant <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">.</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">matches</a></span><span class="op">(</span><span class="st">"^(A1|B1)_(1|2|3)$"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">name</span>, <span class="va">ID</span>, </span>
 <span>                L2FC <span class="op">=</span> <span class="va">B1_vs_A1_diff</span>, pval <span class="op">=</span> <span class="va">B1_vs_A1_p.val</span>, qval <span class="op">=</span> <span class="va">B1_vs_A1_p.adj</span>, t.statistic <span class="op">=</span> <span class="va">B1_vs_A1_t.stastic</span>, <span class="va">meanQuant</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">protein_info2</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">assay</a></span><span class="op">(</span><span class="va">dep_pep</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">perseus_df</span> <span class="op">&lt;-</span> <span class="va">Perseus_res</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>  </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span> meanQuant <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">.</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">matches</a></span><span class="op">(</span><span class="st">"^(LFQ.).*_(1|2|3)$"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span> meanQuant <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">.</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">matches</a></span><span class="op">(</span><span class="st">"^(LFQ.).*_(1|2|3)$"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">name</span>, <span class="va">ID</span>, <span class="va">L2FC</span>, pval <span class="op">=</span> <span class="va">p.value</span>, qval <span class="op">=</span> <span class="va">q.value</span>, <span class="va">t.statistic</span>, <span class="va">meanQuant</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">protein_info2</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">Perseus_res</span>,<span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"LFQ."</span><span class="op">)</span><span class="op">)</span> <span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">Perseus_res</span>,<span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"LFQ."</span><span class="op">)</span><span class="op">)</span> <span class="op">)</span></span>
 <span></span>
 <span><span class="va">DIA_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_df_wide.html">get_df_wide</a></span><span class="op">(</span><span class="va">dep_dia</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="va">as.data.frame</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span> meanQuant <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">.</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">matches</a></span><span class="op">(</span><span class="st">"^(A5|B5)_(1|2|3)$"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span> meanQuant <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowMeans</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">.</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">matches</a></span><span class="op">(</span><span class="st">"^(A5|B5)_(1|2|3)$"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">name</span>, <span class="va">ID</span>, L2FC <span class="op">=</span> <span class="va">B5_vs_A5_diff</span>, pval <span class="op">=</span> <span class="va">B5_vs_A5_p.val</span>, qval <span class="op">=</span> <span class="va">B5_vs_A5_p.adj</span>, t.statistic <span class="op">=</span> <span class="va">B5_vs_A5_t.stastic</span>, <span class="va">meanQuant</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">protein_info2</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">assay</a></span><span class="op">(</span><span class="va">dep_dia</span><span class="op">)</span><span class="op">)</span> </span>
@@ -450,7 +385,7 @@ smaller interquartile ranges.</p>
 <span><span class="va">cols</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ID"</span>, <span class="st">"spe"</span>, <span class="st">"L2FC"</span>, <span class="st">"meanQuant"</span>,<span class="st">"pval"</span>, <span class="st">"qval"</span><span class="op">)</span></span>
 <span><span class="va">res_table</span> <span class="op">=</span> <span class="va">df_list</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">.</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">x</span>,<span class="op">!</span><span class="op">!</span><span class="op">!</span><span class="fu"><a href="https://rlang.r-lib.org/reference/sym.html" class="external-link">syms</a></span><span class="op">(</span><span class="va">cols</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">.</span>, <span class="va">ID</span>, .keep_all <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">x</span>,<span class="op">!</span><span class="op">!</span><span class="op">!</span><span class="fu"><a href="https://rlang.r-lib.org/reference/sym.html" class="external-link">syms</a></span><span class="op">(</span><span class="va">cols</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">.</span>, <span class="va">ID</span>, .keep_all <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
 <span>  <span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/funprog.html" class="external-link">Map</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">method</span><span class="op">)</span><span class="op">{</span></span>
 <span>    <span class="va">x</span><span class="op">$</span><span class="va">method</span> <span class="op">&lt;-</span> <span class="va">method</span></span>
@@ -485,10 +420,7 @@ smaller interquartile ranges.</p>
 <span>        <span class="op">)</span></span>
 <span><span class="va">p_lfc</span></span></code></pre></div>
 <p><img src="05_Benchmark_on_spike_in_data_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
-<p>If we focus on the intersection of results from the four methods, the
-conclusions are consistent. DEP2 demonstrates greater accuracy in
-eliminating quantitative errors, as evidenced by its lower overall fold
-change error compared to Perseus.</p>
+<p>If we focus on the intersections of results from the four methods, the conclusions are consistent. DEP2 demonstrates greater accuracy in eliminating quantitative errors, as evidenced by its lower overall fold change error compared to Perseus.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res_table2</span> <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">res_table</span>, <span class="va">ID</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">intersect_id</span><span class="op">)</span></span>
 <span><span class="va">res_table2</span><span class="op">$</span><span class="va">L2FC</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">res_table2</span><span class="op">$</span><span class="va">spe</span> <span class="op">==</span> <span class="st">"HUMAN"</span>, </span>
@@ -515,20 +447,7 @@ change error compared to Perseus.</p>
 <span>        <span class="op">)</span></span>
 <span><span class="va">p_lfcerr</span></span></code></pre></div>
 <p><img src="05_Benchmark_on_spike_in_data_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
-<p>In all four pipelines, the fold changes of low-abundance proteins
-exhibit greater variability and relative inaccuracy. This result was
-anticipated since low-abundance proteins are more susceptible to the
-impact of random errors and missing values. Perseus imputation exhibits
-lower stability compared to MissForest (the imputation method used in
-DDA-Protein-DEP2). DIA data contains several low-expressed proteins
-(below 13), which are challenging to quantify accurately. The
-peptide-aggregation method does not show a deviation in global fold
-change, but the FC of low- to medium-abundance proteins are
-comparatively more unstable than the Protein-DEP2 method. This could be
-attributed to the presence of low-intensity peptides in low- to
-medium-abundance proteins, which possess higher aggregation weights than
-MaxLFQ after data processing. Further optimization of the aggregation
-method is required to reduce this effect.</p>
+<p>In all four pipelines, the fold changes of low-abundance proteins exhibit greater variability and relative inaccuracy. This result was anticipated since low-abundance proteins are more susceptible to the impact of random errors and missing values. Perseus imputation exhibits lower stability compared to MissForest (the imputation method used in DDA-Protein-DEP2). DIA data contains several low-expressed proteins (below 13), which are challenging to quantify accurately. The peptide-aggregation method does not show a deviation in global fold change, but the FCs of low- to medium-abundance proteins are comparatively more unstable than the Protein-DEP2 method. This could be attributed to the presence of low-intensity peptides in low- to medium-abundance proteins, which possess higher aggregation weights than MaxLFQ after data processing. Further optimization of the aggregation method is required to reduce this effect.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res_table3</span> <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">res_table</span>, <span class="va">ID</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">intersect_id</span><span class="op">)</span></span>
 <span><span class="va">res_table3</span><span class="op">$</span><span class="va">L2FC</span><span class="op">[</span><span class="va">res_table3</span><span class="op">$</span><span class="va">L2FC</span> <span class="op">&lt;</span> <span class="op">-</span><span class="fl">3.5</span><span class="op">]</span> <span class="op">=</span> <span class="op">-</span><span class="fl">3.5</span></span>
@@ -545,13 +464,7 @@ method is required to reduce this effect.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>strip.background <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_rect</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"white"</span>, colour <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">p_lfctrend</span></span></code></pre></div>
 <p><img src="05_Benchmark_on_spike_in_data_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
-<p>The coefficients of variation (CVs) reflect the consistency between
-replicates and directly affects the result of statistical tests. DIA
-data has higher inter-replicate stability compared to DDA data.
-Furthermore, the utilization of MissForest imputation in
-DDA-Protein-DEP2 results in lower CVs compared to the other three
-pipelines, providing additional evidence of its effectiveness in
-mitigating the adverse effects of missing values.</p>
+<p>The coefficients of variations (CVs) reflect the consistency between replicates and directly affect the result of statistical tests. DIA data has higher inter-replicate stability compared to DDA data. Furthermore, the utilization of MissForest imputation in DDA-Protein-DEP2 results in lower CVs compared to the other three pipelines, providing additional evidence of its effectiveness in mitigating the adverse effects of missing values.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dep_list</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>DDA_Protein_DEP2 <span class="op">=</span> <span class="va">dep</span>,</span>
 <span>                DDA_Peptide_DEP2 <span class="op">=</span> <span class="va">dep_pep</span>,</span>
@@ -627,16 +540,13 @@ mitigating the adverse effects of missing values.</p>
 <div class="section level4">
 <h4 id="receiver-operator-characteristic-curve">Receiver operator characteristic curve<a class="anchor" aria-label="anchor" href="#receiver-operator-characteristic-curve"></a>
 </h4>
-<p>Receiver operator characteristic (ROC) curve can assess the
-statistical power of each pipeline. DIA data exhibits a great advance
-compare to DDA data. The Perseus result have a higher AUC (area under
-curve) than DEP2 pipelines.</p>
+<p>Receiver operator characteristic (ROC) curve can assess the statistical power of each pipeline. DIA data exhibits a great advantage compare to DDA data. The Perseus result has a higher AUC (area under curve) than DEP2 pipelines.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://expasy.org/tools/pROC/" class="external-link">pROC</a></span><span class="op">)</span></span>
 <span><span class="va">cols</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ID"</span>, <span class="st">"spe"</span>, <span class="st">"L2FC"</span>, <span class="st">"pval"</span>, <span class="st">"qval"</span>, <span class="st">"t.statistic"</span><span class="op">)</span></span>
 <span><span class="va">df_list</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">x</span>,<span class="op">!</span><span class="op">!</span><span class="op">!</span><span class="fu"><a href="https://rlang.r-lib.org/reference/sym.html" class="external-link">syms</a></span><span class="op">(</span><span class="va">cols</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">x</span>,<span class="op">!</span><span class="op">!</span><span class="op">!</span><span class="fu"><a href="https://rlang.r-lib.org/reference/sym.html" class="external-link">syms</a></span><span class="op">(</span><span class="va">cols</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>      <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">.</span>, <span class="va">ID</span>, .keep_all <span class="op">=</span> <span class="cn">T</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">ID</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">intersect_id</span><span class="op">)</span></span>
 <span>  <span class="op">}</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span></span>
@@ -678,11 +588,8 @@ curve) than DEP2 pipelines.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>panel.grid <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="05_Benchmark_on_spike_in_data_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
-<p>All four pipelines have high AUCs close to 1, indicating their
-ability to efficiently distinguish regulated proteins from the unchanged
-background.</p>
-<p>DDA-Protein-DEP2 0.982, DDA-Peptide-DEP2 0.988, DDA-Protein-Perseus
-0.99, DIA-DEP2 0.998.</p>
+<p>All four pipelines have high AUCs close to 1, indicating their ability to efficiently distinguish regulated proteins from the unchanged background.</p>
+<p>DDA-Protein-DEP2 0.984, DDA-Peptide-DEP2 0.988, DDA-Protein-Perseus 0.99, DIA-DEP2 0.998.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">roc_df</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">qval</span>, y<span class="op">=</span><span class="fl">1</span><span class="op">-</span><span class="va">specificities</span>, color<span class="op">=</span><span class="va">method</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span></span>
@@ -696,27 +603,10 @@ background.</p>
 <div class="section level4">
 <h4 id="intersect-cutoff">Intersect cutoff<a class="anchor" aria-label="anchor" href="#intersect-cutoff"></a>
 </h4>
-<p>In practice, p-value is not the sufficient condition for determining
-significance. Researchers often take both fold change and p-value into
-consideration, and extract candidate lists based on both criteria.
-Intersection thresholds, the thresholds that simultaneously satisfy both
-p-value and fold change, are commonly used as cutoffs for identifying
-significant candidates. We compare the significant proteins obtained by
-the four methods after applying the intersect cutoff. This method is
-also one of the threshold methods used in <code>add_rejections</code>.
-In this case, we set a threshold at L2FC&gt;1.2 and p&lt;0.01 for
-upregulated E. coli proteins, while for downregulated yeast proteins, we
-choose a threshold of L2FC&lt;-0.6 and p&lt;0.05, considering a smaller
-inter-group difference.</p>
-<p>The DIA pipeline demonstrates superior performance, obtaining the
-highest number of true positive results and well controlling the false
-positive rate. Among the DDA pipelines, Protein-DEP2 effectively
-controls false positives, while Perseus detects more downregulated yeast
-proteins but also includes more false positives. The DDA-Peptide-DEP2
-pipeline performs between the previous two pipelines.</p>
+<p>In practice, p-value is not the sufficient condition for determining significance. Researchers often take both fold change and p-value into consideration, and extract candidate lists based on both criteria. Intersection thresholds, the thresholds that simultaneously satisfy both p-value and fold change, are commonly used as cutoffs for identifying significant candidates. We compare the significant proteins obtained by the four methods after applying the intersect cutoff. This method is also one of the threshold methods used in <code>add_rejections</code>. In this case, we set a threshold at L2FC&gt;1.2 and p&lt;0.01 for upregulated E. coli proteins, while for downregulated yeast proteins, we choose a threshold of L2FC&lt;-0.6 and p&lt;0.05, considering a smaller inter-group difference.</p>
+<p>The DIA pipeline demonstrates superior performance, obtaining the highest number of true positive results and well controlling the false positive rate. Among the DDA pipelines, Protein-DEP2 effectively controls false positives, while Perseus detects more downregulated yeast proteins but also includes more false positives. The DDA-Peptide-DEP2 pipeline performs between the previous two pipelines.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">res_table</span><span class="op">$</span><span class="va">trend</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">res_table</span>, <span class="fl">1</span>, </span>
+<code class="sourceCode R"><span><span class="va">res_table</span><span class="op">$</span><span class="va">trend</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">res_table</span>, <span class="fl">1</span>, </span>
 <span>      <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">{</span></span>
 <span>        <span class="kw">if</span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="st">"qval"</span><span class="op">]</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0.05</span><span class="op">)</span></span>
 <span>          <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="st">"Not sig"</span><span class="op">)</span></span>
@@ -768,141 +658,126 @@ pipeline performs between the previous two pipelines.</p>
 <div class="section level2">
 <h2 id="discussion">Discussion<a class="anchor" aria-label="anchor" href="#discussion"></a>
 </h2>
-<p>We compare DEP2 pipelines with Perseus analyses using a benchmark
-dataset. In this dataset, DEP2’s new imputation algorithm can
-appropriately estimate missing values, outperforming the left-shift
-methods in Perseus. In the statistical testing part, the DIA-DEP2
-pipeline demonstrates the best performance, highlighting the necessity
-and availability of DEP2 for compatibility with various data. Perseus
-performs better than DDA-DEP2 pipelines in terms of sensitivity but has
-lower specificity. However, it’s noteworthy that we set the S0 parameter
-in Perseus to 0.5, which incorporates FC into the consideration of FDR
-control. If S0 remains at the default value of 0, Perseus employs the
-conventional t-test and will yield noticeably worse q values.</p>
-<p>The newly introduced peptide-aggregation method performs similarly to
-the traditional proteingroups based method, but there is more obvious FC
-shrink and more outliers among low-abundance proteins, indicating that
-there is still space for improvement.</p>
-<p>The analysis based on benchmark data demonstrates the feasibility of
-the DEP2 protein data analysis workflow. However, in actual research,
-the characteristics of proteomic data may differ. For example, the scale
-and specific extent of changes in regulatory proteins in AP-MS can vary
-significantly. DEP2 offers flexible imputation functions and
-incorporates multiple FDR correction methods. The choice of methods
-should depend on the the experimental design, objectives, and specific
-data characteristics.</p>
+<p>We compare DEP2 pipelines with Perseus analyses using a benchmark dataset. In this dataset, DEP2’s new imputation algorithm can appropriately estimate missing values, outperforming the left-shift methods in Perseus. In the statistical testing part, the DIA-DEP2 pipeline demonstrates the best performance, highlighting the necessity and availability of DEP2 for compatibility with various data. Perseus performs better than DDA-DEP2 pipelines in terms of sensitivity but has lower specificity. However, it’s noteworthy that we set the S0 parameter in Perseus to 0.5, which incorporates FC into the consideration of FDR control. If S0 remains at the default value of 0, Perseus employs the conventional t-test and will yield noticeably worse q values.</p>
+<p>The newly introduced peptide-aggregation method performs similarly to the traditional proteingroups based method, but there is more obvious FC shrink and more outliers among low-abundance proteins, indicating that there is still space for improvement.</p>
+<p>The analysis based on benchmark data demonstrates the feasibility of the DEP2 protein data analysis workflow. However, in actual research, the characteristics of proteomic data may differ. For example, the scale and specific extent of changes in regulatory proteins in AP-MS can vary significantly. DEP2 offers flexible imputation functions and incorporates multiple FDR correction methods. The choice of methods should depend on the the experimental design, objectives, and specific data characteristics.</p>
 <!--
 # Generate protein info
 
 -->
-</div>
-<div class="section level2">
-<h2 id="session-information">Session information<a class="anchor" aria-label="anchor" href="#session-information"></a>
-</h2>
-<pre><code><span><span class="co">#&gt; R version 4.2.1 (2022-06-23 ucrt)</span></span>
-<span><span class="co">#&gt; Platform: x86_64-w64-mingw32/x64 (64-bit)</span></span>
-<span><span class="co">#&gt; Running under: Windows 10 x64 (build 19043)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Matrix products: default</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; locale:</span></span>
-<span><span class="co">#&gt; [1] LC_COLLATE=English_United States.utf8 </span></span>
-<span><span class="co">#&gt; [2] LC_CTYPE=English_United States.utf8   </span></span>
-<span><span class="co">#&gt; [3] LC_MONETARY=English_United States.utf8</span></span>
-<span><span class="co">#&gt; [4] LC_NUMERIC=C                          </span></span>
-<span><span class="co">#&gt; [5] LC_TIME=English_United States.utf8    </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; attached base packages:</span></span>
-<span><span class="co">#&gt; [1] stats4    stats     graphics  grDevices utils     datasets  methods  </span></span>
-<span><span class="co">#&gt; [8] base     </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt;  [1] pROC_1.18.2                 ggsignif_0.6.4             </span></span>
-<span><span class="co">#&gt;  [3] ggplot2_3.4.1               patchwork_1.1.2            </span></span>
-<span><span class="co">#&gt;  [5] ggVennDiagram_1.2.2         dplyr_1.1.0                </span></span>
-<span><span class="co">#&gt;  [7] magrittr_2.0.3              DEP2_0.3.06.13             </span></span>
-<span><span class="co">#&gt;  [9] R6_2.5.1                    limma_3.54.1               </span></span>
-<span><span class="co">#&gt; [11] MSnbase_2.24.2              ProtGenerics_1.30.0        </span></span>
-<span><span class="co">#&gt; [13] mzR_2.32.0                  Rcpp_1.0.10                </span></span>
-<span><span class="co">#&gt; [15] MsCoreUtils_1.10.0          SummarizedExperiment_1.28.0</span></span>
-<span><span class="co">#&gt; [17] Biobase_2.58.0              GenomicRanges_1.50.2       </span></span>
-<span><span class="co">#&gt; [19] GenomeInfoDb_1.34.9         IRanges_2.32.0             </span></span>
-<span><span class="co">#&gt; [21] S4Vectors_0.36.1            BiocGenerics_0.44.0        </span></span>
-<span><span class="co">#&gt; [23] MatrixGenerics_1.10.0       matrixStats_0.63.0         </span></span>
-<span><span class="co">#&gt; [25] BiocStyle_2.26.0           </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;   [1] circlize_0.4.15             BiocBaseUtils_1.0.0        </span></span>
-<span><span class="co">#&gt;   [3] systemfonts_1.0.4           plyr_1.8.8                 </span></span>
-<span><span class="co">#&gt;   [5] igraph_1.4.0                lazyeval_0.2.2             </span></span>
-<span><span class="co">#&gt;   [7] splines_4.2.1               BiocParallel_1.32.5        </span></span>
-<span><span class="co">#&gt;   [9] TCseq_1.22.6                digest_0.6.31              </span></span>
-<span><span class="co">#&gt;  [11] foreach_1.5.2               htmltools_0.5.4            </span></span>
-<span><span class="co">#&gt;  [13] fansi_1.0.4                 memoise_2.0.1              </span></span>
-<span><span class="co">#&gt;  [15] cluster_2.1.4               doParallel_1.0.17          </span></span>
-<span><span class="co">#&gt;  [17] ComplexHeatmap_2.14.0       Biostrings_2.66.0          </span></span>
-<span><span class="co">#&gt;  [19] annotate_1.76.0             askpass_1.1                </span></span>
-<span><span class="co">#&gt;  [21] pkgdown_2.0.7               RVenn_1.1.0                </span></span>
-<span><span class="co">#&gt;  [23] colorspace_2.1-0            blob_1.2.3                 </span></span>
-<span><span class="co">#&gt;  [25] textshaping_0.3.6           xfun_0.39                  </span></span>
-<span><span class="co">#&gt;  [27] crayon_1.5.2                RCurl_1.98-1.10            </span></span>
-<span><span class="co">#&gt;  [29] jsonlite_1.8.4              missForest_1.5             </span></span>
-<span><span class="co">#&gt;  [31] impute_1.72.3               survival_3.5-3             </span></span>
-<span><span class="co">#&gt;  [33] iterators_1.0.14            glue_1.6.2                 </span></span>
-<span><span class="co">#&gt;  [35] gtable_0.3.1                zlibbioc_1.44.0            </span></span>
-<span><span class="co">#&gt;  [37] XVector_0.38.0              GetoptLong_1.0.5           </span></span>
-<span><span class="co">#&gt;  [39] DelayedArray_0.23.2         shape_1.4.6                </span></span>
-<span><span class="co">#&gt;  [41] scales_1.2.1                vsn_3.66.0                 </span></span>
-<span><span class="co">#&gt;  [43] rngtools_1.5.2              DBI_1.1.3                  </span></span>
-<span><span class="co">#&gt;  [45] edgeR_3.40.2                xtable_1.8-4               </span></span>
-<span><span class="co">#&gt;  [47] units_0.8-1                 clue_0.3-64                </span></span>
-<span><span class="co">#&gt;  [49] reticulate_1.28             bit_4.0.5                  </span></span>
-<span><span class="co">#&gt;  [51] proxy_0.4-27                preprocessCore_1.60.2      </span></span>
-<span><span class="co">#&gt;  [53] umap_0.2.10.0               glmnet_4.1-6               </span></span>
-<span><span class="co">#&gt;  [55] httr_1.4.4                  RColorBrewer_1.1-3         </span></span>
-<span><span class="co">#&gt;  [57] farver_2.1.1                pkgconfig_2.0.3            </span></span>
-<span><span class="co">#&gt;  [59] XML_3.99-0.13               sass_0.4.5                 </span></span>
-<span><span class="co">#&gt;  [61] locfit_1.5-9.7              utf8_1.2.3                 </span></span>
-<span><span class="co">#&gt;  [63] labeling_0.4.2              tidyselect_1.2.0           </span></span>
-<span><span class="co">#&gt;  [65] rlang_1.0.6                 reshape2_1.4.4             </span></span>
-<span><span class="co">#&gt;  [67] AnnotationDbi_1.60.0        munsell_0.5.0              </span></span>
-<span><span class="co">#&gt;  [69] tools_4.2.1                 cachem_1.0.6               </span></span>
-<span><span class="co">#&gt;  [71] cli_3.6.0                   generics_0.1.3             </span></span>
-<span><span class="co">#&gt;  [73] RSQLite_2.3.0               QFeatures_1.8.0            </span></span>
-<span><span class="co">#&gt;  [75] fdrtool_1.2.17              evaluate_0.20              </span></span>
-<span><span class="co">#&gt;  [77] stringr_1.5.0               fastmap_1.1.0              </span></span>
-<span><span class="co">#&gt;  [79] mzID_1.36.0                 yaml_2.3.7                 </span></span>
-<span><span class="co">#&gt;  [81] ragg_1.2.5                  knitr_1.42                 </span></span>
-<span><span class="co">#&gt;  [83] bit64_4.0.5                 fs_1.6.1                   </span></span>
-<span><span class="co">#&gt;  [85] purrr_1.0.1                 randomForest_4.7-1.1       </span></span>
-<span><span class="co">#&gt;  [87] KEGGREST_1.38.0             AnnotationFilter_1.22.0    </span></span>
-<span><span class="co">#&gt;  [89] ncdf4_1.21                  nlme_3.1-162               </span></span>
-<span><span class="co">#&gt;  [91] doRNG_1.8.6                 compiler_4.2.1             </span></span>
-<span><span class="co">#&gt;  [93] rstudioapi_0.14             png_0.1-8                  </span></span>
-<span><span class="co">#&gt;  [95] e1071_1.7-13                affyio_1.68.0              </span></span>
-<span><span class="co">#&gt;  [97] tibble_3.1.8                geneplotter_1.76.0         </span></span>
-<span><span class="co">#&gt;  [99] bslib_0.4.2                 stringi_1.7.12             </span></span>
-<span><span class="co">#&gt; [101] highr_0.10                  RSpectra_0.16-1            </span></span>
-<span><span class="co">#&gt; [103] desc_1.4.2                  lattice_0.20-45            </span></span>
-<span><span class="co">#&gt; [105] Matrix_1.5-3                classInt_0.4-8             </span></span>
-<span><span class="co">#&gt; [107] vctrs_0.5.2                 pillar_1.8.1               </span></span>
-<span><span class="co">#&gt; [109] lifecycle_1.0.3             BiocManager_1.30.19        </span></span>
-<span><span class="co">#&gt; [111] jquerylib_0.1.4             MALDIquant_1.22            </span></span>
-<span><span class="co">#&gt; [113] GlobalOptions_0.1.2         data.table_1.14.8          </span></span>
-<span><span class="co">#&gt; [115] bitops_1.0-7                qvalue_2.30.0              </span></span>
-<span><span class="co">#&gt; [117] pcaMethods_1.90.0           affy_1.76.0                </span></span>
-<span><span class="co">#&gt; [119] bookdown_0.34               KernSmooth_2.23-20         </span></span>
-<span><span class="co">#&gt; [121] codetools_0.2-19            MASS_7.3-58.2              </span></span>
-<span><span class="co">#&gt; [123] assertthat_0.2.1            openssl_2.0.5              </span></span>
-<span><span class="co">#&gt; [125] DESeq2_1.38.3               rprojroot_2.0.3            </span></span>
-<span><span class="co">#&gt; [127] rjson_0.2.21                withr_2.5.0                </span></span>
-<span><span class="co">#&gt; [129] GenomicAlignments_1.34.0    Rsamtools_2.14.0           </span></span>
-<span><span class="co">#&gt; [131] GenomeInfoDbData_1.2.9      mgcv_1.8-41                </span></span>
-<span><span class="co">#&gt; [133] parallel_4.2.1              MultiAssayExperiment_1.24.0</span></span>
-<span><span class="co">#&gt; [135] grid_4.2.1                  tidyr_1.3.0                </span></span>
-<span><span class="co">#&gt; [137] class_7.3-21                rmarkdown_2.20             </span></span>
-<span><span class="co">#&gt; [139] Rtsne_0.16                  sf_1.0-9                   </span></span>
-<span><span class="co">#&gt; [141] itertools_0.1-3</span></span></code></pre>
+<!--
+# Session information
+
+
+```
+#> R version 4.3.1 (2023-06-16)
+#> Platform: x86_64-pc-linux-gnu (64-bit)
+#> Running under: Ubuntu 18.04.5 LTS
+#> 
+#> Matrix products: default
+#> BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.7.1 
+#> LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.7.1
+#> 
+#> locale:
+#>  [1] LC_CTYPE=zh_CN.UTF-8       LC_NUMERIC=C              
+#>  [3] LC_TIME=zh_CN.UTF-8        LC_COLLATE=zh_CN.UTF-8    
+#>  [5] LC_MONETARY=zh_CN.UTF-8    LC_MESSAGES=zh_CN.UTF-8   
+#>  [7] LC_PAPER=zh_CN.UTF-8       LC_NAME=C                 
+#>  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+#> [11] LC_MEASUREMENT=zh_CN.UTF-8 LC_IDENTIFICATION=C       
+#> 
+#> time zone: Asia/Shanghai
+#> tzcode source: system (glibc)
+#> 
+#> attached base packages:
+#> [1] stats4    stats     graphics  grDevices utils     datasets  methods  
+#> [8] base     
+#> 
+#> other attached packages:
+#>  [1] pROC_1.18.4                 ggsignif_0.6.4             
+#>  [3] doRNG_1.8.6                 rngtools_1.5.2             
+#>  [5] foreach_1.5.2               randomForest_4.7-1.1       
+#>  [7] ggplot2_3.4.2               patchwork_1.1.2            
+#>  [9] ggVennDiagram_1.2.2         dplyr_1.1.2                
+#> [11] magrittr_2.0.3              DEP2_0.3.7.3               
+#> [13] R6_2.5.1                    limma_3.56.2               
+#> [15] MSnbase_2.26.0              ProtGenerics_1.32.0        
+#> [17] mzR_2.34.1                  Rcpp_1.0.11                
+#> [19] MsCoreUtils_1.12.0          SummarizedExperiment_1.30.2
+#> [21] Biobase_2.60.0              GenomicRanges_1.52.0       
+#> [23] GenomeInfoDb_1.36.1         IRanges_2.34.1             
+#> [25] S4Vectors_0.38.1            BiocGenerics_0.46.0        
+#> [27] MatrixGenerics_1.12.2       matrixStats_1.0.0          
+#> [29] BiocStyle_2.28.0           
+#> 
+#> loaded via a namespace (and not attached):
+#>   [1] RColorBrewer_1.1-3          rstudioapi_0.15.0          
+#>   [3] jsonlite_1.8.7              shape_1.4.6                
+#>   [5] umap_0.2.10.0               MultiAssayExperiment_1.26.0
+#>   [7] farver_2.1.1                MALDIquant_1.22.1          
+#>   [9] rmarkdown_2.23              GlobalOptions_0.1.2        
+#>  [11] fs_1.6.2                    zlibbioc_1.46.0            
+#>  [13] ragg_1.2.5                  vctrs_0.6.3                
+#>  [15] memoise_2.0.1               Rsamtools_2.16.0           
+#>  [17] RCurl_1.98-1.12             askpass_1.1                
+#>  [19] BiocBaseUtils_1.2.0         itertools_0.1-3            
+#>  [21] htmltools_0.5.5             S4Arrays_1.0.4             
+#>  [23] missForest_1.5              mzID_1.38.0                
+#>  [25] sass_0.4.6                  KernSmooth_2.23-21         
+#>  [27] bslib_0.5.0                 desc_1.4.2                 
+#>  [29] plyr_1.8.8                  impute_1.74.1              
+#>  [31] cachem_1.0.8                GenomicAlignments_1.36.0   
+#>  [33] igraph_1.5.0                lifecycle_1.0.3            
+#>  [35] iterators_1.0.14            pkgconfig_2.0.3            
+#>  [37] Matrix_1.5-4.1              fastmap_1.1.1              
+#>  [39] GenomeInfoDbData_1.2.10     clue_0.3-64                
+#>  [41] digest_0.6.33               fdrtool_1.2.17             
+#>  [43] pcaMethods_1.92.0           colorspace_2.1-0           
+#>  [45] DESeq2_1.40.2               rprojroot_2.0.3            
+#>  [47] RSpectra_0.16-1             textshaping_0.3.6          
+#>  [49] labeling_0.4.2              fansi_1.0.4                
+#>  [51] mgcv_1.8-42                 compiler_4.3.1             
+#>  [53] proxy_0.4-27                withr_2.5.0                
+#>  [55] doParallel_1.0.17           downloader_0.4             
+#>  [57] BiocParallel_1.34.2         DBI_1.1.3                  
+#>  [59] highr_0.10                  MASS_7.3-60                
+#>  [61] openssl_2.0.6               DelayedArray_0.26.6        
+#>  [63] classInt_0.4-9              rjson_0.2.21               
+#>  [65] units_0.8-2                 tools_4.3.1                
+#>  [67] glue_1.6.2                  nlme_3.1-162               
+#>  [69] QFeatures_1.10.0            sf_1.0-14                  
+#>  [71] grid_4.3.1                  Rtsne_0.16                 
+#>  [73] cluster_2.1.4               reshape2_1.4.4             
+#>  [75] generics_0.1.3              gtable_0.3.3               
+#>  [77] class_7.3-22                preprocessCore_1.62.1      
+#>  [79] tidyr_1.3.0                 data.table_1.14.8          
+#>  [81] utf8_1.2.3                  XVector_0.40.0             
+#>  [83] pillar_1.9.0                stringr_1.5.0              
+#>  [85] circlize_0.4.15             splines_4.3.1              
+#>  [87] lattice_0.21-8              survival_3.5-5             
+#>  [89] tidyselect_1.2.0            ComplexHeatmap_2.16.0      
+#>  [91] locfit_1.5-9.8              Biostrings_2.68.1          
+#>  [93] knitr_1.43                  bookdown_0.34              
+#>  [95] edgeR_3.42.4                xfun_0.39                  
+#>  [97] stringi_1.7.12              lazyeval_0.2.2             
+#>  [99] yaml_2.3.7                  evaluate_0.21              
+#> [101] codetools_0.2-19            qvalue_2.32.0              
+#> [103] tibble_3.2.1                RVenn_1.1.0                
+#> [105] BiocManager_1.30.21         cli_3.6.1                  
+#> [107] affyio_1.70.0               reticulate_1.30            
+#> [109] systemfonts_1.0.4           munsell_0.5.0              
+#> [111] jquerylib_0.1.4             TCseq_1.23.0               
+#> [113] png_0.1-8                   XML_3.99-0.14              
+#> [115] parallel_4.3.1              pkgdown_2.0.7              
+#> [117] assertthat_0.2.1            AnnotationFilter_1.24.0    
+#> [119] bitops_1.0-7                glmnet_4.1-7               
+#> [121] scales_1.2.1                affy_1.78.1                
+#> [123] e1071_1.7-13                ncdf4_1.21                 
+#> [125] purrr_1.0.1                 crayon_1.5.2               
+#> [127] GetoptLong_1.0.5            rlang_1.1.1                
+#> [129] vsn_3.68.0
+```
+-->
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

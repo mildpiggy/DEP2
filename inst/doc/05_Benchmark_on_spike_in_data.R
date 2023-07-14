@@ -420,7 +420,6 @@ ggplot(roc_df) +
   theme(panel.grid = element_blank())
 
 ## ----message=FALSE,warning=FALSE----------------------------------------------
-
 res_table$trend = apply(res_table, 1, 
       function(x){
         if( as.numeric(x["qval"]) > 0.05)

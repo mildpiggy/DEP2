@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">DEP2</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.06.13</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.7.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,19 +57,70 @@
 
       <dl><dt>
           
+          <code><a href="DEGdata-class.html">DEGdata-class</a></code> 
+        </dt>
+        <dd>Class "DEGdata"
+This class store the test result from DESeq2</dd>
+      </dl><dl><dt>
+          
+          <code><a href="DEP2_add_rejections.html">add_rejections(<i>&lt;SummarizedExperiment&gt;</i>)</a></code> <code><a href="DEP2_add_rejections.html">add_rejections(<i>&lt;DEGdata&gt;</i>)</a></code> 
+        </dt>
+        <dd>Mark significant proteins</dd>
+      </dl><dl><dt>
+          
+          <code><a href="GS_imp_wrapper.html">GS_imp_wrapper()</a></code> 
+        </dt>
+        <dd>pre_processing_GS_wrapper</dd>
+      </dl><dl><dt>
+          
+          <code><a href="ID_transform.html">ID_transform()</a></code> 
+        </dt>
+        <dd>ID transform SE or DEGdata</dd>
+      </dl><dl><dt>
+          
+          <code><a href="NAiszero.html">NAiszero()</a></code> 
+        </dt>
+        <dd>Transform NA to 0 in assay of a SummarizedExperiment</dd>
+      </dl><dl><dt>
+          
+          <code><a href="Order_cols.html">Order_cols()</a></code> 
+        </dt>
+        <dd>Set order of experiment design for SummarizedExperiment</dd>
+      </dl><dl><dt>
+          
+          <code><a href="PPInetwork.html">PPInetwork()</a></code> 
+        </dt>
+        <dd>Draw a network on PPI result</dd>
+      </dl><dl><dt>
+          
+          <code><a href="Silicosis_ExpDesign.html">Silicosis_ExpDesign</a></code> 
+        </dt>
+        <dd>Silicosis_ExpDesign - experiment design of silicosis mouse proteome</dd>
+      </dl><dl><dt>
+          
+          <code><a href="Silicosis_peptide.html">Silicosis_peptide</a></code> 
+        </dt>
+        <dd>Silicosis_peptide - peptide quantity data of a silicosis mouse model</dd>
+      </dl><dl><dt>
+          
+          <code><a href="Silicosis_pg.html">Silicosis_pg</a></code> 
+        </dt>
+        <dd>Silicosis_pg - proteinGroups data of a silicosis mouse model</dd>
+      </dl><dl><dt>
+          
+          <code><a href="Silicosis_phos.html">Silicosis_phos</a></code> 
+        </dt>
+        <dd>Silicosis_phos - phosphoproteome result of a silicosis mouse model</dd>
+      </dl><dl><dt>
+          
           <code><a href="aggregate_pe.html">aggregate_pe()</a></code> 
         </dt>
         <dd>Summarize peptide quantity to protein quantity</dd>
       </dl><dl><dt>
           
-          <code><a href="check_enrichment_depends.html">check_enrichment_depends()</a></code> 
+          <code><a href="annoSpecies_df.html">annoSpecies_df()</a></code> 
         </dt>
-        <dd>Check required packages for enrichment analysis.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="check_organismDB_depends.html">check_organismDB_depends()</a></code> 
-        </dt>
-        <dd>Check organism annotation package</dd>
+        <dd>Species information table</dd>
       </dl><dl><dt>
           
           <code><a href="check_PPI_depends.html">check_PPI_depends()</a></code> 
@@ -82,6 +133,16 @@
         <dd>Check required packages for DESeq2.</dd>
       </dl><dl><dt>
           
+          <code><a href="check_enrichment_depends.html">check_enrichment_depends()</a></code> 
+        </dt>
+        <dd>Check required packages for enrichment analysis.</dd>
+      </dl><dl><dt>
+          
+          <code><a href="check_organismDB_depends.html">check_organismDB_depends()</a></code> 
+        </dt>
+        <dd>Check organism annotation package</dd>
+      </dl><dl><dt>
+          
           <code><a href="clean_character.html">clean_character()</a></code> 
         </dt>
         <dd>Clean characters in expression columns</dd>
@@ -92,15 +153,9 @@
         <dd>correct_PTM_by_Protein</dd>
       </dl><dl><dt>
           
-          <code><a href="DEGdata-class.html">DEGdata-class</a></code> 
+          <code><a href="downloadAbsentFile.html">downloadAbsentFile()</a></code> 
         </dt>
-        <dd>Class "DEGdata"
-This class store the test result from DESeq2</dd>
-      </dl><dl><dt>
-          
-          <code><a href="DEP2_add_rejections.html">add_rejections(<i>&lt;SummarizedExperiment&gt;</i>)</a></code> <code><a href="DEP2_add_rejections.html">add_rejections(<i>&lt;DEGdata&gt;</i>)</a></code> 
-        </dt>
-        <dd>Mark significant proteins</dd>
+        <dd>Title</dd>
       </dl><dl><dt>
           
           <code><a href="filter_pe.html">filter_pe()</a></code> 
@@ -111,6 +166,11 @@ This class store the test result from DESeq2</dd>
           <code><a href="filter_se.html">filter_se()</a></code> 
         </dt>
         <dd>Filter SummarizedExperiment on missing values or formula</dd>
+      </dl><dl><dt>
+          
+          <code><a href="get_ORA_result.html">get_ORA_result()</a></code> 
+        </dt>
+        <dd>Extract significant enrichment terms base on giving threshold</dd>
       </dl><dl><dt>
           
           <code><a href="get_contrast.html">get_contrast()</a></code> 
@@ -131,11 +191,6 @@ This class store the test result from DESeq2</dd>
           <code><a href="get_exdesign_parse.html">get_exdesign_parse()</a></code> 
         </dt>
         <dd>Construct experiment design basic on colnames parse</dd>
-      </dl><dl><dt>
-          
-          <code><a href="get_ORA_result.html">get_ORA_result()</a></code> 
-        </dt>
-        <dd>Extract significant enrichment terms base on giving threshold</dd>
       </dl><dl><dt>
           
           <code><a href="get_prefix.html">get_prefix()</a></code> 
@@ -161,16 +216,6 @@ This class store the test result from DESeq2</dd>
           <code><a href="get_tc_cluster.html">get_tc_cluster()</a></code> 
         </dt>
         <dd>Time-course clustering</dd>
-      </dl><dl><dt>
-          
-          <code><a href="GS_imp_wrapper.html">GS_imp_wrapper()</a></code> 
-        </dt>
-        <dd>pre_processing_GS_wrapper</dd>
-      </dl><dl><dt>
-          
-          <code><a href="ID_transform.html">ID_transform()</a></code> 
-        </dt>
-        <dd>ID transform SE or DEGdata</dd>
       </dl><dl><dt>
           
           <code><a href="impute.html">impute()</a></code> 
@@ -240,11 +285,6 @@ conversion using parsing from column names</dd>
         <dd>Plot row standard deviations versus row means</dd>
       </dl><dl><dt>
           
-          <code><a href="NAiszero.html">NAiszero()</a></code> 
-        </dt>
-        <dd>Transform NA to 0 in assay of a SummarizedExperiment</dd>
-      </dl><dl><dt>
-          
           <code><a href="normalize_pe.html">normalize_pe()</a></code> 
         </dt>
         <dd>Normalize a QFeatures object</dd>
@@ -260,14 +300,14 @@ conversion using parsing from column names</dd>
         <dd>Assign normalized assay for DEGdata object</dd>
       </dl><dl><dt>
           
-          <code><a href="Order_cols.html">Order_cols()</a></code> 
-        </dt>
-        <dd>Set order of experiment design for SummarizedExperiment</dd>
-      </dl><dl><dt>
-          
           <code><a href="pe2se.html">pe2se()</a></code> 
         </dt>
         <dd>Extract the proteins SummarizedExperiment object from a QFeatures container</dd>
+      </dl><dl><dt>
+          
+          <code><a href="plot_Tsne.html">plot_Tsne()</a></code> 
+        </dt>
+        <dd>Plot t-Sne</dd>
       </dl><dl><dt>
           
           <code><a href="plot_cond.html">plot_cond()</a></code> 
@@ -331,14 +371,14 @@ and the overlap in proteins between conditions</dd>
         <dd>Visualize imputation</dd>
       </dl><dl><dt>
           
-          <code><a href="plot_ma_pro.html">plot_ma_pro()</a></code> 
-        </dt>
-        <dd>MA-plot of quantity data</dd>
-      </dl><dl><dt>
-          
           <code><a href="plot_ma_RNA.html">plot_ma_RNA()</a></code> 
         </dt>
         <dd>MA-plot of RNA expression data</dd>
+      </dl><dl><dt>
+          
+          <code><a href="plot_ma_pro.html">plot_ma_pro()</a></code> 
+        </dt>
+        <dd>MA-plot of quantity data</dd>
       </dl><dl><dt>
           
           <code><a href="plot_missval.html">plot_missval()</a></code> 
@@ -356,14 +396,14 @@ and the overlap in proteins between conditions</dd>
         <dd>Plot venn plot of specified genes/proteins across multiple omics results</dd>
       </dl><dl><dt>
           
-          <code><a href="plot_normalization.html">plot_normalization()</a></code> 
-        </dt>
-        <dd>Visualize normalization</dd>
-      </dl><dl><dt>
-          
           <code><a href="plot_norm_distribution.html">plot_norm_distribution()</a></code> 
         </dt>
         <dd>Plot the fit normal for log2 fold change</dd>
+      </dl><dl><dt>
+          
+          <code><a href="plot_normalization.html">plot_normalization()</a></code> 
+        </dt>
+        <dd>Visualize normalization</dd>
       </dl><dl><dt>
           
           <code><a href="plot_numbers.html">plot_numbers()</a></code> 
@@ -386,11 +426,6 @@ and the overlap in proteins between conditions</dd>
         <dd>Plot the distribution of statistic valuse. develop from statistics_plot</dd>
       </dl><dl><dt>
           
-          <code><a href="plot_Tsne.html">plot_Tsne()</a></code> 
-        </dt>
-        <dd>Plot t-Sne</dd>
-      </dl><dl><dt>
-          
           <code><a href="plot_umap.html">plot_umap()</a></code> 
         </dt>
         <dd>Plot Tsne</dd>
@@ -399,11 +434,6 @@ and the overlap in proteins between conditions</dd>
           <code><a href="plot_volcano.html">plot_volcano()</a></code> 
         </dt>
         <dd>Volcano plot</dd>
-      </dl><dl><dt>
-          
-          <code><a href="PPInetwork.html">PPInetwork()</a></code> 
-        </dt>
-        <dd>Draw a network on PPI result</dd>
       </dl><dl><dt>
           
           <code><a href="reshape_long2wide.html">reshape_long2wide()</a></code> 
@@ -421,36 +451,6 @@ and the overlap in proteins between conditions</dd>
         <dd>Run shiny application in DEP2</dd>
       </dl><dl><dt>
           
-          <code><a href="Silicosis_ExpDesign.html">Silicosis_ExpDesign</a></code> 
-        </dt>
-        <dd>Silicosis_ExpDesign - experiment design of silicosis mouse proteome</dd>
-      </dl><dl><dt>
-          
-          <code><a href="Silicosis_peptide.html">Silicosis_peptide</a></code> 
-        </dt>
-        <dd>Silicosis_peptide - peptide quantity data of a silicosis mouse model</dd>
-      </dl><dl><dt>
-          
-          <code><a href="Silicosis_pg.html">Silicosis_pg</a></code> 
-        </dt>
-        <dd>Silicosis_pg - proteinGroups data of a silicosis mouse model</dd>
-      </dl><dl><dt>
-          
-          <code><a href="Silicosis_phos.html">Silicosis_phos</a></code> 
-        </dt>
-        <dd>Silicosis_phos - phosphoproteome result of a silicosis mouse model</dd>
-      </dl><dl><dt>
-          
-          <code><a href="test_diff.html">test_diff()</a></code> 
-        </dt>
-        <dd>Differential enrichment/expression test</dd>
-      </dl><dl><dt>
-          
-          <code><a href="test_diff_deg.html">test_diff_deg()</a></code> 
-        </dt>
-        <dd>Differential expression test on a DESeqDataSet</dd>
-      </dl><dl><dt>
-          
           <code><a href="test_GSEA.html">test_GSEA()</a></code> 
         </dt>
         <dd>GSEA data</dd>
@@ -464,6 +464,16 @@ and the overlap in proteins between conditions</dd>
           <code><a href="test_PPI.html">test_PPI()</a></code> 
         </dt>
         <dd>Protein-protein interaction analysis</dd>
+      </dl><dl><dt>
+          
+          <code><a href="test_diff.html">test_diff()</a></code> 
+        </dt>
+        <dd>Differential enrichment/expression test</dd>
+      </dl><dl><dt>
+          
+          <code><a href="test_diff_deg.html">test_diff_deg()</a></code> 
+        </dt>
+        <dd>Differential expression test on a DESeqDataSet</dd>
       </dl><dl><dt>
           
           <code><a href="theme_DEP1.html">theme_DEP1()</a></code> 

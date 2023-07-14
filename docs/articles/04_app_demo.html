@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">DEP2</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.06.13</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.7.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,8 +73,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>DEP2 Application Guide</h1>
-                        <h4 data-toc-skip class="author">Zhenhuan
-Feng</h4>
+                        <h4 data-toc-skip class="author">Zhenhuan Feng</h4>
                         
       
       
@@ -86,14 +85,8 @@ Feng</h4>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>DEP2 features a user-friendly shiny application designed for
-researchers without programming experience. The application provides a
-easy-used GUI for conducting various analysss in DEP2. In this section,
-we will briefly introduce the app operation. Example tables can be found
-in this <a href="https://github.com/mildpiggy/OmicsExample?_blank" class="external-link">repository</a>.</p>
-<div class="figure">
-<img src="figs/APP_snapshoot.png" title="APP snap" alt=""><p class="caption">Snapshots of APP</p>
-</div>
+<p>DEP2 features an user-friendly shiny application designed for researchers without programming experience. The application provides an easy-used GUI for conducting various analysss in DEP2. In this section, we will briefly introduce the app operation. Example tables can be found in this <a href="https://github.com/mildpiggy/OmicsExample?_blank" class="external-link">repository</a>.</p>
+<p><img src="figs/APP_snapshoot.png" title="APP snap" alt="Snapshots of APP"><br><br></p>
 </div>
 <div class="section level2">
 <h2 id="run-app">Run App<a class="anchor" aria-label="anchor" href="#run-app"></a>
@@ -101,13 +94,12 @@ in this <a href="https://github.com/mildpiggy/OmicsExample?_blank" class="extern
 <p>The application can be launched by executing a single commond.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">DEP2</span><span class="fu">::</span><span class="fu"><a href="../reference/run_app.html">run_app</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><br><br></p>
 </div>
 <div class="section level2">
 <h2 id="add-module">Add Module<a class="anchor" aria-label="anchor" href="#add-module"></a>
 </h2>
-<p>In DEP2, the shiny application follows a modular design, where
-different analysis functionalities are organized into separate modules.
-And modules can be import by click the “Add module” button.</p>
+<p>In DEP2, the shiny application follows a modular design, where different analysis functionalities are organized into separate modules. And modules can be imported by click the “Add module” button.</p>
 <p><img src="figs/APP_1.png" title="Import analysis module"></p>
 <p><img src="figs/APP2.png" title="Import analysis module"></p>
 <p>The app currently comprises following modules:</p>
@@ -116,29 +108,20 @@ And modules can be import by click the “Add module” button.</p>
 <p>Omics modules</p>
 <ul>
 <li>
-<p><strong>Quantificated proteome (based on proteingroup
-quantification)</strong></p>
-<p>This module performs differential analysis of protein-level
-quantitative data, such as intensity, LFQ.intensity or quantity
-tables.</p>
+<p><strong>Quantitative proteome (based on proteingroup quantification)</strong></p>
+<p>This module performs differential analysis of protein-level quantitative data, such as intensity, LFQ.intensity or quantity tables.</p>
 </li>
 <li>
-<p><strong>Quantificated proteome (based on peptide
-quantification)</strong></p>
-<p>This module analyzes differentially expressed proteins by aggregating
-protein quantities from peptide-level quantitative data.</p>
+<p><strong>Quantitative proteome (based on peptide quantification)</strong></p>
+<p>This module analyzes differentially expressed proteins by aggregating protein quantities from peptide-level quantitative data.</p>
 </li>
 <li>
-<p><strong>Modification-specific proteome(modified peptide
-quantification)</strong></p>
-<p>This module analyzes differentially enriched modification-specific
-peptides using peptide quantity from modification-specific
-enrichment.</p>
+<p><strong>Modification-specific proteome(modified peptide quantification)</strong></p>
+<p>This module analyzes differentially enriched modification-specific peptides using peptide quantity from modification-specific enrichment.</p>
 </li>
 <li>
 <p><strong>Transcriptome (RNA counts)</strong></p>
-<p>This module utilizes DEseq2 to perform differential analysis of
-parallel transcriptome data.</p>
+<p>This module utilizes DEseq2 to perform differential analysis of parallel transcriptome data.</p>
 </li>
 </ul>
 </li>
@@ -147,34 +130,28 @@ parallel transcriptome data.</p>
 <ul>
 <li>
 <p><strong>Over-representation analysis</strong></p>
-<p>This module performs biological functional enrichment using the
-function <code>test_ora</code>.</p>
+<p>This module performs biological functional enrichment using the function <code>test_ora</code>.</p>
 </li>
 <li>
 <p><strong>GSEA</strong></p>
-<p>This module utilizes the function <code>test_gsea</code> for
-biological functional enrichment.</p>
+<p>This module utilizes the function <code>test_gsea</code> for biological functional enrichment.</p>
 </li>
 <li>
 <p><strong>Protein-protein interaction</strong></p>
-<p>This module constructs a Protein-Protein Interaction (PPI) network
-using a local STRING database through the function test_ppi. If local
-data is not available, the app will automatically attempt to download
-relevant data from an online database.</p>
+<p>This module constructs a Protein-Protein Interaction (PPI) network using a local STRING database through the function test_ppi. If local data is not available, the app will automatically attempt to download relevant data from an online database.</p>
 </li>
 <li>
 <p><strong>Timecourse cluster</strong></p>
-<p>This module applies a soft cluster to assays comprised of multiple
-groups.</p>
+<p>This module applies a soft cluster to assays comprised of multiple groups.</p>
 </li>
 <li>
 <p><strong>Integrated analysis</strong></p>
-<p>This module allows for the comparison of results between omics
-experiments (note that PTM data is not yet supported).</p>
+<p>This module allows for the comparison of results between omics experiments (note that PTM data is not yet supported).</p>
 </li>
 </ul>
 </li>
 </ol>
+<p><br><br></p>
 </div>
 <div class="section level2">
 <h2 id="omics-analysis-module">Omics Analysis Module<a class="anchor" aria-label="anchor" href="#omics-analysis-module"></a>
@@ -184,32 +161,19 @@ experiments (note that PTM data is not yet supported).</p>
 </ol>
 <p>Three type to upload table:</p>
 <ol style="list-style-type: lower-alpha">
-<li><p>Uploading only an expression table, where the experiment design
-is generated from the expression column names. The column names must
-follow this format: (condition)_(repetition), for example, control_1,
-treat_1.</p></li>
-<li><p>Uploading both an expression table and an experiment design
-table. The experiment design table should contain three columns,
-“label”, “condition” and “replicate”. (The example file is expdesign.txt
-also can be found in the example repository)</p></li>
-<li><p>Uploading a saved logfile from a previous analysis and recovering
-the analysis options.</p></li>
+<li><p>Uploading only an expression table, where the experiment design is generated from the expression column names. The column names must follow this format: (condition)_(repetition), for example, control_1, treat_1.</p></li>
+<li><p>Uploading both an expression table and an experiment design table. The experiment design table should contain three columns, “label,” “condition” and “replicate.” (The example file is expdesign.txt also can be found in the example repository)</p></li>
+<li><p>Uploading a saved log file from a previous analysis and recovering the analysis options.</p></li>
 </ol>
-<p>The application accepts tables in <em>.txt</em> (tab separated),
-<em>.csv</em> (comma separated) or <em>.gz</em> (compressed table)
-format. Log file is in a <em>.logrds</em> format and can be used for
-future reference.</p>
+<p>The application accepts tables in <em>.txt</em> (tab separated), <em>.csv</em> (comma separated) or <em>.gz</em> (compressed table) format. The log file is in a <em>.logrds</em> format and can be used for future reference.</p>
 <p><img src="figs/APP_omics_upload.png" title="Upload table"></p>
+<p><br></p>
 <ol start="2" style="list-style-type: decimal">
 <li><strong>Set columns options</strong></li>
 </ol>
-<p>Specify the correct read-in options, including identifiers,
-expression values, and filter columns.</p>
+<p>Specify the correct read-in options, including identifiers, expression values, and filter columns.</p>
 <p><img src="figs/APP_Column_option.png" title="Column options" width="1000"></p>
-<p>The options of removing suffix and removing prefix can affect the
-assay row names, and thus effect the ‘label’ columns in the
-ExperimentalDesign. For example, in this case, we remove the prefix,
-resulting in the following labels:</p>
+<p>The options of removing suffix and removing prefix can affect the assay row names, and thus effect the ‘label’ columns in the ExperimentalDesign. For example, in this case, we remove the prefix, resulting in the following labels:</p>
 <table class="table">
 <thead><tr class="header">
 <th>Origin column name</th>
@@ -256,11 +220,8 @@ resulting in the following labels:</p>
 </tr>
 </tbody>
 </table>
-<p>Additionally, result files from other quantification software can
-also be imported using similar rules, but it is important to select the
-correct identifier and expression columns. The filter rule can be left
-blank as long as the features have already gone through quality control
-in the upstream software.</p>
+<p>Additionally, result files from other quantification software can also be imported using similar rules, but it is important to select the correct identifier and expression columns. The filter rule can be left blank as long as the features have already gone through quality control in the upstream software.</p>
+<p><br></p>
 <ol start="3" style="list-style-type: decimal">
 <li><strong>Set analysis options</strong></li>
 </ol>
@@ -268,78 +229,81 @@ in the upstream software.</p>
 <p><img src="figs/APP_test_option.png" title="test options" width="400"></p>
 <p>Other options can be adjusted in the option panels.</p>
 <p><img src="figs/APP_test_option2.png" title="test options2"></p>
-<p>Besides, the peptide-protein aggregation pipeline contains two main
-calculate steps: aggregation and differential testing. These steps
-should be performed sequentially within the module.</p>
-<p><img src="figs/APP_test_PTM_option.png" title="test options PTM"></p>
 <ol start="4" style="list-style-type: decimal">
+<li>
+<strong>peptide-protein aggregation pipeline</strong> Besides, the peptide-protein aggregation pipeline contains two main calculate steps: aggregation and differential testing. These steps should be performed sequentially within the module.</li>
+</ol>
+<p><img src="figs/APP_test_PEP_option.png" title="test options PEP"></p>
+<p><br></p>
+<ol start="5" style="list-style-type: decimal">
+<li><strong>Transcriptome analysis</strong></li>
+</ol>
+<p>The usage of the Transcriptome analysis module is similar to that of the proteome modules, but there are still some differences, such as the options for ID transformation. An illustrated example is provided below.</p>
+<p><img src="figs/APP_rna_option.png" title="download log"></p>
+<p><br></p>
+<ol start="6" style="list-style-type: decimal">
 <li><strong>Result export</strong></li>
 </ol>
 <p>Save table</p>
 <p><img src="figs/APP_downtable_option.png" title="download options"></p>
-<p>Save log file. The log file stores test options and intermediate
-results, which can be used to recover the analysis in future sessions.
-Please note that although the file types of the log files exported from
-four omics analysis modules are the same, they do have different data
-formats. Therefore, they can only be imported using the corresponding
-analysis module (for specific instructions, please refer to the previous
-section).</p>
+<p>Save log file. The log file stores test options and intermediate results, which can be used to recover the analysis in future sessions. Please note that although the file types of the log files exported from four omics analysis modules are the same, they do have different data formats. Therefore, they can only be imported using the corresponding analysis module (for specific instructions, please refer to the previous section).</p>
 <p><img src="figs/APP_downtable_log.png" title="download log"></p>
-<ol start="5" style="list-style-type: decimal">
-<li><strong>Example</strong></li>
-</ol>
+<p><br><br></p>
 </div>
 <div class="section level2">
 <h2 id="post-analysis">Post analysis<a class="anchor" aria-label="anchor" href="#post-analysis"></a>
 </h2>
-<p>It is important to note that the functional analysis modules require
-species annotation database packages in the R environment. Therefore,
-the relevant packages must be installed before conducting functional
-analysis for any organism. You can run the function
-<code>check_organismDB_depends</code> in the console to check or install
-the missing packages. Here is an example code:</p>
+<p>It is important to note that post analysis functionalities are not completed when DEP2 is installed in default. Users can complete these functionalities by executing the “check_” series of functions.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">## Parameter organism could one of "Chicken", "Human", "Mouse", "Fly", "Rat", "Yeast".</span></span>
+<code class="sourceCode R"><span><span class="co">## Check required packages for enrichment analysis</span></span>
+<span><span class="fu">DEP2</span><span class="fu">::</span><span class="fu"><a href="../reference/check_enrichment_depends.html">check_enrichment_depends</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] TRUE</span></span></code></pre>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## Check required packages for PPI</span></span>
+<span><span class="fu">DEP2</span><span class="fu">::</span><span class="fu"><a href="../reference/check_PPI_depends.html">check_PPI_depends</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] TRUE</span></span></code></pre>
+<p>As an alternative approach (but one that we do not recommend), users can also choose to proactively specify the installation of all dependent packages when installing DEP2.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## Install all depend packages at once by setting 'dependencies = TRUE'</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"mildpiggy/DEP2"</span>, dependencies <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p>Besides, functional analyses (functional enrichment or PPI) require species annotation database packages in the R environment. Therefore, the relevant packages must be installed before conducting functional analysis for any organism. You can run the function <code>check_organismDB_depends</code> in the console to check or install the missing packages, which can extend the selectable species options in the app. Here is an example code:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## Check organism annotation package of a species</span></span>
+<span><span class="co">## Parameter organism could one of "Chicken", "Human", "Mouse", "Rat", etc.</span></span>
 <span><span class="fu">DEP2</span><span class="fu">::</span><span class="fu"><a href="../reference/check_organismDB_depends.html">check_organismDB_depends</a></span><span class="op">(</span>organism <span class="op">=</span> <span class="st">"Human"</span><span class="op">)</span></span></code></pre></div>
+<p>Note: The command above should be executed in the console before running the app.</p>
+<p><br></p>
 <div class="section level3">
 <h3 id="annotation-enrichment-ora-or-gsea">Annotation Enrichment (ORA or GSEA)<a class="anchor" aria-label="anchor" href="#annotation-enrichment-ora-or-gsea"></a>
 </h3>
-<p>You can perform post-functional analyses directly on existing omics
-analysis datasets. However, it is essential to note that the app
-considers the identifiers as symbols. Therefore, selecting the gene
-symbol column as the ‘name’ in the column options is a prerequisite for
-post-analysis.</p>
+<p>You can perform post-functional analyses directly on existing omics analysis datasets. However, it is essential to note that the app considers the identifiers as symbols. Therefore, selecting the gene symbol column as the ‘name’ in the column options is a prerequisite for post-analysis.</p>
 <p><img src="figs/APP_postanalysis1.png" title="DND input"></p>
+<p><br></p>
 </div>
 <div class="section level3">
 <h3 id="protein-protein-interaction-network">Protein-protein Interaction network<a class="anchor" aria-label="anchor" href="#protein-protein-interaction-network"></a>
 </h3>
-<p>To enable the PPI modules after installing DEP2 for the first time,
-you need to run the <code>check_PPI_depends</code> function in the
-console before running the app.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<p>To enable the PPI modules after installing DEP2 for the first time, you need to run the <code>check_PPI_depends</code> function in the console before running the app.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">DEP2</span><span class="fu">::</span><span class="fu"><a href="../reference/check_PPI_depends.html">check_PPI_depends</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figs/APP_postanalysis2_PPI.png" title="DND input"></p>
+<p><br><br></p>
+</div>
+<div class="section level3">
+<h3 id="integrated-analysis">Integrated analysis<a class="anchor" aria-label="anchor" href="#integrated-analysis"></a>
+</h3>
+<p>The Integrated analysis module can generate venn plot and heatmap for multiple omics results. Here, we showcase the usage of the module through a parallel proteome and transcriptome study on the silicosis mouse.</p>
+<p><img src="figs/APP_integrate_option.png" title="DND input"></p>
+<p>Note: In order to compare results from different omics analyses, it is necessary to standardize the identifier types of features. For the proteome modules, this depends on the gene name option, while for the transcriptome module, the non-gene name identifiers are transformed to symbols using an annotation database.</p>
+<p><br></p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="reshape-table">Reshape table<a class="anchor" aria-label="anchor" href="#reshape-table"></a>
 </h2>
-<p>The Omics analysis modules only accept wide quantitative table, where
-each row represents a features (such as a protein or a proteingroup),
-and rows contain the identification information and quantification
-information of samples. However, long-format tables are also widely used
-in many cases, where each quantity value is represented in a separate
-row. Therefore, DEP2 offers the <code>reshape_long2wide</code> function,
-and APP also offers the Reshape modules for converting long table into
-wide-format. Here, we demonstrate how to analyze the DIA-NN result file,
-report.tsv, which is in the long-format.</p>
+<p>The proteome analysis modules only accept wide quantitative table, where each row represents a features (such as a protein or a proteingroup), and rows contain the identification information and quantification information of samples. However, long-format tables are also widely used in many cases, where each quantity value is represented in a separate row. Therefore, DEP2 offers the <code>reshape_long2wide</code> function, and APP also offers the Reshape module for converting long table into wide-format. Here, we demonstrate how to analyze the DIA-NN result file, report.tsv, which is in the long-format.</p>
 <p><img src="figs/APP_reshape_option.png" title="DND input"></p>
-<p>For the import of other long-format tables, similar settings can be
-referred to the above process. The module can also reshape data at the
-peptide level. For more details, refer to the documentation of the
-<code>reshape_long2wide</code> function and the <code>import data</code>
-vignette.</p>
+<p>For the import of other long-format tables, similar settings can be referred to the above process. The module can also reshape data at the peptide level. For more details, refer to the documentation of the <code>reshape_long2wide</code> function and the <code>Data import</code> vignette.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

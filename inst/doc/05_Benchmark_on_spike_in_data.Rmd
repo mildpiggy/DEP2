@@ -25,13 +25,13 @@ vignette: |
 
 # Abstract
 
-Here, we will compare the analysis result between DEP2 and Perseus using a benchmark dataset. The dataset contains two concentration groups in which Yeast and E.coli proteome were spiked into a human background. The example tables is available in this [repository](https://github.com/mildpiggy/OmicsExample). The ratio of proteomes between species is as follows:
+Here, we will compare the analysis result between DEP2 and Perseus using a benchmark dataset. The dataset contains two concentration groups in which Yeast and E. coli proteome were spiked into a human background. The example tables are available in this [repository](https://github.com/mildpiggy/OmicsExample). The ratios of proteomes between species are as follows:
 
 | Group  | A    | B    |
 |--------|------|------|
 | Human  | 0.7  | 0.7  |
 | Yeast  | 0.24 | 0.12 |
-| E.coli | 0.06 | 0.18 |
+| E. coli | 0.06 | 0.18 |
 
 
 
@@ -99,6 +99,7 @@ To ensure data credibility, we only considered proteingroups that were identifie
 
 This workflow represents the classical pipeline in DEP2 that has been modified from the DEP package, specifically designed for proteingroups results.
 
+
 ```{r pg_dep2,results='hide',message=FALSE,warning=FALSE}
 mq_pgfile <- "./A_spikeIn/MaxQuant_output/proteinGroups.txt.gz"
 pg <- read.csv(mq_pgfile,sep = "\t")
@@ -125,9 +126,11 @@ diff <- test_diff(imp,type = "control", control = "A1", fdr.type = "BH")
 dep <- add_rejections(diff, alpha = 0.05, lfc = 1)
 ```
 
+
 ## DDA-Peptide-DEP2 workflow.
 
 This pipeline bypass the MaxLFQ summarization and instead performs re-aggregation of protein intensity based on peptide quantities.
+
 
 ```{r pep_dep,results='hide',message=FALSE,warning=FALSE}
 mq_pepfile <- "./A_spikeIn/MaxQuant_output/peptides.txt.gz"
@@ -160,7 +163,8 @@ dep_pep <- add_rejections(diff_pep, alpha = 0.01)
 
 ## DDA-Protein-Perseus  
 
-Processing the Perseus analysis output for subsequent comparison.
+Process the Perseus analysis output for subsequent comparison.
+
 
 ```{r pg_perseus,results='hide',message=FALSE,warning=FALSE}
 ## The differetial test result of Perseus
@@ -194,6 +198,7 @@ dep_Perseus = make_se_parse(Perseus_res2,columns = 1:6,mode = "delim")
 ## DIA-Protein-DEP2
 
 This workflow is similar to the first one, but it is applied to DIA data from Spectonaut instead of DDA results.
+
 
 ```{r dia_dep,results='hide',message=FALSE,warning=FALSE}
 Spe_repfile <- "./A_spikeIn/Spectronaut_output/DIA4_MSStates_Report_new_noimpu.xls"
@@ -274,14 +279,14 @@ ggVennDiagram(list("DDA-Protein-DEP2" = features_pg,
 
 Missing values can decrease the power of statistical tests, potentially leading to false positives. To mitigate this issue, DEP2 filter out low-quanlity features with too many missing values through function `filter_pe`/`filter_se`. Both the Perseus and Protein-DEP2 pipelines consider an equal number of proteins due to employing the same filter cutoff. While the Peptide-Aggregation workflow also retains a closed number of features. As expected, DIA outperforms DDA in terms of data coverage and retains the highest number of features.
 
-For the remaining missing values in features, DEP2 provides a range of imputation strategies (`DEP2::impute`). In contrast, Perseus software only offers one method of imputation. Although Perseus can call the impute functions in the imputeLCMD package, this process is counter-intuitive and requires an R executable program in the system.
+<!-- For the remaining missing values in features, DEP2 provides a range of imputation strategies (`DEP2::impute`). In contrast, Perseus software only offers one method of imputation. Although Perseus can call the impute functions in the imputeLCMD package, this process is counter-intuitive and requires an R executable program in the system. -->
 
 
 ## Imputation accuracy
 
-In proteomics experiments, both random and systematic errors, as well as missing values, have a significant impact on the accuracy of protein quantification. Therefore, it is crucial to have an efficient data processing pipeline that minimizes the effects of systematic errors and missing values on the results.Despite filtering out features with excessive missing values, a range of missing values still remains in the assay. For the remaining missing values, DEP2 offers a variety of imputation strategies (`DEP2::impute`). In contrast, the Perseus software only offers one method of imputation. Additionally, Perseus also can call the impute functions in the imputeLCMD package. However, this process is counter-intuitive and requires an R executable program in the system.
+In proteomics experiments, both random and systematic errors, as well as missing values, have a significant impact on the accuracy of protein quantification. Therefore, it is crucial to have an efficient data processing pipeline that minimizes the effects of systematic errors and missing values on the results.Despite filtering out features with excessive missing values, a range of missing values still remains in the assay. For the remaining missing values, DEP2 offers a variety of imputation strategies (`DEP2::impute`). In contrast, the Perseus software only offers one method of imputation. Additionally, Perseus can also call the impute functions in the imputeLCMD package. However, this process is counter-intuitive and requires an R executable program in the system.
 
-In this spike-in sample experiment, the protein concentrations of three species are precisely controlled. The E.coli proteome should exhibit a fold change (group B vs A) of 3, the YEAST proteome should have a fold change of 1/2, while the human background remains unchanged. By comparing the actual differences with the theoretical fold change, we can evaluate the ability of the four pipelines to restore missing values and minimize errors.
+In this spike-in sample experiment, the protein concentrations of three species are precisely controlled. The E. coli proteome should exhibit a fold change (group B vs A) of 3, the YEAST proteome should have a fold change of 1/2, while the human background remains unchanged. By comparing the actual differences with the theoretical fold change, we can evaluate the ability of the four pipelines to restore missing values and minimize errors.
 
 Among these four pipelines, DDA-Protein-DEP2 achieves the highest accuracy in fold change, with the global fold changes closely aligning with the theoretical line. Furthermore, the fold changes of each species are more consistent, resulting in a reduced number of outliers compared to the Perseus pipeline. This highlights the effectiveness of the MissForest imputation method. In contrast, Perseus yields fold changes that are markedly lower than the theoretical line. The results in the Peptide-aggregation pipeline are similar to those of DDA-Protein-DEP2. DIA-Protein-DEP2 exhibits slightly amplified fold changes but also has smaller interquartile ranges.
 
@@ -359,7 +364,9 @@ p_lfc <- ggplot(res_table, aes( y= L2FC, x = spe, fill = method)) +
 p_lfc
 ```
 
-If we focus on the intersection of results from the four methods, the conclusions are consistent. DEP2 demonstrates greater accuracy in eliminating quantitative errors, as evidenced by its lower overall fold change error compared to Perseus.
+
+If we focus on the intersections of results from the four methods, the conclusions are consistent. DEP2 demonstrates greater accuracy in eliminating quantitative errors, as evidenced by its lower overall fold change error compared to Perseus.
+
 
 ```{r message=FALSE,warning=FALSE}
 res_table2 = dplyr::filter(res_table, ID %in% intersect_id)
@@ -389,7 +396,8 @@ p_lfcerr
 ```
 
 
-In all four pipelines, the fold changes of low-abundance proteins exhibit greater variability and relative inaccuracy. This result was anticipated since low-abundance proteins are more susceptible to the impact of random errors and missing values. Perseus imputation exhibits lower stability compared to MissForest (the imputation method used in DDA-Protein-DEP2). DIA data contains several low-expressed proteins (below 13), which are challenging to quantify accurately. The peptide-aggregation method does not show a deviation in global fold change, but the FC of low- to medium-abundance proteins are comparatively more unstable than the Protein-DEP2 method. This could be attributed to the presence of low-intensity peptides in low- to medium-abundance proteins, which possess higher aggregation weights than MaxLFQ after data processing. Further optimization of the aggregation method is required to reduce this effect.
+In all four pipelines, the fold changes of low-abundance proteins exhibit greater variability and relative inaccuracy. This result was anticipated since low-abundance proteins are more susceptible to the impact of random errors and missing values. Perseus imputation exhibits lower stability compared to MissForest (the imputation method used in DDA-Protein-DEP2). DIA data contains several low-expressed proteins (below 13), which are challenging to quantify accurately. The peptide-aggregation method does not show a deviation in global fold change, but the FCs of low- to medium-abundance proteins are comparatively more unstable than the Protein-DEP2 method. This could be attributed to the presence of low-intensity peptides in low- to medium-abundance proteins, which possess higher aggregation weights than MaxLFQ after data processing. Further optimization of the aggregation method is required to reduce this effect.
+
 
 ```{r message=FALSE,warning=FALSE}
 res_table3 = dplyr::filter(res_table, ID %in% intersect_id)
@@ -408,7 +416,9 @@ p_lfctrend <- ggplot(res_table3, aes(x = meanQuant, y = L2FC, color = spe)) +
 p_lfctrend
 ```
 
-The coefficients of variation (CVs) reflect the consistency between replicates and directly affects the result of statistical tests. DIA data has higher inter-replicate stability compared to DDA data. Furthermore, the utilization of MissForest imputation in DDA-Protein-DEP2 results in lower CVs compared to the other three pipelines, providing additional evidence of its effectiveness in mitigating the adverse effects of missing values.
+
+The coefficients of variations (CVs) reflect the consistency between replicates and directly affect the result of statistical tests. DIA data has higher inter-replicate stability compared to DDA data. Furthermore, the utilization of MissForest imputation in DDA-Protein-DEP2 results in lower CVs compared to the other three pipelines, providing additional evidence of its effectiveness in mitigating the adverse effects of missing values.
+
 
 ```{r message=FALSE,warning=FALSE}
 dep_list = list(DDA_Protein_DEP2 = dep,
@@ -484,7 +494,8 @@ p_cvs
 
 ### Receiver operator characteristic curve 
 
-Receiver operator characteristic (ROC) curve can assess the statistical power of each pipeline. DIA data exhibits a great advance compare to DDA data. The Perseus result have a higher AUC (area under curve) than DEP2 pipelines. 
+Receiver operator characteristic (ROC) curve can assess the statistical power of each pipeline. DIA data exhibits a great advantage compare to DDA data. The Perseus result has a higher AUC (area under curve) than DEP2 pipelines. 
+
 
 ```{r message=FALSE,warning=FALSE}
 library(pROC)
@@ -534,9 +545,11 @@ ggplot(roc_df) +
   theme(panel.grid = element_blank())
 ```
 
+
 All four pipelines have high AUCs close to 1, indicating their ability to efficiently distinguish regulated proteins from the unchanged background.
 
 `r aucs`.
+
 
 ```{r message=FALSE,warning=FALSE}
 ggplot(roc_df) +
@@ -556,8 +569,8 @@ In practice, p-value is not the sufficient condition for determining significanc
 
 The DIA pipeline demonstrates superior performance, obtaining the highest number of true positive results and well controlling the false positive rate. Among the DDA pipelines, Protein-DEP2 effectively controls false positives, while Perseus detects more downregulated yeast proteins but also includes more false positives. The DDA-Peptide-DEP2 pipeline performs between the previous two pipelines.
 
-```{r message=FALSE,warning=FALSE}
 
+```{r message=FALSE,warning=FALSE}
 res_table$trend = apply(res_table, 1, 
       function(x){
         if( as.numeric(x["qval"]) > 0.05)
@@ -587,6 +600,8 @@ ggplot(res_table) + geom_bar(aes(x = trend, fill = spe,y=1),stat="identity") +
         strip.background = element_rect(fill = "white", colour = NA)
   )
 ```
+
+
 
 ```{r message=FALSE,warning=FALSE}
 ggplot(res_table) + geom_bar(aes(x = trend, fill = spe,y=1), stat="identity", position = "fill" ) +
@@ -640,12 +655,13 @@ write.csv(protein_info,"./A_spikeIn/protein_info.csv",row.names = F)
 ```
 -->
 
+<!--
 # Session information
 
 ```{r sessioninfo, echo=FALSE}
 sessionInfo()
 ```
-
+-->
 
 
 

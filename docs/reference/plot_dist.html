@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">DEP2</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.06.13</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.7.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -151,25 +151,25 @@ indicating the number of decimal places of distance.</p></dd>
 <span class="r-in"><span><span class="va">exp_design</span> <span class="op">&lt;-</span> <span class="va">UbiLength_ExpDesign</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'UbiLength_ExpDesign' not found</span>
 <span class="r-in"><span><span class="va">se</span> <span class="op">&lt;-</span> <span class="fu"><a href="make_se.html">make_se</a></span><span class="op">(</span><span class="va">data_unique</span>, <span class="va">columns</span>, <span class="va">exp_design</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in is.data.frame(proteins_unique):</span> object 'data_unique' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'data_unique' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Filter, normalize and impute missing values</span></span></span>
 <span class="r-in"><span><span class="va">filt</span> <span class="op">&lt;-</span> <span class="fu">filter_missval</span><span class="op">(</span><span class="va">se</span>, thr <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in filter_missval(se, thr = 0):</span> could not find function "filter_missval"</span>
 <span class="r-in"><span><span class="va">norm</span> <span class="op">&lt;-</span> <span class="fu"><a href="normalize_vsn.html">normalize_vsn</a></span><span class="op">(</span><span class="va">filt</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in inherits(se, "SummarizedExperiment"):</span> object 'filt' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'filt' not found</span>
 <span class="r-in"><span><span class="va">imputed</span> <span class="op">&lt;-</span> <span class="fu"><a href="impute.html">impute</a></span><span class="op">(</span><span class="va">norm</span>, fun <span class="op">=</span> <span class="st">"MinProb"</span>, q <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> se does not inherit from class SummarizedExperiment</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Test for differentially expressed proteins</span></span></span>
 <span class="r-in"><span><span class="va">diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="test_diff.html">test_diff</a></span><span class="op">(</span><span class="va">imputed</span>, <span class="st">"control"</span>, <span class="st">"Ctrl"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in inherits(se, "SummarizedExperiment"):</span> object 'imputed' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'imputed' not found</span>
 <span class="r-in"><span><span class="va">dep</span> <span class="op">&lt;-</span> <span class="fu"><a href="DEP2_add_rejections.html">add_rejections</a></span><span class="op">(</span><span class="va">diff</span>, alpha <span class="op">=</span> <span class="fl">0.05</span>, lfc <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in (function (classes, fdef, mtable) {    methods &lt;- .findInheritedMethods(classes, fdef, mtable)    if (length(methods) == 1L)         return(methods[[1L]])    else if (length(methods) == 0L) {        cnames &lt;- paste0("\"", vapply(classes, as.character,             ""), "\"", collapse = ", ")        stop(gettextf("unable to find an inherited method for function %s for signature %s",             sQuote(fdef@generic), sQuote(cnames)), domain = NA)    }    else stop("Internal error in finding inherited methods; didn't return a unique method",         domain = NA)})(list(structure("standardGeneric", package = "methods")), new("nonstandardGenericFunction",     .Data = function (diff, alpha = 0.05, lfc = 1, thresholdmethod = "intersect",         curvature = 1, x0_fold = 2, ...)     {        standardGeneric("add_rejections")    }, generic = structure("add_rejections", package = "DEP2"),     package = "DEP2", group = list(), valueClass = character(0),     signature = c("diff", "alpha", "lfc", "thresholdmethod",     "curvature", "x0_fold"), default = NULL, skeleton = (function (diff,         alpha = 0.05, lfc = 1, thresholdmethod = "intersect",         curvature = 1, x0_fold = 2, ...)     stop(gettextf("invalid call in method dispatch to '%s' (no default method)",         "add_rejections"), domain = NA))(diff, alpha, lfc, thresholdmethod,         curvature, x0_fold, ...)), &lt;environment&gt;):</span> unable to find an inherited method for function ‘add_rejections’ for signature ‘"standardGeneric"’</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Plot correlation matrix</span></span></span>
 <span class="r-in"><span><span class="fu">plot_dist</span><span class="op">(</span><span class="va">dep</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in inherits(x, "SummarizedExperiment"):</span> object 'dep' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'dep' not found</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

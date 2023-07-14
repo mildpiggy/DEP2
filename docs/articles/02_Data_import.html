@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">DEP2</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.06.13</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.7.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,15 +69,14 @@
 
 
 
-<script src="02_Data_import_files/htmlwidgets-1.6.1/htmlwidgets.js"></script><link href="02_Data_import_files/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet">
-<script src="02_Data_import_files/datatables-binding-0.27/datatables.js"></script><link href="02_Data_import_files/dt-core-1.12.1/css/jquery.dataTables.min.css" rel="stylesheet">
-<link href="02_Data_import_files/dt-core-1.12.1/css/jquery.dataTables.extra.css" rel="stylesheet">
-<script src="02_Data_import_files/dt-core-1.12.1/js/jquery.dataTables.min.js"></script><link href="02_Data_import_files/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet">
+<script src="02_Data_import_files/htmlwidgets-1.6.2/htmlwidgets.js"></script><link href="02_Data_import_files/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet">
+<script src="02_Data_import_files/datatables-binding-0.28/datatables.js"></script><link href="02_Data_import_files/dt-core-1.13.4/css/jquery.dataTables.min.css" rel="stylesheet">
+<link href="02_Data_import_files/dt-core-1.13.4/css/jquery.dataTables.extra.css" rel="stylesheet">
+<script src="02_Data_import_files/dt-core-1.13.4/js/jquery.dataTables.min.js"></script><link href="02_Data_import_files/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet">
 <script src="02_Data_import_files/crosstalk-1.2.0/js/crosstalk.min.js"></script><div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Data import</h1>
-                        <h4 data-toc-skip class="author">Zhenhuan
-Feng</h4>
+                        <h4 data-toc-skip class="author">Zhenhuan Feng</h4>
                         
       
       
@@ -87,31 +86,18 @@ Feng</h4>
     
         <div class="abstract">
       <p class="abstract">Abstract</p>
-      <p>This vigenette introduces how DEP2 receives results from
-      upstream quantitative tools like MaxQuant, DIA-NN, Spectronaut, or
-      Fragpipe.</p>
+      <p>This vigenette introduces how DEP2 receives results from upstream quantitative tools like MaxQuant, DIA-NN, Spectronaut, or Fragpipe.</p>
     </div>
     
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>The <code>DEP2</code> package utilizes the <code>make_unique</code>
-function to format protein/PTM-peptide-level tables and then imports
-them into S4 objects via <code>make_se/pe</code> function. The
-parameters in these functions can be adjusted to accommodate different
-result tables generated from search and quantitative software. Here, we
-present the workflow and provide detailed information on the inputs from
-four different quantitative software programs.</p>
+<p>The <code>DEP2</code> package utilizes the <code>make_unique</code> function to format protein/PTM-peptide-level tables and then imports them into S4 objects via <code>make_se/pe</code> function. The parameters in these functions can be adjusted to accommodate different result tables generated from search and quantitative software. Here, we present the workflow and provide detailed information on the inputs from four different quantitative software programs.</p>
 </div>
 <div class="section level2">
 <h2 id="example-data">Example data<a class="anchor" aria-label="anchor" href="#example-data"></a>
 </h2>
-<p>We obtained a benchmark proteomics dataset by spiking Yeast and
-E.coli lysate into a Hela background. The raw data was obtained using an
-Orbitrap Fusion Lumos Tribrid equipment in either DDA or DIA mode. The
-DDA data was searched and quantified using MaxQuant or FragPipe, while
-the DIA data was analyzed using DIA-NN or Spectronaut in library-free
-mode.</p>
+<p>We obtained a benchmark proteomics dataset by spiking Yeast and E.coli lysate into a Hela background. The raw data was obtained using an Orbitrap Fusion Lumos Tribrid equipment in either DDA or DIA mode. The DDA data was searched and quantified using MaxQuant or FragPipe, while the DIA data was analyzed using DIA-NN or Spectronaut in library-free mode.</p>
 <p>The example tables used in this paper can be found in this in this <a href="https://github.com/mildpiggy/OmicsExample" class="external-link">repository</a>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Download OmicsExample firstly</span></span>
@@ -121,40 +107,27 @@ mode.</p>
 <span>  root.dir <span class="op">=</span> <span class="va">example_path</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">DEP2</span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">DEP2</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="constructing-s4-object">Constructing S4 object<a class="anchor" aria-label="anchor" href="#constructing-s4-object"></a>
 </h2>
-<p>The DEP2 analysis workflow is build upon S4 object, so the initial
-step is to format the table and convert it into an S4 container.</p>
+<p>The DEP2 analysis workflow is build upon S4 object, so the initial step is to format the table and convert it into an S4 container.</p>
 <div class="section level3">
 <h3 id="converting-protein-level-data-into-se-format">Converting protein-level data into SE format<a class="anchor" aria-label="anchor" href="#converting-protein-level-data-into-se-format"></a>
 </h3>
-<p>For protein-level data, the gene name or protein ID should be used as
-the feature identifier. DEP2 provides <code>make_unique</code> and
-<code>make_unique_ptm</code> functions to format the feature identifiers
-in proteomics results. The <code>make_unique</code> function cleans the
-identifiers, keeps the first name/ID in each group, and makes repeated
-identifiers unique by adding a suffix (‘ProXXX’, ‘ProXXX.1’,
-‘ProXXX.2’). Repeated identifiers are common when library search is
-performed with isoforms or unreviewed sequences. The <em>names</em> and
-<em>ids</em> parameters should be gene/protein names or IDs. The unique
-identifiers are saved in the new columns “name” and “id”. Then, the
-<code>make_se</code> function can convert the ‘uniqued’ table into a
-<em>SE</em> object.</p>
+<p>For protein-level data, the gene name or protein ID should be used as the feature identifier. DEP2 provides <code>make_unique</code> and <code>make_unique_ptm</code> functions to format the feature identifiers in proteomics results. The <code>make_unique</code> function cleans the identifiers, keeps the first name/ID in each group, and makes repeated identifiers unique by adding a suffix (‘ProXXX’, ‘ProXXX.1’, ‘ProXXX.2’). Repeated identifiers are common when library search is performed with isoforms or unreviewed sequences. The <em>names</em> and <em>ids</em> parameters should be gene/protein names or IDs. The unique identifiers are saved in the new columns “name” and “id”. Then, the <code>make_se</code> function can convert the ‘uniqued’ table into a <em>SE</em> object.</p>
 <div class="section level4">
 <h4 id="conversion-from-maxquant-proteingroups">Conversion from MaxQuant proteinGroups<a class="anchor" aria-label="anchor" href="#conversion-from-maxquant-proteingroups"></a>
 </h4>
-<p>In this pipeline, DEP2 use the table <code>proteinGroups.txt</code>
-as input.</p>
+<p>In this pipeline, DEP2 use the table <code>proteinGroups.txt</code> as input.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load proteinGroups table</span></span>
 <span><span class="va">mq_pgfile</span> <span class="op">&lt;-</span> <span class="st">"./A_spikeIn/MaxQuant_output/proteinGroups.txt.gz"</span></span>
 <span></span>
 <span><span class="va">pg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">mq_pgfile</span>,sep <span class="op">=</span> <span class="st">"\t"</span><span class="op">)</span></span></code></pre></div>
-<p>The <em>names</em> and <em>ids</em> are in the columns “Gene.names”
-and “Gene.names”, respectively.</p>
+<p>The <em>names</em> and <em>ids</em> are in the columns “Gene.names” and “Gene.names”, respectively.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Generate unique names and ids</span></span>
 <span><span class="va">unique_pg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_unique.html">make_unique</a></span><span class="op">(</span><span class="va">pg</span>, </span>
@@ -185,15 +158,7 @@ and “Gene.names”, respectively.</p>
 <span><span class="co">#&gt; 4                                                                                                                               A0A0U1RRL7</span></span>
 <span><span class="co">#&gt; 5 A0A385XJE6;P0CE65;P0CE64;P0CE63;P0CE62;P0CE61;P0CE60;P0CE59;P0CE58;P0CE57;P0CE56;P0CE55;P0CE54;P0CE53;P0CE52;P0CE51;P0CE50;P0CE49;P76071</span></span>
 <span><span class="co">#&gt; 6                                                                                                                                   A0AVT1</span></span></code></pre></div>
-<p>In this pipeline DEP2 uses SE object as the container to store
-expression assay, features information (row data) and experiment design
-(columns data). After <code>make_unique</code> identifiers, DEP2
-provides the <code>make_se</code>/<code>make_se_parse</code> functions
-to convert <em>SummarizedExperiment</em> object. The former required an
-input experiment design table to annotate samples, which must contain
-three columns: ‘label’, ‘condition’, and ‘replicate’. The ‘parse’
-functions can automatically assign experiment design table by parsing
-the column names of the abundance assay.</p>
+<p>In this pipeline DEP2 uses SE object as the container to store expression assay, features information (row data) and experiment design (columns data). After <code>make_unique</code> identifiers, DEP2 provides the <code>make_se</code>/<code>make_se_parse</code> functions to convert <em>SummarizedExperiment</em> object. The former required an input experiment design table to annotate samples, which must contain three columns: ‘label’, ‘condition’, and ‘replicate’. The ‘parse’ functions can automatically assign experiment design table by parsing the column names of the abundance assay.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Expression columns in the input data</span></span>
 <span><span class="va">ecols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"LFQ.intensity."</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">unique_pg</span><span class="op">)</span><span class="op">)</span></span>
@@ -243,15 +208,13 @@ the column names of the abundance assay.</p>
 <div class="section level4">
 <h4 id="conversion-from-fragpipe-combined_protein">Conversion from FragPipe combined_protein<a class="anchor" aria-label="anchor" href="#conversion-from-fragpipe-combined_protein"></a>
 </h4>
-<p>Next, we use the table <code>combined_protein.tsv</code> from
-FragPipe as input.</p>
+<p>Next, we use the table <code>combined_protein.tsv</code> from FragPipe as input.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load combined_protein.tsv table</span></span>
 <span><span class="va">FragP_pgfile</span> <span class="op">&lt;-</span> <span class="st">"./A_spikeIn/FragPipe_output/combined_protein.tsv.gz"</span></span>
 <span></span>
 <span><span class="va">FragP_pg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">FragP_pgfile</span>,sep <span class="op">=</span> <span class="st">"\t"</span><span class="op">)</span></span></code></pre></div>
-<p><strong>Unique identifier</strong>. The <em>names</em> and
-<em>ids</em> are in the columns “Gene” and “Protein.ID”.</p>
+<p><strong>Unique identifier</strong>. The <em>names</em> and <em>ids</em> are in the columns “Gene” and “Protein.ID”.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Generate unique names and ids</span></span>
 <span><span class="va">unique_FragP_pg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_unique.html">make_unique</a></span><span class="op">(</span><span class="va">FragP_pg</span>, </span>
@@ -268,9 +231,7 @@ FragPipe as input.</p>
 <span><span class="co">#&gt; 4 CSN1S2 P02663 CSN1S2     P02663</span></span>
 <span><span class="co">#&gt; 5   CSN2 P02666   CSN2     P02666</span></span>
 <span><span class="co">#&gt; 6   CSN3 P02668   CSN3     P02668</span></span></code></pre></div>
-<p><strong>Convert SE</strong>. Here, We used the “MaxLFQ Intensity”
-values. “Intesity” is also practicable, but may bring some effect on the
-test result.</p>
+<p><strong>Convert SE</strong>. Here, We used the “MaxLFQ Intensity” values. “Intesity” is also practicable, but may bring some effect on the test result.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Expression col in the combined_protein.tsv</span></span>
 <span><span class="va">ecols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">".MaxLFQ.Intensity"</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">unique_FragP_pg</span><span class="op">)</span>,value <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
@@ -301,27 +262,17 @@ test result.</p>
 <div class="section level4">
 <h4 id="conversion-from-dia-nn-result">Conversion from DIA-NN result<a class="anchor" aria-label="anchor" href="#conversion-from-dia-nn-result"></a>
 </h4>
-<p>As in the example above, <code>make_se</code> and
-<code>make_se_parse</code> accept wide-format tables which each row
-represents a features (a protein or a proteingroup), and rows contain
-the identification information and quantification information of
-samples. However, long-format tables are also widely used in many cases,
-such as the <em>report.tsv</em> output from DIA-NN or the
-<em>MSstats</em> output. Function <code>reshape_long2wide</code> can
-turn long-format tables into wide tables. Next, we will show the
-difference between handling wide- or long-tables.</p>
+<p>As in the example above, <code>make_se</code> and <code>make_se_parse</code> accept wide-format tables which each row represents a features (a protein or a proteingroup), and rows contain the identification information and quantification information of samples. However, long-format tables are also widely used in many cases, such as the <em>report.tsv</em> output from DIA-NN or the <em>MSstats</em> output. Function <code>reshape_long2wide</code> can turn long-format tables into wide tables. Next, we will show the difference between handling wide- or long-tables.</p>
 <div class="section level5">
 <h5 id="wide-table-output">Wide table output<a class="anchor" aria-label="anchor" href="#wide-table-output"></a>
 </h5>
-<p>The <em>report.pg_matrix.tsv</em> from DIA-NN is a wide-format table
-similar to <em>proteinGroups</em>.</p>
+<p>The <em>report.pg_matrix.tsv</em> from DIA-NN is a wide-format table similar to <em>proteinGroups</em>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load combined_protein.tsv table</span></span>
 <span><span class="va">Diann_pgfile</span> <span class="op">&lt;-</span> <span class="st">"./A_spikeIn/Diann_output/report.pg_matrix.tsv.gz"</span></span>
 <span></span>
 <span><span class="va">Diann_pg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">Diann_pgfile</span>,sep <span class="op">=</span> <span class="st">"\t"</span>, fileEncoding<span class="op">=</span><span class="st">"latin1"</span><span class="op">)</span></span></code></pre></div>
-<p><strong>Unique identifier</strong>. The <em>name</em> and
-<em>ids</em> are in the columns “Genes” and “Protein.Group”.</p>
+<p><strong>Unique identifier</strong>. The <em>name</em> and <em>ids</em> are in the columns “Genes” and “Protein.Group”.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Generate unique names and ids</span></span>
 <span><span class="va">unique_diann_pg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_unique.html">make_unique</a></span><span class="op">(</span><span class="va">Diann_pg</span>, </span>
@@ -338,9 +289,7 @@ similar to <em>proteinGroups</em>.</p>
 <span><span class="co">#&gt; 4   PIGBOS1 A0A0B4J2F0         PIGBOS1        A0A0B4J2F0</span></span>
 <span><span class="co">#&gt; 5      SIK1 A0A0B4J2F2      SIK1;SIK1B A0A0B4J2F2;P57059</span></span>
 <span><span class="co">#&gt; 6   CENPVL1 A0A0U1RR11 CENPVL1;CENPVL2 A0A0U1RR11;P0DPI3</span></span></code></pre></div>
-<p><strong>Convert SE</strong>. The expression columns are directly
-named by the file names of samples. We recommend to renaming the columns
-or renaming the MS files before DIAN-NN search.</p>
+<p><strong>Convert SE</strong>. The expression columns are directly named by the file names of samples. We recommend to renaming the columns or renaming the MS files before DIAN-NN search.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Expression col in the DIA-NN report.pg_matrix</span></span>
 <span><span class="va">ecols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">".raw$"</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">unique_diann_pg</span><span class="op">)</span>,value <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
@@ -377,13 +326,11 @@ or renaming the MS files before DIAN-NN search.</p>
 <div class="section level5">
 <h5 id="long-table-output">Long table output<a class="anchor" aria-label="anchor" href="#long-table-output"></a>
 </h5>
-<p>Unlike the above cases, the <strong>report.tsv</strong> from DIA-NN
-is in long format. Function <code>reshape_long2wide</code> can reshape
-long tables to wide format, before constructing <em>SE</em> object.</p>
+<p>Unlike the above cases, the <strong>report.tsv</strong> from DIA-NN is in long format. Function <code>reshape_long2wide</code> can reshape long tables to wide format, before constructing <em>SE</em> object.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Load combined_protein.tsv table</span></span>
 <span><span class="va">Diann_repfile</span> <span class="op">&lt;-</span> <span class="st">"./A_spikeIn/Diann_output/report.tsv.gz"</span></span>
-<span></span>
+<span><span class="co"># Diann_repfile &lt;- "./example_data/OmicsExample/A_spikeIn/Diann_output/report.tsv.gz"</span></span>
 <span><span class="va">Diann_rep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">Diann_repfile</span>,sep <span class="op">=</span> <span class="st">"\t"</span><span class="op">)</span> <span class="co">#</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">Diann_rep</span><span class="op">)</span> <span class="co"># 390479 rows, each row is a precursor.</span></span>
 <span><span class="co">#&gt; [1] 390479     64</span></span>
@@ -393,9 +340,9 @@ long tables to wide format, before constructing <em>SE</em> object.</p>
 <span></span>
 <span></span>
 <span><span class="co">## Table report.tsv stores both Precursor- and PG-level quality</span></span>
-<span><span class="fu">DT</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/DT/man/datatable.html" class="external-link">datatable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">Diann_rep</span><span class="op">)</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>scrollX <span class="op">=</span> <span class="cn">T</span>,pageLength <span class="op">=</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-765d0b2bcbf746d99902" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-765d0b2bcbf746d99902">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6"],["F:\\DIA_5\\20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5&lt;a6&gt;&lt;c1&gt;_FASP_DIA_A6_1.raw","F:\\DIA_5\\20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5&lt;a6&gt;&lt;c1&gt;_FASP_DIA_A6_2.raw","F:\\DIA_5\\20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5&lt;a6&gt;&lt;c1&gt;_FASP_DIA_A6_3.raw","F:\\DIA_5\\20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5&lt;a6&gt;&lt;c1&gt;_FASP_DIA_B6_1.raw","F:\\DIA_5\\20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5&lt;a6&gt;&lt;c1&gt;_FASP_DIA_B6_2.raw","F:\\DIA_5\\20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5&lt;a6&gt;&lt;c1&gt;_FASP_DIA_B6_3.raw"],["20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5&lt;a6&gt;&lt;c1&gt;_FASP_DIA_A6_1","20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5&lt;a6&gt;&lt;c1&gt;_FASP_DIA_A6_2","20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5&lt;a6&gt;&lt;c1&gt;_FASP_DIA_A6_3","20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5&lt;a6&gt;&lt;c1&gt;_FASP_DIA_B6_1","20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5&lt;a6&gt;&lt;c1&gt;_FASP_DIA_B6_2","20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5&lt;a6&gt;&lt;c1&gt;_FASP_DIA_B6_3"],["P55011","P55011","P55011","P55011","P55011","P55011"],["P55011","P55011","P55011","P55011","P55011","P55011"],["S12A2_HUMAN","S12A2_HUMAN","S12A2_HUMAN","S12A2_HUMAN","S12A2_HUMAN","S12A2_HUMAN"],["SLC12A2","SLC12A2","SLC12A2","SLC12A2","SLC12A2","SLC12A2"],[3288700,3054760,2956670,3119070,2555810,2658530],[3105380,3027640,2836220,2690900,2692180,2749300],[2593340,3086470,2917650,2799910,2845650,2868510],[3288700,3054760,2956670,3119070,2555810,2658530],[3105380,3027640,2836220,2690900,2692180,2749300],[2593340,3086470,2917650,2799910,2845650,2868510],[2593340,3086470,2917650,2799910,2845650,2868510],["AAAAAAAAAAAAAAAGAGAGAK","AAAAAAAAAAAAAAAGAGAGAK","AAAAAAAAAAAAAAAGAGAGAK","AAAAAAAAAAAAAAAGAGAGAK","AAAAAAAAAAAAAAAGAGAGAK","AAAAAAAAAAAAAAAGAGAGAK"],["AAAAAAAAAAAAAAAGAGAGAK","AAAAAAAAAAAAAAAGAGAGAK","AAAAAAAAAAAAAAAGAGAGAK","AAAAAAAAAAAAAAAGAGAGAK","AAAAAAAAAAAAAAAGAGAGAK","AAAAAAAAAAAAAAAGAGAGAK"],["AAAAAAAAAAAAAAAGAGAGAK3","AAAAAAAAAAAAAAAGAGAGAK3","AAAAAAAAAAAAAAAGAGAGAK3","AAAAAAAAAAAAAAAGAGAGAK3","AAAAAAAAAAAAAAAGAGAGAK3","AAAAAAAAAAAAAAAGAGAGAK3"],[3,3,3,3,3,3],[2.66475e-05,2.15722e-05,1.84452e-05,2.48775e-05,2.57361e-05,2.60132e-05],[0.000441274,0.00144097,1.84452e-05,0.000819513,6.17697e-05,0.000193587],[0.000258474,0.000258474,0.000258474,0.000258474,0.000258474,0.000258474],[0.000139237,0.000120715,0.00011733,0.000116374,0.000122956,0.000123335],[0.000133743,0.000116104,0.000114129,0.00012288,0.000118624,0.000118977],[0.000123716,0.000123716,0.000123716,0.000123716,0.000123716,0.000123716],[0.000135962,0.000118231,0.000116333,0.00012475,0.000120453,0.000120817],[0,0,0,0,0,0],[1,1,1,1,1,1],[1081300,1272230,1192630,1262150,1192170,1167480],[1056810,1311190,1185640,1139750,1212380,1203980],[953859,1300920,1253370,1229470,1171810,1172060],[null,null,null,null,null,null],[1740560,2791480,3603090,3094980,2735800,2808800],[0.995975,0.994287,0.994979,0.996999,0.996848,0.997854],[65.0505,64.6901,64.4852,64.9846,64.5535,64.3136],[64.8126,64.4521,64.2475,64.7474,64.3161,64.0758],[65.2888,64.9276,64.723,65.2212,64.7912,64.5511],[41.8375,41.8375,41.8375,41.8375,41.8375,41.8375],[65.3254,65.0317,64.8082,65.1442,64.9038,64.6513],[41.4578,41.37,41.3452,41.5618,41.3579,41.313],["Solute carrier family 12 member 2","Solute carrier family 12 member 2","Solute carrier family 12 member 2","Solute carrier family 12 member 2","Solute carrier family 12 member 2","Solute carrier family 12 member 2"],[3.75601e-05,3.75601e-05,3.75601e-05,3.75601e-05,3.75601e-05,3.75601e-05],[0.000129383,0.000129383,0.000129383,0.000129383,0.000129383,0.000129383],[0.979495,0.980377,0.991737,0.98012,0.985356,0.984682],[1973110,2729920,3428470,3177260,2783330,2797840],[6.75941,6.73721,6.72539,6.69945,6.80359,6.84255],[0.91093,0.891578,0.909192,0.922376,0.914673,0.901198],[1,1,1,1,1,1],[0,0,0,0,0,0],[0.999795,0.999329,0.999991,0.999609,0.999971,0.99991],[1.11636,1.74999,1.89908,1.09971,1.85128,1.81814],[0.0441394,0.0544773,0.0352723,0.168227,0.0136596,0.00700956],["827234;367664;366917;363881;350505;312323;324379;326154;256538;236549;166755;168704;","954108;445249;438077;408008;426149;353200;370115;388135;289531;275266;198776;201495;","895593;416252;406744;388747;397135;367399;372246;356240;290490;262753;189232;174100;","969732;446958;429682;405800;426672;367070;398082;390949;291612;266969;203881;169365;","806626;425329;389163;392829;410180;342054;374532;361191;289156;260159;177393;160349;","860234;385540;400191;379109;388184;335318;344010;346493;260469;243175;175882;183632;"],["827234;367664;366917;363881;350505;312323;324379;326154;256538;236549;166755;168704;","954108;445249;438077;408008;426149;353200;370115;388135;289531;275266;198776;201495;","895593;416252;406744;388747;397135;367399;372246;356240;290490;262753;189232;174100;","969732;446958;429682;405800;426672;367070;398082;390949;291612;266969;203881;169365;","806626;425329;389163;392829;410180;342054;374532;361191;289156;260159;177393;160349;","860234;385540;400191;379109;388184;335318;344010;346493;260469;243175;175882;183632;"],["0.97976;0.997339;0.995379;0.997228;0.995297;0.993732;0.997043;0.992573;0.99627;0.996218;0.993245;0.983539;","0.996549;0.99182;0.997826;0.989858;0.99489;0.996335;0.991647;0.994546;0.993389;0.994945;0.98742;0.971467;","0.990237;0.993683;0.994301;0.994333;0.996305;0.993484;0.992154;0.997233;0.995215;0.993947;0.995741;0.9678;","0.994862;0.995227;0.996559;0.997356;0.997102;0.995773;0.994995;0.994405;0.991882;0.994216;0.989895;0.996112;","0.981493;0.996515;0.996955;0.997125;0.996482;0.99644;0.997755;0.99712;0.996083;0.997378;0.980816;0.967914;","0.996533;0.997767;0.996747;0.998663;0.998205;0.994059;0.994126;0.995359;0.996227;0.994233;0.985221;0.972635;"],[45075,44865,44739,45117,44781,44613],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0.999559,0.998559,0.999962,0.99918,0.999938,0.999806],[0.999547,0.999547,0.999547,0.999547,0.999547,0.999547],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>File.Name<\/th>\n      <th>Run<\/th>\n      <th>Protein.Group<\/th>\n      <th>Protein.Ids<\/th>\n      <th>Protein.Names<\/th>\n      <th>Genes<\/th>\n      <th>PG.Quantity<\/th>\n      <th>PG.Normalised<\/th>\n      <th>PG.MaxLFQ<\/th>\n      <th>Genes.Quantity<\/th>\n      <th>Genes.Normalised<\/th>\n      <th>Genes.MaxLFQ<\/th>\n      <th>Genes.MaxLFQ.Unique<\/th>\n      <th>Modified.Sequence<\/th>\n      <th>Stripped.Sequence<\/th>\n      <th>Precursor.Id<\/th>\n      <th>Precursor.Charge<\/th>\n      <th>Q.Value<\/th>\n      <th>PEP<\/th>\n      <th>Global.Q.Value<\/th>\n      <th>Protein.Q.Value<\/th>\n      <th>PG.Q.Value<\/th>\n      <th>Global.PG.Q.Value<\/th>\n      <th>GG.Q.Value<\/th>\n      <th>Translated.Q.Value<\/th>\n      <th>Proteotypic<\/th>\n      <th>Precursor.Quantity<\/th>\n      <th>Precursor.Normalised<\/th>\n      <th>Precursor.Translated<\/th>\n      <th>Translated.Quality<\/th>\n      <th>Ms1.Translated<\/th>\n      <th>Quantity.Quality<\/th>\n      <th>RT<\/th>\n      <th>RT.Start<\/th>\n      <th>RT.Stop<\/th>\n      <th>iRT<\/th>\n      <th>Predicted.RT<\/th>\n      <th>Predicted.iRT<\/th>\n      <th>First.Protein.Description<\/th>\n      <th>Lib.Q.Value<\/th>\n      <th>Lib.PG.Q.Value<\/th>\n      <th>Ms1.Profile.Corr<\/th>\n      <th>Ms1.Area<\/th>\n      <th>Evidence<\/th>\n      <th>Spectrum.Similarity<\/th>\n      <th>Averagine<\/th>\n      <th>Mass.Evidence<\/th>\n      <th>CScore<\/th>\n      <th>Decoy.Evidence<\/th>\n      <th>Decoy.CScore<\/th>\n      <th>Fragment.Quant.Raw<\/th>\n      <th>Fragment.Quant.Corrected<\/th>\n      <th>Fragment.Correlations<\/th>\n      <th>MS2.Scan<\/th>\n      <th>PTM.Informative<\/th>\n      <th>PTM.Specific<\/th>\n      <th>PTM.Localising<\/th>\n      <th>PTM.Q.Value<\/th>\n      <th>PTM.Site.Confidence<\/th>\n      <th>Lib.PTM.Site.Confidence<\/th>\n      <th>IM<\/th>\n      <th>iIM<\/th>\n      <th>Predicted.IM<\/th>\n      <th>Predicted.iIM<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollX":true,"pageLength":6,"columnDefs":[{"className":"dt-right","targets":[7,8,9,10,11,12,13,17,18,19,20,21,22,23,24,25,26,27,28,29,31,32,33,34,35,36,37,38,40,41,42,43,44,45,46,47,48,49,50,54,55,56,57,58,59,60,61,62,63,64]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[6,10,25,50,100]}},"evals":[],"jsHooks":[]}</script><p><strong>Reshape</strong> long-table.</p>
+<span><span class="fu">DT</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/DT/man/datatable.html" class="external-link">datatable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">Diann_rep</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate_all.html" class="external-link">mutate_if</a></span><span class="op">(</span><span class="va">is.character</span>, <span class="fu">utf8</span><span class="fu">::</span><span class="va"><a href="https://ptrckprry.com/r-utf8/reference/utf8_encode.html" class="external-link">utf8_encode</a></span><span class="op">)</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>scrollX <span class="op">=</span> <span class="cn">T</span>,pageLength <span class="op">=</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-abca6db0fb33be32820d" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-abca6db0fb33be32820d">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6"],["F:\\\\DIA_5\\\\20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5\\xa6\\xc1_FASP_DIA_A6_1.raw","F:\\\\DIA_5\\\\20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5\\xa6\\xc1_FASP_DIA_A6_2.raw","F:\\\\DIA_5\\\\20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5\\xa6\\xc1_FASP_DIA_A6_3.raw","F:\\\\DIA_5\\\\20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5\\xa6\\xc1_FASP_DIA_B6_1.raw","F:\\\\DIA_5\\\\20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5\\xa6\\xc1_FASP_DIA_B6_2.raw","F:\\\\DIA_5\\\\20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5\\xa6\\xc1_FASP_DIA_B6_3.raw"],["20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5\\xa6\\xc1_FASP_DIA_A6_1","20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5\\xa6\\xc1_FASP_DIA_A6_2","20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5\\xa6\\xc1_FASP_DIA_A6_3","20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5\\xa6\\xc1_FASP_DIA_B6_1","20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5\\xa6\\xc1_FASP_DIA_B6_2","20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5\\xa6\\xc1_FASP_DIA_B6_3"],["P55011","P55011","P55011","P55011","P55011","P55011"],["P55011","P55011","P55011","P55011","P55011","P55011"],["S12A2_HUMAN","S12A2_HUMAN","S12A2_HUMAN","S12A2_HUMAN","S12A2_HUMAN","S12A2_HUMAN"],["SLC12A2","SLC12A2","SLC12A2","SLC12A2","SLC12A2","SLC12A2"],[3288700,3054760,2956670,3119070,2555810,2658530],[3105380,3027640,2836220,2690900,2692180,2749300],[2593340,3086470,2917650,2799910,2845650,2868510],[3288700,3054760,2956670,3119070,2555810,2658530],[3105380,3027640,2836220,2690900,2692180,2749300],[2593340,3086470,2917650,2799910,2845650,2868510],[2593340,3086470,2917650,2799910,2845650,2868510],["AAAAAAAAAAAAAAAGAGAGAK","AAAAAAAAAAAAAAAGAGAGAK","AAAAAAAAAAAAAAAGAGAGAK","AAAAAAAAAAAAAAAGAGAGAK","AAAAAAAAAAAAAAAGAGAGAK","AAAAAAAAAAAAAAAGAGAGAK"],["AAAAAAAAAAAAAAAGAGAGAK","AAAAAAAAAAAAAAAGAGAGAK","AAAAAAAAAAAAAAAGAGAGAK","AAAAAAAAAAAAAAAGAGAGAK","AAAAAAAAAAAAAAAGAGAGAK","AAAAAAAAAAAAAAAGAGAGAK"],["AAAAAAAAAAAAAAAGAGAGAK3","AAAAAAAAAAAAAAAGAGAGAK3","AAAAAAAAAAAAAAAGAGAGAK3","AAAAAAAAAAAAAAAGAGAGAK3","AAAAAAAAAAAAAAAGAGAGAK3","AAAAAAAAAAAAAAAGAGAGAK3"],[3,3,3,3,3,3],[2.66475e-05,2.15722e-05,1.84452e-05,2.48775e-05,2.57361e-05,2.60132e-05],[0.000441274,0.00144097,1.84452e-05,0.000819513,6.176970000000001e-05,0.000193587],[0.000258474,0.000258474,0.000258474,0.000258474,0.000258474,0.000258474],[0.000139237,0.000120715,0.00011733,0.000116374,0.000122956,0.000123335],[0.000133743,0.000116104,0.000114129,0.00012288,0.000118624,0.000118977],[0.000123716,0.000123716,0.000123716,0.000123716,0.000123716,0.000123716],[0.000135962,0.000118231,0.000116333,0.00012475,0.000120453,0.000120817],[0,0,0,0,0,0],[1,1,1,1,1,1],[1081300,1272230,1192630,1262150,1192170,1167480],[1056810,1311190,1185640,1139750,1212380,1203980],[953859,1300920,1253370,1229470,1171810,1172060],[null,null,null,null,null,null],[1740560,2791480,3603090,3094980,2735800,2808800],[0.9959750000000001,0.994287,0.9949789999999999,0.996999,0.996848,0.997854],[65.0505,64.6901,64.48520000000001,64.9846,64.5535,64.31359999999999],[64.8126,64.4521,64.2475,64.7474,64.31610000000001,64.0758],[65.28879999999999,64.9276,64.723,65.2212,64.7912,64.55110000000001],[41.8375,41.8375,41.8375,41.8375,41.8375,41.8375],[65.3254,65.0317,64.8082,65.1442,64.9038,64.65130000000001],[41.4578,41.37,41.3452,41.5618,41.3579,41.313],["Solute carrier family 12 member 2","Solute carrier family 12 member 2","Solute carrier family 12 member 2","Solute carrier family 12 member 2","Solute carrier family 12 member 2","Solute carrier family 12 member 2"],[3.75601e-05,3.75601e-05,3.75601e-05,3.75601e-05,3.75601e-05,3.75601e-05],[0.000129383,0.000129383,0.000129383,0.000129383,0.000129383,0.000129383],[0.979495,0.9803770000000001,0.991737,0.98012,0.985356,0.9846819999999999],[1973110,2729920,3428470,3177260,2783330,2797840],[6.75941,6.73721,6.72539,6.69945,6.80359,6.84255],[0.91093,0.891578,0.909192,0.922376,0.914673,0.9011980000000001],[1,1,1,1,1,1],[0,0,0,0,0,0],[0.999795,0.999329,0.999991,0.999609,0.9999710000000001,0.99991],[1.11636,1.74999,1.89908,1.09971,1.85128,1.81814],[0.0441394,0.0544773,0.0352723,0.168227,0.0136596,0.00700956],["827234;367664;366917;363881;350505;312323;324379;326154;256538;236549;166755;168704;","954108;445249;438077;408008;426149;353200;370115;388135;289531;275266;198776;201495;","895593;416252;406744;388747;397135;367399;372246;356240;290490;262753;189232;174100;","969732;446958;429682;405800;426672;367070;398082;390949;291612;266969;203881;169365;","806626;425329;389163;392829;410180;342054;374532;361191;289156;260159;177393;160349;","860234;385540;400191;379109;388184;335318;344010;346493;260469;243175;175882;183632;"],["827234;367664;366917;363881;350505;312323;324379;326154;256538;236549;166755;168704;","954108;445249;438077;408008;426149;353200;370115;388135;289531;275266;198776;201495;","895593;416252;406744;388747;397135;367399;372246;356240;290490;262753;189232;174100;","969732;446958;429682;405800;426672;367070;398082;390949;291612;266969;203881;169365;","806626;425329;389163;392829;410180;342054;374532;361191;289156;260159;177393;160349;","860234;385540;400191;379109;388184;335318;344010;346493;260469;243175;175882;183632;"],["0.97976;0.997339;0.995379;0.997228;0.995297;0.993732;0.997043;0.992573;0.99627;0.996218;0.993245;0.983539;","0.996549;0.99182;0.997826;0.989858;0.99489;0.996335;0.991647;0.994546;0.993389;0.994945;0.98742;0.971467;","0.990237;0.993683;0.994301;0.994333;0.996305;0.993484;0.992154;0.997233;0.995215;0.993947;0.995741;0.9678;","0.994862;0.995227;0.996559;0.997356;0.997102;0.995773;0.994995;0.994405;0.991882;0.994216;0.989895;0.996112;","0.981493;0.996515;0.996955;0.997125;0.996482;0.99644;0.997755;0.99712;0.996083;0.997378;0.980816;0.967914;","0.996533;0.997767;0.996747;0.998663;0.998205;0.994059;0.994126;0.995359;0.996227;0.994233;0.985221;0.972635;"],[45075,44865,44739,45117,44781,44613],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0.999559,0.998559,0.999962,0.99918,0.999938,0.999806],[0.999547,0.999547,0.999547,0.999547,0.999547,0.999547],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>File.Name<\/th>\n      <th>Run<\/th>\n      <th>Protein.Group<\/th>\n      <th>Protein.Ids<\/th>\n      <th>Protein.Names<\/th>\n      <th>Genes<\/th>\n      <th>PG.Quantity<\/th>\n      <th>PG.Normalised<\/th>\n      <th>PG.MaxLFQ<\/th>\n      <th>Genes.Quantity<\/th>\n      <th>Genes.Normalised<\/th>\n      <th>Genes.MaxLFQ<\/th>\n      <th>Genes.MaxLFQ.Unique<\/th>\n      <th>Modified.Sequence<\/th>\n      <th>Stripped.Sequence<\/th>\n      <th>Precursor.Id<\/th>\n      <th>Precursor.Charge<\/th>\n      <th>Q.Value<\/th>\n      <th>PEP<\/th>\n      <th>Global.Q.Value<\/th>\n      <th>Protein.Q.Value<\/th>\n      <th>PG.Q.Value<\/th>\n      <th>Global.PG.Q.Value<\/th>\n      <th>GG.Q.Value<\/th>\n      <th>Translated.Q.Value<\/th>\n      <th>Proteotypic<\/th>\n      <th>Precursor.Quantity<\/th>\n      <th>Precursor.Normalised<\/th>\n      <th>Precursor.Translated<\/th>\n      <th>Translated.Quality<\/th>\n      <th>Ms1.Translated<\/th>\n      <th>Quantity.Quality<\/th>\n      <th>RT<\/th>\n      <th>RT.Start<\/th>\n      <th>RT.Stop<\/th>\n      <th>iRT<\/th>\n      <th>Predicted.RT<\/th>\n      <th>Predicted.iRT<\/th>\n      <th>First.Protein.Description<\/th>\n      <th>Lib.Q.Value<\/th>\n      <th>Lib.PG.Q.Value<\/th>\n      <th>Ms1.Profile.Corr<\/th>\n      <th>Ms1.Area<\/th>\n      <th>Evidence<\/th>\n      <th>Spectrum.Similarity<\/th>\n      <th>Averagine<\/th>\n      <th>Mass.Evidence<\/th>\n      <th>CScore<\/th>\n      <th>Decoy.Evidence<\/th>\n      <th>Decoy.CScore<\/th>\n      <th>Fragment.Quant.Raw<\/th>\n      <th>Fragment.Quant.Corrected<\/th>\n      <th>Fragment.Correlations<\/th>\n      <th>MS2.Scan<\/th>\n      <th>PTM.Informative<\/th>\n      <th>PTM.Specific<\/th>\n      <th>PTM.Localising<\/th>\n      <th>PTM.Q.Value<\/th>\n      <th>PTM.Site.Confidence<\/th>\n      <th>Lib.PTM.Site.Confidence<\/th>\n      <th>IM<\/th>\n      <th>iIM<\/th>\n      <th>Predicted.IM<\/th>\n      <th>Predicted.iIM<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollX":true,"pageLength":6,"columnDefs":[{"className":"dt-right","targets":[7,8,9,10,11,12,13,17,18,19,20,21,22,23,24,25,26,27,28,29,31,32,33,34,35,36,37,38,40,41,42,43,44,45,46,47,48,49,50,54,55,56,57,58,59,60,61,62,63,64]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[6,10,25,50,100]}},"evals":[],"jsHooks":[]}</script><p><strong>Reshape</strong> long-table.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">Diann_rep_wided</span> <span class="op">=</span> <span class="fu"><a href="../reference/reshape_long2wide.html">reshape_long2wide</a></span><span class="op">(</span><span class="va">Diann_rep</span>,</span>
@@ -407,18 +354,11 @@ long tables to wide format, before constructing <em>SE</em> object.</p>
 <span>                                    remove_sample_prefix <span class="op">=</span> <span class="cn">FALSE</span>,  <span class="co"># remove prefix in sample_col</span></span>
 <span>                                    remove_sample_suffix <span class="op">=</span> <span class="cn">FALSE</span>   <span class="co"># remove suffix in sample_col</span></span>
 <span>                                    <span class="op">)</span></span></code></pre></div>
-<p>The reshaping result has ‘Genes’ in a column and extends the
-‘Protein.Q.Value’ to 6 columns, each representing a different sample.
-The variables in <em>shrink_ident_cols</em> are combined into a string
-by concatenating all the values for each feature and separating them
-with a ‘;’. The variables in <em>extend_ident_cols</em> are expanded
-into multiple columns, with each column containing the values for each
-sample (e.g., “Q.Value”).</p>
+<p>The reshaping result has ‘Genes’ in a column and extends the ‘Protein.Q.Value’ to 6 columns, each representing a different sample. The variables in <em>shrink_ident_cols</em> are combined into a string by concatenating all the values for each feature and separating them with a ‘;’. The variables in <em>extend_ident_cols</em> are expanded into multiple columns, with each column containing the values for each sample (e.g., “Q.Value”).</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">DT</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/DT/man/datatable.html" class="external-link">datatable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">Diann_rep_wided</span>,<span class="fl">3</span><span class="op">)</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>scrollX <span class="op">=</span> <span class="cn">T</span>,pageLength <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-2b563ac5781e75449c24" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-2b563ac5781e75449c24">{"x":{"filter":"none","vertical":false,"data":[["1","2","3"],["A0A0B4J2D5;P0DPI2","A0A0B4J2F0","A0A0B4J2F2;P57059"],[403160,569143,70110.1],[628954,469485,null],[603493,390541,null],[614230,476756,null],[581705,535058,64387.1],[543701,497088,null],["GATD3;GATD3B","PIGBOS1","SIK1;SIK1B"],[1,0.000542417,1],[1,0.00053056,null],[1,0.000643294,null],[1,0.000747624,null],[1,0.000748183,1],[1,0.00107591,null]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Protein.Group<\/th>\n      <th>F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_A6_1.raw<\/th>\n      <th>F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_A6_2.raw<\/th>\n      <th>F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_A6_3.raw<\/th>\n      <th>F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_B6_1.raw<\/th>\n      <th>F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_B6_2.raw<\/th>\n      <th>F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_B6_3.raw<\/th>\n      <th>Genes<\/th>\n      <th>Protein.Q.Value.F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_A6_1.raw<\/th>\n      <th>Protein.Q.Value.F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_A6_2.raw<\/th>\n      <th>Protein.Q.Value.F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_A6_3.raw<\/th>\n      <th>Protein.Q.Value.F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_B6_1.raw<\/th>\n      <th>Protein.Q.Value.F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_B6_2.raw<\/th>\n      <th>Protein.Q.Value.F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_B6_3.raw<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollX":true,"pageLength":3,"columnDefs":[{"className":"dt-right","targets":[2,3,4,5,6,7,9,10,11,12,13,14]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[3,10,25,50,100]}},"evals":[],"jsHooks":[]}</script><p><strong>Unique identifier</strong>. The <em>names</em> and
-<em>ids</em> are in the columns “Genes” and “Protein.Group”.</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-5084f0237e6638453f1a" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-5084f0237e6638453f1a">{"x":{"filter":"none","vertical":false,"data":[["1","2","3"],["A0A0B4J2D5;P0DPI2","A0A0B4J2F0","A0A0B4J2F2;P57059"],[403160,569143,70110.10000000001],[628954,469485,null],[603493,390541,null],[614230,476756,null],[581705,535058,64387.1],[543701,497088,null],["GATD3;GATD3B","PIGBOS1","SIK1;SIK1B"],[1,0.000542417,1],[1,0.00053056,null],[1,0.000643294,null],[1,0.000747624,null],[1,0.000748183,1],[1,0.00107591,null]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Protein.Group<\/th>\n      <th>F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_A6_1.raw<\/th>\n      <th>F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_A6_2.raw<\/th>\n      <th>F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_A6_3.raw<\/th>\n      <th>F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_B6_1.raw<\/th>\n      <th>F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_B6_2.raw<\/th>\n      <th>F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_B6_3.raw<\/th>\n      <th>Genes<\/th>\n      <th>Protein.Q.Value.F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_A6_1.raw<\/th>\n      <th>Protein.Q.Value.F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_A6_2.raw<\/th>\n      <th>Protein.Q.Value.F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_A6_3.raw<\/th>\n      <th>Protein.Q.Value.F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_B6_1.raw<\/th>\n      <th>Protein.Q.Value.F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_B6_2.raw<\/th>\n      <th>Protein.Q.Value.F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_B6_3.raw<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollX":true,"pageLength":3,"columnDefs":[{"className":"dt-right","targets":[2,3,4,5,6,7,9,10,11,12,13,14]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[3,10,25,50,100]}},"evals":[],"jsHooks":[]}</script><p><strong>Unique identifier</strong>. The <em>names</em> and <em>ids</em> are in the columns “Genes” and “Protein.Group”.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Generate unique names and ids</span></span>
 <span><span class="va">unique_diann_pg2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_unique.html">make_unique</a></span><span class="op">(</span><span class="va">Diann_rep_wided</span>, </span>
@@ -438,8 +378,7 @@ sample (e.g., “Q.Value”).</p>
 <span><span class="co">#&gt; 2                                                  A0A0B4J2F0</span></span>
 <span><span class="co">#&gt; 3                                           A0A0B4J2F2;P57059</span></span>
 <span><span class="co">#&gt; 4 A0A385XJ53;P0CF07;P0CF08;P0CF09;P0CF10;P0CF11;P0CF12;P0CF13</span></span></code></pre></div>
-<p><strong>Convert SE</strong>. The expression columns are also directly
-named by the file names of samples.</p>
+<p><strong>Convert SE</strong>. The expression columns are also directly named by the file names of samples.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Expression col in the DIA-NN report.pg_matrix</span></span>
 <span><span class="va">ecols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">".raw$"</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">unique_diann_pg2</span><span class="op">)</span>,value <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
@@ -485,9 +424,7 @@ named by the file names of samples.</p>
 <div class="section level4">
 <h4 id="conversion-from-spectronaut-report">Conversion from Spectronaut Report<a class="anchor" aria-label="anchor" href="#conversion-from-spectronaut-report"></a>
 </h4>
-<p>Spectronaut offers the ability to customize the output table. In this
-example, we will use the built-in MSstats style table, which is in a
-long-format.</p>
+<p>Spectronaut offers the ability to customize the output table. In this example, we will use the built-in MSstats style table, which is in a long-format.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Spe_repfile</span> <span class="op">&lt;-</span> <span class="st">"./A_spikeIn/Spectronaut_output/DIA_MSStats_Report.xls.gz"</span></span>
 <span><span class="va">Spe_rep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">Spe_repfile</span>,sep <span class="op">=</span> <span class="st">"\t"</span><span class="op">)</span> </span>
@@ -495,9 +432,9 @@ long-format.</p>
 <span><span class="co">#&gt; [1] 449106     12</span></span>
 <span></span>
 <span><span class="co">## Store both Precursor-, Peptides- and PG-level quality</span></span>
-<span><span class="fu">DT</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/DT/man/datatable.html" class="external-link">datatable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">Spe_rep</span><span class="op">)</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>scrollX <span class="op">=</span> <span class="cn">T</span>,pageLength <span class="op">=</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-bcd810a7737ddac18d71" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-bcd810a7737ddac18d71">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6"],["20211205_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5&lt;a6&gt;&lt;c1&gt;_FASP_DIA_A5_1","20211205_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5&lt;a6&gt;&lt;c1&gt;_FASP_DIA_A5_1","20211205_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5&lt;a6&gt;&lt;c1&gt;_FASP_DIA_A5_1","20211205_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5&lt;a6&gt;&lt;c1&gt;_FASP_DIA_A5_1","20211205_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5&lt;a6&gt;&lt;c1&gt;_FASP_DIA_A5_1","20211205_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5&lt;a6&gt;&lt;c1&gt;_FASP_DIA_A5_1"],[7.67954861027751e-08,7.37826131391528e-132,7.37826131391528e-132,7.37826131391528e-132,7.37826131391528e-132,1.98299265103186e-68],["NUDT4B;NUDT4","GATD3B;GATD3","GATD3B;GATD3","GATD3B;GATD3","GATD3B;GATD3","MMP24OS"],["A0A024RBG1;Q9NZJ9","A0A0B4J2D5;P0DPI2","A0A0B4J2D5;P0DPI2","A0A0B4J2D5;P0DPI2","A0A0B4J2D5;P0DPI2","A0A0U1RRL7"],["A0A024RBG1;Q9NZJ9","A0A0B4J2D5;P0DPI2","A0A0B4J2D5;P0DPI2","A0A0B4J2D5;P0DPI2","A0A0B4J2D5;P0DPI2","A0A0U1RRL7"],["NUD4B_HUMAN;NUDT4_HUMAN","GAL3B_HUMAN;GAL3A_HUMAN","GAL3B_HUMAN;GAL3A_HUMAN","GAL3B_HUMAN;GAL3A_HUMAN","GAL3B_HUMAN;GAL3A_HUMAN","MMPOS_HUMAN"],[0,0,0,0,0,0],[1,3,3,3,3,1],[13176.96484375,122699.0390625,122699.0390625,122699.0390625,122699.0390625,75306.1953125],["SEQEDEVLLVSSSR","ITDLANLSAANHDAAIFPGGFGAAK","EVVEAHVDQK","GVEVTVGHEQEEGGK","EFHQAGKPIGLCCIAPVLAAK","GAPEPAQTQPQPQPQPAAPEGPEQPR"],["SEQEDEVLLVSSSR","ITDLANLSAANHDAAIFPGGFGAAK","EVVEAHVDQK","GVEVTVGHEQEEGGK","EFHQAGKPIGLCCIAPVLAAK","GAPEPAQTQPQPQPQPAAPEGPEQPR"],[13176.96484375,250095.359375,107830.9453125,11695.9501953125,1,75306.1953125]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>R.FileName<\/th>\n      <th>PG.QValue..Run.Wise.<\/th>\n      <th>PG.Genes<\/th>\n      <th>PG.ProteinAccessions<\/th>\n      <th>PG.ProteinGroups<\/th>\n      <th>PG.ProteinNames<\/th>\n      <th>PG.Qvalue<\/th>\n      <th>PG.RunEvidenceCount<\/th>\n      <th>PG.Quantity<\/th>\n      <th>PEP.GroupingKey<\/th>\n      <th>PEP.StrippedSequence<\/th>\n      <th>PEP.Quantity<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollX":true,"pageLength":6,"columnDefs":[{"className":"dt-right","targets":[2,7,8,9,12]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[6,10,25,50,100]}},"evals":[],"jsHooks":[]}</script><p><strong>Reshape</strong> long table.</p>
+<span><span class="fu">DT</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/DT/man/datatable.html" class="external-link">datatable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">Spe_rep</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate_all.html" class="external-link">mutate_if</a></span><span class="op">(</span><span class="va">is.character</span>, <span class="fu">utf8</span><span class="fu">::</span><span class="va"><a href="https://ptrckprry.com/r-utf8/reference/utf8_encode.html" class="external-link">utf8_encode</a></span><span class="op">)</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>scrollX <span class="op">=</span> <span class="cn">T</span>,pageLength <span class="op">=</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-fdbbe8dfad0c86e56858" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-fdbbe8dfad0c86e56858">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6"],["20211205_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5\\xa6\\xc1_FASP_DIA_A5_1","20211205_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5\\xa6\\xc1_FASP_DIA_A5_1","20211205_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5\\xa6\\xc1_FASP_DIA_A5_1","20211205_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5\\xa6\\xc1_FASP_DIA_A5_1","20211205_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5\\xa6\\xc1_FASP_DIA_A5_1","20211205_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5\\xa6\\xc1_FASP_DIA_A5_1"],[7.67954861027751e-08,7.37826131391528e-132,7.37826131391528e-132,7.37826131391528e-132,7.37826131391528e-132,1.98299265103186e-68],["NUDT4B;NUDT4","GATD3B;GATD3","GATD3B;GATD3","GATD3B;GATD3","GATD3B;GATD3","MMP24OS"],["A0A024RBG1;Q9NZJ9","A0A0B4J2D5;P0DPI2","A0A0B4J2D5;P0DPI2","A0A0B4J2D5;P0DPI2","A0A0B4J2D5;P0DPI2","A0A0U1RRL7"],["A0A024RBG1;Q9NZJ9","A0A0B4J2D5;P0DPI2","A0A0B4J2D5;P0DPI2","A0A0B4J2D5;P0DPI2","A0A0B4J2D5;P0DPI2","A0A0U1RRL7"],["NUD4B_HUMAN;NUDT4_HUMAN","GAL3B_HUMAN;GAL3A_HUMAN","GAL3B_HUMAN;GAL3A_HUMAN","GAL3B_HUMAN;GAL3A_HUMAN","GAL3B_HUMAN;GAL3A_HUMAN","MMPOS_HUMAN"],[0,0,0,0,0,0],[1,3,3,3,3,1],[13176.96484375,122699.0390625,122699.0390625,122699.0390625,122699.0390625,75306.1953125],["SEQEDEVLLVSSSR","ITDLANLSAANHDAAIFPGGFGAAK","EVVEAHVDQK","GVEVTVGHEQEEGGK","EFHQAGKPIGLCCIAPVLAAK","GAPEPAQTQPQPQPQPAAPEGPEQPR"],["SEQEDEVLLVSSSR","ITDLANLSAANHDAAIFPGGFGAAK","EVVEAHVDQK","GVEVTVGHEQEEGGK","EFHQAGKPIGLCCIAPVLAAK","GAPEPAQTQPQPQPQPAAPEGPEQPR"],[13176.96484375,250095.359375,107830.9453125,11695.9501953125,1,75306.1953125]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>R.FileName<\/th>\n      <th>PG.QValue..Run.Wise.<\/th>\n      <th>PG.Genes<\/th>\n      <th>PG.ProteinAccessions<\/th>\n      <th>PG.ProteinGroups<\/th>\n      <th>PG.ProteinNames<\/th>\n      <th>PG.Qvalue<\/th>\n      <th>PG.RunEvidenceCount<\/th>\n      <th>PG.Quantity<\/th>\n      <th>PEP.GroupingKey<\/th>\n      <th>PEP.StrippedSequence<\/th>\n      <th>PEP.Quantity<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollX":true,"pageLength":6,"columnDefs":[{"className":"dt-right","targets":[2,7,8,9,12]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[6,10,25,50,100]}},"evals":[],"jsHooks":[]}</script><p><strong>Reshape</strong> long table.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Spe_rep_wided</span> <span class="op">=</span> <span class="fu"><a href="../reference/reshape_long2wide.html">reshape_long2wide</a></span><span class="op">(</span><span class="va">Spe_rep</span>,</span>
 <span>                                  sample_col <span class="op">=</span> <span class="st">"R.FileName"</span>,      <span class="co"># the column labeling sample names</span></span>
@@ -509,10 +446,8 @@ long-format.</p>
 <span>                                  <span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">DT</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/DT/man/datatable.html" class="external-link">datatable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">Spe_rep_wided</span><span class="op">)</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>scrollX <span class="op">=</span> <span class="cn">T</span>,pageLength <span class="op">=</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-aea2944123a5abb42b61" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-aea2944123a5abb42b61">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6"],["A0A024RBG1;Q9NZJ9","A0A0B4J2D5;P0DPI2","A0A0U1RRL7","A0A385XJ53;P0CF07;P0CF08;P0CF09;P0CF10;P0CF11;P0CF12;P0CF13","A0A385XJE6;P0CE49;P0CE50;P0CE51;P0CE52;P0CE53;P0CE54;P0CE55;P0CE56;P0CE57;P0CE58;P0CE59;P0CE60;P0CE61;P0CE62;P0CE63;P0CE64;P0CE65;P76071","A0AV96"],[13176.96484375,122699.0390625,75306.1953125,6142.08154296875,163282.640625,57251.90234375],[40587.54296875,194708.921875,54314.203125,5976.90625,104541.0078125,45763.26953125],[38172.60546875,159348.875,69445.3046875,7738.24169921875,45158.515625,49096.0625],[40311.69140625,119929.796875,77590.5703125,18182.8515625,221442.75,50882.83203125],[38109.078125,123110.3125,100368.2890625,19809.111328125,201767.40625,51212.234375],[42953.93359375,164581.8125,81528.7578125,19082.6484375,217305.625,45542.8203125],["NUDT4B;NUDT4","GATD3B;GATD3","MMP24OS","insA9;insA1;insA2;insA3;insA4;insA5;insA6;insA8","insH21;insH1;insH2;insH3;insH4;insH6;insH7;insH8;insH9;insH10;insH11;JW1882;JW5895;JW5914;JW5928;JW5935;JW5936;JW5951;insH5","RBM47"],[0,0,0,0,0,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>PG.ProteinGroups<\/th>\n      <th>A5_1<\/th>\n      <th>A5_2<\/th>\n      <th>A5_3<\/th>\n      <th>B5_1<\/th>\n      <th>B5_2<\/th>\n      <th>B5_3<\/th>\n      <th>PG.Genes<\/th>\n      <th>PG.Qvalue<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollX":true,"pageLength":6,"columnDefs":[{"className":"dt-right","targets":[2,3,4,5,6,7,9]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[6,10,25,50,100]}},"evals":[],"jsHooks":[]}</script><p><strong>Unique identifier</strong>. The <em>names</em> and
-<em>Protein.Group</em> are located in the “Genes” and “Protein.Group”
-columns.</p>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-490ca3aad850f7c33172" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-490ca3aad850f7c33172">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6"],["A0A024RBG1;Q9NZJ9","A0A0B4J2D5;P0DPI2","A0A0U1RRL7","A0A385XJ53;P0CF07;P0CF08;P0CF09;P0CF10;P0CF11;P0CF12;P0CF13","A0A385XJE6;P0CE49;P0CE50;P0CE51;P0CE52;P0CE53;P0CE54;P0CE55;P0CE56;P0CE57;P0CE58;P0CE59;P0CE60;P0CE61;P0CE62;P0CE63;P0CE64;P0CE65;P76071","A0AV96"],[13176.96484375,122699.0390625,75306.1953125,6142.08154296875,163282.640625,57251.90234375],[40587.54296875,194708.921875,54314.203125,5976.90625,104541.0078125,45763.26953125],[38172.60546875,159348.875,69445.3046875,7738.24169921875,45158.515625,49096.0625],[40311.69140625,119929.796875,77590.5703125,18182.8515625,221442.75,50882.83203125],[38109.078125,123110.3125,100368.2890625,19809.111328125,201767.40625,51212.234375],[42953.93359375,164581.8125,81528.7578125,19082.6484375,217305.625,45542.8203125],["NUDT4B;NUDT4","GATD3B;GATD3","MMP24OS","insA9;insA1;insA2;insA3;insA4;insA5;insA6;insA8","insH21;insH1;insH2;insH3;insH4;insH6;insH7;insH8;insH9;insH10;insH11;JW1882;JW5895;JW5914;JW5928;JW5935;JW5936;JW5951;insH5","RBM47"],[0,0,0,0,0,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>PG.ProteinGroups<\/th>\n      <th>A5_1<\/th>\n      <th>A5_2<\/th>\n      <th>A5_3<\/th>\n      <th>B5_1<\/th>\n      <th>B5_2<\/th>\n      <th>B5_3<\/th>\n      <th>PG.Genes<\/th>\n      <th>PG.Qvalue<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollX":true,"pageLength":6,"columnDefs":[{"className":"dt-right","targets":[2,3,4,5,6,7,9]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[6,10,25,50,100]}},"evals":[],"jsHooks":[]}</script><p><strong>Unique identifier</strong>. The <em>names</em> and <em>Protein.Group</em> are located in the “Genes” and “Protein.Group” columns.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Generate unique names and ids</span></span>
 <span><span class="va">unique_spe_pg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_unique.html">make_unique</a></span><span class="op">(</span><span class="va">Spe_rep_wided</span>, </span>
@@ -532,8 +467,7 @@ columns.</p>
 <span><span class="co">#&gt; 2                                           A0A0B4J2D5;P0DPI2</span></span>
 <span><span class="co">#&gt; 3                                                  A0A0U1RRL7</span></span>
 <span><span class="co">#&gt; 4 A0A385XJ53;P0CF07;P0CF08;P0CF09;P0CF10;P0CF11;P0CF12;P0CF13</span></span></code></pre></div>
-<p><strong>Convert SE</strong>. The expression columns is directly named
-by the file names of samples.</p>
+<p><strong>Convert SE</strong>. The expression columns is directly named by the file names of samples.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Expression columns in the Spectronaut output</span></span>
 <span><span class="va">ecols</span> <span class="op">&lt;-</span> <span class="fl">2</span><span class="op">:</span><span class="fl">7</span></span>
@@ -566,28 +500,17 @@ by the file names of samples.</p>
 <div class="section level3">
 <h3 id="converting-peptide-level-data-to-a-qfeatures-object">Converting peptide-level data to a QFeatures object<a class="anchor" aria-label="anchor" href="#converting-peptide-level-data-to-a-qfeatures-object"></a>
 </h3>
-<p>DEP2 provides a pipeline, using the QFeature package, to aggregate
-and summarize peptide quantities into protein-level.The protein-level
-quantities used in the preceding section were counted by upstream
-software and mostly summarized using the maxLFQ algorithm. DEP2 offers
-other aggregation strategies in this peptide-to-protein analysis
-pipeline.</p>
-<p>The following code snippet demonstrates the conversion of
-peptide-level data to a QFeatures object using different software
-outputs.</p>
+<p>DEP2 provides a pipeline, using the QFeature package, to aggregate and summarize peptide quantities into protein-level.The protein-level quantities used in the preceding section were counted by upstream software and mostly summarized using the maxLFQ algorithm. DEP2 offers other aggregation strategies in this peptide-to-protein analysis pipeline.</p>
+<p>The following code snippet demonstrates the conversion of peptide-level data to a QFeatures object using different software outputs.</p>
 <div class="section level4">
 <h4 id="conversion-from-maxquant-peptides">Conversion from MaxQuant peptides<a class="anchor" aria-label="anchor" href="#conversion-from-maxquant-peptides"></a>
 </h4>
-<p>The first step is to load in peptide-level data into
-<em>QFeatures</em> class via the <code>make_pe</code> or
-<code>make_pe_pars</code> function. We start by reading the peptides.txt
-file from the MaxQuant txt directory.</p>
+<p>The first step is to load in peptide-level data into <em>QFeatures</em> class via the <code>make_pe</code> or <code>make_pe_pars</code> function. We start by reading the peptides.txt file from the MaxQuant txt directory.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mq_pepfile</span> <span class="op">&lt;-</span> <span class="st">"./A_spikeIn/MaxQuant_output/peptides.txt.gz"</span></span>
 <span></span>
 <span><span class="va">mq_pep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">mq_pepfile</span>,sep <span class="op">=</span> <span class="st">"\t"</span><span class="op">)</span></span></code></pre></div>
-<p>To convert the data into a <code>QFeatures</code> object, we extract
-the ‘intensity’ columns.</p>
+<p>To convert the data into a <code>QFeatures</code> object, we extract the ‘intensity’ columns.</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ecols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"Intensity."</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">mq_pep</span><span class="op">)</span><span class="op">)</span> <span class="co">## the peptides intensity cols</span></span>
 <span><span class="va">mq_pe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_pe.html">make_pe</a></span><span class="op">(</span><span class="va">mq_pep</span>, columns <span class="op">=</span> <span class="va">ecols</span>, expdesign <span class="op">=</span> <span class="va">expdesign</span><span class="op">)</span></span>
@@ -598,8 +521,7 @@ the ‘intensity’ columns.</p>
 <div class="section level4">
 <h4 id="conversion-from-fragpipe-combined_peptides">Conversion from FragPipe combined_peptides<a class="anchor" aria-label="anchor" href="#conversion-from-fragpipe-combined_peptides"></a>
 </h4>
-<p>Next, we process the combined_peptide.tsv file generated by
-FragPipe.</p>
+<p>Next, we process the combined_peptide.tsv file generated by FragPipe.</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">FragP_pepfile</span> <span class="op">&lt;-</span> <span class="st">"./A_spikeIn/FragPipe_output/combined_peptide.tsv.gz"</span></span>
 <span></span>
@@ -625,12 +547,7 @@ FragPipe.</p>
 <div class="section level4">
 <h4 id="conversion-from-dia-nn-report">Conversion from DIA-NN report<a class="anchor" aria-label="anchor" href="#conversion-from-dia-nn-report"></a>
 </h4>
-<p>We <strong>reshape</strong> the peptide quantities into a wide table
-using the <code>reshape_long2wide</code> function. The
-‘Stripped.Sequence’ column represents the peptide IDs. A stripped
-peptide may have multiple precursors due to variable modifications or
-different charge states. For these peptides, the function retains the
-maximum expression values.</p>
+<p>We <strong>reshape</strong> the peptide quantities into a wide table using the <code>reshape_long2wide</code> function. The ‘Stripped.Sequence’ column represents the peptide IDs. A stripped peptide may have multiple precursors due to variable modifications or different charge states. For these peptides, the function retains the maximum expression values.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">## filter out proteingroups exceed the threshold value</span></span>
@@ -647,8 +564,8 @@ maximum expression values.</p>
 <span>                                    <span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">DT</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/DT/man/datatable.html" class="external-link">datatable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">Diann_pep_wided</span><span class="op">)</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>scrollX <span class="op">=</span> <span class="cn">T</span>,pageLength <span class="op">=</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-e23d706b78fdb39e1ed2" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-e23d706b78fdb39e1ed2">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6"],["AAAAAAAAAAAAAAAGAGAGAK","AAAAAAAAAPAAAATAPTTAATTAATAAQ","AAAAAAAAGAFAGR","AAAAAAAGDSDSWDADAFSVEDPVR","AAAAAAAGDSDSWDADAFSVEDPVRK","AAAAAAALQAK"],[1262150,276517,720155,3699900,25266900,333706],[1167480,234608,701191,4417610,21415600,301121],[1192170,172256,656106,4848980,21009500,289805],[1081300,239481,508512,7033580,23675500,362111],[1192630,269866,717595,4631290,27571100,300490],[1272230,251862,686968,4230860,22918600,290802],["P55011","P37108","Q8N697","O75822","O75822","P36578"],["SLC12A2","SRP14","SLC15A4","EIF3J","EIF3J","RPL4"],[0.000258474,0.000417787,0.00152047,0.000929368,0.000929368,0.000258474],[0.000258474,0.000417787,0.00152047,0.000929368,0.000929368,0.000258474],[0.000258474,0.000417787,0.00152047,0.000929368,0.000929368,0.000258474],[0.000258474,0.000417787,0.00152047,0.000929368,0.000929368,0.000258474],[0.000258474,0.000417787,0.00152047,0.000929368,0.000929368,0.000258474],[0.000258474,0.000417787,0.00152047,0.000929368,0.000929368,0.000258474]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Stripped.Sequence<\/th>\n      <th>F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_B6_1.raw<\/th>\n      <th>F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_B6_3.raw<\/th>\n      <th>F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_B6_2.raw<\/th>\n      <th>F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_A6_1.raw<\/th>\n      <th>F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_A6_3.raw<\/th>\n      <th>F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_A6_2.raw<\/th>\n      <th>Protein.Group<\/th>\n      <th>Genes<\/th>\n      <th>Global.Q.Value.F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_B6_1.raw<\/th>\n      <th>Global.Q.Value.F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_B6_3.raw<\/th>\n      <th>Global.Q.Value.F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_B6_2.raw<\/th>\n      <th>Global.Q.Value.F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_A6_1.raw<\/th>\n      <th>Global.Q.Value.F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_A6_3.raw<\/th>\n      <th>Global.Q.Value.F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_A6_2.raw<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollX":true,"pageLength":6,"columnDefs":[{"className":"dt-right","targets":[2,3,4,5,6,7,10,11,12,13,14,15]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[6,10,25,50,100]}},"evals":[],"jsHooks":[]}</script><div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-b2b1ec7b8227c9388267" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-b2b1ec7b8227c9388267">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6"],["AAAAAAAAAAAAAAAGAGAGAK","AAAAAAAAAPAAAATAPTTAATTAATAAQ","AAAAAAAAGAFAGR","AAAAAAAGDSDSWDADAFSVEDPVR","AAAAAAAGDSDSWDADAFSVEDPVRK","AAAAAAALQAK"],[1262150,276517,720155,3699900,25266900,333706],[1167480,234608,701191,4417610,21415600,301121],[1192170,172256,656106,4848980,21009500,289805],[1081300,239481,508512,7033580,23675500,362111],[1192630,269866,717595,4631290,27571100,300490],[1272230,251862,686968,4230860,22918600,290802],["P55011","P37108","Q8N697","O75822","O75822","P36578"],["SLC12A2","SRP14","SLC15A4","EIF3J","EIF3J","RPL4"],[0.000258474,0.000417787,0.00152047,0.000929368,0.000929368,0.000258474],[0.000258474,0.000417787,0.00152047,0.000929368,0.000929368,0.000258474],[0.000258474,0.000417787,0.00152047,0.000929368,0.000929368,0.000258474],[0.000258474,0.000417787,0.00152047,0.000929368,0.000929368,0.000258474],[0.000258474,0.000417787,0.00152047,0.000929368,0.000929368,0.000258474],[0.000258474,0.000417787,0.00152047,0.000929368,0.000929368,0.000258474]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Stripped.Sequence<\/th>\n      <th>F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_B6_1.raw<\/th>\n      <th>F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_B6_3.raw<\/th>\n      <th>F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_B6_2.raw<\/th>\n      <th>F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_A6_1.raw<\/th>\n      <th>F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_A6_3.raw<\/th>\n      <th>F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_A6_2.raw<\/th>\n      <th>Protein.Group<\/th>\n      <th>Genes<\/th>\n      <th>Global.Q.Value.F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_B6_1.raw<\/th>\n      <th>Global.Q.Value.F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_B6_3.raw<\/th>\n      <th>Global.Q.Value.F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_B6_2.raw<\/th>\n      <th>Global.Q.Value.F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_A6_1.raw<\/th>\n      <th>Global.Q.Value.F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_A6_3.raw<\/th>\n      <th>Global.Q.Value.F..DIA_5.20211207_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5.Á_FASP_DIA_A6_2.raw<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollX":true,"pageLength":6,"columnDefs":[{"className":"dt-right","targets":[2,3,4,5,6,7,10,11,12,13,14,15]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[6,10,25,50,100]}},"evals":[],"jsHooks":[]}</script><div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ecols</span> <span class="op">=</span> <span class="fl">2</span><span class="op">:</span><span class="fl">7</span></span>
 <span></span>
 <span><span class="va">pe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_pe_parse.html">make_pe_parse</a></span><span class="op">(</span><span class="va">Diann_pep_wided</span>, columns <span class="op">=</span> <span class="va">ecols</span>, </span>
@@ -667,9 +584,9 @@ maximum expression values.</p>
 <span><span class="co">#&gt; [1] 449106     12</span></span>
 <span></span>
 <span><span class="co">## Store both Precursor-, Peptides- and PG-level quality</span></span>
-<span><span class="fu">DT</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/DT/man/datatable.html" class="external-link">datatable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">Spe_rep</span><span class="op">)</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>scrollX <span class="op">=</span> <span class="cn">T</span>,pageLength <span class="op">=</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-49a2f53dd398484094a9" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-49a2f53dd398484094a9">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6"],["20211205_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5&lt;a6&gt;&lt;c1&gt;_FASP_DIA_A5_1","20211205_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5&lt;a6&gt;&lt;c1&gt;_FASP_DIA_A5_1","20211205_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5&lt;a6&gt;&lt;c1&gt;_FASP_DIA_A5_1","20211205_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5&lt;a6&gt;&lt;c1&gt;_FASP_DIA_A5_1","20211205_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5&lt;a6&gt;&lt;c1&gt;_FASP_DIA_A5_1","20211205_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5&lt;a6&gt;&lt;c1&gt;_FASP_DIA_A5_1"],[7.67954861027751e-08,7.37826131391528e-132,7.37826131391528e-132,7.37826131391528e-132,7.37826131391528e-132,1.98299265103186e-68],["NUDT4B;NUDT4","GATD3B;GATD3","GATD3B;GATD3","GATD3B;GATD3","GATD3B;GATD3","MMP24OS"],["A0A024RBG1;Q9NZJ9","A0A0B4J2D5;P0DPI2","A0A0B4J2D5;P0DPI2","A0A0B4J2D5;P0DPI2","A0A0B4J2D5;P0DPI2","A0A0U1RRL7"],["A0A024RBG1;Q9NZJ9","A0A0B4J2D5;P0DPI2","A0A0B4J2D5;P0DPI2","A0A0B4J2D5;P0DPI2","A0A0B4J2D5;P0DPI2","A0A0U1RRL7"],["NUD4B_HUMAN;NUDT4_HUMAN","GAL3B_HUMAN;GAL3A_HUMAN","GAL3B_HUMAN;GAL3A_HUMAN","GAL3B_HUMAN;GAL3A_HUMAN","GAL3B_HUMAN;GAL3A_HUMAN","MMPOS_HUMAN"],[0,0,0,0,0,0],[1,3,3,3,3,1],[13176.96484375,122699.0390625,122699.0390625,122699.0390625,122699.0390625,75306.1953125],["SEQEDEVLLVSSSR","ITDLANLSAANHDAAIFPGGFGAAK","EVVEAHVDQK","GVEVTVGHEQEEGGK","EFHQAGKPIGLCCIAPVLAAK","GAPEPAQTQPQPQPQPAAPEGPEQPR"],["SEQEDEVLLVSSSR","ITDLANLSAANHDAAIFPGGFGAAK","EVVEAHVDQK","GVEVTVGHEQEEGGK","EFHQAGKPIGLCCIAPVLAAK","GAPEPAQTQPQPQPQPAAPEGPEQPR"],[13176.96484375,250095.359375,107830.9453125,11695.9501953125,1,75306.1953125]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>R.FileName<\/th>\n      <th>PG.QValue..Run.Wise.<\/th>\n      <th>PG.Genes<\/th>\n      <th>PG.ProteinAccessions<\/th>\n      <th>PG.ProteinGroups<\/th>\n      <th>PG.ProteinNames<\/th>\n      <th>PG.Qvalue<\/th>\n      <th>PG.RunEvidenceCount<\/th>\n      <th>PG.Quantity<\/th>\n      <th>PEP.GroupingKey<\/th>\n      <th>PEP.StrippedSequence<\/th>\n      <th>PEP.Quantity<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollX":true,"pageLength":6,"columnDefs":[{"className":"dt-right","targets":[2,7,8,9,12]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[6,10,25,50,100]}},"evals":[],"jsHooks":[]}</script><p><strong>Reshape</strong> the long-table.</p>
+<span><span class="fu">DT</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/DT/man/datatable.html" class="external-link">datatable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">Spe_rep</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate_all.html" class="external-link">mutate_if</a></span><span class="op">(</span><span class="va">is.character</span>, <span class="fu">utf8</span><span class="fu">::</span><span class="va"><a href="https://ptrckprry.com/r-utf8/reference/utf8_encode.html" class="external-link">utf8_encode</a></span><span class="op">)</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>scrollX <span class="op">=</span> <span class="cn">T</span>,pageLength <span class="op">=</span> <span class="fl">6</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-6445b01147811516e1fa" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-6445b01147811516e1fa">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6"],["20211205_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5\\xa6\\xc1_FASP_DIA_A5_1","20211205_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5\\xa6\\xc1_FASP_DIA_A5_1","20211205_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5\\xa6\\xc1_FASP_DIA_A5_1","20211205_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5\\xa6\\xc1_FASP_DIA_A5_1","20211205_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5\\xa6\\xc1_FASP_DIA_A5_1","20211205_LM_SA_ZXF_LY_FZH_Hela_AH109_DH5\\xa6\\xc1_FASP_DIA_A5_1"],[7.67954861027751e-08,7.37826131391528e-132,7.37826131391528e-132,7.37826131391528e-132,7.37826131391528e-132,1.98299265103186e-68],["NUDT4B;NUDT4","GATD3B;GATD3","GATD3B;GATD3","GATD3B;GATD3","GATD3B;GATD3","MMP24OS"],["A0A024RBG1;Q9NZJ9","A0A0B4J2D5;P0DPI2","A0A0B4J2D5;P0DPI2","A0A0B4J2D5;P0DPI2","A0A0B4J2D5;P0DPI2","A0A0U1RRL7"],["A0A024RBG1;Q9NZJ9","A0A0B4J2D5;P0DPI2","A0A0B4J2D5;P0DPI2","A0A0B4J2D5;P0DPI2","A0A0B4J2D5;P0DPI2","A0A0U1RRL7"],["NUD4B_HUMAN;NUDT4_HUMAN","GAL3B_HUMAN;GAL3A_HUMAN","GAL3B_HUMAN;GAL3A_HUMAN","GAL3B_HUMAN;GAL3A_HUMAN","GAL3B_HUMAN;GAL3A_HUMAN","MMPOS_HUMAN"],[0,0,0,0,0,0],[1,3,3,3,3,1],[13176.96484375,122699.0390625,122699.0390625,122699.0390625,122699.0390625,75306.1953125],["SEQEDEVLLVSSSR","ITDLANLSAANHDAAIFPGGFGAAK","EVVEAHVDQK","GVEVTVGHEQEEGGK","EFHQAGKPIGLCCIAPVLAAK","GAPEPAQTQPQPQPQPAAPEGPEQPR"],["SEQEDEVLLVSSSR","ITDLANLSAANHDAAIFPGGFGAAK","EVVEAHVDQK","GVEVTVGHEQEEGGK","EFHQAGKPIGLCCIAPVLAAK","GAPEPAQTQPQPQPQPAAPEGPEQPR"],[13176.96484375,250095.359375,107830.9453125,11695.9501953125,1,75306.1953125]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>R.FileName<\/th>\n      <th>PG.QValue..Run.Wise.<\/th>\n      <th>PG.Genes<\/th>\n      <th>PG.ProteinAccessions<\/th>\n      <th>PG.ProteinGroups<\/th>\n      <th>PG.ProteinNames<\/th>\n      <th>PG.Qvalue<\/th>\n      <th>PG.RunEvidenceCount<\/th>\n      <th>PG.Quantity<\/th>\n      <th>PEP.GroupingKey<\/th>\n      <th>PEP.StrippedSequence<\/th>\n      <th>PEP.Quantity<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollX":true,"pageLength":6,"columnDefs":[{"className":"dt-right","targets":[2,7,8,9,12]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[6,10,25,50,100]}},"evals":[],"jsHooks":[]}</script><p><strong>Reshape</strong> the long-table.</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Spe_rep_wided2</span> <span class="op">=</span> <span class="fu"><a href="../reference/reshape_long2wide.html">reshape_long2wide</a></span><span class="op">(</span><span class="va">Spe_rep</span>,</span>
 <span>                                   sample_col <span class="op">=</span> <span class="st">"R.FileName"</span>,      <span class="co"># the column labeling sample names</span></span>
@@ -703,104 +620,106 @@ maximum expression values.</p>
 <div class="section level2">
 <h2 id="session-information">Session information<a class="anchor" aria-label="anchor" href="#session-information"></a>
 </h2>
-<pre><code><span><span class="co">#&gt; R version 4.2.1 (2022-06-23 ucrt)</span></span>
-<span><span class="co">#&gt; Platform: x86_64-w64-mingw32/x64 (64-bit)</span></span>
-<span><span class="co">#&gt; Running under: Windows 10 x64 (build 19043)</span></span>
+<pre><code><span><span class="co">#&gt; R version 4.3.1 (2023-06-16)</span></span>
+<span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu (64-bit)</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 18.04.5 LTS</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Matrix products: default</span></span>
+<span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.7.1 </span></span>
+<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.7.1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; locale:</span></span>
-<span><span class="co">#&gt; [1] LC_COLLATE=English_United States.utf8 </span></span>
-<span><span class="co">#&gt; [2] LC_CTYPE=English_United States.utf8   </span></span>
-<span><span class="co">#&gt; [3] LC_MONETARY=English_United States.utf8</span></span>
-<span><span class="co">#&gt; [4] LC_NUMERIC=C                          </span></span>
-<span><span class="co">#&gt; [5] LC_TIME=English_United States.utf8    </span></span>
+<span><span class="co">#&gt;  [1] LC_CTYPE=zh_CN.UTF-8       LC_NUMERIC=C              </span></span>
+<span><span class="co">#&gt;  [3] LC_TIME=zh_CN.UTF-8        LC_COLLATE=zh_CN.UTF-8    </span></span>
+<span><span class="co">#&gt;  [5] LC_MONETARY=zh_CN.UTF-8    LC_MESSAGES=zh_CN.UTF-8   </span></span>
+<span><span class="co">#&gt;  [7] LC_PAPER=zh_CN.UTF-8       LC_NAME=C                 </span></span>
+<span><span class="co">#&gt;  [9] LC_ADDRESS=C               LC_TELEPHONE=C            </span></span>
+<span><span class="co">#&gt; [11] LC_MEASUREMENT=zh_CN.UTF-8 LC_IDENTIFICATION=C       </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; time zone: Asia/Shanghai</span></span>
+<span><span class="co">#&gt; tzcode source: system (glibc)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; attached base packages:</span></span>
 <span><span class="co">#&gt; [1] stats4    stats     graphics  grDevices utils     datasets  methods  </span></span>
 <span><span class="co">#&gt; [8] base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt;  [1] DEP2_0.3.06.13              R6_2.5.1                   </span></span>
-<span><span class="co">#&gt;  [3] limma_3.54.1                MSnbase_2.24.2             </span></span>
-<span><span class="co">#&gt;  [5] ProtGenerics_1.30.0         mzR_2.32.0                 </span></span>
-<span><span class="co">#&gt;  [7] Rcpp_1.0.10                 MsCoreUtils_1.10.0         </span></span>
-<span><span class="co">#&gt;  [9] SummarizedExperiment_1.28.0 Biobase_2.58.0             </span></span>
-<span><span class="co">#&gt; [11] GenomicRanges_1.50.2        GenomeInfoDb_1.34.9        </span></span>
-<span><span class="co">#&gt; [13] IRanges_2.32.0              S4Vectors_0.36.1           </span></span>
-<span><span class="co">#&gt; [15] BiocGenerics_0.44.0         MatrixGenerics_1.10.0      </span></span>
-<span><span class="co">#&gt; [17] matrixStats_0.63.0          BiocStyle_2.26.0           </span></span>
+<span><span class="co">#&gt;  [1] dplyr_1.1.2                 DEP2_0.3.7.3               </span></span>
+<span><span class="co">#&gt;  [3] R6_2.5.1                    limma_3.56.2               </span></span>
+<span><span class="co">#&gt;  [5] MSnbase_2.26.0              ProtGenerics_1.32.0        </span></span>
+<span><span class="co">#&gt;  [7] mzR_2.34.1                  Rcpp_1.0.11                </span></span>
+<span><span class="co">#&gt;  [9] MsCoreUtils_1.12.0          SummarizedExperiment_1.30.2</span></span>
+<span><span class="co">#&gt; [11] Biobase_2.60.0              GenomicRanges_1.52.0       </span></span>
+<span><span class="co">#&gt; [13] GenomeInfoDb_1.36.1         IRanges_2.34.1             </span></span>
+<span><span class="co">#&gt; [15] S4Vectors_0.38.1            BiocGenerics_0.46.0        </span></span>
+<span><span class="co">#&gt; [17] MatrixGenerics_1.12.2       matrixStats_1.0.0          </span></span>
+<span><span class="co">#&gt; [19] BiocStyle_2.28.0           </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;   [1] circlize_0.4.15             BiocBaseUtils_1.0.0        </span></span>
-<span><span class="co">#&gt;   [3] systemfonts_1.0.4           plyr_1.8.8                 </span></span>
-<span><span class="co">#&gt;   [5] igraph_1.4.0                lazyeval_0.2.2             </span></span>
-<span><span class="co">#&gt;   [7] splines_4.2.1               crosstalk_1.2.0            </span></span>
-<span><span class="co">#&gt;   [9] BiocParallel_1.32.5         TCseq_1.22.6               </span></span>
-<span><span class="co">#&gt;  [11] ggplot2_3.4.1               digest_0.6.31              </span></span>
-<span><span class="co">#&gt;  [13] foreach_1.5.2               htmltools_0.5.4            </span></span>
-<span><span class="co">#&gt;  [15] fansi_1.0.4                 magrittr_2.0.3             </span></span>
-<span><span class="co">#&gt;  [17] memoise_2.0.1               cluster_2.1.4              </span></span>
-<span><span class="co">#&gt;  [19] doParallel_1.0.17           ComplexHeatmap_2.14.0      </span></span>
-<span><span class="co">#&gt;  [21] Biostrings_2.66.0           annotate_1.76.0            </span></span>
-<span><span class="co">#&gt;  [23] askpass_1.1                 pkgdown_2.0.7              </span></span>
-<span><span class="co">#&gt;  [25] colorspace_2.1-0            blob_1.2.3                 </span></span>
-<span><span class="co">#&gt;  [27] textshaping_0.3.6           xfun_0.39                  </span></span>
-<span><span class="co">#&gt;  [29] dplyr_1.1.0                 crayon_1.5.2               </span></span>
-<span><span class="co">#&gt;  [31] RCurl_1.98-1.10             jsonlite_1.8.4             </span></span>
-<span><span class="co">#&gt;  [33] missForest_1.5              impute_1.72.3              </span></span>
-<span><span class="co">#&gt;  [35] survival_3.5-3              iterators_1.0.14           </span></span>
-<span><span class="co">#&gt;  [37] glue_1.6.2                  gtable_0.3.1               </span></span>
-<span><span class="co">#&gt;  [39] zlibbioc_1.44.0             XVector_0.38.0             </span></span>
-<span><span class="co">#&gt;  [41] GetoptLong_1.0.5            DelayedArray_0.23.2        </span></span>
-<span><span class="co">#&gt;  [43] shape_1.4.6                 scales_1.2.1               </span></span>
-<span><span class="co">#&gt;  [45] vsn_3.66.0                  rngtools_1.5.2             </span></span>
-<span><span class="co">#&gt;  [47] DBI_1.1.3                   edgeR_3.40.2               </span></span>
-<span><span class="co">#&gt;  [49] xtable_1.8-4                clue_0.3-64                </span></span>
-<span><span class="co">#&gt;  [51] reticulate_1.28             bit_4.0.5                  </span></span>
-<span><span class="co">#&gt;  [53] proxy_0.4-27                preprocessCore_1.60.2      </span></span>
-<span><span class="co">#&gt;  [55] DT_0.27                     umap_0.2.10.0              </span></span>
-<span><span class="co">#&gt;  [57] glmnet_4.1-6                htmlwidgets_1.6.1          </span></span>
-<span><span class="co">#&gt;  [59] httr_1.4.4                  RColorBrewer_1.1-3         </span></span>
-<span><span class="co">#&gt;  [61] ellipsis_0.3.2              pkgconfig_2.0.3            </span></span>
-<span><span class="co">#&gt;  [63] XML_3.99-0.13               sass_0.4.5                 </span></span>
-<span><span class="co">#&gt;  [65] locfit_1.5-9.7              utf8_1.2.3                 </span></span>
-<span><span class="co">#&gt;  [67] tidyselect_1.2.0            rlang_1.0.6                </span></span>
-<span><span class="co">#&gt;  [69] reshape2_1.4.4              AnnotationDbi_1.60.0       </span></span>
-<span><span class="co">#&gt;  [71] munsell_0.5.0               tools_4.2.1                </span></span>
-<span><span class="co">#&gt;  [73] cachem_1.0.6                cli_3.6.0                  </span></span>
-<span><span class="co">#&gt;  [75] generics_0.1.3              RSQLite_2.3.0              </span></span>
-<span><span class="co">#&gt;  [77] QFeatures_1.8.0             fdrtool_1.2.17             </span></span>
-<span><span class="co">#&gt;  [79] evaluate_0.20               stringr_1.5.0              </span></span>
-<span><span class="co">#&gt;  [81] fastmap_1.1.0               mzID_1.36.0                </span></span>
-<span><span class="co">#&gt;  [83] yaml_2.3.7                  ragg_1.2.5                 </span></span>
-<span><span class="co">#&gt;  [85] knitr_1.42                  bit64_4.0.5                </span></span>
-<span><span class="co">#&gt;  [87] fs_1.6.1                    purrr_1.0.1                </span></span>
-<span><span class="co">#&gt;  [89] randomForest_4.7-1.1        KEGGREST_1.38.0            </span></span>
-<span><span class="co">#&gt;  [91] AnnotationFilter_1.22.0     ncdf4_1.21                 </span></span>
-<span><span class="co">#&gt;  [93] doRNG_1.8.6                 compiler_4.2.1             </span></span>
-<span><span class="co">#&gt;  [95] rstudioapi_0.14             png_0.1-8                  </span></span>
-<span><span class="co">#&gt;  [97] e1071_1.7-13                affyio_1.68.0              </span></span>
-<span><span class="co">#&gt;  [99] tibble_3.1.8                geneplotter_1.76.0         </span></span>
-<span><span class="co">#&gt; [101] bslib_0.4.2                 stringi_1.7.12             </span></span>
-<span><span class="co">#&gt; [103] RSpectra_0.16-1             desc_1.4.2                 </span></span>
-<span><span class="co">#&gt; [105] lattice_0.20-45             Matrix_1.5-3               </span></span>
-<span><span class="co">#&gt; [107] vctrs_0.5.2                 pillar_1.8.1               </span></span>
-<span><span class="co">#&gt; [109] lifecycle_1.0.3             BiocManager_1.30.19        </span></span>
-<span><span class="co">#&gt; [111] jquerylib_0.1.4             MALDIquant_1.22            </span></span>
-<span><span class="co">#&gt; [113] GlobalOptions_0.1.2         data.table_1.14.8          </span></span>
-<span><span class="co">#&gt; [115] bitops_1.0-7                pcaMethods_1.90.0          </span></span>
-<span><span class="co">#&gt; [117] affy_1.76.0                 bookdown_0.34              </span></span>
-<span><span class="co">#&gt; [119] codetools_0.2-19            MASS_7.3-58.2              </span></span>
-<span><span class="co">#&gt; [121] assertthat_0.2.1            openssl_2.0.5              </span></span>
-<span><span class="co">#&gt; [123] DESeq2_1.38.3               rprojroot_2.0.3            </span></span>
-<span><span class="co">#&gt; [125] rjson_0.2.21                withr_2.5.0                </span></span>
-<span><span class="co">#&gt; [127] GenomicAlignments_1.34.0    Rsamtools_2.14.0           </span></span>
-<span><span class="co">#&gt; [129] GenomeInfoDbData_1.2.9      parallel_4.2.1             </span></span>
-<span><span class="co">#&gt; [131] MultiAssayExperiment_1.24.0 grid_4.2.1                 </span></span>
-<span><span class="co">#&gt; [133] tidyr_1.3.0                 class_7.3-21               </span></span>
-<span><span class="co">#&gt; [135] rmarkdown_2.20              Rtsne_0.16                 </span></span>
-<span><span class="co">#&gt; [137] itertools_0.1-3</span></span></code></pre>
+<span><span class="co">#&gt;   [1] RColorBrewer_1.1-3          rstudioapi_0.15.0          </span></span>
+<span><span class="co">#&gt;   [3] jsonlite_1.8.7              shape_1.4.6                </span></span>
+<span><span class="co">#&gt;   [5] umap_0.2.10.0               MultiAssayExperiment_1.26.0</span></span>
+<span><span class="co">#&gt;   [7] magrittr_2.0.3              MALDIquant_1.22.1          </span></span>
+<span><span class="co">#&gt;   [9] rmarkdown_2.23              GlobalOptions_0.1.2        </span></span>
+<span><span class="co">#&gt;  [11] fs_1.6.2                    zlibbioc_1.46.0            </span></span>
+<span><span class="co">#&gt;  [13] ragg_1.2.5                  vctrs_0.6.3                </span></span>
+<span><span class="co">#&gt;  [15] memoise_2.0.1               Rsamtools_2.16.0           </span></span>
+<span><span class="co">#&gt;  [17] RCurl_1.98-1.12             askpass_1.1                </span></span>
+<span><span class="co">#&gt;  [19] BiocBaseUtils_1.2.0         itertools_0.1-3            </span></span>
+<span><span class="co">#&gt;  [21] htmltools_0.5.5             S4Arrays_1.0.4             </span></span>
+<span><span class="co">#&gt;  [23] missForest_1.5              mzID_1.38.0                </span></span>
+<span><span class="co">#&gt;  [25] sass_0.4.6                  bslib_0.5.0                </span></span>
+<span><span class="co">#&gt;  [27] htmlwidgets_1.6.2           desc_1.4.2                 </span></span>
+<span><span class="co">#&gt;  [29] plyr_1.8.8                  impute_1.74.1              </span></span>
+<span><span class="co">#&gt;  [31] cachem_1.0.8                GenomicAlignments_1.36.0   </span></span>
+<span><span class="co">#&gt;  [33] igraph_1.5.0                lifecycle_1.0.3            </span></span>
+<span><span class="co">#&gt;  [35] iterators_1.0.14            pkgconfig_2.0.3            </span></span>
+<span><span class="co">#&gt;  [37] Matrix_1.5-4.1              fastmap_1.1.1              </span></span>
+<span><span class="co">#&gt;  [39] GenomeInfoDbData_1.2.10     clue_0.3-64                </span></span>
+<span><span class="co">#&gt;  [41] digest_0.6.33               fdrtool_1.2.17             </span></span>
+<span><span class="co">#&gt;  [43] pcaMethods_1.92.0           colorspace_2.1-0           </span></span>
+<span><span class="co">#&gt;  [45] DESeq2_1.40.2               rprojroot_2.0.3            </span></span>
+<span><span class="co">#&gt;  [47] RSpectra_0.16-1             crosstalk_1.2.0            </span></span>
+<span><span class="co">#&gt;  [49] textshaping_0.3.6           randomForest_4.7-1.1       </span></span>
+<span><span class="co">#&gt;  [51] fansi_1.0.4                 compiler_4.3.1             </span></span>
+<span><span class="co">#&gt;  [53] rngtools_1.5.2              proxy_0.4-27               </span></span>
+<span><span class="co">#&gt;  [55] withr_2.5.0                 doParallel_1.0.17          </span></span>
+<span><span class="co">#&gt;  [57] downloader_0.4              BiocParallel_1.34.2        </span></span>
+<span><span class="co">#&gt;  [59] MASS_7.3-60                 openssl_2.0.6              </span></span>
+<span><span class="co">#&gt;  [61] DelayedArray_0.26.6         rjson_0.2.21               </span></span>
+<span><span class="co">#&gt;  [63] tools_4.3.1                 glue_1.6.2                 </span></span>
+<span><span class="co">#&gt;  [65] QFeatures_1.10.0            grid_4.3.1                 </span></span>
+<span><span class="co">#&gt;  [67] Rtsne_0.16                  cluster_2.1.4              </span></span>
+<span><span class="co">#&gt;  [69] reshape2_1.4.4              generics_0.1.3             </span></span>
+<span><span class="co">#&gt;  [71] gtable_0.3.3                class_7.3-22               </span></span>
+<span><span class="co">#&gt;  [73] preprocessCore_1.62.1       tidyr_1.3.0                </span></span>
+<span><span class="co">#&gt;  [75] data.table_1.14.8           utf8_1.2.3                 </span></span>
+<span><span class="co">#&gt;  [77] XVector_0.40.0              foreach_1.5.2              </span></span>
+<span><span class="co">#&gt;  [79] pillar_1.9.0                stringr_1.5.0              </span></span>
+<span><span class="co">#&gt;  [81] circlize_0.4.15             splines_4.3.1              </span></span>
+<span><span class="co">#&gt;  [83] lattice_0.21-8              survival_3.5-5             </span></span>
+<span><span class="co">#&gt;  [85] tidyselect_1.2.0            ComplexHeatmap_2.16.0      </span></span>
+<span><span class="co">#&gt;  [87] locfit_1.5-9.8              Biostrings_2.68.1          </span></span>
+<span><span class="co">#&gt;  [89] knitr_1.43                  bookdown_0.34              </span></span>
+<span><span class="co">#&gt;  [91] edgeR_3.42.4                xfun_0.39                  </span></span>
+<span><span class="co">#&gt;  [93] DT_0.28                     stringi_1.7.12             </span></span>
+<span><span class="co">#&gt;  [95] lazyeval_0.2.2              yaml_2.3.7                 </span></span>
+<span><span class="co">#&gt;  [97] evaluate_0.21               codetools_0.2-19           </span></span>
+<span><span class="co">#&gt;  [99] tibble_3.2.1                BiocManager_1.30.21        </span></span>
+<span><span class="co">#&gt; [101] cli_3.6.1                   affyio_1.70.0              </span></span>
+<span><span class="co">#&gt; [103] reticulate_1.30             systemfonts_1.0.4          </span></span>
+<span><span class="co">#&gt; [105] munsell_0.5.0               jquerylib_0.1.4            </span></span>
+<span><span class="co">#&gt; [107] TCseq_1.23.0                png_0.1-8                  </span></span>
+<span><span class="co">#&gt; [109] XML_3.99-0.14               parallel_4.3.1             </span></span>
+<span><span class="co">#&gt; [111] ellipsis_0.3.2              pkgdown_2.0.7              </span></span>
+<span><span class="co">#&gt; [113] ggplot2_3.4.2               assertthat_0.2.1           </span></span>
+<span><span class="co">#&gt; [115] doRNG_1.8.6                 AnnotationFilter_1.24.0    </span></span>
+<span><span class="co">#&gt; [117] bitops_1.0-7                glmnet_4.1-7               </span></span>
+<span><span class="co">#&gt; [119] scales_1.2.1                affy_1.78.1                </span></span>
+<span><span class="co">#&gt; [121] e1071_1.7-13                ncdf4_1.21                 </span></span>
+<span><span class="co">#&gt; [123] purrr_1.0.1                 crayon_1.5.2               </span></span>
+<span><span class="co">#&gt; [125] GetoptLong_1.0.5            rlang_1.1.1                </span></span>
+<span><span class="co">#&gt; [127] vsn_3.68.0</span></span></code></pre>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

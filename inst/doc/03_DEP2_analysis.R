@@ -1,8 +1,9 @@
 ## ----opts ,include = FALSE----------------------------------------------------
 knitr::opts_chunk$set(
-  collapse = T,
-  eval = T,
-  comment = "#>"
+  collapse = TRUE,
+  eval = TRUE,
+  comment = "#>",
+  warning = FALSE
   # ,fig.path = "man/figures/README-"
   # ,out.width = "100%"
 )
@@ -71,7 +72,7 @@ plot_normalization(filter_pg, norm_pg)
 ## ----missing heatmap, message=FALSE-------------------------------------------
 plot_missval(filter_pg)
 
-## ----impute, collapse=T-------------------------------------------------------
+## ----impute, collapse=T,message=FALSE-----------------------------------------
 set.seed(35)
 sample_rows <- sample(1:nrow(norm_pg), 300)
 norm_pg_sample = norm_pg[sample_rows,] # random sample 150 features to reduce runing time
@@ -96,7 +97,7 @@ imp_pg_QRILC <- DEP2::impute(norm_pg_sample, fun = "QRILC")
 ## ----message=FALSE------------------------------------------------------------
 plot_detect(norm_pg_sample)
 
-## ----compare imp--------------------------------------------------------------
+## ----compare imp,message=FALSE------------------------------------------------
 NAs <- is.na(assay(norm_pg_sample)) 
 ## the imputed values by different methods.
 imps <- list("GSimp" = imp_pg_GSimp, "QRILC" = imp_pg_QRILC, "MinProb" = imp_pg_MinProb, "RF" = imp_pg_RF, "knn" = imp_pg_knn) %>% 
@@ -164,11 +165,9 @@ plot_diff_hist(dep_pg_curve, plot = F) ## a table of gaussian args \sigma and \m
 
 ## ----heatmap,collapse=T-------------------------------------------------------
 plot_heatmap(dep_pg)
-
 ## Reorder columns by condition
 dep_pg = DEP2::Order_cols(dep_pg,order = c("PBS","W2","W4","W6","W9","W10"))
 plot_heatmap(dep_pg, cluster_columns = F, kmeans = T, k = 5, seed = 1) # cluster features
-
 ## Only plot the clusters that are up-regulated in treatment groups.
 plot_heatmap(dep_pg, cluster_columns = F, kmeans = T, k = 5, seed = 1, col_limit = 4,
              split_order = c(1,2,5)
@@ -271,11 +270,11 @@ filt_ptm <- filter_se(se_ptm,
 ## VSN normalization
 norm_ptm <- normalize_vsn(filt_ptm)
 
-## ----PTM_imp------------------------------------------------------------------
+## ----PTM_imp,message=FALSE----------------------------------------------------
 ## KNN impute relatively larger values
 imp_ptm <- impute(filt_ptm, fun= "knn")
 
-## -----------------------------------------------------------------------------
+## ----warning=FALSE------------------------------------------------------------
 diff_ptm <- test_diff(imp_ptm, type = "manual", test = "PBS_vs_W6" , fdr.type = "BH")
 
 dep_ptm <- DEP2::add_rejections(diff_ptm, alpha = 0.05, lfc = 1)
@@ -296,7 +295,7 @@ inherits(dds,"SummarizedExperiment")
 dds <- filter_se(dds, fraction = 0.3, thr = 1, rowsum_threshold = 35)
 
 ## ----rna_transformid----------------------------------------------------------
-## Check if the annotation package is already installed.
+## Check if the annotation package has been already installed. Or install it if not yet.
 check_organismDB_depends(organism = "Mouse")
 
 head(rownames(dds),4)
@@ -368,6 +367,22 @@ dep_pg <- Order_cols(dep_pg, order = c("PBS","W2","W4","W6","W9","W10"))
 plot_multi_heatmap(omics_list = list(PG= dep_pg, pep=dep_pep),
                    choose_name = IL1_relative_genes,
                    width = 4)
+
+## ----eval=FALSE---------------------------------------------------------------
+#  ## Check required packages for enrichment analysis
+#  DEP2::check_enrichment_depends()
+#  
+#  ## Check required packages for PPI
+#  DEP2::check_PPI_depends()
+
+## ----eval=FALSE---------------------------------------------------------------
+#  ## Install all depend packages at once by setting 'dependencies = TRUE'
+#  devtools::install_github("mildpiggy/DEP2", dependencies = TRUE)
+
+## ----eval=FALSE---------------------------------------------------------------
+#  ## Check organism annotation package of a species
+#  ## Parameter organism could one of "Chicken", "Human", "Mouse", "Rat", etc.
+#  DEP2::check_organismDB_depends(organism = "Human")
 
 ## ----enrichment, message=FALSE, warning=FALSE---------------------------------
 ## 1. Extract gene list

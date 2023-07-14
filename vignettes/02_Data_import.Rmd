@@ -45,6 +45,7 @@ knitr::opts_knit$set(
   )
 
 library(DEP2)
+library(dplyr)
 ```
 
 ```{r workplace0,include=FALSE}
@@ -53,6 +54,7 @@ knitr::opts_knit$set(
   root.dir = example_path
   )
 library(DEP2)
+library(dplyr)
 ```
 
 # Constructing S4 object
@@ -217,7 +219,7 @@ Unlike the above cases, the **report.tsv** from DIA-NN is in long format. Functi
 ```{r diann_load2}
 ## Load combined_protein.tsv table
 Diann_repfile <- "./A_spikeIn/Diann_output/report.tsv.gz"
-
+# Diann_repfile <- "./example_data/OmicsExample/A_spikeIn/Diann_output/report.tsv.gz"
 Diann_rep <- read.csv(Diann_repfile,sep = "\t") #
 dim(Diann_rep) # 390479 rows, each row is a precursor.
 
@@ -226,7 +228,7 @@ Diann_rep = dplyr::filter(Diann_rep, PG.Q.Value < 0.01)
 
 
 ## Table report.tsv stores both Precursor- and PG-level quality
-DT::datatable(head(Diann_rep), options = list(scrollX = T,pageLength = 6))
+DT::datatable(head(Diann_rep) %>% mutate_if(is.character, utf8::utf8_encode), options = list(scrollX = T,pageLength = 6))
 ```
 
 **Reshape** long-table.
@@ -297,7 +299,7 @@ Spe_rep <- read.csv(Spe_repfile,sep = "\t")
 dim(Spe_rep) # 318132 rows, each row is a precursor.
 
 ## Store both Precursor-, Peptides- and PG-level quality
-DT::datatable(head(Spe_rep), options = list(scrollX = T,pageLength = 6))
+DT::datatable(head(Spe_rep) %>% mutate_if(is.character, utf8::utf8_encode), options = list(scrollX = T,pageLength = 6))
 ```
 
 **Reshape** long table.
@@ -444,7 +446,7 @@ Spe_rep <- read.csv(Spe_repfile,sep = "\t") #
 dim(Spe_rep) # 318132 rows, each row is a precursor.
 
 ## Store both Precursor-, Peptides- and PG-level quality
-DT::datatable(head(Spe_rep), options = list(scrollX = T,pageLength = 6))
+DT::datatable(head(Spe_rep) %>% mutate_if(is.character, utf8::utf8_encode), options = list(scrollX = T,pageLength = 6))
 ```
 
 **Reshape** the long-table.

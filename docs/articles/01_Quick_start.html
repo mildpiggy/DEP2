@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">DEP2</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.06.13</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.7.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,8 +73,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Quick start</h1>
-                        <h4 data-toc-skip class="author">Zhenhuan
-Feng</h4>
+                        <h4 data-toc-skip class="author">Zhenhuan Feng</h4>
                         
       
       
@@ -84,32 +83,20 @@ Feng</h4>
     
         <div class="abstract">
       <p class="abstract">Abstract</p>
-      <p>This vignette gives an overview of the DEP2 analysis
-      pipeline.</p>
+      <p>This vignette gives an overview of the DEP2 analysis pipeline.</p>
     </div>
     
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>DEP2 provides a differentially expressed/enriched analysis toolkit
-for mass spectrometry based quantitative proteomics data utilizing the
-limma package for statistical analysis <span class="citation">(Ritchie
-et al. 2015)</span>. DEP2 is an upgraded version of the previous package
-DEP <span class="citation">(Zhang et al. 2018)</span> and provides a
-comprehensive workflow for proteomics analysis, encompassing data
-processing, missing value imputation, hypothesis test, visualization and
-downstream functional exploration.</p>
+<p>DEP2 provides a differentially expressed/enriched analysis toolkit for mass spectrometry based quantitative proteomics data utilizing the limma package for statistical analysis <span class="citation">(Ritchie et al. 2015)</span>. DEP2 is an upgraded version of the previous package DEP <span class="citation">(Zhang et al. 2018)</span> and provides a comprehensive workflow for proteomics analysis, encompassing data processing, missing value imputation, hypothesis test, visualization and downstream functional exploration.</p>
 <p>DEP2 provide three types of differential proteomics analysis:</p>
 <ol style="list-style-type: decimal">
-<li><p>The pipeline for proteins-level expression/enrichment analysis,
-starting with protein-level quantity data.</p></li>
-<li><p>The pipeline for proteins-level expression/enrichment analysis,
-starting with peptide-level quantity data.</p></li>
-<li><p>The pipeline for post-translation modification(PTM)-specified
-proteomics, performed upon modified peptides quantities.</p></li>
+<li><p>The pipeline for proteins-level expression/enrichment analysis, starting with protein-level quantity data.</p></li>
+<li><p>The pipeline for proteins-level expression/enrichment analysis, starting with peptide-level quantity data.</p></li>
+<li><p>The pipeline for post-translation modification(PTM)-specified proteomics, performed upon modified peptides quantities.</p></li>
 </ol>
-<p>In addition, DEP2 also includes a packaged RNA-seq data analysis
-pipeline from the <em><a href="https://bioconductor.org/packages/3.16/DESeq2" class="external-link">DESeq2</a></em>.</p>
+<p>In addition, DEP2 also includes a packaged RNA-seq data analysis pipeline from the <em><a href="https://bioconductor.org/packages/3.17/DESeq2" class="external-link">DESeq2</a></em>.</p>
 </div>
 <div class="section level2">
 <h2 id="load-required-packages">Load Required Packages<a class="anchor" aria-label="anchor" href="#load-required-packages"></a>
@@ -123,12 +110,7 @@ pipeline from the <em><a href="https://bioconductor.org/packages/3.16/DESeq2" cl
 <div class="section level2">
 <h2 id="example-data">Example Data<a class="anchor" aria-label="anchor" href="#example-data"></a>
 </h2>
-<p>In this section, we showcase the utilization of the DEP2 pipelines by
-employing data from a multiple-omics study of a silicosis mouse model
-(Wang et al., 2022). which are built-in data in the package. These
-datasets are included as built-in data within the DEP2 package.
-Additionally, the data can be accessed in table format from the
-repository at github.com/mildpiggy/OmicsExample.</p>
+<p>In this section, we showcase the utilization of the DEP2 pipelines by employing data from a multiple-omics study of a silicosis mouse model (Wang et al., 2022), which are built-in data in the package. These datasets are included as built-in data within the DEP2 package. Additionally, the data can be accessed in table format from the repository at github.com/mildpiggy/OmicsExample.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## The proteomics data represented in protein-level format (proteingroup.txt output from MaxQuant).</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Silicosis_pg</span><span class="op">)</span> </span>
@@ -148,8 +130,7 @@ repository at github.com/mildpiggy/OmicsExample.</p>
 <div class="section level2">
 <h2 id="get-start">Get Start<a class="anchor" aria-label="anchor" href="#get-start"></a>
 </h2>
-<p>The four pipelines can be executed step-by-step as outlined
-below:</p>
+<p>The four pipelines can be executed step-by-step as outlined below:</p>
 <div class="section level3">
 <h3 id="proteingroup-workflow">Proteingroup Workflow<a class="anchor" aria-label="anchor" href="#proteingroup-workflow"></a>
 </h3>
@@ -256,8 +237,7 @@ below:</p>
 <div class="section level3">
 <h3 id="rna-seq-workflow">RNA-seq workflow<a class="anchor" aria-label="anchor" href="#rna-seq-workflow"></a>
 </h3>
-<p>DEP2 packages a simple pipeline from <code>DESeq2</code> for the
-RNA-seq data (gene counts).</p>
+<p>DEP2 packages a simple pipeline from <code>DESeq2</code> for the RNA-seq data (gene counts).</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## 0. Check the depend packages</span></span>
 <span><span class="fu"><a href="../reference/check_RNAseq_depends.html">check_RNAseq_depends</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -286,8 +266,7 @@ RNA-seq data (gene counts).</p>
 <h3 id="result-visualization-and-table-export">Result Visualization and Table Export<a class="anchor" aria-label="anchor" href="#result-visualization-and-table-export"></a>
 </h3>
 <p>DEP2 provides functions to visualize differential test results.</p>
-<p><code>plot_heatmap</code> can draw a <em>ComplexHeatmap</em> upon SE
-or DEGdata object out from <code>add_rejections</code>.</p>
+<p><code>plot_heatmap</code> can draw a <em>ComplexHeatmap</em> upon SE or DEGdata object out from <code>add_rejections</code>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">dep</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "SummarizedExperiment"</span></span>
@@ -348,8 +327,7 @@ or DEGdata object out from <code>add_rejections</code>.</p>
 <span><span class="co"># pdf("ht.pdf")</span></span>
 <span><span class="co"># ht</span></span>
 <span><span class="co"># dev.off()</span></span></code></pre></div>
-<p>Another common figure in omics study is the volcano plot, which can
-be created using <code>plot_volcano</code>.</p>
+<p>Another common figure in omics study is the volcano plot, which can be created using <code>plot_volcano</code>.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_volcano.html">plot_volcano</a></span><span class="op">(</span><span class="va">dep</span><span class="op">)</span></span></code></pre></div>
 <p><img src="01_Quick_start_files/figure-html/volcano2-1.png" width="700"></p>
@@ -375,12 +353,7 @@ be created using <code>plot_volcano</code>.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># ggplot2::ggsave(filename = "volcano.png") # export to file</span></span></code></pre></div>
-<p>Exporting a table from an S4 object that inherits SE class is
-straightforward. Functions like
-<code><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">SummarizedExperiment::colData</a></code> and <code>rowData</code> can
-easily extract information from the object. DEP2 contains
-<code>get_significant</code> and <code>get_df_wide</code> to generate a
-significant result table or full dataset from the analysis result.</p>
+<p>Exporting a table from an S4 object that inherits SE class is straightforward. Functions like <code><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">SummarizedExperiment::colData</a></code> and <code>rowData</code> can easily extract information from the object. DEP2 contains <code>get_significant</code> and <code>get_df_wide</code> to generate a significant result table or full dataset from the analysis result.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Significant table</span></span>
 <span><span class="va">sig_tb</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_signicant.html">get_signicant</a></span><span class="op">(</span><span class="va">dep</span>,</span>
@@ -408,131 +381,131 @@ significant result table or full dataset from the analysis result.</p>
 <div class="section level2">
 <h2 id="session-information">Session information<a class="anchor" aria-label="anchor" href="#session-information"></a>
 </h2>
-<pre><code><span><span class="co">#&gt; R version 4.2.1 (2022-06-23 ucrt)</span></span>
-<span><span class="co">#&gt; Platform: x86_64-w64-mingw32/x64 (64-bit)</span></span>
-<span><span class="co">#&gt; Running under: Windows 10 x64 (build 19043)</span></span>
+<pre><code><span><span class="co">#&gt; R version 4.3.1 (2023-06-16)</span></span>
+<span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu (64-bit)</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 18.04.5 LTS</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Matrix products: default</span></span>
+<span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.7.1 </span></span>
+<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.7.1</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; locale:</span></span>
-<span><span class="co">#&gt; [1] LC_COLLATE=English_United States.utf8 </span></span>
-<span><span class="co">#&gt; [2] LC_CTYPE=English_United States.utf8   </span></span>
-<span><span class="co">#&gt; [3] LC_MONETARY=English_United States.utf8</span></span>
-<span><span class="co">#&gt; [4] LC_NUMERIC=C                          </span></span>
-<span><span class="co">#&gt; [5] LC_TIME=English_United States.utf8    </span></span>
+<span><span class="co">#&gt;  [1] LC_CTYPE=zh_CN.UTF-8       LC_NUMERIC=C              </span></span>
+<span><span class="co">#&gt;  [3] LC_TIME=zh_CN.UTF-8        LC_COLLATE=zh_CN.UTF-8    </span></span>
+<span><span class="co">#&gt;  [5] LC_MONETARY=zh_CN.UTF-8    LC_MESSAGES=zh_CN.UTF-8   </span></span>
+<span><span class="co">#&gt;  [7] LC_PAPER=zh_CN.UTF-8       LC_NAME=C                 </span></span>
+<span><span class="co">#&gt;  [9] LC_ADDRESS=C               LC_TELEPHONE=C            </span></span>
+<span><span class="co">#&gt; [11] LC_MEASUREMENT=zh_CN.UTF-8 LC_IDENTIFICATION=C       </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; time zone: Asia/Shanghai</span></span>
+<span><span class="co">#&gt; tzcode source: system (glibc)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; attached base packages:</span></span>
 <span><span class="co">#&gt; [1] grid      stats4    stats     graphics  grDevices utils     datasets </span></span>
 <span><span class="co">#&gt; [8] methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt;  [1] org.Mm.eg.db_3.16.0         AnnotationDbi_1.60.0       </span></span>
-<span><span class="co">#&gt;  [3] ComplexHeatmap_2.14.0       ggplot2_3.4.1              </span></span>
-<span><span class="co">#&gt;  [5] dplyr_1.1.0                 DEP2_0.3.06.13             </span></span>
-<span><span class="co">#&gt;  [7] R6_2.5.1                    limma_3.54.1               </span></span>
-<span><span class="co">#&gt;  [9] MSnbase_2.24.2              ProtGenerics_1.30.0        </span></span>
-<span><span class="co">#&gt; [11] mzR_2.32.0                  Rcpp_1.0.10                </span></span>
-<span><span class="co">#&gt; [13] MsCoreUtils_1.10.0          SummarizedExperiment_1.28.0</span></span>
-<span><span class="co">#&gt; [15] Biobase_2.58.0              GenomicRanges_1.50.2       </span></span>
-<span><span class="co">#&gt; [17] GenomeInfoDb_1.34.9         IRanges_2.32.0             </span></span>
-<span><span class="co">#&gt; [19] S4Vectors_0.36.1            BiocGenerics_0.44.0        </span></span>
-<span><span class="co">#&gt; [21] MatrixGenerics_1.10.0       matrixStats_0.63.0         </span></span>
-<span><span class="co">#&gt; [23] BiocStyle_2.26.0           </span></span>
+<span><span class="co">#&gt;  [1] org.Mm.eg.db_3.17.0         AnnotationDbi_1.62.2       </span></span>
+<span><span class="co">#&gt;  [3] ComplexHeatmap_2.16.0       ggplot2_3.4.2              </span></span>
+<span><span class="co">#&gt;  [5] dplyr_1.1.2                 DEP2_0.3.7.3               </span></span>
+<span><span class="co">#&gt;  [7] R6_2.5.1                    limma_3.56.2               </span></span>
+<span><span class="co">#&gt;  [9] MSnbase_2.26.0              ProtGenerics_1.32.0        </span></span>
+<span><span class="co">#&gt; [11] mzR_2.34.1                  Rcpp_1.0.11                </span></span>
+<span><span class="co">#&gt; [13] MsCoreUtils_1.12.0          SummarizedExperiment_1.30.2</span></span>
+<span><span class="co">#&gt; [15] Biobase_2.60.0              GenomicRanges_1.52.0       </span></span>
+<span><span class="co">#&gt; [17] GenomeInfoDb_1.36.1         IRanges_2.34.1             </span></span>
+<span><span class="co">#&gt; [19] S4Vectors_0.38.1            BiocGenerics_0.46.0        </span></span>
+<span><span class="co">#&gt; [21] MatrixGenerics_1.12.2       matrixStats_1.0.0          </span></span>
+<span><span class="co">#&gt; [23] BiocStyle_2.28.0           </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;   [1] utf8_1.2.3                  reticulate_1.28            </span></span>
-<span><span class="co">#&gt;   [3] gmm_1.7                     tidyselect_1.2.0           </span></span>
-<span><span class="co">#&gt;   [5] RSQLite_2.3.0               BiocParallel_1.32.5        </span></span>
-<span><span class="co">#&gt;   [7] Rtsne_0.16                  norm_1.0-10.0              </span></span>
-<span><span class="co">#&gt;   [9] IHW_1.26.0                  munsell_0.5.0              </span></span>
-<span><span class="co">#&gt;  [11] codetools_0.2-19            ragg_1.2.5                 </span></span>
-<span><span class="co">#&gt;  [13] preprocessCore_1.60.2       umap_0.2.10.0              </span></span>
-<span><span class="co">#&gt;  [15] withr_2.5.0                 colorspace_2.1-0           </span></span>
-<span><span class="co">#&gt;  [17] highr_0.10                  knitr_1.42                 </span></span>
-<span><span class="co">#&gt;  [19] rstudioapi_0.14             mzID_1.36.0                </span></span>
-<span><span class="co">#&gt;  [21] labeling_0.4.2              slam_0.1-50                </span></span>
-<span><span class="co">#&gt;  [23] bbmle_1.0.25                GenomeInfoDbData_1.2.9     </span></span>
-<span><span class="co">#&gt;  [25] lpsymphony_1.26.3           mixsqp_0.3-48              </span></span>
-<span><span class="co">#&gt;  [27] farver_2.1.1                bit64_4.0.5                </span></span>
-<span><span class="co">#&gt;  [29] rprojroot_2.0.3             coda_0.19-4                </span></span>
-<span><span class="co">#&gt;  [31] vctrs_0.5.2                 generics_0.1.3             </span></span>
-<span><span class="co">#&gt;  [33] xfun_0.39                   itertools_0.1-3            </span></span>
-<span><span class="co">#&gt;  [35] randomForest_4.7-1.1        doParallel_1.0.17          </span></span>
-<span><span class="co">#&gt;  [37] clue_0.3-64                 apeglm_1.20.0              </span></span>
-<span><span class="co">#&gt;  [39] invgamma_1.1                locfit_1.5-9.7             </span></span>
-<span><span class="co">#&gt;  [41] AnnotationFilter_1.22.0     bitops_1.0-7               </span></span>
-<span><span class="co">#&gt;  [43] cachem_1.0.6                DelayedArray_0.23.2        </span></span>
-<span><span class="co">#&gt;  [45] assertthat_0.2.1            scales_1.2.1               </span></span>
-<span><span class="co">#&gt;  [47] gtable_0.3.1                affy_1.76.0                </span></span>
-<span><span class="co">#&gt;  [49] sandwich_3.0-2              rlang_1.0.6                </span></span>
-<span><span class="co">#&gt;  [51] systemfonts_1.0.4           GlobalOptions_0.1.2        </span></span>
-<span><span class="co">#&gt;  [53] splines_4.2.1               lazyeval_0.2.2             </span></span>
-<span><span class="co">#&gt;  [55] impute_1.72.3               BiocManager_1.30.19        </span></span>
-<span><span class="co">#&gt;  [57] yaml_2.3.7                  reshape2_1.4.4             </span></span>
-<span><span class="co">#&gt;  [59] tools_4.2.1                 bookdown_0.34              </span></span>
-<span><span class="co">#&gt;  [61] affyio_1.68.0               jquerylib_0.1.4            </span></span>
-<span><span class="co">#&gt;  [63] RColorBrewer_1.1-3          proxy_0.4-27               </span></span>
-<span><span class="co">#&gt;  [65] MultiAssayExperiment_1.24.0 plyr_1.8.8                 </span></span>
-<span><span class="co">#&gt;  [67] zlibbioc_1.44.0             purrr_1.0.1                </span></span>
-<span><span class="co">#&gt;  [69] RCurl_1.98-1.10             openssl_2.0.5              </span></span>
-<span><span class="co">#&gt;  [71] GetoptLong_1.0.5            ashr_2.2-54                </span></span>
-<span><span class="co">#&gt;  [73] zoo_1.8-11                  ggrepel_0.9.3              </span></span>
-<span><span class="co">#&gt;  [75] cluster_2.1.4               fs_1.6.1                   </span></span>
-<span><span class="co">#&gt;  [77] magrittr_2.0.3              data.table_1.14.8          </span></span>
-<span><span class="co">#&gt;  [79] RSpectra_0.16-1             magick_2.7.4               </span></span>
-<span><span class="co">#&gt;  [81] circlize_0.4.15             pcaMethods_1.90.0          </span></span>
-<span><span class="co">#&gt;  [83] truncnorm_1.0-8             mvtnorm_1.1-3              </span></span>
-<span><span class="co">#&gt;  [85] SQUAREM_2021.1              evaluate_0.20              </span></span>
-<span><span class="co">#&gt;  [87] xtable_1.8-4                XML_3.99-0.13              </span></span>
-<span><span class="co">#&gt;  [89] emdbook_1.3.12              shape_1.4.6                </span></span>
-<span><span class="co">#&gt;  [91] compiler_4.2.1              bdsmatrix_1.3-6            </span></span>
-<span><span class="co">#&gt;  [93] tibble_3.1.8                ncdf4_1.21                 </span></span>
-<span><span class="co">#&gt;  [95] crayon_1.5.2                htmltools_0.5.4            </span></span>
-<span><span class="co">#&gt;  [97] tidyr_1.3.0                 geneplotter_1.76.0         </span></span>
-<span><span class="co">#&gt;  [99] DBI_1.1.3                   MASS_7.3-58.2              </span></span>
-<span><span class="co">#&gt; [101] tmvtnorm_1.5                Matrix_1.5-3               </span></span>
-<span><span class="co">#&gt; [103] cli_3.6.0                   vsn_3.66.0                 </span></span>
-<span><span class="co">#&gt; [105] imputeLCMD_2.1              parallel_4.2.1             </span></span>
-<span><span class="co">#&gt; [107] igraph_1.4.0                pkgconfig_2.0.3            </span></span>
-<span><span class="co">#&gt; [109] pkgdown_2.0.7               GenomicAlignments_1.34.0   </span></span>
-<span><span class="co">#&gt; [111] numDeriv_2016.8-1.1         TCseq_1.22.6               </span></span>
-<span><span class="co">#&gt; [113] MALDIquant_1.22             foreach_1.5.2              </span></span>
-<span><span class="co">#&gt; [115] annotate_1.76.0             bslib_0.4.2                </span></span>
-<span><span class="co">#&gt; [117] missForest_1.5              rngtools_1.5.2             </span></span>
-<span><span class="co">#&gt; [119] XVector_0.38.0              doRNG_1.8.6                </span></span>
-<span><span class="co">#&gt; [121] stringr_1.5.0               digest_0.6.31              </span></span>
-<span><span class="co">#&gt; [123] Biostrings_2.66.0           rmarkdown_2.20             </span></span>
-<span><span class="co">#&gt; [125] edgeR_3.40.2                Rsamtools_2.14.0           </span></span>
-<span><span class="co">#&gt; [127] rjson_0.2.21                lifecycle_1.0.3            </span></span>
-<span><span class="co">#&gt; [129] jsonlite_1.8.4              QFeatures_1.8.0            </span></span>
-<span><span class="co">#&gt; [131] desc_1.4.2                  askpass_1.1                </span></span>
-<span><span class="co">#&gt; [133] fansi_1.0.4                 pillar_1.8.1               </span></span>
-<span><span class="co">#&gt; [135] lattice_0.20-45             KEGGREST_1.38.0            </span></span>
-<span><span class="co">#&gt; [137] fastmap_1.1.0               httr_1.4.4                 </span></span>
-<span><span class="co">#&gt; [139] survival_3.5-3              glue_1.6.2                 </span></span>
-<span><span class="co">#&gt; [141] fdrtool_1.2.17              png_0.1-8                  </span></span>
-<span><span class="co">#&gt; [143] iterators_1.0.14            glmnet_4.1-6               </span></span>
-<span><span class="co">#&gt; [145] bit_4.0.5                   class_7.3-21               </span></span>
-<span><span class="co">#&gt; [147] stringi_1.7.12              sass_0.4.5                 </span></span>
-<span><span class="co">#&gt; [149] blob_1.2.3                  textshaping_0.3.6          </span></span>
-<span><span class="co">#&gt; [151] DESeq2_1.38.3               memoise_2.0.1              </span></span>
-<span><span class="co">#&gt; [153] irlba_2.3.5.1               e1071_1.7-13</span></span></code></pre>
+<span><span class="co">#&gt;   [1] splines_4.3.1               norm_1.0-11.1              </span></span>
+<span><span class="co">#&gt;   [3] bitops_1.0-7                tibble_3.2.1               </span></span>
+<span><span class="co">#&gt;   [5] lpsymphony_1.28.1           preprocessCore_1.62.1      </span></span>
+<span><span class="co">#&gt;   [7] XML_3.99-0.14               lifecycle_1.0.3            </span></span>
+<span><span class="co">#&gt;   [9] mixsqp_0.3-48               edgeR_3.42.4               </span></span>
+<span><span class="co">#&gt;  [11] doParallel_1.0.17           rprojroot_2.0.3            </span></span>
+<span><span class="co">#&gt;  [13] lattice_0.21-8              MASS_7.3-60                </span></span>
+<span><span class="co">#&gt;  [15] MultiAssayExperiment_1.26.0 magrittr_2.0.3             </span></span>
+<span><span class="co">#&gt;  [17] sass_0.4.6                  rmarkdown_2.23             </span></span>
+<span><span class="co">#&gt;  [19] jquerylib_0.1.4             yaml_2.3.7                 </span></span>
+<span><span class="co">#&gt;  [21] doRNG_1.8.6                 askpass_1.1                </span></span>
+<span><span class="co">#&gt;  [23] reticulate_1.30             DBI_1.1.3                  </span></span>
+<span><span class="co">#&gt;  [25] RColorBrewer_1.1-3          zlibbioc_1.46.0            </span></span>
+<span><span class="co">#&gt;  [27] Rtsne_0.16                  purrr_1.0.1                </span></span>
+<span><span class="co">#&gt;  [29] AnnotationFilter_1.24.0     itertools_0.1-3            </span></span>
+<span><span class="co">#&gt;  [31] RCurl_1.98-1.12             sandwich_3.0-2             </span></span>
+<span><span class="co">#&gt;  [33] circlize_0.4.15             GenomeInfoDbData_1.2.10    </span></span>
+<span><span class="co">#&gt;  [35] ggrepel_0.9.3               irlba_2.3.5.1              </span></span>
+<span><span class="co">#&gt;  [37] umap_0.2.10.0               RSpectra_0.16-1            </span></span>
+<span><span class="co">#&gt;  [39] missForest_1.5              pkgdown_2.0.7              </span></span>
+<span><span class="co">#&gt;  [41] ncdf4_1.21                  codetools_0.2-19           </span></span>
+<span><span class="co">#&gt;  [43] DelayedArray_0.26.6         tidyselect_1.2.0           </span></span>
+<span><span class="co">#&gt;  [45] gmm_1.8                     shape_1.4.6                </span></span>
+<span><span class="co">#&gt;  [47] farver_2.1.1                GenomicAlignments_1.36.0   </span></span>
+<span><span class="co">#&gt;  [49] jsonlite_1.8.7              GetoptLong_1.0.5           </span></span>
+<span><span class="co">#&gt;  [51] e1071_1.7-13                survival_3.5-5             </span></span>
+<span><span class="co">#&gt;  [53] iterators_1.0.14            systemfonts_1.0.4          </span></span>
+<span><span class="co">#&gt;  [55] bbmle_1.0.25                foreach_1.5.2              </span></span>
+<span><span class="co">#&gt;  [57] tools_4.3.1                 ragg_1.2.5                 </span></span>
+<span><span class="co">#&gt;  [59] glue_1.6.2                  xfun_0.39                  </span></span>
+<span><span class="co">#&gt;  [61] DESeq2_1.40.2               withr_2.5.0                </span></span>
+<span><span class="co">#&gt;  [63] numDeriv_2016.8-1.1         BiocManager_1.30.21        </span></span>
+<span><span class="co">#&gt;  [65] fastmap_1.1.1               fansi_1.0.4                </span></span>
+<span><span class="co">#&gt;  [67] openssl_2.0.6               digest_0.6.33              </span></span>
+<span><span class="co">#&gt;  [69] truncnorm_1.0-9             imputeLCMD_2.1             </span></span>
+<span><span class="co">#&gt;  [71] textshaping_0.3.6           colorspace_2.1-0           </span></span>
+<span><span class="co">#&gt;  [73] RSQLite_2.3.1               utf8_1.2.3                 </span></span>
+<span><span class="co">#&gt;  [75] tidyr_1.3.0                 generics_0.1.3             </span></span>
+<span><span class="co">#&gt;  [77] data.table_1.14.8           class_7.3-22               </span></span>
+<span><span class="co">#&gt;  [79] httr_1.4.6                  S4Arrays_1.0.4             </span></span>
+<span><span class="co">#&gt;  [81] pkgconfig_2.0.3             gtable_0.3.3               </span></span>
+<span><span class="co">#&gt;  [83] blob_1.2.4                  impute_1.74.1              </span></span>
+<span><span class="co">#&gt;  [85] XVector_0.40.0              htmltools_0.5.5            </span></span>
+<span><span class="co">#&gt;  [87] bookdown_0.34               MALDIquant_1.22.1          </span></span>
+<span><span class="co">#&gt;  [89] clue_0.3-64                 scales_1.2.1               </span></span>
+<span><span class="co">#&gt;  [91] tmvtnorm_1.5                png_0.1-8                  </span></span>
+<span><span class="co">#&gt;  [93] ashr_2.2-54                 knitr_1.43                 </span></span>
+<span><span class="co">#&gt;  [95] rstudioapi_0.15.0           reshape2_1.4.4             </span></span>
+<span><span class="co">#&gt;  [97] rjson_0.2.21                coda_0.19-4                </span></span>
+<span><span class="co">#&gt;  [99] bdsmatrix_1.3-6             proxy_0.4-27               </span></span>
+<span><span class="co">#&gt; [101] cachem_1.0.8                zoo_1.8-12                 </span></span>
+<span><span class="co">#&gt; [103] GlobalOptions_0.1.2         stringr_1.5.0              </span></span>
+<span><span class="co">#&gt; [105] parallel_4.3.1              mzID_1.38.0                </span></span>
+<span><span class="co">#&gt; [107] vsn_3.68.0                  desc_1.4.2                 </span></span>
+<span><span class="co">#&gt; [109] apeglm_1.22.1               pillar_1.9.0               </span></span>
+<span><span class="co">#&gt; [111] vctrs_0.6.3                 pcaMethods_1.92.0          </span></span>
+<span><span class="co">#&gt; [113] slam_0.1-50                 randomForest_4.7-1.1       </span></span>
+<span><span class="co">#&gt; [115] IHW_1.28.0                  cluster_2.1.4              </span></span>
+<span><span class="co">#&gt; [117] evaluate_0.21               magick_2.7.4               </span></span>
+<span><span class="co">#&gt; [119] invgamma_1.1                mvtnorm_1.2-2              </span></span>
+<span><span class="co">#&gt; [121] cli_3.6.1                   locfit_1.5-9.8             </span></span>
+<span><span class="co">#&gt; [123] compiler_4.3.1              Rsamtools_2.16.0           </span></span>
+<span><span class="co">#&gt; [125] rlang_1.1.1                 crayon_1.5.2               </span></span>
+<span><span class="co">#&gt; [127] rngtools_1.5.2              SQUAREM_2021.1             </span></span>
+<span><span class="co">#&gt; [129] labeling_0.4.2              fdrtool_1.2.17             </span></span>
+<span><span class="co">#&gt; [131] TCseq_1.23.0                emdbook_1.3.13             </span></span>
+<span><span class="co">#&gt; [133] QFeatures_1.10.0            affy_1.78.1                </span></span>
+<span><span class="co">#&gt; [135] plyr_1.8.8                  fs_1.6.2                   </span></span>
+<span><span class="co">#&gt; [137] stringi_1.7.12              BiocParallel_1.34.2        </span></span>
+<span><span class="co">#&gt; [139] assertthat_0.2.1            munsell_0.5.0              </span></span>
+<span><span class="co">#&gt; [141] Biostrings_2.68.1           lazyeval_0.2.2             </span></span>
+<span><span class="co">#&gt; [143] glmnet_4.1-7                Matrix_1.5-4.1             </span></span>
+<span><span class="co">#&gt; [145] bit64_4.0.5                 KEGGREST_1.40.0            </span></span>
+<span><span class="co">#&gt; [147] highr_0.10                  igraph_1.5.0               </span></span>
+<span><span class="co">#&gt; [149] memoise_2.0.1               affyio_1.70.0              </span></span>
+<span><span class="co">#&gt; [151] bslib_0.5.0                 bit_4.0.5                  </span></span>
+<span><span class="co">#&gt; [153] downloader_0.4</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Ritchie:2015" class="csl-entry">
-Ritchie, M. E., B. Phipson, D. Wu, Y. Hu, C. W. Law, W. Shi, and G. K.
-Smyth. 2015. <span>“Limma Powers Differential Expression Analyses for
-RNA-Sequencing and Microarray Studies.”</span> Journal Article.
-<em>Nucleic Acids Res</em> 43 (7): e47. <a href="https://doi.org/10.1093/nar/gkv007" class="external-link">https://doi.org/10.1093/nar/gkv007</a>.
+Ritchie, M. E., B. Phipson, D. Wu, Y. Hu, C. W. Law, W. Shi, and G. K. Smyth. 2015. <span>“Limma Powers Differential Expression Analyses for RNA-Sequencing and Microarray Studies.”</span> Journal Article. <em>Nucleic Acids Res</em> 43 (7): e47. <a href="https://doi.org/10.1093/nar/gkv007" class="external-link">https://doi.org/10.1093/nar/gkv007</a>.
 </div>
 <div id="ref-Zhang:2018" class="csl-entry">
-Zhang, X., A. H. Smits, G. B. van Tilburg, H. Ovaa, W. Huber, and M.
-Vermeulen. 2018. <span>“Proteome-Wide Identification of Ubiquitin
-Interactions Using UbIA-MS.”</span> Journal Article. <em>Nat Protoc</em>
-13 (3): 530–50. <a href="https://doi.org/10.1038/nprot.2017.147" class="external-link">https://doi.org/10.1038/nprot.2017.147</a>.
+Zhang, X., A. H. Smits, G. B. van Tilburg, H. Ovaa, W. Huber, and M. Vermeulen. 2018. <span>“Proteome-Wide Identification of Ubiquitin Interactions Using UbIA-MS.”</span> Journal Article. <em>Nat Protoc</em> 13 (3): 530–50. <a href="https://doi.org/10.1038/nprot.2017.147" class="external-link">https://doi.org/10.1038/nprot.2017.147</a>.
 </div>
 </div>
 </div>

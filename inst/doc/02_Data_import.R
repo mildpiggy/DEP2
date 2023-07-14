@@ -15,6 +15,7 @@ library(BiocStyle)
 #    )
 #  
 #  library(DEP2)
+#  library(dplyr)
 
 ## ----workplace0,include=FALSE-------------------------------------------------
 example_path = "../example_data/OmicsExample/"
@@ -22,6 +23,7 @@ knitr::opts_knit$set(
   root.dir = example_path
   )
 library(DEP2)
+library(dplyr)
 
 ## ----mq-----------------------------------------------------------------------
 # Load proteinGroups table
@@ -132,7 +134,7 @@ colnames(se)
 ## ----diann_load2--------------------------------------------------------------
 ## Load combined_protein.tsv table
 Diann_repfile <- "./A_spikeIn/Diann_output/report.tsv.gz"
-
+# Diann_repfile <- "./example_data/OmicsExample/A_spikeIn/Diann_output/report.tsv.gz"
 Diann_rep <- read.csv(Diann_repfile,sep = "\t") #
 dim(Diann_rep) # 390479 rows, each row is a precursor.
 
@@ -141,7 +143,7 @@ Diann_rep = dplyr::filter(Diann_rep, PG.Q.Value < 0.01)
 
 
 ## Table report.tsv stores both Precursor- and PG-level quality
-DT::datatable(head(Diann_rep), options = list(scrollX = T,pageLength = 6))
+DT::datatable(head(Diann_rep) %>% mutate_if(is.character, utf8::utf8_encode), options = list(scrollX = T,pageLength = 6))
 
 ## ----diann_resha--------------------------------------------------------------
 
@@ -194,7 +196,7 @@ Spe_rep <- read.csv(Spe_repfile,sep = "\t")
 dim(Spe_rep) # 318132 rows, each row is a precursor.
 
 ## Store both Precursor-, Peptides- and PG-level quality
-DT::datatable(head(Spe_rep), options = list(scrollX = T,pageLength = 6))
+DT::datatable(head(Spe_rep) %>% mutate_if(is.character, utf8::utf8_encode), options = list(scrollX = T,pageLength = 6))
 
 ## ----spe_resha----------------------------------------------------------------
 Spe_rep_wided = reshape_long2wide(Spe_rep,
@@ -294,7 +296,7 @@ Spe_rep <- read.csv(Spe_repfile,sep = "\t") #
 dim(Spe_rep) # 318132 rows, each row is a precursor.
 
 ## Store both Precursor-, Peptides- and PG-level quality
-DT::datatable(head(Spe_rep), options = list(scrollX = T,pageLength = 6))
+DT::datatable(head(Spe_rep) %>% mutate_if(is.character, utf8::utf8_encode), options = list(scrollX = T,pageLength = 6))
 
 ## ----spe_resha2---------------------------------------------------------------
 Spe_rep_wided2 = reshape_long2wide(Spe_rep,

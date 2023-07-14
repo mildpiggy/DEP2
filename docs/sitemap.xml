@@ -4,6 +4,9 @@
     <loc>/404.html</loc>
   </url>
   <url>
+    <loc>/LICENSE-text.html</loc>
+  </url>
+  <url>
     <loc>/articles/01_Quick_start.html</loc>
   </url>
   <url>
@@ -28,16 +31,43 @@
     <loc>/index.html</loc>
   </url>
   <url>
-    <loc>/LICENSE-text.html</loc>
+    <loc>/reference/DEGdata-class.html</loc>
+  </url>
+  <url>
+    <loc>/reference/DEP2_add_rejections.html</loc>
+  </url>
+  <url>
+    <loc>/reference/GS_imp_wrapper.html</loc>
+  </url>
+  <url>
+    <loc>/reference/ID_transform.html</loc>
+  </url>
+  <url>
+    <loc>/reference/NAiszero.html</loc>
+  </url>
+  <url>
+    <loc>/reference/Order_cols.html</loc>
+  </url>
+  <url>
+    <loc>/reference/PPInetwork.html</loc>
+  </url>
+  <url>
+    <loc>/reference/Silicosis_ExpDesign.html</loc>
+  </url>
+  <url>
+    <loc>/reference/Silicosis_peptide.html</loc>
+  </url>
+  <url>
+    <loc>/reference/Silicosis_pg.html</loc>
+  </url>
+  <url>
+    <loc>/reference/Silicosis_phos.html</loc>
   </url>
   <url>
     <loc>/reference/aggregate_pe.html</loc>
   </url>
   <url>
-    <loc>/reference/check_enrichment_depends.html</loc>
-  </url>
-  <url>
-    <loc>/reference/check_organismDB_depends.html</loc>
+    <loc>/reference/annoSpecies_df.html</loc>
   </url>
   <url>
     <loc>/reference/check_PPI_depends.html</loc>
@@ -46,22 +76,28 @@
     <loc>/reference/check_RNAseq_depends.html</loc>
   </url>
   <url>
+    <loc>/reference/check_enrichment_depends.html</loc>
+  </url>
+  <url>
+    <loc>/reference/check_organismDB_depends.html</loc>
+  </url>
+  <url>
     <loc>/reference/clean_character.html</loc>
   </url>
   <url>
     <loc>/reference/correct_PTM_by_Protein.html</loc>
   </url>
   <url>
-    <loc>/reference/DEGdata-class.html</loc>
-  </url>
-  <url>
-    <loc>/reference/DEP2_add_rejections.html</loc>
+    <loc>/reference/downloadAbsentFile.html</loc>
   </url>
   <url>
     <loc>/reference/filter_pe.html</loc>
   </url>
   <url>
     <loc>/reference/filter_se.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_ORA_result.html</loc>
   </url>
   <url>
     <loc>/reference/get_contrast.html</loc>
@@ -74,9 +110,6 @@
   </url>
   <url>
     <loc>/reference/get_exdesign_parse.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_ORA_result.html</loc>
   </url>
   <url>
     <loc>/reference/get_prefix.html</loc>
@@ -92,12 +125,6 @@
   </url>
   <url>
     <loc>/reference/get_tc_cluster.html</loc>
-  </url>
-  <url>
-    <loc>/reference/GS_imp_wrapper.html</loc>
-  </url>
-  <url>
-    <loc>/reference/ID_transform.html</loc>
   </url>
   <url>
     <loc>/reference/impute.html</loc>
@@ -142,9 +169,6 @@
     <loc>/reference/meanSdPlot.html</loc>
   </url>
   <url>
-    <loc>/reference/NAiszero.html</loc>
-  </url>
-  <url>
     <loc>/reference/normalize_pe.html</loc>
   </url>
   <url>
@@ -154,10 +178,10 @@
     <loc>/reference/ntf_deg.html</loc>
   </url>
   <url>
-    <loc>/reference/Order_cols.html</loc>
+    <loc>/reference/pe2se.html</loc>
   </url>
   <url>
-    <loc>/reference/pe2se.html</loc>
+    <loc>/reference/plot_Tsne.html</loc>
   </url>
   <url>
     <loc>/reference/plot_cond.html</loc>
@@ -196,10 +220,10 @@
     <loc>/reference/plot_imputation.html</loc>
   </url>
   <url>
-    <loc>/reference/plot_ma_pro.html</loc>
+    <loc>/reference/plot_ma_RNA.html</loc>
   </url>
   <url>
-    <loc>/reference/plot_ma_RNA.html</loc>
+    <loc>/reference/plot_ma_pro.html</loc>
   </url>
   <url>
     <loc>/reference/plot_missval.html</loc>
@@ -211,10 +235,10 @@
     <loc>/reference/plot_multi_venn.html</loc>
   </url>
   <url>
-    <loc>/reference/plot_normalization.html</loc>
+    <loc>/reference/plot_norm_distribution.html</loc>
   </url>
   <url>
-    <loc>/reference/plot_norm_distribution.html</loc>
+    <loc>/reference/plot_normalization.html</loc>
   </url>
   <url>
     <loc>/reference/plot_numbers.html</loc>
@@ -229,16 +253,10 @@
     <loc>/reference/plot_statistics.html</loc>
   </url>
   <url>
-    <loc>/reference/plot_Tsne.html</loc>
-  </url>
-  <url>
     <loc>/reference/plot_umap.html</loc>
   </url>
   <url>
     <loc>/reference/plot_volcano.html</loc>
-  </url>
-  <url>
-    <loc>/reference/PPInetwork.html</loc>
   </url>
   <url>
     <loc>/reference/reshape_long2wide.html</loc>
@@ -250,24 +268,6 @@
     <loc>/reference/run_app.html</loc>
   </url>
   <url>
-    <loc>/reference/Silicosis_ExpDesign.html</loc>
-  </url>
-  <url>
-    <loc>/reference/Silicosis_peptide.html</loc>
-  </url>
-  <url>
-    <loc>/reference/Silicosis_pg.html</loc>
-  </url>
-  <url>
-    <loc>/reference/Silicosis_phos.html</loc>
-  </url>
-  <url>
-    <loc>/reference/test_diff.html</loc>
-  </url>
-  <url>
-    <loc>/reference/test_diff_deg.html</loc>
-  </url>
-  <url>
     <loc>/reference/test_GSEA.html</loc>
   </url>
   <url>
@@ -275,6 +275,12 @@
   </url>
   <url>
     <loc>/reference/test_PPI.html</loc>
+  </url>
+  <url>
+    <loc>/reference/test_diff.html</loc>
+  </url>
+  <url>
+    <loc>/reference/test_diff_deg.html</loc>
   </url>
   <url>
     <loc>/reference/theme_DEP1.html</loc>
