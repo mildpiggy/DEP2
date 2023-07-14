@@ -33,7 +33,7 @@ Imports:
     purrr,  readr, dplyr, tidyr, tibble, data.table,
     missForest, vsn, fdrtool(>= 1.2.16), lazyeval, ComplexHeatmap,
     RColorBrewer, circlize, DT,  glmnet, ggplot2, 
-    ggVennDiagram, TCseq, Rtsne, umap, abind
+    ggVennDiagram, TCseq, Rtsne, umap, abind, downloader
 Remotes:
     serenity-r/dndselectr,
     YuLab-SMU/clusterProfiler.dplyr
