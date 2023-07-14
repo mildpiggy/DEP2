@@ -198,48 +198,49 @@ ORA_GO_UI <- function(id){
                                     shinyBS::bsTooltip(ns("go_wide_ema"), "Width of the figure to export", "top", options = list(container = "body")),
                                     shinyBS::bsTooltip(ns("go_high_ema"), "Height of the figure to export", "top", options = list(container = "body"))
                            ),
-                           tabPanel(title = "Goplot",
-                                    fluidRow(
-                                      box(numericInput(ns("go_ShowCategory_go"), "ShowCategory", min = 1, max = 100, value = 10),
-                                          width = 4),
-                                      box(numericInput(ns("go_wide_go"), "Width", min = 1, max = 50, value = 11),
-                                          width = 4),
-                                      box(numericInput(ns("go_high_go"), "Height", min = 1, max = 50, value = 10),
-                                          width = 4)
-                                    ),
-                                    fluidRow(
-                                      box(checkboxInput(ns("go_circular_go"),
-                                                        "Circular",
-                                                        value = TRUE),
-                                          width = 4)
-                                    ),
-                                    fluidRow(
-                                      plotOutput(ns("go_goplot"), height = 500),
-                                      downloadButton(ns('download_go_goplot'), 'Save')
-                                    ),
-                                    shinyBS::bsTooltip(ns("go_ShowCategory_go"), "Number of categories to show", "top", options = list(container = "body")),
-                                    shinyBS::bsTooltip(ns("go_wide_go"), "Width of the figure to export", "top", options = list(container = "body")),
-                                    shinyBS::bsTooltip(ns("go_high_go"), "Height of the figure to export", "top", options = list(container = "body")),
-                                    shinyBS::bsTooltip(ns("go_circular_go"), "whether using circular layout", "top", options = list(container = "body"))
-                           ),
-                           tabPanel(title = "GOgraph",
-                                    fluidRow(
-                                      box(numericInput(ns("go_ShowCategory_GOgraph"), "FirstSigNodes", min = 1, max = 100, value = 10),
-                                          width = 4),
-                                      box(numericInput(ns("go_wide_GOgraph"), "Width", min = 1, max = 50, value = 7),
-                                          width = 4),
-                                      box(numericInput(ns("go_high_GOgraph"), "Height", min = 1, max = 50, value = 7),
-                                          width = 4)
-                                    ),
-                                    fluidRow(actionButton(ns("plot_for_GOgraphplot"), "Plot", width = "10%", icon = icon("caret-right"))),#step-forward
-                                    fluidRow(
-                                      plotOutput(ns("go_GOgraphplot"), height = 500),
-                                      downloadButton(ns('download_go_GOgraphplot'), 'Save')
-                                    ),
-                                    shinyBS::bsTooltip(ns("go_ShowCategory_GOgraph"), "Number of significant nodes (retangle nodes in the graph)", "top", options = list(container = "body")),
-                                    shinyBS::bsTooltip(ns("go_wide_GOgraph"), "Width of the figure to export", "top", options = list(container = "body")),
-                                    shinyBS::bsTooltip(ns("go_high_GOgraph"), "Height of the figure to export", "top", options = list(container = "body"))
-                           )
+                           ## GOplot and GOgraph are not usable for all omics analysis result, hide it.
+                           # tabPanel(title = "Goplot",
+                           #          fluidRow(
+                           #            box(numericInput(ns("go_ShowCategory_go"), "ShowCategory", min = 1, max = 100, value = 10),
+                           #                width = 4),
+                           #            box(numericInput(ns("go_wide_go"), "Width", min = 1, max = 50, value = 11),
+                           #                width = 4),
+                           #            box(numericInput(ns("go_high_go"), "Height", min = 1, max = 50, value = 10),
+                           #                width = 4)
+                           #          ),
+                           #          fluidRow(
+                           #            box(checkboxInput(ns("go_circular_go"),
+                           #                              "Circular",
+                           #                              value = TRUE),
+                           #                width = 4)
+                           #          ),
+                           #          fluidRow(
+                           #            plotOutput(ns("go_goplot"), height = 500),
+                           #            downloadButton(ns('download_go_goplot'), 'Save')
+                           #          ),
+                           #          shinyBS::bsTooltip(ns("go_ShowCategory_go"), "Number of categories to show", "top", options = list(container = "body")),
+                           #          shinyBS::bsTooltip(ns("go_wide_go"), "Width of the figure to export", "top", options = list(container = "body")),
+                           #          shinyBS::bsTooltip(ns("go_high_go"), "Height of the figure to export", "top", options = list(container = "body")),
+                           #          shinyBS::bsTooltip(ns("go_circular_go"), "whether using circular layout", "top", options = list(container = "body"))
+                           # ),
+                           # tabPanel(title = "GOgraph",
+                           #          fluidRow(
+                           #            box(numericInput(ns("go_ShowCategory_GOgraph"), "FirstSigNodes", min = 1, max = 100, value = 10),
+                           #                width = 4),
+                           #            box(numericInput(ns("go_wide_GOgraph"), "Width", min = 1, max = 50, value = 7),
+                           #                width = 4),
+                           #            box(numericInput(ns("go_high_GOgraph"), "Height", min = 1, max = 50, value = 7),
+                           #                width = 4)
+                           #          ),
+                           #          fluidRow(actionButton(ns("plot_for_GOgraphplot"), "Plot", width = "10%", icon = icon("caret-right"))),#step-forward
+                           #          fluidRow(
+                           #            plotOutput(ns("go_GOgraphplot"), height = 500),
+                           #            downloadButton(ns('download_go_GOgraphplot'), 'Save')
+                           #          ),
+                           #          shinyBS::bsTooltip(ns("go_ShowCategory_GOgraph"), "Number of significant nodes (retangle nodes in the graph)", "top", options = list(container = "body")),
+                           #          shinyBS::bsTooltip(ns("go_wide_GOgraph"), "Width of the figure to export", "top", options = list(container = "body")),
+                           #          shinyBS::bsTooltip(ns("go_high_GOgraph"), "Height of the figure to export", "top", options = list(container = "body"))
+                           # )
                     )
 
              )

@@ -277,6 +277,16 @@ DEP_ptm_body_mod <- function(id){
               tabName = id,
               width = 9,
               helpText("Please cite: "),
+              fluidRow(tags$head(tags$style(type="text/css", "
+                        #loadmessage {
+                        top: 0px; left: 0px;
+                        width: 100%; padding: 5px 0px 5px 0px;
+                        text-align: center; font-weight: bold;
+                        font-size: 100%; color: #000000;
+                        background-color: #FFC1C1; z-index: 105;}")), ## 提示条的样式
+                       conditionalPanel(condition="$('html').hasClass('shiny-busy')",
+                                        tags$div("Calculating...Please wait...",id="loadmessage"))
+              ),
               fluidRow(
 
                 conditionalPanel(condition = paste0("input['",ns("threshold_method"),"']","== 'intersect'"), ## condition in mod
@@ -1120,8 +1130,7 @@ DEP_ptm_server_module <- function(id, Omics_res){
 
       output$check_log_match_pg <- renderUI({
         log_matchpg <- upload_log()$resultVals()$matchPG
-        upload_log111 <<- upload_log()
-        log_matchpg111 <<- log_matchpg
+
         shiny::validate(need(!is.null(log_matchpg),
                              paste0("Log file do not contain a corresponding global proteomics for PTM-omic data, or the proteomics data is NULL.\n",
                                     "Please check your input. Or use the result from other proteomic analysis module (from proteingroup or aggregated from peptides)"
@@ -1758,7 +1767,7 @@ DEP_ptm_server_module <- function(id, Omics_res){
             }else {
               mathPG = Omics_res[[input$protein_group_choose]]()
             }
-            mathPG222 <<- mathPG
+
             thelog = ptm_log$new(input = input,
                                  reactive_vals = list(
                                    data = data(),
@@ -1771,7 +1780,7 @@ DEP_ptm_server_module <- function(id, Omics_res){
                                  ),
                                  app_version = DEP2:::app_version
             )
-            thelog111 <<- thelog
+
             saveRDS(thelog, file = file)
           })
         }

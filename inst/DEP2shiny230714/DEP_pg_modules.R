@@ -212,6 +212,16 @@ DEP_pg_body_mod <- function(id){
               tabName = id,
               width = 9,
               helpText("Please cite: "),
+              fluidRow(tags$head(tags$style(type="text/css", "
+                        #loadmessage {
+                        top: 0px; left: 0px;
+                        width: 100%; padding: 5px 0px 5px 0px;
+                        text-align: center; font-weight: bold;
+                        font-size: 100%; color: #000000;
+                        background-color: #FFC1C1; z-index: 105;}")), ## 提示条的样式
+                       conditionalPanel(condition="$('html').hasClass('shiny-busy')",
+                                        tags$div("Calculating...Please wait...",id="loadmessage"))
+              ),
               fluidRow(
 
                 conditionalPanel(condition = paste0("input['",ns("threshold_method"),"']","== 'intersect'"), ## condition in mod
@@ -1072,8 +1082,6 @@ DEP_pg_server_module <- function(id){
                            "filt", "order", "control")
             for(i in column_opt){
               # message("update ",i," to '", upload_log()$inputVals()[[i]],"'\n", sep = "")
-              upload_log22 <<- upload_log
-              if(i == "intensitycols") temp11 <<- upload_log()$inputVals()[[i]]
               updateSelectizeInput(session = session, inputId = i,
                                    selected = upload_log()$inputVals()[[i]] )
             }
@@ -1187,7 +1195,6 @@ DEP_pg_server_module <- function(id){
 
           cat("Read infile_log\n")
           upload_log <- readRDS(logFile$datapath)
-          upload_log11 <<- upload_log
 
           if( upload_log$appVersion == DEP2:::app_version && inherits(upload_log,"pg_log") ){
             sendSweetAlert(
@@ -1240,7 +1247,7 @@ DEP_pg_server_module <- function(id){
           if(input$anno == "logexpdesign"){
             cat("Use expdesign from log\n")
             expdesign <- upload_log$resultVals()$expdesign
-            # expdesign11 <<- expdesign
+
           }else if(input$anno == "columns"){
             cols <- which(colnames(data()) %in% input$intensitycols)
 
@@ -1281,7 +1288,6 @@ DEP_pg_server_module <- function(id){
           }
         }
 
-        my_expdesign <<- expdesign
         return(expdesign)
       })
 

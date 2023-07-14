@@ -153,7 +153,7 @@ DEP_pep_sidebar_mod <-  function(id, labelname){
       actionButton(ns("aggregate_button"), "Aggregate"),
       # disabled(actionButton(ns("aggregate_button"), "Aggregate")),
       br(),br(),
-      uiOutput(outputId = ns("save_aggregate_button")),
+      # uiOutput(outputId = ns("save_aggregate_button")),
       br(),
       uiOutput(ns("aggregation_check")),
       br(),
@@ -162,45 +162,45 @@ DEP_pep_sidebar_mod <-  function(id, labelname){
       bsCollapse( id = "pro_sidebar",
                   open = "Columns",
                   multiple = F,
-        bsCollapsePanel("Columns",
-                        style = "primary",
-                        # uiOutput(ns("intensitycols")),
-                        # uiOutput(ns("id")),
-                        shinyBS::bsTooltip(ns("name"), "Name of the column containing feature names", "right", options = list(container = "body")),
+                  bsCollapsePanel("Columns",
+                                  style = "primary",
+                                  # uiOutput(ns("intensitycols")),
+                                  # uiOutput(ns("id")),
+                                  shinyBS::bsTooltip(ns("name"), "Name of the column containing feature names", "right", options = list(container = "body")),
 
-                        uiOutput(ns("peptidescol")),
-                        # numericInput(ns("thr"), "allowed max.miss.num at least one condition", min = 0, max = 20, value = 0),
-                        uiOutput(ns("control")),
-                        uiOutput(ns("order")),
-                        uiOutput(ns("test_manual")),
-                        # selectizeInput(ns("norm_method"), "normalized method",
-                        #                choices = c("quantiles","quantiles.robust",
-                        #                            "vsn","center.mean",
-                        #                            "center.median","div.mean",
-                        #                            "div.median", "diff.median"),
-                        #                selected = "quantiles", multiple = FALSE),
+                                  uiOutput(ns("peptidescol")),
+                                  # numericInput(ns("thr"), "allowed max.miss.num at least one condition", min = 0, max = 20, value = 0),
+                                  uiOutput(ns("control")),
+                                  uiOutput(ns("order")),
+                                  uiOutput(ns("test_manual")),
+                                  # selectizeInput(ns("norm_method"), "normalized method",
+                                  #                choices = c("quantiles","quantiles.robust",
+                                  #                            "vsn","center.mean",
+                                  #                            "center.median","div.mean",
+                                  #                            "div.median", "diff.median"),
+                                  #                selected = "quantiles", multiple = FALSE),
 
-                        shinyBS::bsTooltip(ns("peptidescol"), "Choose the peptides column of your data. And this column should be numeric. It is only used to plot heatmap and custom volcano to color the peptides number 1 and 2 to help user check the accuracy of the quantification. Of course, if your data does not have this column, You can leave it blank", "right", options = list(container = "body")),
-                        shinyBS::bsTooltip(ns("filt"), "The filtered columns based on", "right", options = list(container = "body")),
-                        shinyBS::bsTooltip(ns("control"), "Choose your control condition", "right", options = list(container = "body")),
-                        shinyBS::bsTooltip(ns("test_manual"), "Choose the contrasts that you want to test", "right", options = list(container = "body"))
-        ),
-        bsCollapsePanel("FDR correction",  ## DEP FDR correct options
-                        style = "primary",
-                        radioButtons(ns("FDR_type"),
-                                     "type of FDR value",
-                                     choices = c("Strimmer's qvalue(t)","Strimmer's qvalue(p)","BH","Storey's qvalue"),
-                                     selected = "Strimmer's qvalue(t)"),
-                        shinyBS::bsTooltip(ns("FDR_type"), "Choose the method of pvalue adjustment", "right", options = list(container = "body"))
-        ),
-        bsCollapsePanel("Threshold method",
-                        style = "primary",
-                        radioButtons(ns("threshold_method"),
-                                     "Threshold method",
-                                     choices = c("intersect", "curve"),
-                                     selected = "intersect"),
-                        shinyBS::bsTooltip(ns("threshold_method"), "Choose the method that the cutoff of significant proteins based on. [intersect] means by adjusted pvalue and log2 fold change cutoff and [curve] means by curvature and x0 fold cutoff", "right", options = list(container = "body"))
-        )
+                                  shinyBS::bsTooltip(ns("peptidescol"), "Choose the peptides column of your data. And this column should be numeric. It is only used to plot heatmap and custom volcano to color the peptides number 1 and 2 to help user check the accuracy of the quantification. Of course, if your data does not have this column, You can leave it blank", "right", options = list(container = "body")),
+                                  shinyBS::bsTooltip(ns("filt"), "The filtered columns based on", "right", options = list(container = "body")),
+                                  shinyBS::bsTooltip(ns("control"), "Choose your control condition", "right", options = list(container = "body")),
+                                  shinyBS::bsTooltip(ns("test_manual"), "Choose the contrasts that you want to test", "right", options = list(container = "body"))
+                  ),
+                  bsCollapsePanel("FDR correction",  ## DEP FDR correct options
+                                  style = "primary",
+                                  radioButtons(ns("FDR_type"),
+                                               "type of FDR value",
+                                               choices = c("Strimmer's qvalue(t)","Strimmer's qvalue(p)","BH","Storey's qvalue"),
+                                               selected = "Strimmer's qvalue(t)"),
+                                  shinyBS::bsTooltip(ns("FDR_type"), "Choose the method of pvalue adjustment", "right", options = list(container = "body"))
+                  ),
+                  bsCollapsePanel("Threshold method",
+                                  style = "primary",
+                                  radioButtons(ns("threshold_method"),
+                                               "Threshold method",
+                                               choices = c("intersect", "curve"),
+                                               selected = "intersect"),
+                                  shinyBS::bsTooltip(ns("threshold_method"), "Choose the method that the cutoff of significant proteins based on. [intersect] means by adjusted pvalue and log2 fold change cutoff and [curve] means by curvature and x0 fold cutoff", "right", options = list(container = "body"))
+                  )
       ),
       disabled(actionButton(ns("analyze"), "Analyze")),
       shinyBS::bsTooltip(ns("analyze"), "Click on it to analyze your data", "right", options = list(container = "body")),
@@ -999,16 +999,15 @@ DEP_pep_server_module <- function(id){
                          selected = NULL)
 
         } else if (input$anno == "expdesign" & !is.null(expdesign()) & input$contrasts == "control"){
-            selectizeInput(ns("control"), "Control",
-                           choices = make.names(expdesign()$condition)%>% unique() )
+          selectizeInput(ns("control"), "Control",
+                         choices = make.names(expdesign()$condition)%>% unique() )
 
         }else if (input$anno == "logexpdesign" & !is.null(upload_log()) & !is.null(expdesign()) ){
-          # selected111 <<- upload_log()$inputVals()[["control"]]
-          # condition11 <<- make.names(expdesign()$condition) %>% unique()
+
           selectizeInput(ns("control"), "Control",
                          choices = make.names(expdesign()$condition)%>% unique(),
                          selected = upload_log()$inputVals()[["control"]]
-                         )
+          )
         }
       })
 
@@ -1107,8 +1106,7 @@ DEP_pep_server_module <- function(id){
         message("Update options 1 finished \n")
 
         data_QF <- data_QF({
-          data_QF = upload_log()$resultVals()$data
-          # data_QF11 <<- data_QF
+          data_QF = upload_log()$resultVals()$data_QF
         })
 
         Columns_to_updata = Columns_to_updata(1)
@@ -1130,7 +1128,7 @@ DEP_pep_server_module <- function(id){
             column_opt = c("name", "id", "delim", "intensitycols",
                            "filt", "order", "control",
                            "norm_method", "aggregate_Peptide_Type", "aggregation_method"
-                           )
+            )
             for(i in column_opt){
               # message("update ",i," to '", upload_log()$inputVals()[[i]],"'\n", sep = "")
               updateSelectizeInput(session = session, inputId = i,
@@ -1155,7 +1153,7 @@ DEP_pep_server_module <- function(id){
 
       ## update anno option according uploadmode
       observe({
-        # uploadmode11 <<- input$uploadmode
+
         # cat("uploadmode shift")
         if(input$uploadmode == "fromTable"){
           updateRadioButtons(session = session,
@@ -1233,7 +1231,7 @@ DEP_pep_server_module <- function(id){
                                inputId = "norm_method",
                                choices = c("quantiles","quantiles.robust", "diff.median","vsn"),
                                selected = "quantiles"
-                               )
+          )
         }else if(input$imp_norm_order){
           updateSelectizeInput(session = session,
                                inputId = "norm_method",
@@ -1352,7 +1350,6 @@ DEP_pep_server_module <- function(id){
           }
         }
 
-        # my_expdesign <<- expdesign
         return(expdesign)
 
 
@@ -1434,7 +1431,6 @@ DEP_pep_server_module <- function(id){
         #   colData(pe)$replicate = as.character(colData(se)$replicate)
         # }
 
-        # expdesign111 <<- expdesign()
         pe <- DEP2::make_pe(Peptide = Peptide, columns = Ecols,
                             # protein_col = "Pepid",
                             expdesign = expdesign(),
@@ -1483,25 +1479,26 @@ DEP_pep_server_module <- function(id){
       pe_norm <- reactive({
         # rdataFile <- input$resultRData
         # if(is.null(rdataFile)){
-        upload_log = upload_log()
-        if( !is.null(upload_log) & input$uploadmode == "fromLog" ){
-          options_before_imp <- c("name", "id", "delim",
-                                  "intensitycols", "filt",
-                                  "imputation", "imp_norm_order", "norm_method")
-          # input11 <<- input
-          check_opt_change <- options_before_imp %>% sapply(.,function(x){
-            identical(input[[x]], upload_log()$inputVals()[[x]])
-          })
 
-          # check_opt_change2 <<- check_opt_change
-
-          if(all(check_opt_change)){ # if the option before imputation unchange, directly use the old imputation result
-            imp_norm = upload_log()$resultVals()$pe_norm
-            message("Use the imputation in log file!")
-            return(imp_norm)
-          }
-
-        }
+        # upload_log = upload_log()
+        # if( !is.null(upload_log) & input$uploadmode == "fromLog" ){
+        #   options_before_imp <- c("name", "id", "delim",
+        #                           "intensitycols", "filt",
+        #                           "imputation", "imp_norm_order", "norm_method")
+        #   # input11 <<- input
+        #   check_opt_change <- options_before_imp %>% sapply(.,function(x){
+        #     identical(input[[x]], upload_log()$inputVals()[[x]])
+        #   })
+        #
+        #   # check_opt_change2 <<- check_opt_change
+        #
+        #   if(all(check_opt_change)){ # if the option before imputation unchange, directly use the old imputation result
+        #     imp_norm = upload_log()$resultVals()$pe_norm
+        #     message("Use the imputation in log file!")
+        #     return(imp_norm)
+        #   }
+        #
+        # }
 
         pe_filt = pe_filt()
         # cat("begin normalization ...")
@@ -1754,7 +1751,33 @@ DEP_pep_server_module <- function(id){
 
         data_QF <- data_QF({
           input$aggregate_button
+
+
           isolate({
+
+            ## from log
+            upload_log = upload_log()
+            if( !is.null(upload_log) & input$uploadmode == "fromLog" ){
+              message("Exist a log file, check the input options.")
+              options_before_agg <- c("name", "id", "delim",
+                                      "intensitycols", "filt",
+                                      "imputation", "imp_norm_order", "norm_method",
+                                      "aggregate_Peptide_Type", "aggregation_method")
+
+              check_opt_change <- options_before_agg %>% sapply(.,function(x){
+                identical(input[[x]], upload_log()$inputVals()[[x]])
+              })
+
+              if(all(check_opt_change)){ # if the option before imputation unchange, directly use the old imputation result
+                data_QF = upload_log()$resultVals()$data_QF
+                message("Option have no change, Use the aggregation result data_QF in log file!")
+                return(imp_norm)
+              }
+
+            }
+
+
+            ## from aggregation
             pe_norm = pe_norm()
             fcol = input$id
 
@@ -1775,24 +1798,24 @@ DEP_pep_server_module <- function(id){
           })
         })
 
-        output$save_aggregate_button <- renderUI({
-          downloadButton(outputId = session$ns("save_aggregate_button2"), label = "save aggregation result")
-        })
+        # output$save_aggregate_button <- renderUI({
+        #   downloadButton(outputId = session$ns("save_aggregate_button2"), label = "save aggregation result")
+        # })
 
-      })
+      },ignoreInit = T,ignoreNULL = T)
 
-      output$save_aggregate_button2 <- downloadHandler(
-        filename = function() {
-          paste0("aggregation_result.RData")
-        },
-        content = function(file) {
-          peptide = peptide()
-          pe = pe()
-          pe_norm = pe_norm()
-          data = data_QF()
-          save(peptide, pe, pe_norm, data,file = file)
-        }
-      )
+      # output$save_aggregate_button2 <- downloadHandler(
+      #   filename = function() {
+      #     paste0("aggregation_result.RData")
+      #   },
+      #   content = function(file) {
+      #     peptide = peptide()
+      #     pe = pe()
+      #     pe_norm = pe_norm()
+      #     data = data_QF()
+      #     save(peptide, pe, pe_norm, data,file = file)
+      #   }
+      # )
 
       output$Save_RData <- downloadHandler(
         filename = function() { paste("results", ".RData", sep = "") },
@@ -1813,22 +1836,23 @@ DEP_pep_server_module <- function(id){
           withProgress(message = 'Compressing result. Please wait ...', value = 0.66, {
             message("Export log...")
             thelog = pgpep_log$new(input = input,
-                                 reactive_vals = list(
-                                   peptide = peptide(), # required
-                                   expdesign = expdesign(),  # required
-                                   pe = pe(),
-                                   pe_filt = pe_filt(),
-                                   pe_norm = pe_norm(),
-                                   data_QF = data_QF(),
-                                   filt0 = filt0(),
-                                   filt = filt(),
-                                   norm = norm(),
-                                   imp = imp(),
-                                   dep = dep()
-                                 ),
-                                 app_version = DEP2:::app_version
+                                   reactive_vals = list(
+                                     peptide = peptide(), # required
+                                     expdesign = expdesign(),  # required
+                                     # pe = pe(),
+                                     # pe_filt = pe_filt(),
+                                     # pe_norm = pe_norm(),
+                                     data_QF = data_QF()
+                                     # ,
+                                     # filt0 = filt0(),
+                                     # filt = filt(),
+                                     # norm = norm(),
+                                     # imp = imp(),
+                                     # dep = dep()
+                                   ),
+                                   app_version = DEP2:::app_version
             )
-            thelog111 <<- thelog
+
             saveRDS(thelog, file = file)
           })
         }
