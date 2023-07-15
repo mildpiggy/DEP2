@@ -390,7 +390,7 @@ GSEA_server_module <- function(id, Omics_res) {
 
       observeEvent(input$analyze_for_GSEA,{
         # warning if select no database
-        type_for_GSEA_Pass1 <- ifelse((is.null(input$type_for_GSEA) || input$type_for_GSEA == ""), F, T)
+        type_for_GSEA_Pass1 <- ifelse(length(input$type_for_GSEA) < 1 || all(input$type_for_GSEA == ""), F, T)
         shinyFeedback::feedbackWarning("type_for_GSEA", !type_for_GSEA_Pass1, "Please select at least one database")
         req(type_for_GSEA_Pass1)
 

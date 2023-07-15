@@ -139,7 +139,9 @@ ORA_server_module2 <- function(id, Omics_res) {
       output$organism_for_ORA <- renderUI({
 
         if(is.element("Msigdb", input$type_for_ORA)){
-          selectizeInput(ns("organism_for_ORA"), "Select organism", choices=c("Human", "Mouse", "Rat"), selected="Human")
+          selectizeInput(ns("organism_for_ORA"), "Select organism",
+                         choices = intersect(c("Human", "Mouse", "Rat"), annoSpecies_df$species),
+                         selected="Human")
         } else {
           if(is.element("Reactome", input$type_for_ORA)){
             selectizeInput(ns("organism_for_ORA"), "Select organism", choices=annoSpecies_df$species, selected="Human") ## Now reactome and GO have the same selection
@@ -376,7 +378,7 @@ ORA_server_module2 <- function(id, Omics_res) {
 
       observeEvent(input$analyze_for_ORA,{
         # warning if select no database
-        type_for_ORA_Pass1 <- ifelse((is.null(input$type_for_ORA) || input$type_for_ORA == ""), F, T)
+        type_for_ORA_Pass1 <- ifelse(length(input$type_for_ORA) < 1 || all(input$type_for_ORA == ""), F, T)
         shinyFeedback::feedbackWarning("type_for_ORA", !type_for_ORA_Pass1, "Please select at least one database")
         req(type_for_ORA_Pass1)
 
