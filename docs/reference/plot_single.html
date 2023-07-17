@@ -24,11 +24,11 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/01_Quick_start.html">Quick start</a>
-    <a class="dropdown-item" href="../articles/02_Data_import.html">Data import</a>
-    <a class="dropdown-item" href="../articles/03_DEP2_analysis.html">DEP2 analysis workflow</a>
-    <a class="dropdown-item" href="../articles/04_app_demo.html">DEP2 Application Guide</a>
-    <a class="dropdown-item" href="../articles/05_Benchmark_on_spike_in_data.html">A benchmark on spike-in data</a>
+    <a class="dropdown-item" href="../articles/A_Quick_start.html">Quick start</a>
+    <a class="dropdown-item" href="../articles/B_Data_import.html">Data import</a>
+    <a class="dropdown-item" href="../articles/C_DEP2_analysis.html">DEP2 analysis workflow</a>
+    <a class="dropdown-item" href="../articles/D_app_demo.html">DEP2 Application Guide</a>
+    <a class="dropdown-item" href="../articles/E_Benchmark_on_spike_in_data.html">A benchmark on spike-in data</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -92,44 +92,49 @@ barplot is based on are returned.</p></dd>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Load example</span></span></span>
-<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">UbiLength</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'UbiLength' not found</span>
-<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="va">data</span><span class="op">$</span><span class="va">Reverse</span> <span class="op">!=</span> <span class="st">"+"</span> <span class="op">&amp;</span> <span class="va">data</span><span class="op">$</span><span class="va">Potential.contaminant</span> <span class="op">!=</span> <span class="st">"+"</span>,<span class="op">]</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in data$Reverse:</span> object of type 'closure' is not subsettable</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Silicosis_pg</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">Silicosis_pg</span></span></span>
 <span class="r-in"><span><span class="va">data_unique</span> <span class="op">&lt;-</span> <span class="fu"><a href="make_unique.html">make_unique</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"Gene.names"</span>, <span class="st">"Protein.IDs"</span>, delim <span class="op">=</span> <span class="st">";"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> proteins is not a data frame</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Make SummarizedExperiment</span></span></span>
-<span class="r-in"><span><span class="va">columns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"LFQ."</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">data_unique</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'grep': error in evaluating the argument 'x' in selecting a method for function 'colnames': object 'data_unique' not found</span>
-<span class="r-in"><span><span class="va">exp_design</span> <span class="op">&lt;-</span> <span class="va">UbiLength_ExpDesign</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'UbiLength_ExpDesign' not found</span>
-<span class="r-in"><span><span class="va">se</span> <span class="op">&lt;-</span> <span class="fu"><a href="make_se.html">make_se</a></span><span class="op">(</span><span class="va">data_unique</span>, <span class="va">columns</span>, <span class="va">exp_design</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'data_unique' not found</span>
+<span class="r-in"><span><span class="va">ecols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"LFQ."</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">data_unique</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Filter, normalize and impute missing values</span></span></span>
-<span class="r-in"><span><span class="va">filt</span> <span class="op">&lt;-</span> <span class="fu">filter_missval</span><span class="op">(</span><span class="va">se</span>, thr <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in filter_missval(se, thr = 0):</span> could not find function "filter_missval"</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Load experiement design</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Silicosis_ExpDesign</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">exp_design</span> <span class="op">&lt;-</span> <span class="va">Silicosis_ExpDesign</span></span></span>
+<span class="r-in"><span><span class="va">se</span> <span class="op">&lt;-</span> <span class="fu"><a href="make_se.html">make_se</a></span><span class="op">(</span><span class="va">data_unique</span>, <span class="va">ecols</span>, <span class="va">exp_design</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Filter and normalize</span></span></span>
+<span class="r-in"><span><span class="va">filt</span> <span class="op">&lt;-</span> <span class="fu"><a href="filter_se.html">filter_se</a></span><span class="op">(</span><span class="va">se</span>, thr <span class="op">=</span> <span class="fl">0</span>, fraction <span class="op">=</span> <span class="fl">0.4</span>, filter_formula <span class="op">=</span> <span class="op">~</span> <span class="va">Reverse</span> <span class="op">!=</span> <span class="st">"+"</span> <span class="op">&amp;</span> <span class="va">Potential.contaminant</span><span class="op">!=</span><span class="st">"+"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> filter base on missing number is &lt;= 0 in at least one condition.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> filter base on missing number fraction &lt; 0.4 in each row</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> filter base on giving formula </span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">norm</span> <span class="op">&lt;-</span> <span class="fu"><a href="normalize_vsn.html">normalize_vsn</a></span><span class="op">(</span><span class="va">filt</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'filt' not found</span>
-<span class="r-in"><span><span class="va">imputed</span> <span class="op">&lt;-</span> <span class="fu"><a href="impute.html">impute</a></span><span class="op">(</span><span class="va">norm</span>, fun <span class="op">=</span> <span class="st">"MinProb"</span>, q <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> se does not inherit from class SummarizedExperiment</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> vsn2: 8762 x 20 matrix (1 stratum). </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Please use 'meanSdPlot' to verify the fit.</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Impute missing values using different functions</span></span></span>
+<span class="r-in"><span><span class="va">imputed</span> <span class="op">&lt;-</span> <span class="fu"><a href="impute.html">impute</a></span><span class="op">(</span><span class="va">norm</span>, fun <span class="op">=</span> <span class="st">"MinProb"</span>, q <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Imputing along margin 2 (samples/columns).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.3026531</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Test for differentially expressed proteins</span></span></span>
-<span class="r-in"><span><span class="va">diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="test_diff.html">test_diff</a></span><span class="op">(</span><span class="va">imputed</span>, <span class="st">"control"</span>, <span class="st">"Ctrl"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'imputed' not found</span>
+<span class="r-in"><span><span class="va">diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="test_diff.html">test_diff</a></span><span class="op">(</span><span class="va">imputed</span>, <span class="st">"control"</span>, <span class="st">"PBS"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Tested contrasts: W10_vs_PBS, W2_vs_PBS, W4_vs_PBS, W6_vs_PBS, W9_vs_PBS</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Strimmer's qvalue(t)</span>
 <span class="r-in"><span><span class="va">dep</span> <span class="op">&lt;-</span> <span class="fu"><a href="DEP2_add_rejections.html">add_rejections</a></span><span class="op">(</span><span class="va">diff</span>, alpha <span class="op">=</span> <span class="fl">0.05</span>, lfc <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in (function (classes, fdef, mtable) {    methods &lt;- .findInheritedMethods(classes, fdef, mtable)    if (length(methods) == 1L)         return(methods[[1L]])    else if (length(methods) == 0L) {        cnames &lt;- paste0("\"", vapply(classes, as.character,             ""), "\"", collapse = ", ")        stop(gettextf("unable to find an inherited method for function %s for signature %s",             sQuote(fdef@generic), sQuote(cnames)), domain = NA)    }    else stop("Internal error in finding inherited methods; didn't return a unique method",         domain = NA)})(list(structure("standardGeneric", package = "methods")), new("nonstandardGenericFunction",     .Data = function (diff, alpha = 0.05, lfc = 1, thresholdmethod = "intersect",         curvature = 1, x0_fold = 2, ...)     {        standardGeneric("add_rejections")    }, generic = structure("add_rejections", package = "DEP2"),     package = "DEP2", group = list(), valueClass = character(0),     signature = c("diff", "alpha", "lfc", "thresholdmethod",     "curvature", "x0_fold"), default = NULL, skeleton = (function (diff,         alpha = 0.05, lfc = 1, thresholdmethod = "intersect",         curvature = 1, x0_fold = 2, ...)     stop(gettextf("invalid call in method dispatch to '%s' (no default method)",         "add_rejections"), domain = NA))(diff, alpha, lfc, thresholdmethod,         curvature, x0_fold, ...)), &lt;environment&gt;):</span> unable to find an inherited method for function ‘add_rejections’ for signature ‘"standardGeneric"’</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Plot single proteins</span></span></span>
-<span class="r-in"><span><span class="fu">plot_single</span><span class="op">(</span><span class="va">dep</span>, <span class="st">'USP15'</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'dep' not found</span>
-<span class="r-in"><span><span class="fu">plot_single</span><span class="op">(</span><span class="va">dep</span>, <span class="st">'USP15'</span>, <span class="st">'centered'</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'dep' not found</span>
-<span class="r-in"><span><span class="fu">plot_single</span><span class="op">(</span><span class="va">dep</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'USP15'</span>, <span class="st">'CUL1'</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'dep' not found</span>
-<span class="r-in"><span><span class="fu">plot_single</span><span class="op">(</span><span class="va">dep</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'USP15'</span>, <span class="st">'CUL1'</span><span class="op">)</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'dep' not found</span>
+<span class="r-in"><span><span class="fu">plot_single</span><span class="op">(</span><span class="va">dep</span>, <span class="st">'Oas2'</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in str_extract(suffix, "_vs_(.)+"):</span> could not find function "str_extract"</span>
+<span class="r-in"><span><span class="fu">plot_single</span><span class="op">(</span><span class="va">dep</span>, <span class="st">'Oas2'</span>, <span class="st">'centered'</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="plot_single-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="fu">plot_single</span><span class="op">(</span><span class="va">dep</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Oas2'</span>, <span class="st">'Oas3'</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in str_extract(suffix, "_vs_(.)+"):</span> could not find function "str_extract"</span>
+<span class="r-in"><span><span class="fu">plot_single</span><span class="op">(</span><span class="va">dep</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Oas2'</span>, <span class="st">'Oas3'</span><span class="op">)</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in str_extract(suffix, "_vs_(.)+"):</span> could not find function "str_extract"</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

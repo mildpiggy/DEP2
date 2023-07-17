@@ -377,7 +377,7 @@ plot_cond_freq <- function(dep, plot = TRUE) {
     labs(x = "Number of significant conditions",
          y = "Number of proteins",
          title = "Frequency of significant conditions per protein") +
-    DEP::theme_DEP1() +
+    DEP2::theme_DEP1() +
     theme(legend.position = "none")
   if(plot) {
     return(p)
@@ -613,7 +613,7 @@ plot_cond <- function(dep, plot = TRUE) {
     labs(x = "Number of significant conditions",
          y = "Number of proteins",
          title = "Overlap between conditions") +
-    DEP::theme_DEP1()
+    DEP2::theme_DEP1()
 
   # Legend table
   ttheme <- gridExtra::ttheme_minimal(

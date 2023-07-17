@@ -24,11 +24,11 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/01_Quick_start.html">Quick start</a>
-    <a class="dropdown-item" href="../articles/02_Data_import.html">Data import</a>
-    <a class="dropdown-item" href="../articles/03_DEP2_analysis.html">DEP2 analysis workflow</a>
-    <a class="dropdown-item" href="../articles/04_app_demo.html">DEP2 Application Guide</a>
-    <a class="dropdown-item" href="../articles/05_Benchmark_on_spike_in_data.html">A benchmark on spike-in data</a>
+    <a class="dropdown-item" href="../articles/A_Quick_start.html">Quick start</a>
+    <a class="dropdown-item" href="../articles/B_Data_import.html">Data import</a>
+    <a class="dropdown-item" href="../articles/C_DEP2_analysis.html">DEP2 analysis workflow</a>
+    <a class="dropdown-item" href="../articles/D_app_demo.html">DEP2 Application Guide</a>
+    <a class="dropdown-item" href="../articles/E_Benchmark_on_spike_in_data.html">A benchmark on spike-in data</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -224,9 +224,8 @@ Preset a seed could a repeatable cluster result.</p></dd>
 <span class="r-in"><span><span class="va">imputed</span> <span class="op">&lt;-</span> <span class="fu"><a href="impute.html">impute</a></span><span class="op">(</span><span class="va">norm</span>, fun <span class="op">=</span> <span class="st">"MinProb"</span>, q <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Imputing along margin 2 (samples/columns).</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.3026531</span>
-<span class="r-in"><span><span class="va">diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="test_diff.html">test_diff</a></span><span class="op">(</span><span class="va">imputed</span>, type <span class="op">=</span> <span class="st">"manual"</span>, control  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"W4_vs_PBS"</span><span class="op">)</span>, fdr.type <span class="op">=</span> <span class="st">"Storey's qvalue"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> run test_diff() with a valid control.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> Valid controls are: 'PBS', 'W10', 'W2', 'W4', 'W6', 'W9'</span>
+<span class="r-in"><span><span class="va">diff</span> <span class="op">&lt;-</span> <span class="fu"><a href="test_diff.html">test_diff</a></span><span class="op">(</span><span class="va">imputed</span>, type <span class="op">=</span> <span class="st">"manual"</span>, control  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PBS"</span><span class="op">)</span>, fdr.type <span class="op">=</span> <span class="st">"Storey's qvalue"</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in test_diff(imputed, type = "manual", control = c("PBS"), fdr.type = "Storey's qvalue"):</span> run test_diff(type = 'manual') with a 'test' argument</span>
 <span class="r-in"><span><span class="va">dep</span> <span class="op">&lt;-</span> <span class="fu"><a href="DEP2_add_rejections.html">add_rejections</a></span><span class="op">(</span><span class="va">diff</span>, alpha <span class="op">=</span> <span class="fl">0.01</span>,lfc <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in (function (classes, fdef, mtable) {    methods &lt;- .findInheritedMethods(classes, fdef, mtable)    if (length(methods) == 1L)         return(methods[[1L]])    else if (length(methods) == 0L) {        cnames &lt;- paste0("\"", vapply(classes, as.character,             ""), "\"", collapse = ", ")        stop(gettextf("unable to find an inherited method for function %s for signature %s",             sQuote(fdef@generic), sQuote(cnames)), domain = NA)    }    else stop("Internal error in finding inherited methods; didn't return a unique method",         domain = NA)})(list(structure("standardGeneric", package = "methods")), new("nonstandardGenericFunction",     .Data = function (diff, alpha = 0.05, lfc = 1, thresholdmethod = "intersect",         curvature = 1, x0_fold = 2, ...)     {        standardGeneric("add_rejections")    }, generic = structure("add_rejections", package = "DEP2"),     package = "DEP2", group = list(), valueClass = character(0),     signature = c("diff", "alpha", "lfc", "thresholdmethod",     "curvature", "x0_fold"), default = NULL, skeleton = (function (diff,         alpha = 0.05, lfc = 1, thresholdmethod = "intersect",         curvature = 1, x0_fold = 2, ...)     stop(gettextf("invalid call in method dispatch to '%s' (no default method)",         "add_rejections"), domain = NA))(diff, alpha, lfc, thresholdmethod,         curvature, x0_fold, ...)), &lt;environment&gt;):</span> unable to find an inherited method for function ‘add_rejections’ for signature ‘"standardGeneric"’</span>
 <span class="r-in"><span></span></span>

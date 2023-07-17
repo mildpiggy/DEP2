@@ -26,11 +26,11 @@ timeclust()"><meta property="og:image" content="/logo.png"><!-- mathjax --><scri
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/01_Quick_start.html">Quick start</a>
-    <a class="dropdown-item" href="../articles/02_Data_import.html">Data import</a>
-    <a class="dropdown-item" href="../articles/03_DEP2_analysis.html">DEP2 analysis workflow</a>
-    <a class="dropdown-item" href="../articles/04_app_demo.html">DEP2 Application Guide</a>
-    <a class="dropdown-item" href="../articles/05_Benchmark_on_spike_in_data.html">A benchmark on spike-in data</a>
+    <a class="dropdown-item" href="../articles/A_Quick_start.html">Quick start</a>
+    <a class="dropdown-item" href="../articles/B_Data_import.html">Data import</a>
+    <a class="dropdown-item" href="../articles/C_DEP2_analysis.html">DEP2 analysis workflow</a>
+    <a class="dropdown-item" href="../articles/D_app_demo.html">DEP2 Application Guide</a>
+    <a class="dropdown-item" href="../articles/E_Benchmark_on_spike_in_data.html">A benchmark on spike-in data</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -176,58 +176,58 @@ It can be a palette name in "RdBu", "RdYlBu", "RdYlGn", "BrBG", "PiYG", "PRGn", 
 <span class="r-plt img"><img src="get_tc_cluster-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">TC</span><span class="op">$</span><span class="va">res</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          name Timecourse_cluster         mebership              PBS_1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Ca2       Ca2                  1 0.329063383475686   1.69065263119242</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Cldn18 Cldn18                  4 0.553121137926746   1.23958646631143</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Creb1   Creb1                  1 0.326312557758223  0.136487390098118</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Dhx58   Dhx58                  2  0.81902259749771  -2.06544095513807</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Dnmt3a Dnmt3a                  5 0.597688777916992 -0.904896251325489</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Efemp2 Efemp2                  2 0.462700530759487 -0.930272399356138</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     PBS_2               PBS_3              PBS_4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Ca2      1.41759313041917    1.21867872572312  0.871398543111233</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Cldn18   1.14834276230686    1.17683392038859  0.649627636229976</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Creb1  0.0467783130732933 -0.0684995222221971  0.263004266377287</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Dhx58   -1.96084347617414   -2.93920556318203   -3.1943284449183</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Dnmt3a -0.939565872453979   -1.17776444420126 -0.906231190648125</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Efemp2 -0.605958902335448   -1.08561736048544 -0.812065013310434</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> C1qbp   C1qbp                  4 0.886304715790769  0.420263091052544</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Ca2       Ca2                  3 0.411242340092725   1.69065263119242</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Cldn18 Cldn18                  2 0.686617687623295   1.23958646631143</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Dhx58   Dhx58                  1 0.846778402740017  -2.06544095513807</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Dnmt3a Dnmt3a                  6 0.552528926838831 -0.904896251325489</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Efemp2 Efemp2                  5 0.505110922852042 -0.930272399356138</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                     PBS_2             PBS_3              PBS_4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> C1qbp  -0.195529409711714 0.424599288402426 -0.575735101668087</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Ca2      1.41759313041917  1.21867872572312  0.871398543111233</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Cldn18   1.14834276230686  1.17683392038859  0.649627636229976</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Dhx58   -1.96084347617414 -2.93920556318203   -3.1943284449183</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Dnmt3a -0.939565872453979 -1.17776444420126 -0.906231190648125</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Efemp2 -0.605958902335448 -1.08561736048544 -0.812065013310434</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                      W2_1               W2_3                W2_4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> C1qbp   0.515549989532623 -0.204071405680601   -0.36550912598274</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Ca2     0.098613225762044 0.0159171430763649 -0.0158498148229711</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cldn18 -0.360596970057859  -0.47187623920922    -0.4255120562602</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Creb1   0.539337458007282  0.701506484535862   0.901503283103786</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dhx58   0.746457200193323   1.24456979871951   0.821772070624508</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dnmt3a  0.783357254120432   1.08808001389562   0.868693353844201</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Efemp2  -0.15358956170402  0.174213060034393   0.249851981034421</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                      W2_5                W4_2               W4_3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> C1qbp   0.062132795471836  -0.162074321207182 -0.485304611494996</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Ca2     0.100742763687713   -0.37424848888098 -0.119820470177196</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cldn18 -0.288477991839169   0.330153178862002  0.239899871574369</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Creb1   0.557541990037336   0.365962761537745  0.125169868503782</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dhx58    1.03333640641943    1.13127573675511  0.192532251407595</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dnmt3a  0.749978466197163   0.583297318826038 -0.395325255498001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Efemp2  0.214905350869383 0.00808615857910056 -0.244696885643624</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                      W4_4                W4_5                W6_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> C1qbp   -1.24162814651021   -1.16854438888593  -0.443699676074125</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Ca2    -0.181299577487948 -0.0116517269610839  -0.460001709658762</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cldn18  0.199424707360595   0.567415080217049  -0.619790712033538</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Creb1   0.502401723735161   0.433261249125621   -0.25721959379948</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dhx58   0.716047237780469 0.00185594051893645   0.123212926214716</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dnmt3a  0.277692440227106  -0.312137949657195 -0.0517147839181824</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Efemp2 0.0411470168599486  -0.173965660789197   0.363980847906301</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       W6_3                W6_4               W6_6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Ca2     -0.530563532665759  -0.776238614295806 -0.539418285530573</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Cldn18  -0.783321687943666  -0.794706626067534 -0.405821220765933</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Creb1  -0.0459444624686149 -0.0892369439907519  0.281828507675655</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Dhx58    0.734945929150886   0.642967460601366  0.555262089321882</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Dnmt3a   0.477148540207022   0.228572037733063  0.393591813383914</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Efemp2  0.0413562665920004    0.50074823953592  0.342584869825163</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                      W6_3               W6_4               W6_6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> C1qbp  -0.792023214384841 -0.480044206757867  -2.07162607062625</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Ca2    -0.530563532665759 -0.776238614295806 -0.539418285530573</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Cldn18 -0.783321687943666 -0.794706626067534 -0.405821220765933</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Dhx58   0.734945929150886  0.642967460601366  0.555262089321882</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Dnmt3a  0.477148540207022  0.228572037733063  0.393591813383914</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Efemp2 0.0413562665920004   0.50074823953592  0.342584869825163</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                      W9_2                W9_4               W10_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> C1qbp   -0.77498614221431  -0.342256735421753     3.8874092603213</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Ca2    -0.163821633610759  -0.476498689126373  -0.713390780262202</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cldn18 -0.129757499196334 -0.0287980472910228  -0.414560565381205</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Creb1   -3.05293888550846   -1.61561760717282   0.323729726334115</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dhx58   0.393764307310281   0.481596331711717   0.840155068871187</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dnmt3a -0.439023661513279   -0.22878860702064 -0.0366646751473709</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Efemp2  0.925971985604367   0.835542242088724   0.115609350582677</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                      W10_4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> C1qbp     3.99307813183992</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Ca2      -1.05079283949163</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Cldn18  -0.828064007205182</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Creb1  -0.0490560069827133</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dhx58    0.500067683811611</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dnmt3a -0.0582985470510273</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Efemp2   0.192168414111929</span>

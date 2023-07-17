@@ -74,5 +74,5 @@ norm <- normalize_vsn(filt)
 imputed <- impute(norm, fun = "MinProb", q = 0.05)
 
 # UMAP plot
-plot_umap(norm)
+plot_umap(imputed)
 }

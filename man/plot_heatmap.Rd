@@ -130,7 +130,7 @@ se <- make_se_parse(data_unique, ecols,mode = "delim")
 filt <- filter_se(se, thr = 0, fraction = 0.4, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
 norm <- normalize_vsn(filt)
 imputed <- impute(norm, fun = "MinProb", q = 0.05)
-diff <- test_diff(imputed, type = "manual", control  = c("W4_vs_PBS"), fdr.type = "Storey's qvalue")
+diff <- test_diff(imputed, type = "manual", control  = c("PBS"), fdr.type = "Storey's qvalue")
 dep <- add_rejections(diff, alpha = 0.01,lfc = 2)
 
 # Heatmap
