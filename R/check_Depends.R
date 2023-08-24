@@ -67,8 +67,9 @@ check_shiny_depends = function(install = T){
                    "serenity-r/dndselectr",
                    "rmarkdown",
                    "shiny",
-                   "colourpicker"
-                   )
+                   "colourpicker",
+                   "rhandsontable"
+ )
  bioc_pkg = c("serenity-r/dndselectr")
  checek_req_depends(need_packages,install = install, mess = "for the shiny application", bioc_pkg = bioc_pkg)
 

@@ -37,6 +37,7 @@ require(shinyBS)
 library(shinyvalidate)
 library(shinyWidgets)
 library(shinyjs)
+library(rhandsontable)
 # library(bslib)
 
 app_version = 0503

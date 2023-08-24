@@ -33,12 +33,42 @@ Reshape_sidebar_mod <-  function(id,label="Reshape_sidabar"){
                         fluidRow(
                           column(width = 12,
                                  selectInput(ns('sep'),
-                                           "The field separator character",
-                                           choices = c("\\t" = "\t", ",", ";"),
+                                           "The field separator/delimiter character",
+                                           choices = c("\\t" = "\t", ",", ";","|"),
                                            selected = "\\t"
                                  )
                           )
                         )
+        ),
+        bsCollapsePanel("filter", ## filter options pannel
+                        style = "primary",
+                        tagList(
+                          fluidRow(
+                            column(width = 12,
+                                   # shiny::div(HTML(
+                                   #   paste0("<h5>",
+                                   #          "If need to filter the input 'Long table' before, ",
+                                   #          "please fill in the filter conditions in the table below.",
+                                   #          "Else please skip these step.",
+                                   #          "</h5>")
+                                   # )),
+                                   h5("If need to filter the input 'Long table' before,
+                                   please fill in the filter conditions in the table below.
+                                   Else please skip these step."),
+                                   h6("Each complete row corresponds to a filter rule")
+                            )
+                          ),
+                          fluidRow(column( width = 12,rhandsontable::rHandsontableOutput(ns("filtOpt_table")) )),
+                          fluidRow(column( width = 12,actionButton(ns("filt_butt"),"Perform filter") )),
+                          # fluidRow(shiny::verbatimTextOutput(ns("test_opt"))),
+                          # fluidRow(shiny::verbatimTextOutput(ns("test_opt2"))),
+                          fluidRow(column( width = 12,p("Filter based on rule(s):") )),
+                          fluidRow(shiny::verbatimTextOutput(ns("test_opt3"))),
+                          fluidRow(shiny::verbatimTextOutput(ns("filter_message"))),
+                        )
+        # )
+                        # )
+
         ),
         bsCollapsePanel("Reshape options",
                         style = "primary",
@@ -47,7 +77,17 @@ Reshape_sidebar_mod <-  function(id,label="Reshape_sidabar"){
                         br(),br(),
                         uiOutput(ns("down_butt"))
         )
-      )
+      ),
+      shinyBS::bsTooltip(ns("sep"),
+                         paste0(
+                           "The delimiter of input table, ",
+                           "character used to separate individual columns within a table, such as:<br>",
+                           "CSV(Comma-Separated): <b>,</b> <br>",
+                           "TSV(Tab-Separated) or TXT:  <b>\\\\t</b> <br>",
+                           "Semicolon-Delimited: <b>;</b> <br>",
+                           "You check check the table <b>delimiter</b> through text editors like Notepad."
+                         ),
+                         "top", options = list(container = "body"))
     )
   )
 }
@@ -79,6 +119,12 @@ Reshape_body_mod <- function(id, label = "Reshape_body") {
           # verbatimTextOutput(ns("input_table_classes"))
         ),
         tabPanel(
+          "Filtered table",
+          dataTableOutput(ns("filtered_table")),
+          # verbatimTextOutput(ns("input_table_str")),
+          # verbatimTextOutput(ns("input_table_classes"))
+        ),
+        tabPanel(
           "Unique table",
           dataTableOutput(ns("unique_table"))
         ),
@@ -106,7 +152,61 @@ Reshape_Server <- function(id, Omics_res) {
         inFile <- input$table_for_reshape
         if (is.null(inFile))
           return(NULL)
-        read.csv(inFile$datapath, sep = "\t", stringsAsFactors = F, header = T) %>% as.data.frame()
+        fread(inFile$datapath, sep = input$sep, stringsAsFactors = F, header = T) %>% as.tibble()
+      })
+
+      filt_table <- reactive({
+        filt_condition = isolate(filt_condition())
+
+        long_table = long_table()
+        filt_butt = input$filt_butt
+
+        if(is.null(filt_butt)||filt_butt == 0) return(NULL)
+        if(is.null(long_table)) return(NULL)
+
+        if(is.null(filt_condition) || length(filt_condition) < 1){
+          sendSweetAlert(
+            session = shiny::getDefaultReactiveDomain(),
+            title = "No filter rules.",
+            text = paste0("Input the filter rules first"),
+            type = "warning"
+          )
+          return(NULL) # no filter rules
+
+        }else{
+          for(i in filt_condition){
+            filt_table = try({
+              long_table %>% filter(!!rlang::parse_expr(i))
+            })
+            if(any(class(filt_table) == "try-error")){ # if filter error
+              sendSweetAlert(
+                session = shiny::getDefaultReactiveDomain(),
+                title = "Error in filter",
+                text = paste0(
+                  "Something go wrong. Please check your input filter rules:\n",
+                  i),
+                type = "error"
+              )
+              return(NULL)
+            }
+
+            if(nrow(filt_table) < 1){ # if all rows is filtered out
+              sendSweetAlert(
+                session = shiny::getDefaultReactiveDomain(),
+                title = "No row is remained after filter",
+                text = paste0(
+                  "All rows are filtered out. Please check your input filter rules:",
+                  i),
+                type = "warning"
+              )
+              return(NULL)
+            }
+
+          }
+
+          return(filt_table)
+        }
+
       })
 
       classes <- reactive({
@@ -126,13 +226,18 @@ Reshape_Server <- function(id, Omics_res) {
         a = input$reshape_butt
         unique_table <- NULL
         isolate({
+
           if(!(is.null(long_table())||
                is.null(input$feature_col)||input$feature_col == ""||
                is.null(input$sample_col)||input$sample_col == ""||
                is.null(input$expression_col)||input$expression_col == ""
           )){
+            if(!is.null(filt_table()) & # filter is finnished
+               colnames(filt_table()) == colnames(long_table()) # filtered table is from long table
+            ){
+              thedata = thedata()
+            }else thedata <- long_table()
             # thesampcol <- input$sample_col
-            thedata <- long_table()
             unique_table <- thedata[,c(input$feature_col,input$sample_col,input$expression_col)] %>% unique()
           }else{
             unique_table <- NULL
@@ -165,6 +270,99 @@ Reshape_Server <- function(id, Omics_res) {
         })
 
         return(out_tb)
+      })
+
+      # The filter condition input
+      filt_opt_table <- reactive({
+
+        ## accept the value from rhandsontable
+        opt_table = hot_to_r(input$filtOpt_table)
+        if(is.null(opt_table)) return(NULL)
+
+        ## only retain the complete rows from input filter opt table
+        keep_rows = which(!MatrixGenerics::rowAnys(opt_table == ""))
+        if(length(keep_rows) < 1) return(NULL)
+        opt_table = opt_table[keep_rows,]
+        return(opt_table)
+      })
+
+      filt_condition <- reactive({
+        ## validate rules
+        filt_opt_table <- filt_opt_table()
+
+        if(!is.null(filt_opt_table)){
+          Boolean_operators = "&"
+          filt_condition = vector()
+
+          # when long_table is changed
+          if(any(!filt_opt_table$filteronColumn %in% colnames(long_table()))){
+            cat
+            return(NULL)
+          }
+
+          for (i in 1:nrow(filt_opt_table)) {
+            # if(filt_opt_table$filteronColumn[i] %in% colnames(long_table()))
+            if(filt_opt_table$judgmentRule[i] == "containCharecter" ){
+              filt_condition[i] = paste0("grepl('",
+                                         filt_opt_table$criteriaValue[i],
+                                         "',",
+                                         filt_opt_table$filteronColumn[i],
+                                         ")"
+              )
+            }else if(filt_opt_table$judgmentRule[i] == "excludeCharecter" ){
+              filt_condition[i] = paste0("! grepl('",
+                                         filt_opt_table$criteriaValue[i],
+                                         "',",
+                                         filt_opt_table$filteronColumn[i],
+                                         ")"
+              )
+            }else if(filt_opt_table$judgmentRule[i] %in% c(">","<","=","!=") ){
+              filt_condition[i] = paste0(filt_opt_table$filteronColumn[i],
+                                         filt_opt_table$judgmentRule[i],
+                                         filt_opt_table$criteriaValue[i])
+            }
+          }
+          return(filt_condition)
+          # theformula = paste(filt_condition, collapse = Boolean_operators)
+        }else{
+          return(NULL)
+        }
+      })
+
+
+
+      # The output rhandsontable for filter condition input, up to 7 rules
+      output$filtOpt_table <- rhandsontable::renderRHandsontable({
+        temp_table = data.frame(a= 1:4,b = 4:1,c = letters[1:4])
+        if(is.null(long_table())) return(NULL)
+        # cols = colnames(temp_table)
+        cols = colnames(long_table())
+        opt_table = data.frame(filteronColumn = factor(replicate(7,""),levels = c("",cols)),
+                               judgmentRule = factor(replicate(7,""),level=c("",">","<","=","!=","contain","exclude")),
+                               criteriaValue = replicate(7,""),
+                               stringsAsFactors = F)
+        rhandsontable::rhandsontable(opt_table,rowHeaders = c("Filter on Which Column","Judgment Rule", "Criteria Value"))
+      })
+
+      output$test_opt <- renderText({
+        input$filtOpt_table -> temp
+        hot_to_r(temp)[,1] %>% as.character()
+      })
+
+      output$test_opt2 <- renderText({
+        filt_opt_table()
+      })
+
+      output$test_opt3 <- renderText({
+        filt_condition()
+      })
+
+      output$filter_message <- renderText({
+        if(!is.null(long_table()) && !is.null(filt_table())){
+          paste0("Before filter: ",nrow(long_table())," rows.\n",
+                 "After filter: ",nrow(filt_table())," rows."
+          )
+        }else NULL
       })
 
       output$Reshape_opts <- renderUI({
@@ -239,6 +437,17 @@ Reshape_Server <- function(id, Omics_res) {
       output$input_table <- renderDataTable({
         if(!is.null(long_table())){
           thedata <- long_table()
+          render_tb <- trim_table_character(thedata, length_lim = 14)
+          suppressWarnings(render_tb)
+        }else{
+          NULL
+        }
+      },options = list(autoWidth = F, scrollX = T)
+      )
+
+      output$filtered_table <- renderDataTable({
+        if(!is.null(filt_table())){
+          thedata <- filt_table()
           suppressWarnings(trim_table_character(thedata, length_lim = 14))
         }else{
           NULL
@@ -279,9 +488,7 @@ trim_table_character <- function(thedata,length_lim = 14){
 
   if(length(character_cols) > 1){
     thedata[,character_cols] = thedata[,character_cols] %>% apply(.,2,function(x,len_limit){
-      # x111 <<- x
-      # x = x111
-      x = thedata[,1]
+      # x = thedata[,1]
       t_df <- data.frame(ori = unique(x))
       t_df$trans_code = stringr::str_conv(t_df$ori,"UTF-8")
       t_df$trans_char = ifelse(stringr::str_length(t_df$trans_code) > len_limit,

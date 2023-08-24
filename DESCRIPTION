@@ -1,6 +1,6 @@
 Package: DEP2
 Title: An analysis toolkits for mass spectrometry based proteomics data.
-Version: 0.3.7.4
+Version: 0.4.8.24
 Authors@R: 
     c(
     person("Zhenhuan", "Feng", email = "feng_zhenhuan@gibh.ac.cn", role = c("cre", "aut")),
@@ -21,7 +21,7 @@ Suggests:
     testthat (>= 3.0.0),
     knitr, BiocStyle, ggridges, ggsignif, magick, pROC,
     IHW, ashr, apeglm,
-    shiny (>= 1.6), shinydashboard, shinyvalidate, shinyWidgets, shinythemes, shinyBS, shinyFeedback, 
+    shiny (>= 1.6), shinydashboard, shinyvalidate, shinyWidgets, shinythemes, shinyBS, shinyFeedback, rhandsontable,
     markdown, dndselectr, rmarkdown, colourpicker,
     clusterProfiler, clusterProfiler.dplyr, ReactomePA, msigdbr, dbplyr,
     org.Mm.eg.db, org.Hs.eg.db,
