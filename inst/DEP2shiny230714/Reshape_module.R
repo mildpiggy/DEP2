@@ -184,9 +184,7 @@ Reshape_Server <- function(id, Omics_res) {
           return(NULL) # no filter rules
 
         }else{
-          long_table11 <<- long_table
-          filt_condition11 <<- filt_condition
-          filt_table <- filt_table
+          filt_table <- long_table
           for(i in filt_condition){
             filt_table = try({
               filt_table %>% filter(!!rlang::parse_expr(i))
