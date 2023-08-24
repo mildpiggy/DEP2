@@ -12,7 +12,8 @@ reshape_long2wide(
   remove_sample_prefix = T,
   remove_sample_suffix = T,
   shrink_ident_cols = NULL,
-  extend_ident_cols = NULL
+  extend_ident_cols = NULL,
+  subfeature_col = NULL
 )
 }
 \arguments{
@@ -36,6 +37,15 @@ If the variable is multiple for a feature, it will paste to a character string. 
 \item{extend_ident_cols}{NULL or characters,the variables (identification information, like score, protein.names)
 to stored in transformed table, like the .
 The variables will be extended to wide table like the expression_col, the value of different sample will store in different colmun in out table.}
+
+\item{subfeature_col}{NULL or a character(1).
+If is a character, it should be the column names subprime features of the features, such as (modified/stripped) peptide sequence/ID or precursor ID.
+In output table, columns will records the appearing count of subfeatures or each sample-feature and golbal feature.
+The character could be named to label the subfeatures, like \code{subfeature_col = c(peptides = "Peptide.Sequence")} or
+\code{subfeature_col = c(PSM = "modified.Sequence")}).
+Then the peptides(or PSM in the second case) will be the label name of subfeature, the output count columns will be
+peptides.samplenames et.al. If the character is unnamed the default label name is subfeaturecounts, so the out columns will be
+subfeaturecounts.samplenames et.al.}
 }
 \value{
 A data.frame in a wide format
