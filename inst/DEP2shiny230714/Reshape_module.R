@@ -33,7 +33,7 @@ Reshape_sidebar_mod <-  function(id,label="Reshape_sidabar"){
                         fluidRow(
                           column(width = 12,
                                  selectInput(ns('sep'),
-                                           "The field separator/delimiter character",
+                                           "The field separator/delimiter character of table",
                                            choices = c("\\t" = "\t", ",", ";","|"),
                                            selected = "\\t"
                                  )
@@ -52,8 +52,8 @@ Reshape_sidebar_mod <-  function(id,label="Reshape_sidabar"){
                                    #          "Else please skip these step.",
                                    #          "</h5>")
                                    # )),
-                                   h5("If need to filter the input 'Long table' before,
-                                   please fill in the filter conditions in the table below.
+                                   h5("If need to filter the input 'Long table' before filter,
+                                   please fill in the filter conditions in the table below and click filter button.
                                    Else please skip these step."),
                                    h6("Each complete row corresponds to a filter rule")
                             )
@@ -63,8 +63,8 @@ Reshape_sidebar_mod <-  function(id,label="Reshape_sidabar"){
                           # fluidRow(shiny::verbatimTextOutput(ns("test_opt"))),
                           # fluidRow(shiny::verbatimTextOutput(ns("test_opt2"))),
                           fluidRow(column( width = 12,p("Filter based on rule(s):") )),
-                          fluidRow(shiny::verbatimTextOutput(ns("test_opt3"))),
-                          fluidRow(shiny::verbatimTextOutput(ns("filter_message"))),
+                          fluidRow(column( width = 12,shiny::verbatimTextOutput(ns("test_opt3")) )),
+                          fluidRow(column( width = 12,shiny::verbatimTextOutput(ns("filter_message")) )),
                         )
         # )
                         # )
@@ -78,17 +78,21 @@ Reshape_sidebar_mod <-  function(id,label="Reshape_sidabar"){
                         uiOutput(ns("down_butt"))
         )
       ),
-      shinyBS::bsTooltip(ns("sep"),
-                         paste0(
-                           "The delimiter of input table, ",
-                           "character used to separate individual columns within a table, such as:<br>",
-                           "CSV(Comma-Separated): <b>,</b> <br>",
-                           "TSV(Tab-Separated) or TXT:  <b>\\\\t</b> <br>",
-                           "Semicolon-Delimited: <b>;</b> <br>",
-                           "You check check the table <b>delimiter</b> through text editors like Notepad."
-                         ),
-                         "top", options = list(container = "body"))
-    )
+      shinyBS::bsPopover(ns("sep"), "Delimiter",
+                         content = paste0("<p>",
+                                          "The delimiter of input table, ",
+                                          "character used to separate individual columns within a table, such as:<br>",
+                                          "CSV(Comma-Separated): <b>,</b> <br>",
+                                          "TSV(Tab-Separated) or TXT:  <b>\\\\t</b> <br>",
+                                          "Semicolon-Delimited: <b>;</b> <br>",
+                                          "You check check the table <b>delimiter</b> through text editors like Notepad.",
+                                          "</p>"), trigger = 'hover')
+
+    ),
+    shinyBS::bsTooltip(ns("rm_prefix"), "Remove the prefix of variables in the Sample column, like the file path",
+                       "top", options = list(container = "body")),
+    shinyBS::bsTooltip(ns("rm_suffix"), "Remove the suffix of variables in the Sample column",
+                       "top", options = list(container = "body"))
   )
 }
 
@@ -148,11 +152,17 @@ Reshape_Server <- function(id, Omics_res) {
     function(input, output, session) {
       ns = session$ns
 
+      shinyBS::addPopover(session, "distPlot", "Data", content = paste0("<p>Waiting time between ",
+                                                               "eruptions and the duration of the eruption for the Old Faithful geyser ",
+                                                               "in Yellowstone National Park, Wyoming, USA.</p><p>Azzalini, A. and ",
+                                                               "Bowman, A. W. (1990). A look at some data on the Old Faithful geyser. ",
+                                                               "Applied Statistics 39, 357-365.</p>"), trigger = 'click')
+
       long_table <- reactive({
         inFile <- input$table_for_reshape
         if (is.null(inFile))
           return(NULL)
-        fread(inFile$datapath, sep = input$sep, stringsAsFactors = F, header = T) %>% as.tibble()
+        fread(inFile$datapath, sep = input$sep, stringsAsFactors = F, header = T) %>% as.data.frame()
       })
 
       filt_table <- reactive({
@@ -174,9 +184,12 @@ Reshape_Server <- function(id, Omics_res) {
           return(NULL) # no filter rules
 
         }else{
+          long_table11 <<- long_table
+          filt_condition11 <<- filt_condition
+          filt_table <- filt_table
           for(i in filt_condition){
             filt_table = try({
-              long_table %>% filter(!!rlang::parse_expr(i))
+              filt_table %>% filter(!!rlang::parse_expr(i))
             })
             if(any(class(filt_table) == "try-error")){ # if filter error
               sendSweetAlert(
@@ -215,7 +228,6 @@ Reshape_Server <- function(id, Omics_res) {
           classes <- 1:ncol(thedata) %>% sapply(function(x){
             class(thedata[,x])
           })
-
           classes
         }else{
           NULL
@@ -228,14 +240,14 @@ Reshape_Server <- function(id, Omics_res) {
         isolate({
 
           if(!(is.null(long_table())||
-               is.null(input$feature_col)||input$feature_col == ""||
-               is.null(input$sample_col)||input$sample_col == ""||
-               is.null(input$expression_col)||input$expression_col == ""
+               is.null(input$feature_col)||all(input$feature_col == "")||
+               is.null(input$sample_col)||all(input$sample_col == "")||
+               is.null(input$expression_col)||all(input$expression_col == "")
           )){
-            if(!is.null(filt_table()) & # filter is finnished
-               colnames(filt_table()) == colnames(long_table()) # filtered table is from long table
+            if(!is.null(filt_table()) && # filter is finnished
+               all.equal(colnames(filt_table()), colnames(long_table())) # filtered table is from long table
             ){
-              thedata = thedata()
+              thedata = filt_table()
             }else thedata <- long_table()
             # thesampcol <- input$sample_col
             unique_table <- thedata[,c(input$feature_col,input$sample_col,input$expression_col)] %>% unique()
@@ -253,11 +265,11 @@ Reshape_Server <- function(id, Omics_res) {
           if(!(is.null(long_table())||
                is.null(unique_table())
           )){
-            if(is.null(input$shrink_col)|| input$shrink_col == ""){
+            if(is.null(input$shrink_col)|| all(input$shrink_col == "")){
               shrink_ident_cols = NULL
             }else{shrink_ident_cols = input$shrink_col}
 
-            if(is.null(input$extend_col)|| input$extend_col == ""){
+            if(is.null(input$extend_col)|| all(input$extend_col == "")){
               extend_ident_cols = NULL
             }else{extend_ident_cols = input$extend_col}
 
@@ -310,7 +322,7 @@ Reshape_Server <- function(id, Omics_res) {
                                          ")"
               )
             }else if(filt_opt_table$judgmentRule[i] == "excludeCharecter" ){
-              filt_condition[i] = paste0("! grepl('",
+              filt_condition[i] = paste0("!grepl('",
                                          filt_opt_table$criteriaValue[i],
                                          "',",
                                          filt_opt_table$filteronColumn[i],
@@ -338,10 +350,12 @@ Reshape_Server <- function(id, Omics_res) {
         # cols = colnames(temp_table)
         cols = colnames(long_table())
         opt_table = data.frame(filteronColumn = factor(replicate(7,""),levels = c("",cols)),
-                               judgmentRule = factor(replicate(7,""),level=c("",">","<","=","!=","contain","exclude")),
+                               judgmentRule = factor(replicate(7,""),level=c("",">","<","=","!=","containCharecter","excludeCharecter")),
                                criteriaValue = replicate(7,""),
                                stringsAsFactors = F)
-        rhandsontable::rhandsontable(opt_table,rowHeaders = c("Filter on Which Column","Judgment Rule", "Criteria Value"))
+        rhandsontable::rhandsontable(opt_table,
+                                     colHeaders = c("Filter on Which Column","Judgment Rule", "Criteria Value"),
+                                     rowHeaders = paste("Rule",1:7))
       })
 
       output$test_opt <- renderText({
