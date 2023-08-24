@@ -43,6 +43,15 @@ clean_character <- function(express_assay){
 #' @param extend_ident_cols NULL or characters,the variables (identification information, like score, protein.names)
 #' to stored in transformed table, like the .
 #' The variables will be extended to wide table like the expression_col, the value of different sample will store in different colmun in out table.
+#' @param subfeature_col NULL or a character(1).
+#' If is a character, it should be the column names subprime features of the features, such as (modified/stripped) peptide sequence/ID or precursor ID.
+#' In output table, columns will records the appearing count of subfeatures or each sample-feature and golbal feature.
+#' The character could be named to label the subfeatures, like \code{subfeature_col = c(peptides = "Peptide.Sequence")} or
+#' \code{subfeature_col = c(PSM = "modified.Sequence")}).
+#' Then the peptides(or PSM in the second case) will be the label name of subfeature, the output count columns will be
+#' peptides.samplenames et.al. If the character is unnamed the default label name is subfeaturecounts, so the out columns will be
+#' subfeaturecounts.samplenames et.al.
+#'
 #'
 #' @return
 #' A data.frame in a wide format
@@ -82,7 +91,9 @@ reshape_long2wide <- function(long_table,
                               remove_sample_prefix=T, # logical(1)
                               remove_sample_suffix=T, # logical(1)
                               shrink_ident_cols = NULL, # characters
-                              extend_ident_cols = NULL # characters
+                              extend_ident_cols = NULL, # characters
+                              subfeature_col = NULL # NULL or character(1)
+
 ){
   assertthat::assert_that(is.data.frame(long_table),
                           is.character(feature_col) & length(feature_col) == 1,
@@ -91,7 +102,8 @@ reshape_long2wide <- function(long_table,
                           is.logical((remove_sample_prefix)) & length(remove_sample_prefix) == 1,
                           is.logical((remove_sample_suffix)) & length(remove_sample_suffix) == 1,
                           is.null(shrink_ident_cols)||is.character(shrink_ident_cols),
-                          is.null(extend_ident_cols)||is.character(extend_ident_cols)
+                          is.null(extend_ident_cols)||is.character(extend_ident_cols),
+                          is.null(subfeature_col)||(is.character(subfeature_col) & length(subfeature_col) == 1)
   )
   if(!feature_col %in% colnames(long_table)) stop("feature_col must be a column name of long_table")
   if(!expression_col %in% colnames(long_table)) stop("expression_col must be a column name of long_table")
@@ -101,10 +113,11 @@ reshape_long2wide <- function(long_table,
   all_col = c(feature_col,expression_col,shrink_ident_cols,extend_ident_cols)
   if(any(duplicated(all_col))) stop(all_col[duplicated(all_col)],"is repeated in input, please check")
 
+  # convert sample characters into UTF8
   long_table[,sample_col] = iconv(long_table[,sample_col], "WINDOWS-1252", "UTF-8")
   if(remove_sample_prefix){
     prefix <- DEP2:::get_prefix(long_table[,sample_col])
-    prefix <- gsub("\\\\","\\\\\\\\",prefix)
+    prefix <- gsub("\\\\","\\\\\\\\",prefix) # if character contains \
     long_table[,sample_col]= gsub(prefix,"",long_table[,sample_col])
   }
   if(remove_sample_suffix){
@@ -117,6 +130,28 @@ reshape_long2wide <- function(long_table,
   long_table2[,sample_col]  = factor(long_table2[,sample_col],levels = samp)
   long_table2 = long_table2 %>% arrange(.data[[sample_col]])
 
+  ## Create a subfeature counts column
+  if(!is.null(subfeature_col)){
+    if(!subfeature_col %in% colnames(long_table)) stop("subfeature_col must be a column name of long_table")
+
+    subfeat_name = ifelse(is.null(names(subfeature_col)), "subfeaturecounts", names(subfeature_col))
+
+    # the global subfeature. A featrue of each sample is from how many different subfeat.
+    long_table2 = long_table2 %>% group_by(!!sym(sample_col), !!sym(feature_col)) %>%
+      mutate(!!subfeat_name := n_distinct(.data[[subfeature_col]])) %>%
+      as.data.frame()
+    extend_ident_cols = c(extend_ident_cols, subfeat_name)
+
+    # the global subfeature. A featrue is from how many different subfeat.
+    subfeat_name = paste0("Global.",subfeat_name,".counts")
+    long_table2 = long_table2 %>% group_by(.data[[feature_col]]) %>%
+      mutate(!!subfeat_name := n_distinct(.data[[subfeature_col]])) %>%
+      as.data.frame()
+
+    shrink_ident_cols = c(shrink_ident_cols, subfeat_name) # shrink the subfeature
+  }
+
+
   ## Remove Duplicates in c(feature_col,sample_col,expression_col)
   long_table2 <- long_table2[!duplicated(long_table2[,c(feature_col,sample_col,expression_col)]),]
 
@@ -128,18 +163,22 @@ reshape_long2wide <- function(long_table,
     message(dup_precent,"% of features have multiple expression, keep the max value.")
 
     long_table2 = long_table2[order(long_table2[,expression_col],decreasing = T), ]
-    long_table2 = long_table2[!duplicated(long_table2[,c(feature_col,sample_col)]), ]
-  }
 
+    long_table2 = long_table2[!duplicated(long_table2[,c(feature_col,sample_col,expression_col)]), ]
+  }
+  long_table222 <<- long_table2
+
+  ## exp_df: the wide expression table
   exp_df = tidyr::pivot_wider(long_table2, id_cols = feature_col, names_from = sample_col, values_from = expression_col,
                               values_fn = function(x){
                                 if(all(is.na(x))){
                                   NA
                                 }else{
-                                  max(x,na.rm = T)  ## Use the maximum
+                                  max(x,na.rm = T)  ## If a [feature_col,sample_col] has mulit values, use the maximum
                                 }
                               }
   )
+
 
   if(!is.null(shrink_ident_cols)){
     if(! all(shrink_ident_cols %in% colnames(long_table2)))
@@ -155,6 +194,7 @@ reshape_long2wide <- function(long_table,
     exp_df = merge(exp_df,fea_id_table_shrink2)
   }
 
+
   if(!is.null(extend_ident_cols)){
     if(! all(extend_ident_cols %in% colnames(long_table2)))
       stop(extend_ident_cols[!extend_ident_cols %in% colnames(long_table2)], " is not the colname.")
@@ -165,9 +205,9 @@ reshape_long2wide <- function(long_table,
     exp_df = merge(exp_df,fea_id_table_extend)
   }
 
+
   colnames(exp_df) = suppressWarnings(stringr::str_conv(colnames(exp_df),"UTF-8")) %>% make.names
   return(as.data.frame(exp_df))
-
 }
 
 reduce_table <- function(long_table2, feature_col, sample_col, val_col){
