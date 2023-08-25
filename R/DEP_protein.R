@@ -166,7 +166,6 @@ reshape_long2wide <- function(long_table,
 
     long_table2 = long_table2[!duplicated(long_table2[,c(feature_col,sample_col,expression_col)]), ]
   }
-  long_table222 <<- long_table2
 
   ## exp_df: the wide expression table
   exp_df = tidyr::pivot_wider(long_table2, id_cols = feature_col, names_from = sample_col, values_from = expression_col,

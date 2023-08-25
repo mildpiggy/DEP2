@@ -40,7 +40,7 @@ Reshape_sidebar_mod <-  function(id,label="Reshape_sidabar"){
                           )
                         )
         ),
-        bsCollapsePanel("filter", ## filter options pannel
+        bsCollapsePanel("Filter (optional)", ## filter options pannel
                         style = "primary",
                         tagList(
                           fluidRow(
@@ -92,6 +92,9 @@ Reshape_sidebar_mod <-  function(id,label="Reshape_sidabar"){
     shinyBS::bsTooltip(ns("rm_prefix"), "Remove the prefix of variables in the Sample column, like the file path",
                        "top", options = list(container = "body")),
     shinyBS::bsTooltip(ns("rm_suffix"), "Remove the suffix of variables in the Sample column",
+                       "top", options = list(container = "body")),
+    shinyBS::bsTooltip(ns("subfeature_col"), "Identifiers for subprime features. It could be peptides/precursors' ID or sequence.
+                       Reshape function will count the subfeature number of each feature (in each sample and among the global experiment).",
                        "top", options = list(container = "body"))
   )
 }
@@ -187,7 +190,7 @@ Reshape_Server <- function(id, Omics_res) {
           filt_table <- long_table
           for(i in filt_condition){
             filt_table = try({
-              filt_table %>% filter(!!rlang::parse_expr(i))
+              filt_table %>% dplyr::filter(!!rlang::parse_expr(i))
             })
             if(any(class(filt_table) == "try-error")){ # if filter error
               sendSweetAlert(
@@ -271,11 +274,17 @@ Reshape_Server <- function(id, Omics_res) {
               extend_ident_cols = NULL
             }else{extend_ident_cols = input$extend_col}
 
+            if(input$subfeature_col == ""){
+              subfeature_col = NULL
+            }else{subfeature_col = input$subfeature_col}
+
             out_tb <- reshape_long2wide(long_table(),feature_col = input$feature_col,
                                         expression_col = input$expression_col,sample_col = input$sample_col,
                                         remove_sample_prefix = input$rm_prefix,remove_sample_suffix = input$rm_suffix,
                                         shrink_ident_cols = shrink_ident_cols,
-                                        extend_ident_cols = extend_ident_cols)
+                                        extend_ident_cols = extend_ident_cols,
+                                        subfeature_col = subfeature_col
+                                        )
           }else{out_tb <- NULL}
         })
 
@@ -327,8 +336,10 @@ Reshape_Server <- function(id, Omics_res) {
                                          ")"
               )
             }else if(filt_opt_table$judgmentRule[i] %in% c(">","<","=","!=") ){
+              judgment_rule = filt_opt_table$judgmentRule[i]
+              if(judgment_rule == "=") judgment_rule = "=="
               filt_condition[i] = paste0(filt_opt_table$filteronColumn[i],
-                                         filt_opt_table$judgmentRule[i],
+                                         judgment_rule,
                                          filt_opt_table$criteriaValue[i])
             }
           }
@@ -395,6 +406,14 @@ Reshape_Server <- function(id, Omics_res) {
               style = "warning",
               title = "Select the column of samples")
           ),
+          pickerInput(
+            ns("subfeature_col"),
+            "Subprime feature column (optional)",
+            choices = colnames(long_table())[which(classes() == "character")],
+            options = list(
+              style = "warning",
+              title = "Select the column of samples")
+          ),
           shiny::checkboxInput(ns("rm_prefix"),"Remove prefix of samples",value = T),
           shiny::checkboxInput(ns("rm_suffix"),"Remove suffix of samples",value = T),
           pickerInput(
@@ -407,7 +426,7 @@ Reshape_Server <- function(id, Omics_res) {
           ),
           pickerInput(
             ns("shrink_col"),
-            "The column to shrink",
+            "The column to shrink (optional)",
             choices = colnames(long_table()),
             options = list(
               style = "warning",
@@ -416,7 +435,7 @@ Reshape_Server <- function(id, Omics_res) {
           ),
           pickerInput(
             ns("extend_col"),
-            "The column to extend",
+            "The column to extend (optional)",
             choices = colnames(long_table()),
             options = list(
               style = "warning",
