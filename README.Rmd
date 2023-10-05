@@ -76,3 +76,11 @@ DEP2::run_app()
 ## Further information
 
 For more information and details on the functionalities of DEP2, you can visit the online [website](https://mildpiggy.github.io/DEP2/) or refer to the built-in vignette after installation.
+
+## Citation
+
+If you use DEP2 in your publication, please cite the articles.
+
+```{r, eval=T,comment = ">",collapse=F}
+citation("DEP2")
+```

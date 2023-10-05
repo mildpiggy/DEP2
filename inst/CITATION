@@ -1,0 +1,42 @@
+citHeader("2023 for the DEP2 package; 2018 for its predecessor DEP package.")
+
+bibentry(
+  bibtype  = "Article",
+  title    = "DEP2: an upgraded comprehensive analysis toolkit for quantitative proteomics data",
+  author   = c(person("Zhenhuan", "Feng"), person("Peiyang", "Fang"), person("Hui", "Zheng"),
+               person("Xiaofei", "Zhang")),
+  journal  = "Bioinformatics",
+  year     = "2023",
+  volume   = "39",
+  number   = "8",
+  pages    = "btad526",
+  doi      = "10.1093/bioinformatics/btad526",
+  textVersion = paste(
+    # "For DEP2, please cite:",
+    "Feng Z, Fang P, Zheng H, Zhang X.",
+    "DEP2: an upgraded comprehensive analysis toolkit for quantitative proteomics data.",
+    "Bioinformatics. 2023."
+    )
+)
+
+bibentry(
+  bibtype  = "Article",
+  title    = "Proteome-wide identification of ubiquitin interactions using UbIA-MS",
+  author   = c(person(given="Xiaofei", family="Zhang"),
+               person(given="Arne H", family="Smits"),
+               person(given="Gabrielle BA", family="van Tilburg"),
+               person(given="Huib", family="Ovaa"),
+               person(given="Wolfgang", family="Huber"),
+               person(given="Michiel", family="Vermeulen")),
+  journal  = "Nature Protocols",
+  year     = "2018",
+  volume   = "13",
+  pages    = "530–550",
+  doi      = "10.1038/nprot.2017.147",
+  textVersion = paste(
+                      # "For the previous DEP package, please cite:",
+                      "Xiaofei Zhang, Arne H. Smits, Gabrielle B.A. van Tilburg,
+                       Huib Ovaa, Wolfgang Huber and Michiel Vermeulen.",
+                      "Proteome-wide identification of ubiquitin interactions using UbIA-MS.",
+                      "Nature Protocols. 2018.")
+)

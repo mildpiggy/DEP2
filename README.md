@@ -84,3 +84,25 @@ DEP2::run_app()
 For more information and details on the functionalities of DEP2, you can
 visit the online [website](https://mildpiggy.github.io/DEP2/) or refer
 to the built-in vignette after installation.
+
+## Citation
+
+If you use DEP2 in your publication, please cite the articles.
+
+``` r
+citation("DEP2")
+```
+
+    > 2023 for the DEP2 package; 2018 for its predecessor DEP package.
+    > 
+    >   Feng Z, Fang P, Zheng H, Zhang X. DEP2: an upgraded comprehensive
+    >   analysis toolkit for quantitative proteomics data. Bioinformatics.
+    >   2023.
+    > 
+    >   Xiaofei Zhang, Arne H. Smits, Gabrielle B.A. van Tilburg, Huib Ovaa,
+    >   Wolfgang Huber and Michiel Vermeulen. Proteome-wide identification of
+    >   ubiquitin interactions using UbIA-MS. Nature Protocols. 2018.
+    > 
+    > To see these entries in BibTeX format, use 'print(<citation>,
+    > bibtex=TRUE)', 'toBibtex(.)', or set
+    > 'options(citation.bibtex.max=999)'.
