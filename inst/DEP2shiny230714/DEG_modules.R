@@ -1059,6 +1059,7 @@ DEG_server_module <- function(id){
         countData <- fread(inFile$datapath, stringsAsFactors = F, header = "auto")
         countData <- as.data.frame(countData)
 
+
         row_name = countData[,1]
         countData = countData[ , -1]
         countData = as.matrix(countData)
@@ -1361,8 +1362,7 @@ DEG_server_module <- function(id){
             return(NULL)
           }
 
-          # from table or options changed
-          dds_1 <- DESeqDataSetFromMatrix(countData = countData(),colData = expdesign(),
+          dds_1 <- DESeqDataSetFromMatrix(countData = round(countData()),colData = expdesign(),
                                           design = as.formula(paste0("~", paste(input$dds_design, collapse = " + "))))
           return(dds_1)
         })
@@ -1494,7 +1494,6 @@ DEG_server_module <- function(id){
                                      "contrasts","contrasts","test_manual_for_RNAseq",
                                      "independent_filtering","Shrink_lfc")
               check_opt_change <- options_before_diff %>% sapply(.,function(x){
-                x1111 <<- x
                 identical(input[[x]], upload_log$inputVals()[[x]])
               })
 
@@ -1502,12 +1501,9 @@ DEG_server_module <- function(id){
                 identical(input[["idtype"]], upload_log$inputVals()[["idtype"]]) &&
                 identical(input[["species"]], upload_log$inputVals()[["species"]])
 
-              check_opt_change111 <<- check_opt_change
-              check_opt_change222 <<- check_opt_change2
 
               if(all(check_opt_change) & check_opt_change2){
                 message("Use the diff in log file000!")
-                temp1111 <<- upload_log$resultVals()
                 diff = upload_log$resultVals()$diff
                 message("Use the diff in log file!")
                 return(diff)
@@ -1553,7 +1549,6 @@ DEG_server_module <- function(id){
         deg <- reactive({
           deg <- DEP2::add_rejections(diff = diff(), alpha = input$p, lfc = input$lfc)
           returnval <- returnval(deg)
-
           return(deg)
         })
         deg_df <- reactive(deg()@test_result)
