@@ -298,3 +298,28 @@ timeclust <- function (x, algo, k, dist = "euclidean", centers = NULL, standardi
   })
   clustres
 }
+
+
+
+cal_dtw_betweenfeature = function(dep ,xfeature ,yfeature){
+  mt = assay(dep); cd = colData(dep)
+  mt2 = mt[which(rownames(mt) %in% c(xfeature,yfeature)),]
+  mt3 = mt2 %>% as.data.frame() %>% rownames_to_column()
+  mt3 = mt3 %>% gather(.,label,value,-rowname)
+
+  mt4 = left_join(mt3,as.data.frame(cd))
+  mt4
+  mt5 = mt4 %>% group_by(rowname,group,time) %>% summarise(mean_val = mean(value))
+  mt5 = mt5 %>% group_by(rowname) %>% mutate(scaled_val = scale(mean_val)[,1])
+  x = dplyr::filter(mt5,rowname == xfeature)
+  y = dplyr::filter(mt5,rowname == yfeature)
+  allgroup = x$group %>% unique
+  dists = allgroup %>% lapply(., function(thegroup){
+    x = x$scaled_val[which(x$group == thegroup)]
+    y = y$scaled_val[which(y$group == thegroup)]
+    dtw::dtw(x=x,y=y)$distance
+  })
+  names(dists) = allgroup
+  dists = dists %>% unlist()
+  return(dists)
+}
