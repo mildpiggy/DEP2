@@ -261,94 +261,114 @@ test_ORA <- function(x,
                      ...
 ){
   check_pak <- check_enrichment_depends()
-  if(!isTRUE(check_pak)){
-    stop("Packages ",paste0(check_pak,collapse = ", ")," are required for test_ORA, but not found")
+  if (!isTRUE(check_pak)) {
+    stop("Packages ", paste0(check_pak, collapse = ", "),
+         " are required for test_ORA, but not found")
   }
-
-
-  assertthat::assert_that(class(x) == "SummarizedExperiment"|class(x) == "DEGdata",
-                          is.null(contrasts)|is.character(contrasts),
-                          is.character(species) && length(species) ==1,
-                          is.logical(by_contrast) && length(by_contrast) == 1,
-                          is.character(pAdjustMethod))
+  assertthat::assert_that(class(x) == "SummarizedExperiment" |
+                            class(x) == "DEGdata" | is.vector(x), is.null(contrasts) | is.character(contrasts),
+                          is.character(species) && length(species) == 1, is.logical(by_contrast) &&
+                            length(by_contrast) == 1, is.character(pAdjustMethod))
   pAdjustMethod = match.arg(pAdjustMethod)
   type = match.arg(type)
-
-
   the_annoSpecies_df = annoSpecies_df()
-
-  if(is.null(contrasts)){
+  if (!species %in% the_annoSpecies_df$species) {
+    stop("species is wrong, it should be one of annoSpecies_df()$species like 'Human', 'Mouse'. You can check the help documment.")
+  }
+  if (by_contrast && is.null(contrasts)) {
     contrasts = get_contrast(x)
   }
-  if(by_contrast && length(contrasts) == 1){
+  if (by_contrast && length(contrasts) == 1) {
     message("Only contain one contrasts, 'by_contrast' is meanless.")
     by_contrast = F
   }
-
-  if((!by_contrast)){
-    if(class(x) == "character"){
-      gene_id = x
-    }else if(class(x) == "DEGdata" | class(x) == "SummarizedExperiment"){
-      # contrasts = get_contrast(x)
-      sig = get_signicant(x, return_type = "name")
-      # sig = row.names(sig)
+  if ((!by_contrast)) {
+    if (class(x) == "character") {
+      sig = x
     }
-    gene = sig ## a character vector
-  }else{
-    if( class(x) == "character" )
-      stop("x should be a test result from add_adjections(), when by_contrast is TRUE")
-    # lapply(contrasts, get_signicant, object = x, return_type = "name")
-    gene = map(contrasts, get_signicant, object = x, return_type = "name")
-    if(length(contrasts) == 1){
-      gene = gene[[1]]
-      message("only one contrasts exists in", deparse(substitute(x)), ".")
+    else if (class(x) == "DEGdata" | class(x) == "SummarizedExperiment") {
+      sig = get_signicant(x, contrasts = contrasts, return_type = "name")
     }
-    names(gene) = contrasts ## a list of sig genes in different contrasts
+    gene = sig
   }
-
-  orgDB = the_annoSpecies_df$pkg[the_annoSpecies_df$species == species]
+  else {
+    if (class(x) == "character")
+      stop("x should be a test result from add_adjections(), when by_contrast is TRUE")
+    gene = map(contrasts, get_signicant,
+               object = x, return_type = "name")
+    if (length(contrasts) == 1) {
+      gene = gene[[1]]
+      message("only one contrasts exists in", deparse(substitute(x)),
+              ".")
+    }
+    names(gene) = contrasts
+  }
+  orgDB = the_annoSpecies_df$pkg[the_annoSpecies_df$species ==
+                                   species]
   require(orgDB, character.only = TRUE)
   orgDB = get(orgDB)
-  if(!by_contrast){ ## enricher
-    gene_id_table <- map_to_entrezid(gene, orgDB = orgDB)
+  if (!by_contrast) {
+    gene_id_table <- DEP2:::map_to_entrezid(gene, orgDB = orgDB)
     ids <- gene_id_table %>% tibble::rownames_to_column() %>%
-      dplyr::rename(., name = rowname, ENTREZID = id) %>% dplyr::select(name, ENTREZID) %>%
-      filter(!is.na(ENTREZID)) %>% filter(!duplicated(ENTREZID))
-    if(type == "GO"){
-      cat("Star enrich GO terms by",nrow(ids),"ENTREZIDs.")
-      enrich_res <- goAnalysis(ids, organism = species, species_df = the_annoSpecies_df, pAdjustMethod = pAdjustMethod, ...)
-    }else if(type == "KEGG"){
-      cat("Star enrich KEGG terms by",nrow(ids),"ENTREZIDs.")
-      enrich_res <- keggAnalysis(ids, organism = species, species_df = the_annoSpecies_df, pAdjustMethod = pAdjustMethod, ...)
-    }else if(type == "REACTOME"){
-      cat("Star enrich REACTOME terms by",nrow(ids),"ENTREZIDs.")
-      enrich_res <- reactAnalysis(ids, organism = species, species_df = the_annoSpecies_df, pAdjustMethod = pAdjustMethod, ...)
+      dplyr::rename(., name = rowname, ENTREZID = id) %>%
+      dplyr::select(name, ENTREZID) %>% filter(!is.na(ENTREZID)) %>%
+      filter(!duplicated(ENTREZID))
+    if (type == "GO") {
+      cat("Star enrich GO terms by", nrow(ids), "ENTREZIDs.")
+      enrich_res <- DEP2:::goAnalysis(ids, organism = species,
+                                      species_df = the_annoSpecies_df, pAdjustMethod = pAdjustMethod,
+                                      ...)
     }
-
-  }else{ ## comparecluster, the input gene_id_list is a list
-    gene_id_list <- gene %>% lapply(.,map_to_entrezid, orgDB = orgDB)
-    gene_id_list = gene_id_list %>% lapply(., function(gene_id_table){
-      gene_id_table %>% tibble::rownames_to_column() %>%
-        dplyr::rename(., name = rowname, ENTREZID = id) %>% dplyr::select(name, ENTREZID) %>% filter(!is.na(ENTREZID))
-    })
-    ## filter out 0 ID vector
-    gene_id_list = gene_id_list[which(sapply(gene_id_list,nrow) > 0)]
-
-    if(type == "GO"){
-      cat("Star enrich GO terms on",length(gene_id_list),"clusters:", paste0(names(gene_id_list), collapse = ";"),
-          "with", paste0(sapply(gene_id_list,nrow), collapse = ";"),"ENTREZIDs.\n")
-      enrich_res <- goAnalysis(gene_id_list, organism = species, species_df = the_annoSpecies_df, pAdjustMethod = pAdjustMethod)
-    }else if(type == "KEGG"){
-      cat("Star enrich KEGG terms on",length(gene_id_list),"clusters:", paste0(names(gene_id_list), collapse = ";"),
-          "with", paste0(sapply(gene_id_list,nrow), collapse = ";"),"ENTREZIDs.\n")
-      enrich_res <- keggAnalysis(gene_id_list, organism = species, species_df = the_annoSpecies_df, pAdjustMethod = pAdjustMethod)
-    }else if(type == "REACTOME"){
-      cat("Star enrich REACTOME terms on",length(gene_id_list),"clusters:", paste0(names(gene_id_list), collapse = ";"),
-          "with", paste0(sapply(gene_id_list,nrow), collapse = ";"),"ENTREZIDs.\n")
-      enrich_res <- reactAnalysis(gene_id_list, organism = species, species_df = the_annoSpecies_df, pAdjustMethod = pAdjustMethod)
+    else if (type == "KEGG") {
+      cat("Star enrich KEGG terms by", nrow(ids), "ENTREZIDs.")
+      enrich_res <- keggAnalysis(ids, organism = species,
+                                 species_df = the_annoSpecies_df, pAdjustMethod = pAdjustMethod,
+                                 ...)
+    }
+    else if (type == "REACTOME") {
+      cat("Star enrich REACTOME terms by", nrow(ids), "ENTREZIDs.")
+      enrich_res <- DEP2:::reactAnalysis(ids, organism = species,
+                                         species_df = the_annoSpecies_df, pAdjustMethod = pAdjustMethod,
+                                         ...)
     }
   }
-
+  else {
+    gene_id_list <- gene %>% lapply(., DEP2:::map_to_entrezid, orgDB = orgDB)
+    gene_id_list = gene_id_list %>% lapply(., function(gene_id_table) {
+      gene_id_table %>% tibble::rownames_to_column() %>%
+        dplyr::rename(., name = rowname, ENTREZID = id) %>%
+        dplyr::select(name, ENTREZID) %>% filter(!is.na(ENTREZID))
+    })
+    gene_id_list = gene_id_list[which(sapply(gene_id_list,
+                                             nrow) > 0)]
+    if (type == "GO") {
+      cat("Star enrich GO terms on", length(gene_id_list),
+          "clusters:", paste0(names(gene_id_list), collapse = ";"),
+          "with", paste0(sapply(gene_id_list, nrow), collapse = ";"),
+          "ENTREZIDs.\n")
+      enrich_res <- DEP2:::goAnalysis(gene_id_list, organism = species,
+                                      species_df = the_annoSpecies_df, pAdjustMethod = pAdjustMethod,
+                                      ...)
+    }
+    else if (type == "KEGG") {
+      cat("Star enrich KEGG terms on", length(gene_id_list),
+          "clusters:", paste0(names(gene_id_list), collapse = ";"),
+          "with", paste0(sapply(gene_id_list, nrow), collapse = ";"),
+          "ENTREZIDs.\n")
+      enrich_res <- keggAnalysis(gene_id_list, organism = species,
+                                 species_df = the_annoSpecies_df, pAdjustMethod = pAdjustMethod,
+                                 ...)
+    }
+    else if (type == "REACTOME") {
+      cat("Star enrich REACTOME terms on", length(gene_id_list),
+          "clusters:", paste0(names(gene_id_list), collapse = ";"),
+          "with", paste0(sapply(gene_id_list, nrow), collapse = ";"),
+          "ENTREZIDs.\n")
+      enrich_res <- DEP2:::reactAnalysis(gene_id_list, organism = species,
+                                         species_df = the_annoSpecies_df, pAdjustMethod = pAdjustMethod,
+                                         ...)
+    }
+  }
   return(enrich_res)
 }
 
@@ -712,29 +732,32 @@ keggAnalysis <- function(gene_id,
                          pvalueCutoff = 1, qvalueCutoff = 1,
                          ...){
   organism <- species_df$organism[species_df$species == organism]
-  if(class(gene_id) == "data.frame"){
-    reat <- try(enrichKEGG(gene = gene_id$ENTREZID, organism = organism,
-                           pAdjustMethod = pAdjustMethod, pvalueCutoff = pvalueCutoff, qvalueCutoff = qvalueCutoff,
-                           readable = F,
-                           ...), silent = T)
-    if(class(reat) == "try-error") return(reat)
-    reat@result$geneID %<>% set_readable(., ids_table = gene_id)
-  }else if(class(gene_id) == "list"){
+  if (class(gene_id) == "data.frame") {
+    reat <- try(clusterProfiler::enrichKEGG(gene = gene_id$ENTREZID, organism = organism,
+                                            pAdjustMethod = pAdjustMethod, pvalueCutoff = pvalueCutoff,
+                                            qvalueCutoff = qvalueCutoff, ...),
+                silent = T)
+    if (class(reat) == "try-error")
+      return(reat)
+    reat@result$geneID %<>% DEP2:::set_readable(., ids_table = gene_id)
+  }
+  else if (class(gene_id) == "list") {
     gene_id_list = gene_id
-    gene_clusters <- gene_id_list %>% lapply(., function(x){
+    gene_clusters <- gene_id_list %>% lapply(., function(x) {
       set_names(x$ENTREZID, x$name)
     })
-    reat <- try(clusterProfiler::compareCluster(geneClusters = gene_clusters, fun = "enrichKEGG",
-                               OrgDb = organism, pAdjustMethod = pAdjustMethod, pvalueCutoff = pvalueCutoff,
-                               qvalueCutoff = qvalueCutoff, readable = F,
-                               ...), silent = T)
-    if(class(reat) == "try-error") return(reat)
-    gene_id = do.call(rbind, gene_id_list) %>% .[!duplicated(.$ENTREZID),]
-    reat@compareClusterResult$geneID %<>% set_readable(., ids_table = gene_id)
+    reat <- try(clusterProfiler::compareCluster(geneClusters = gene_clusters,
+                                                fun = "enrichKEGG", organism = organism, pAdjustMethod = pAdjustMethod,
+                                                pvalueCutoff = pvalueCutoff, qvalueCutoff = qvalueCutoff, ...), silent = T)
+    if (class(reat) == "try-error")
+      return(reat)
+    gene_id = do.call(rbind, gene_id_list) %>% .[!duplicated(.$ENTREZID),
+    ]
+    reat@compareClusterResult$geneID %<>% DEP2:::set_readable(.,
+                                                              ids_table = gene_id)
   }
-
   reat@readable = TRUE
-  reat@gene2Symbol = set_names(gene_id$name, gene_id$ENTREZID )
+  reat@gene2Symbol = rlang::set_names(gene_id$name, gene_id$ENTREZID)
   return(reat)
 }
 
