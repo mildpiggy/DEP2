@@ -10,8 +10,11 @@
 #' \code{\link{add_rejections}}().
 #' @param curvature Numeric(1), Sets the curvature for the curve cutoff lines
 #' @param x0_fold Numeric(1), decide the x0 ratio to the standard deviations of L2FC. The x0 usually is set to 1(medium confidence) or 2(high confidence) standard deviations.
+#' @param trend Character(1), one of "all","up","down". Exctract all, upregulated(L2FC > 0) or downregulated(L2FC < 0) subset.
 #' @param return_type One of "subset", "table", "names". "subset" return a subset object, "table" return a result data.frame,
-#' names return name vector of object.
+#' names return name vector of object. "genelist" and "idlist" require a contrasts input and
+#' return the vector of l2fc, the names of vector are the names or the ids. If contrasts is more than one, return the first input contrasts l2fc;
+#' if contrasts is NULL, return the l2fc of the first contrasts of object.
 #'
 #' @inheritParams add_rejections
 #' @return
@@ -50,69 +53,111 @@ get_signicant <- function(object,
                           diff = diff, alpha = alpha,
                           curvature = 1,
                           x0_fold = 2,
-                          return_type = c("subset", "table", "names")
-                          ){
+                          trend = c("all","up","down"),
+                          return_type = c("subset", "table", "names","genelist","idlist")
+){
   row_data = rowData(object)
   return_type = match.arg(return_type)
-  # trend = match.arg(trend)
+  trend = match.arg(trend)
+
   if(is.null(thresholdmethod)){
-    ## check significant cols
-    if(length(grep("_significant$",colnames(row_data))) < 1){
+    if((!is.null(diff)) & (!is.null(alpha))){
+      thresholdmethod = "intersect"
+    }else if((!is.null(curvature)) & (!is.null(x0_fold))){
+      thresholdmethod = "curve"
+    }
+  }
+
+  if (is.null(thresholdmethod)) {
+    if (length(grep("_significant$", colnames(row_data))) <
+        1) {
       stop(paste0("'significant' column is necessary when thresholdmethod = NULL, and is not presented in '",
-                  deparse(substitute(object)), "'.\nRun add_rejections() to obtain the required column,
-                  or set a significant thresholdmethod to obtain rejections."))
+                  deparse(substitute(object)), "'.\nRun add_rejections() to obtain the required column,\n                  or set a significant thresholdmethod to obtain rejections."))
     }
+    message("Used the existed rejections in the object")
     de = object
-  }else{
-    ## check test results
-    if(length(grep("_diff$",colnames(row_data))) < 1){
-      if(class(object) == "SummarizedExperiment") frontfun = "test_diff"
-      stop(paste0("Differentail test result is necessary for classify significant candidate via 'thresholdmethod',
-                  and is not presented in '",
-                  deparse(substitute(object)), "'.\nRun a ", frontfun, "() to obtain the required column,
-                  or set a significant thresholdmethod."))
+  } else {
+    if (length(grep("_diff$", colnames(row_data))) < 1) {
+      if (class(object) == "SummarizedExperiment")
+        frontfun = "test_diff"
+      stop(paste0("Differentail test result is necessary for classify significant candidate via 'thresholdmethod',\n                  and is not presented in '",
+                  deparse(substitute(object)), "'.\nRun a ", frontfun,
+                  "() to obtain the required column,\n                  or set a significant thresholdmethod."))
     }
-    de = add_rejections(object,
-                        # contrasts = contrasts,
-                        thresholdmethod = thresholdmethod,
-                        curvature = curvature,
-                        x0_fold = x0_fold,
-                        diff = diff,
+    cat("thresholdmethod:",thresholdmethod)
+    de = add_rejections(object, thresholdmethod = thresholdmethod,
+                        curvature = curvature, x0_fold = x0_fold, lfc = diff,
                         alpha = alpha)
     de
   }
-
   row_data = rowData(de)
-  if(is.null(contrasts)){
-    r_ind = row_data[,"significant"]
-  }else{
+  if (is.null(contrasts)) {
+    r_ind = row_data[, "significant"]
+  }
+  else {
     exist_contrasts <- get_contrast(de)
-    ## check input contrasts
-    if(any(!contrasts %in% exist_contrasts)){
-      if(all(!contrasts %in% exist_contrasts)){
-        stop("Input contrasts: ", paste0(contrasts, collapse = ", ")," don't exists. Contrasts should be: ",
-             paste0(exist_contrasts, collapse = ", "))
-      }else{
-        warning("Input contrasts: ", paste0(contrasts[which(!contrasts %in% exist_contrasts)], collapse = ", ")," don't exists. Only perform on: ",
-                paste0(intersect(contrasts, exist_contrasts), collapse = ", "))
+    if (any(!contrasts %in% exist_contrasts)) {
+      if (all(!contrasts %in% exist_contrasts)) {
+        stop("Input contrasts: ", paste0(contrasts, collapse = ", "),
+             " don't exists. Contrasts should be: ", paste0(exist_contrasts,
+                                                            collapse = ", "))
+      }
+      else {
+        warning("Input contrasts: ", paste0(contrasts[which(!contrasts %in%
+                                                              exist_contrasts)], collapse = ", "), " don't exists. Only perform on: ",
+                paste0(intersect(contrasts, exist_contrasts),
+                       collapse = ", "))
         contrasts = intersect(contrasts, exist_contrasts)
       }
     }
-    sig_ind <- row_data[ , paste(contrasts, "_significant", sep = ""),drop = F]
-
-    if(class(sig_ind) == "data.frame" || class(sig_ind) == "DFrame"){
+    sig_ind <- row_data[, paste(contrasts, "_significant",
+                                sep = ""), drop = F]
+    if (class(sig_ind) == "data.frame" || class(sig_ind) ==
+        "DFrame") {
       r_ind = apply(sig_ind, 1, any)
+    }
+  }
+  filtered <- de[r_ind, ]
+  row_data_filtered = rowData(filtered)
 
+
+  if(trend != "all" & is.null(contrasts)){
+    contrasts = get_contrast(object)
+    # trend = "all"
+  }
+  if(trend == "up"){
+    if(length(contrasts) > 1 )
+      stop("contrasts is more than one, can not use trend")
+    rd = rowData(filtered)
+    filtered = filtered[which(rd[,paste0(contrasts,"_diff")] > 0 ),]
+  }else if(trend == "down"){
+    if(length(contrasts) > 1 )
+      stop("contrasts is more than one, can not use trend")
+    rd = rowData(filtered)
+    filtered = filtered[which(rd[,paste0(contrasts,"_diff")] < 0 ),]
+  }
+
+  if (return_type == "genelist" | return_type == "idlist") {
+    if (is.null(contrasts)) {
+      contrasts = get_contrast(de)[1]
+    }
+    else if (length(contrasts) > 1) {
+      contrasts = contrasts[1]
+    }
+    l2fc = get_results(filtered)[, paste0(contrasts, "_ratio")]
+    if (return_type == "genelist") {
+      names(l2fc) = get_results(filtered)$name
+    }
+    else if (return_type == "idlist") {
+      names(l2fc) = get_results(filtered)$id
     }
   }
 
-  filtered <- de[r_ind , ]
-  row_data_filtered = rowData(filtered)
-  return_val = switch(return_type,
-                      "subset" = filtered,
-                      "table" = get_results(filtered),
-                      "names" = rownames(row_data_filtered)
-                      )
+
+  return_val = switch(return_type, subset = filtered, table = get_results(filtered),
+                      names = rownames(row_data_filtered), genelist = l2fc,
+                      idlist = l2fc)
+  return(return_val)
 }
 
 
