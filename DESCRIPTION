@@ -1,6 +1,6 @@
 Package: DEP2
 Title: An analysis toolkits for mass spectrometry based proteomics data.
-Version: 0.4.8.24
+Version: 0.5.2.28
 Authors@R: 
     c(
     person("Zhenhuan", "Feng", email = "feng_zhenhuan@gibh.ac.cn", role = c("cre", "aut")),
@@ -40,7 +40,7 @@ Remotes:
 biocViews: Proteomics, MassSpectrometry, DifferentialExpression, DataRepresentation
 VignetteBuilder: knitr
 Depends: 
-    R (>= 4.1.0),
+    R (>= 4.2.0),
     SummarizedExperiment (>= 1.11.5),
     MsCoreUtils (>= 1.9.0),
     MSnbase (>= 2.18.0),
