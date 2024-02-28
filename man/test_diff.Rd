@@ -10,6 +10,7 @@ test_diff(
   control = NULL,
   test = NULL,
   design_formula = formula(~0 + condition),
+  advanced_contrast = NULL,
   fdr.type = c("Strimmer's qvalue(t)", "Strimmer's qvalue(p)", "BH", "Storey's qvalue")
 )
 }
@@ -38,6 +39,12 @@ c("conditionA_vs_conditionC", "conditionB_vs_conditionC").}
 
 \item{design_formula}{Formula,
 Used to create the design matrix.}
+
+\item{advanced_contrast}{Character. A experimental parameter, could perform complex test by giving formula.
+For example, c(testNC="siNC12d - siNC0d", testA0="siA0d - siNC0d",
+testA12 = "(siA12d - siA0d) - (siNC12d - siNC0d)",
+testAB = "(siA12d - siA0d + siB12d - siB0d)/2 - (siNC12d - siNC0d)"
+)}
 
 \item{fdr.type}{Character(1), the method to control false discovery rate,
 one of "Strimmer's qvalue(t)","Strimmer's qvalue(p)","BH","Storey's qvalue".

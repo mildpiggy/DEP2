@@ -6,7 +6,7 @@
 \usage{
 aggregate_pe(
   pe,
-  aggrefun = c("RobustSummary", "medianPolish", "totalMean"),
+  aggrefun = c("RobustSummary", "medianPolish", "totalMean", "directLFQ"),
   aggregate_Peptide_Type = c("Unique + Razor", "Unique"),
   fcol,
   i = "peptideNorm",
@@ -18,7 +18,8 @@ aggregate_pe(
 contains the normalized peptide assay}
 
 \item{aggrefun}{A function used for quantitative feature aggregation.
-It can be a character in "RobustSummary","medianPolish","totalMean" or other function.
+It can be a character in "RobustSummary","directLFQ","medianPolish","totalMean" or
+a function. Method directLFQ is required package Rdirectlfq.
 Details see \code{\link[QFeatures]{aggregateFeatures}}}
 
 \item{aggregate_Peptide_Type}{Character in "Unique + Razor" or "Unique".

@@ -12,7 +12,8 @@ get_signicant(
   alpha = alpha,
   curvature = 1,
   x0_fold = 2,
-  return_type = c("subset", "table", "names")
+  trend = c("all", "up", "down"),
+  return_type = c("subset", "table", "names", "genelist", "idlist")
 )
 }
 \arguments{
@@ -31,8 +32,12 @@ Sets the threshold for the adjusted P value.}
 
 \item{x0_fold}{Numeric(1), decide the x0 ratio to the standard deviations of L2FC. The x0 usually is set to 1(medium confidence) or 2(high confidence) standard deviations.}
 
+\item{trend}{Character(1), one of "all","up","down". Exctract all, upregulated(L2FC > 0) or downregulated(L2FC < 0) subset.}
+
 \item{return_type}{One of "subset", "table", "names". "subset" return a subset object, "table" return a result data.frame,
-names return name vector of object.}
+names return name vector of object. "genelist" and "idlist" require a contrasts input and
+return the vector of l2fc, the names of vector are the names or the ids. If contrasts is more than one, return the first input contrasts l2fc;
+if contrasts is NULL, return the l2fc of the first contrasts of object.}
 }
 \value{
 A object in the same class of input or a data.frame or a names vector, designed by return_type.
