@@ -318,6 +318,86 @@ invariant_cols2 <- function (x)
   which(res)
 }
 
+
+.aggregateSE_directlfq <- function(object, fcol,reserve, ...){
+  if (missing(fcol))
+    stop("'fcol' is required.")
+  m <- assay(object, 1)
+  allna_rows = which(m %>% is.na() %>% rowAlls())
+  m[-allna_rows,]
+
+  rd <- rowData(object)
+  if (!fcol %in% names(rd))
+    stop("'fcol' not found in the assay's rowData.")
+  groupBy <- rd[[fcol]]
+
+  ## Store class of assay i in case it is not a Summarized experiment so that
+  ## the aggregated assay can be reverted to that class
+  .class <- class(object)
+
+  if(require(Rdirectlfq)){
+    if(Rdirectlfq::check_directlfq_Module(install = F)){
+      mat = m
+      mat = 2^mat
+      ion = seq(nrow(mat))
+      protein = groupBy
+      input_df = data.frame(protein=protein,ion = ion)
+      input_df = cbind(input_df,mat)
+      direlfq_res = Rdirectlfq::directlfq(input_df)
+      direlfq_res1 <<- direlfq_res
+
+      aggregated_assay = direlfq_res[,-(1:2)]
+      aggregated_assay[aggregated_assay == 0] <- NA
+      aggregated_assay = log2(aggregated_assay)
+      rownames(aggregated_assay) = direlfq_res$protein
+      aggregated_assay = aggregated_assay[order(direlfq_res$protein),]
+      aggregated_assay= aggregated_assay[!(rownames(aggregated_assay) == ""),]
+      aggregated_assay11 <<- aggregated_assay
+
+    }else{
+      stop("The python environment is not deployed yet. Please run Rdirectlfq::check_directlfq_Module() first.")
+    }
+
+  }else{
+    stop("Rdirectlfq is absent. Please install by devtools::install_github('mildpiggy/Rdirectlfq) and
+         run Rdirectlfq::check_directlfq_Module() to deployed python directlfq module.")
+  }
+
+  aggcount_assay <- MsCoreUtils::aggregate_by_vector(m, groupBy, colCounts)
+  aggcount_assay = aggcount_assay[match(rownames(aggregated_assay),rownames(aggcount_assay)),]
+  # aggcount_assay11 <<- aggcount_assay
+
+  print("begin reducedataframe")
+  aggregated_rowdata <- reducedataframe(rd, rd[[fcol]],
+                                        simplify = T,
+                                        drop = T,
+                                        count = TRUE,
+                                        reserve = reserve)
+  # aggregated_rowdata11 <<- aggregated_rowdata
+  print("reducedataframe finiched")
+
+  if(nrow(aggregated_assay) != nrow(aggregated_rowdata)){
+    warning("The aggregated features number is changed compared to the fcol label. ")
+  }
+  aggregated_assay = aggregated_assay[match(rownames(aggregated_assay),rownames(aggregated_assay)),]
+
+  aggregated_assay = as.matrix(aggregated_assay)
+  se <- SummarizedExperiment(assays = S4Vectors::SimpleList(assay = aggregated_assay,
+                                                            aggcounts = aggcount_assay),
+                             rowData = aggregated_rowdata[rownames(aggregated_assay), ])
+  se111 <<- se
+
+  ## If the input objects weren't SummarizedExperiments, then try to
+  ## convert the merged assay into that class. If the conversion
+  ## fails, keep the SummarizedExperiment, otherwise use the
+  ## converted object .
+  if (.class != "SummarizedExperiment")
+    se <- tryCatch(as(se, .class),
+                   error = function(e) se)
+
+  return(se)
+}
+
 ## modified from QFeatures:::.aggregateQFeatures, add reserve argument for reducedataframe
 #' @importFrom MsCoreUtils aggregate_by_vector robustSummary colCounts
 .aggregateSE <- function(object, fcol, fun, reserve,...) {
@@ -458,9 +538,18 @@ aggregateFeatures = function(object, i, fcol, name = "newAssay",
     stop("There's already an assay named '", name, "'.")
   if (missing(i))
     i <- QFeatures:::main_assay(object)
+
   print("begin assay aggregate")
-  ## Create the aggregated assay
-  aggAssay <- .aggregateSE(object[[i]], fcol, fun, ...)
+
+
+  if(is.character(fun) && fun == "directLFQ"){
+    ## Create the directLFQ aggregated assay
+    aggAssay <- .aggregateSE_directlfq(object[[i]], fcol, ...)
+  }else{
+    ## Create other aggregated assay
+    aggAssay <- .aggregateSE(object[[i]], fcol, fun, ...)
+  }
+
   print("assay aggregate finished")
   ## Add the assay to the QFeatures object
   object <- QFeatures::addAssay(object,
@@ -593,7 +682,8 @@ normalize_pe <- function(pe, method = c("diff.median", "quantiles", "quantiles.r
 #' @param pe A QFeatures object,
 #' contains the normalized peptide assay
 #' @param aggrefun 	A function used for quantitative feature aggregation.
-#' It can be a character in "RobustSummary","medianPolish","totalMean" or other function.
+#' It can be a character in "RobustSummary","directLFQ","medianPolish","totalMean" or
+#'  a function. Method directLFQ is required package Rdirectlfq.
 #' Details see \code{\link[QFeatures]{aggregateFeatures}}
 #' @param aggregate_Peptide_Type Character in "Unique + Razor" or "Unique".
 #' Use what kind of peptides to summarise proteins. If choose "Unique", return output just save unique peptides in smallest proteingroups.
@@ -626,19 +716,20 @@ normalize_pe <- function(pe, method = c("diff.median", "quantiles", "quantiles.r
 #' }
 #' @export
 #'
-aggregate_pe <- function(pe, aggrefun = c("RobustSummary","medianPolish","totalMean"), aggregate_Peptide_Type = c("Unique + Razor", "Unique"),
+aggregate_pe <- function(pe, aggrefun = c("RobustSummary","medianPolish","totalMean", "directLFQ"), aggregate_Peptide_Type = c("Unique + Razor", "Unique"),
                          fcol, i = "peptideNorm", reserve = "Gene.names"
 ){
   aggregate_Peptide_Type <- match.arg(aggregate_Peptide_Type)
   assertthat::assert_that(class(pe) == "QFeatures", is.function(aggrefun)|is.character(aggrefun),
                           is.character(aggregate_Peptide_Type), length(aggregate_Peptide_Type) == 1, is.character(aggregate_Peptide_Type))
   if(class(aggrefun) == "character"){
-    aggrefun <- match.arg(aggrefun,choices = c("RobustSummary","medianPolish","totalMean"))
+    aggrefun <- match.arg(aggrefun,choices = c("RobustSummary","medianPolish","totalMean", "directLFQ"))
     aggrefun = switch(aggrefun,
                       totalSum = base::colSums,
                       totalMean = base::colMeans,
                       medianPolish = MsCoreUtils::medianPolish,
-                      RobustSummary = MsCoreUtils::robustSummary)
+                      RobustSummary = MsCoreUtils::robustSummary,
+                      directLFQ = "directLFQ")
   }
 
   if(!i %in% names(pe))
