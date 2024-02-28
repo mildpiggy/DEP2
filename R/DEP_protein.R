@@ -738,6 +738,12 @@ manual_impute <- function(se, scale = 0.3, shift = 1.8) {
 #' c("conditionA_vs_conditionC", "conditionB_vs_conditionC").
 #' @param design_formula Formula,
 #' Used to create the design matrix.
+#' @param advanced_contrast Character. A experimental parameter, could perform complex test by giving formula.
+#' For example, c(testNC="siNC12d - siNC0d", testA0="siA0d - siNC0d",
+#' testA12 = "(siA12d - siA0d) - (siNC12d - siNC0d)",
+#' testAB = "(siA12d - siA0d + siB12d - siB0d)/2 - (siNC12d - siNC0d)"
+#' )
+#'
 #' @param fdr.type Character(1), the method to control false discovery rate,
 #' one of "Strimmer's qvalue(t)","Strimmer's qvalue(p)","BH","Storey's qvalue".
 #' "Strimmer's qvalue" calculate fdr vis \code{\link[fdrtool]{fdrtool}()} using t-statistic or p values from limma.
@@ -778,190 +784,149 @@ manual_impute <- function(se, scale = 0.3, shift = 1.8) {
 test_diff <- function(se, type = c("all", "control", "manual"),
                       control = NULL, test = NULL,
                       design_formula = formula(~ 0 + condition),
+                      advanced_contrast = NULL,
                       fdr.type = c("Strimmer's qvalue(t)","Strimmer's qvalue(p)","BH","Storey's qvalue")) {
-
-  # Show error if inputs are not the required classes
   assertthat::assert_that(inherits(se, "SummarizedExperiment"),
-                          is.null(control) | is.character(control),
-                          is.null(test) | is.character(test),
-                          # is.character(contrast_upon),
-                          is.character(type),
-                          class(design_formula) == "formula",
-                          is.character(fdr.type))
-  # Show error if inputs do not contain required columns
+                          is.null(control) | is.character(control), is.null(test) |
+                            is.character(test), is.character(type), class(design_formula) ==
+                            "formula", is.character(fdr.type))
   type <- match.arg(type)
   fdr.type <- match.arg(fdr.type)
-
   col_data <- colData(se)
   raw <- assay(se)
-
-  if(any(!c("name", "ID") %in% colnames(rowData(se, use.names = FALSE)))) {
+  if (any(!c("name", "ID") %in% colnames(rowData(se, use.names = FALSE)))) {
     stop("'name' and/or 'ID' columns are not present in '",
-         deparse(substitute(se)),
-         "'\nRun make_unique() and make_se() to obtain the required columns",
+         deparse(substitute(se)), "'\nRun make_unique() and make_se() to obtain the required columns",
          call. = FALSE)
   }
-  if(any(!c("label", "condition", "replicate") %in% colnames(col_data))) {
+  if (any(!c("label", "condition", "replicate") %in% colnames(col_data))) {
     stop("'label', 'condition' and/or 'replicate' columns are not present in '",
-         deparse(substitute(se)),
-         "'\nRun make_se() or make_se_parse() to obtain the required columns",
+         deparse(substitute(se)), "'\nRun make_se() or make_se_parse() to obtain the required columns",
          call. = FALSE)
   }
-  if(any(is.na(raw))) {
-    warning("Missing values in '", deparse(substitute(se)), "'")
+  if (any(is.na(raw))) {
+    warning("Missing values in '", deparse(substitute(se)),
+            "'")
   }
-
-  if(!is.null(control)) {
-    # Show error if control input is not valid
-    assertthat::assert_that(is.character(control),
-                            length(control) == 1)
-    if(!control %in% unique(col_data$condition)) {
+  if (!is.null(control)) {
+    assertthat::assert_that(is.character(control), length(control) ==
+                              1)
+    if (!control %in% unique(col_data$condition)) {
       stop("run test_diff() with a valid control.\nValid controls are: '",
-           paste0(unique(col_data$condition), collapse = "', '"), "'",
-           call. = FALSE)
+           paste0(unique(col_data$condition), collapse = "', '"),
+           "'", call. = FALSE)
     }
   }
-
-  # Show error if inputs do not contain required columns
-  # fdr.type <- match.arg(fdr.type)
-  # variables in formula
-  variables <- terms.formula(design_formula) %>%
-    attr(., "variables") %>%
-    as.character() %>%
-    .[-1]
-
-  # Throw error if variables are not col_data columns
-  if(any(!variables %in% colnames(col_data))) {
+  variables <- terms.formula(design_formula) %>% attr(., "variables") %>%
+    as.character() %>% .[-1]
+  if (any(!variables %in% colnames(col_data))) {
     stop("run make_diff() with an appropriate 'design_formula'")
   }
-  if(variables[1] != "condition") {
+  if (variables[1] != "condition") {
     stop("first factor of 'design_formula' should be 'condition'")
   }
-
-  # Obtain variable factors
-  for(var in variables) {
+  for (var in variables) {
     temp <- factor(col_data[[var]])
     assign(var, temp)
   }
-
-  # Make an appropriate design matrix
   design <- model.matrix(design_formula, data = environment())
   colnames(design) <- gsub("condition", "", colnames(design))
-
-  # Generate contrasts to be tested
-  # Either make all possible combinations ("all"),
-  # only the contrasts versus the control sample ("control") or
-  # use manual contrasts
   conditions <- as.character(unique(condition))
-  if(type == "all") {
-    # All possible combinations
-    cntrst <- apply(utils::combn(conditions, 2), 2, paste, collapse = " - ")
-
-    if(!is.null(control)) {
-      # Make sure that contrast containing
-      # the control sample have the control as denominator
+  if (type == "all") {
+    cntrst <- apply(utils::combn(conditions, 2), 2, paste,
+                    collapse = " - ")
+    if (!is.null(control)) {
       flip <- grep(paste("^", control, sep = ""), cntrst)
-      if(length(flip) >= 1) {
-        cntrst[flip] <- cntrst[flip] %>%
-          gsub(paste(control, "- ", sep = " "), "", .) %>%
-          paste(" - ", control, sep = "")
+      if (length(flip) >= 1) {
+        cntrst[flip] <- cntrst[flip] %>% gsub(paste(control,
+                                                    "- ", sep = " "), "", .) %>% paste(" - ", control,
+                                                                                       sep = "")
       }
     }
-
   }
-  if(type == "control") {
-    # Throw error if no control argument is present
-    if(is.null(control))
+  if (type == "control") {
+    if (is.null(control))
       stop("run test_diff(type = 'control') with a 'control' argument")
-
-    # Make contrasts
     cntrst <- paste(conditions[!conditions %in% control],
-                    control,
-                    sep = " - ")
+                    control, sep = " - ")
   }
-  if(type == "manual") {
-    # Throw error if no test argument is present
-    if(is.null(test)) {
+  if (type == "manual") {
+    if (is.null(test)) {
       stop("run test_diff(type = 'manual') with a 'test' argument")
     }
     assertthat::assert_that(is.character(test))
-
-    if(any(!unlist(strsplit(test, "_vs_")) %in% conditions)) {
+    if (any(!unlist(strsplit(test, "_vs_")) %in% conditions)) {
       stop("run test_diff() with valid contrasts in 'test'",
            ".\nValid contrasts should contain combinations of: '",
-           paste0(conditions, collapse = "', '"),
-           "', for example '", paste0(conditions[1], "_vs_", conditions[2]),
+           paste0(conditions, collapse = "', '"), "', for example '",
+           paste0(conditions[1], "_vs_", conditions[2]),
            "'.", call. = FALSE)
     }
-
     cntrst <- gsub("_vs_", " - ", test)
-
   }
-  # Print tested contrasts
-  message("Tested contrasts: ",
-          paste(gsub(" - ", "_vs_", cntrst), collapse = ", "))
-
-  # Test for differential expression by empirical Bayes moderation
-  # of a linear model on the predefined contrasts
+  if (type == "advanced_manual"){
+    cntrst = advanced_contrast
+  }
+  message("Tested contrasts: ", paste(gsub(" - ", "_vs_", cntrst),
+                                      collapse = ", "))
   fit <- lmFit(raw, design = design)
   made_contrasts <- makeContrasts(contrasts = cntrst, levels = design)
   contrast_fit <- contrasts.fit(fit, made_contrasts)
-
-  if(any(is.na(raw))) {
-    for(i in cntrst) {
+  if (any(is.na(raw))) {
+    for (i in cntrst) {
       covariates <- strsplit(i, " - ") %>% unlist
-      single_contrast <- makeContrasts(contrasts = i, levels = design[, covariates])
-      single_contrast_fit <- contrasts.fit(fit[, covariates], single_contrast)
-      contrast_fit$coefficients[, i] <- single_contrast_fit$coefficients[, 1]
-      contrast_fit$stdev.unscaled[, i] <- single_contrast_fit$stdev.unscaled[, 1]
+      single_contrast <- makeContrasts(contrasts = i, levels = design[,
+                                                                      covariates])
+      single_contrast_fit <- contrasts.fit(fit[, covariates],
+                                           single_contrast)
+      contrast_fit$coefficients[, i] <- single_contrast_fit$coefficients[,
+                                                                         1]
+      contrast_fit$stdev.unscaled[, i] <- single_contrast_fit$stdev.unscaled[,
+                                                                             1]
     }
   }
-
-  eB_fit <- eBayes(contrast_fit,trend = FALSE)
-
-  # function to retrieve the results of
-  # the differential expression test using 'fdrtool',('BH','qvalue')
-  retrieve_fun <- function(comp, fit = eB_fit, fdr.type){
-    res <- topTable(fit, sort.by = "t", coef = comp,
-                    number = Inf, confint = TRUE)
-    res <- res[!is.na(res$t),]
-
-    if(fdr.type == "Strimmer's qvalue(t)"){ ##
-      fdr_res <- fdrtool(res$t,plot = FALSE, verbose = FALSE)
+  eB_fit <- eBayes(contrast_fit, trend = FALSE)
+  retrieve_fun <- function(comp, fit = eB_fit, fdr.type) {
+    res <- topTable(fit, sort.by = "t", coef = comp, number = Inf,
+                    confint = TRUE)
+    res <- res[!is.na(res$t), ]
+    if (fdr.type == "Strimmer's qvalue(t)") {
+      fdr_res <- fdrtool(res$t, plot = FALSE, verbose = FALSE)
       res$qval <- fdr_res$qval
     }
-    if(fdr.type == "Strimmer's qvalue(p)"){
-      fdr_res <- fdrtool(res$P.Value,statistic = "pvalue",plot = FALSE, verbose = FALSE)
+    if (fdr.type == "Strimmer's qvalue(p)") {
+      fdr_res <- fdrtool(res$P.Value, statistic = "pvalue",
+                         plot = FALSE, verbose = FALSE)
       res$qval <- fdr_res$qval
     }
-    if(fdr.type == "BH"){
-      padj <- p.adjust(res$P.Value,method = "BH")
+    if (fdr.type == "BH") {
+      padj <- p.adjust(res$P.Value, method = "BH")
       res$qval = padj
     }
-    if(fdr.type == "Storey's qvalue"){
+    if (fdr.type == "Storey's qvalue") {
       qval_res = qvalue::qvalue(res$P.Value)
       res$qval = qval_res$qvalues
     }
-
     res$comparison <- rep(comp, dim(res)[1])
-    res <- rownames_to_column(res)
+    res <- tibble::rownames_to_column(res)
     return(res)
   }
-
   message(fdr.type)
-  # Retrieve the differential expression test results
-  limma_res <- purrr::map_df(cntrst, retrieve_fun,fdr.type = fdr.type)
 
-  table <- limma_res %>%
-    select(rowname, logFC, CI.L, CI.R, t,P.Value, qval, comparison) %>%
-    mutate(comparison = gsub(" - ", "_vs_", comparison)) %>%
-    gather(variable, value, -c(rowname,comparison)) %>%
-    mutate(variable = recode(variable, logFC = "diff", t="t.stastic", P.Value = "p.val", qval = "p.adj")) %>%
-    unite(temp, comparison, variable) %>%
-    spread(temp, value)
+  limma_res <- purrr::map_df(cntrst, retrieve_fun, fdr.type = fdr.type)
+  if(type != "advanced_manual"){
+    limma_res$comparison = gsub(" - ", "_vs_", limma_res$comparison)
+  }else
+    limma_res$comparison = names(cntrst)[match(limma_res$comparison, cntrst)]
 
+  table <- limma_res %>% dplyr::select(rowname, logFC, CI.L, CI.R,
+                                       t, P.Value, qval, comparison) %>%
+    # mutate(comparison = gsub(" - ", "_vs_", comparison)) %>%
+    gather(variable, value, -c(rowname, comparison)) %>%
+    mutate(variable = recode(variable, logFC = "diff",  t = "t.stastic", P.Value = "p.val", qval = "p.adj")) %>%
+    unite(temp, comparison, variable) %>% spread(temp, value)
   rowData(se) <- merge(rowData(se, use.names = FALSE), table,
-                       by.x = "name", by.y = "rowname", all.x = TRUE, sort=FALSE)
+                       by.x = "name", by.y = "rowname", all.x = TRUE, sort = FALSE)
   return(se)
 }
 
