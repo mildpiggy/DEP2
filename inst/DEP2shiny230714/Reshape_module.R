@@ -52,7 +52,7 @@ Reshape_sidebar_mod <-  function(id,label="Reshape_sidabar"){
                                    #          "Else please skip these step.",
                                    #          "</h5>")
                                    # )),
-                                   h5("If need to filter the input 'Long table' before filter,
+                                   h5("If need to filter the input 'Long table' before reshape,
                                    please fill in the filter conditions in the table below and click filter button.
                                    Else please skip these step."),
                                    h6("Each complete row corresponds to a filter rule")
