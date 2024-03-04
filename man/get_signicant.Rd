@@ -8,11 +8,10 @@ get_signicant(
   object,
   contrasts = NULL,
   thresholdmethod = NULL,
-  diff = diff,
-  alpha = alpha,
-  curvature = 1,
-  x0_fold = 2,
-  trend = c("all", "up", "down"),
+  diff = NULL,
+  alpha = NULL,
+  curvature = NULL,
+  x0_fold = NULL,
   return_type = c("subset", "table", "names", "genelist", "idlist")
 )
 }
@@ -25,19 +24,22 @@ get_signicant(
 If is NULL, used existing rejections. Otherwise filter new rejections via
 \code{\link{add_rejections}}().}
 
-\item{alpha}{Numeric(1),
-Sets the threshold for the adjusted P value.}
+\item{diff}{Numeric(1) or NULL, The l2fc threshold. Required if thresholdmethod is 'intersect', default is 1.}
 
-\item{curvature}{Numeric(1), Sets the curvature for the curve cutoff lines}
+\item{alpha}{Numeric(1) or NULL, The p threshold. Required if thresholdmethod is 'intersect', default is 0.05.}
 
-\item{x0_fold}{Numeric(1), decide the x0 ratio to the standard deviations of L2FC. The x0 usually is set to 1(medium confidence) or 2(high confidence) standard deviations.}
+\item{curvature}{Numeric(1), sets the curvature for the curve cutoff lines.
+Required if thresholdmethod is 'curve', default is 0.6.}
 
-\item{trend}{Character(1), one of "all","up","down". Exctract all, upregulated(L2FC > 0) or downregulated(L2FC < 0) subset.}
+\item{x0_fold}{Numeric(1), decides the x0 ratio to the standard deviations of L2FC. The x0 usually is set to 1(medium confidence) or 2(high confidence) standard deviations.
+Required if thresholdmethod is 'curve', default is 2.}
 
-\item{return_type}{One of "subset", "table", "names". "subset" return a subset object, "table" return a result data.frame,
+\item{return_type}{One of "subset", "table", "names","genelist","idlist". "subset" return a subset object, "table" return a result data.frame,
 names return name vector of object. "genelist" and "idlist" require a contrasts input and
 return the vector of l2fc, the names of vector are the names or the ids. If contrasts is more than one, return the first input contrasts l2fc;
 if contrasts is NULL, return the l2fc of the first contrasts of object.}
+
+\item{change_trend}{Character(1), one of "all","up","down". Exctract all, upregulated(L2FC > 0) or downregulated(L2FC < 0) subset.}
 }
 \value{
 A object in the same class of input or a data.frame or a names vector, designed by return_type.

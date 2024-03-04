@@ -8,10 +8,14 @@
 #' @param thresholdmethod NULL or 'intersect' or 'curve'. The thresholdmethod to decide significant.
 #' If is NULL, used existing rejections. Otherwise filter new rejections via
 #' \code{\link{add_rejections}}().
-#' @param curvature Numeric(1), Sets the curvature for the curve cutoff lines
-#' @param x0_fold Numeric(1), decide the x0 ratio to the standard deviations of L2FC. The x0 usually is set to 1(medium confidence) or 2(high confidence) standard deviations.
-#' @param trend Character(1), one of "all","up","down". Exctract all, upregulated(L2FC > 0) or downregulated(L2FC < 0) subset.
-#' @param return_type One of "subset", "table", "names". "subset" return a subset object, "table" return a result data.frame,
+#' @param diff Numeric(1) or NULL, The l2fc threshold. Required if thresholdmethod is 'intersect', default is 1.
+#' @param alpha Numeric(1) or NULL, The p threshold. Required if thresholdmethod is 'intersect', default is 0.05.
+#' @param curvature Numeric(1), sets the curvature for the curve cutoff lines.
+#' Required if thresholdmethod is 'curve', default is 0.6.
+#' @param x0_fold Numeric(1), decides the x0 ratio to the standard deviations of L2FC. The x0 usually is set to 1(medium confidence) or 2(high confidence) standard deviations.
+#' Required if thresholdmethod is 'curve', default is 2.
+#' @param change_trend Character(1), one of "all","up","down". Exctract all, upregulated(L2FC > 0) or downregulated(L2FC < 0) subset.
+#' @param return_type One of "subset", "table", "names","genelist","idlist". "subset" return a subset object, "table" return a result data.frame,
 #' names return name vector of object. "genelist" and "idlist" require a contrasts input and
 #' return the vector of l2fc, the names of vector are the names or the ids. If contrasts is more than one, return the first input contrasts l2fc;
 #' if contrasts is NULL, return the l2fc of the first contrasts of object.
@@ -50,21 +54,36 @@
 get_signicant <- function(object,
                           contrasts = NULL,
                           thresholdmethod = NULL,
-                          diff = diff, alpha = alpha,
-                          curvature = 1,
-                          x0_fold = 2,
-                          trend = c("all","up","down"),
+                          diff = NULL, alpha = NULL,
+                          curvature = NULL,
+                          x0_fold = NULL,
+                          # change_trend = c("all","up","down"),
                           return_type = c("subset", "table", "names","genelist","idlist")
 ){
   row_data = rowData(object)
   return_type = match.arg(return_type)
-  trend = match.arg(trend)
+  # change_trend = match.arg(change_trend)
+  change_trend = "all"
 
   if(is.null(thresholdmethod)){
     if((!is.null(diff)) & (!is.null(alpha))){
       thresholdmethod = "intersect"
     }else if((!is.null(curvature)) & (!is.null(x0_fold))){
       thresholdmethod = "curve"
+    }
+  }
+
+  if(!is.null(thresholdmethod)){
+    if(thresholdmethod == "intersect"){
+      if(is.null(diff)) diff = 1
+      if(is.null(alpha)) alpha = 0.05
+      message("The threshold is diff=",diff,", alpha=",alpha)
+    }
+
+    if(thresholdmethod == "curve"){
+      if(is.null(curvature)) curvature = 0.6
+      if(is.null(x0_fold)) x0_fold = 2
+      message("The threshold is curvature=",curvature,", x0_fold=",x0_fold)
     }
   }
 
@@ -84,7 +103,7 @@ get_signicant <- function(object,
                   deparse(substitute(object)), "'.\nRun a ", frontfun,
                   "() to obtain the required column,\n                  or set a significant thresholdmethod."))
     }
-    cat("thresholdmethod:",thresholdmethod)
+    cat("thresholdmethod:",thresholdmethod,"\n")
     de = add_rejections(object, thresholdmethod = thresholdmethod,
                         curvature = curvature, x0_fold = x0_fold, lfc = diff,
                         alpha = alpha)
@@ -121,18 +140,18 @@ get_signicant <- function(object,
   row_data_filtered = rowData(filtered)
 
 
-  if(trend != "all" & is.null(contrasts)){
+  if(change_trend != "all" & is.null(contrasts)){
     contrasts = get_contrast(object)
-    # trend = "all"
+    # change_trend = "all"
   }
-  if(trend == "up"){
+  if(change_trend == "up"){
     if(length(contrasts) > 1 )
-      stop("contrasts is more than one, can not use trend")
+      stop("contrasts is more than one, can not use change_trend")
     rd = rowData(filtered)
     filtered = filtered[which(rd[,paste0(contrasts,"_diff")] > 0 ),]
-  }else if(trend == "down"){
+  }else if(change_trend == "down"){
     if(length(contrasts) > 1 )
-      stop("contrasts is more than one, can not use trend")
+      stop("contrasts is more than one, can not use change_trend")
     rd = rowData(filtered)
     filtered = filtered[which(rd[,paste0(contrasts,"_diff")] < 0 ),]
   }
@@ -159,6 +178,8 @@ get_signicant <- function(object,
                       idlist = l2fc)
   return(return_val)
 }
+
+
 
 
 
