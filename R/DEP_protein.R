@@ -925,8 +925,16 @@ test_diff <- function(se, type = c("all", "control", "manual"),
     gather(variable, value, -c(rowname, comparison)) %>%
     mutate(variable = recode(variable, logFC = "diff",  t = "t.stastic", P.Value = "p.val", qval = "p.adj")) %>%
     unite(temp, comparison, variable) %>% spread(temp, value)
-  rowData(se) <- merge(rowData(se, use.names = FALSE), table,
-                       by.x = "name", by.y = "rowname", all.x = TRUE, sort = FALSE)
+
+  ## Fixed the issue https://github.com/mildpiggy/DEP2/issues/3#issue-2202171893。
+  ## If diff contain Missing Values in assay, test result will report NAs for the features which are all replication quantity are NAs in one condition of contrast.
+  ## Such test result "NAs" disorder the dep rowdata (binding by `merge`). Therefor, `merge` in here is replaced by `left_join`.
+  # rowData(se) <- merge(rowData(se, use.names = FALSE), table,
+  #                      by.x = "name", by.y = "rowname", all.x = TRUE, sort = FALSE)
+
+  rowData(se) <- left_join(rowData(se, use.names = FALSE) %>% as.data.frame(), table,
+                           by= c("name"= "rowname"),keep = NULL)
+
   return(se)
 }
 

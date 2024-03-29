@@ -1,6 +1,6 @@
 Package: DEP2
 Title: An analysis toolkits for mass spectrometry based proteomics data.
-Version: 0.5.2.28
+Version: 0.5.3.29
 Authors@R: 
     c(
     person("Zhenhuan", "Feng", email = "feng_zhenhuan@gibh.ac.cn", role = c("cre", "aut")),
@@ -32,7 +32,7 @@ Imports:
     rlang, pak (>= 0.3.1), methods, assertthat, S4Vectors, 
     purrr,  readr, dplyr, tidyr, tibble, data.table,
     missForest, vsn, fdrtool(>= 1.2.16), lazyeval, ComplexHeatmap,
-    RColorBrewer, circlize, DT,  glmnet, ggplot2, 
+    RColorBrewer, circlize, DT,  glmnet, ggplot2, ggrepel,
     ggVennDiagram, TCseq, Rtsne, umap, abind, downloader
 Remotes:
     serenity-r/dndselectr,
