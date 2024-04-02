@@ -172,6 +172,8 @@ Reshape_Server <- function(id, Omics_res) {
         filt_condition = isolate(filt_condition())
 
         long_table = long_table()
+
+        filt_table <- long_table
         filt_butt = input$filt_butt
 
         if(is.null(filt_butt)||filt_butt == 0) return(NULL)
@@ -187,7 +189,6 @@ Reshape_Server <- function(id, Omics_res) {
           return(NULL) # no filter rules
 
         }else{
-          filt_table <- long_table
           for(i in filt_condition){
             filt_table = try({
               filt_table %>% dplyr::filter(!!rlang::parse_expr(i))
@@ -256,6 +257,7 @@ Reshape_Server <- function(id, Omics_res) {
             unique_table <- NULL
           }
         })
+
         return(unique_table)
       })
 
@@ -263,8 +265,8 @@ Reshape_Server <- function(id, Omics_res) {
         a = input$reshape_butt
         out_tb <- NULL
         isolate({
-          if(!(is.null(long_table())||
-               is.null(unique_table())
+          if(!(is.null(filt_table())&&
+               is.null(long_table())
           )){
             if(is.null(input$shrink_col)|| all(input$shrink_col == "")){
               shrink_ident_cols = NULL
@@ -278,13 +280,28 @@ Reshape_Server <- function(id, Omics_res) {
               subfeature_col = NULL
             }else{subfeature_col = input$subfeature_col}
 
-            out_tb <- reshape_long2wide(long_table(),feature_col = input$feature_col,
+            # out_tb <- reshape_long2wide(long_table(),feature_col = input$feature_col,
+            #                             expression_col = input$expression_col,sample_col = input$sample_col,
+            #                             remove_sample_prefix = input$rm_prefix,remove_sample_suffix = input$rm_suffix,
+            #                             shrink_ident_cols = shrink_ident_cols,
+            #                             extend_ident_cols = extend_ident_cols,
+            #                             subfeature_col = subfeature_col
+            #                             )
+
+            if(is.null(filt_table())){
+              source_table = long_table()
+            }else{
+              source_table = filt_table()
+            }
+
+            out_tb <- reshape_long2wide(source_table,feature_col = input$feature_col,
                                         expression_col = input$expression_col,sample_col = input$sample_col,
                                         remove_sample_prefix = input$rm_prefix,remove_sample_suffix = input$rm_suffix,
                                         shrink_ident_cols = shrink_ident_cols,
                                         extend_ident_cols = extend_ident_cols,
                                         subfeature_col = subfeature_col
-                                        )
+            )
+            # out_tb2 <<- out_tb
           }else{out_tb <- NULL}
         })
 
