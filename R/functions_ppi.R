@@ -136,7 +136,7 @@ test_PPI <- function(x,
 
 
   message("Mapping STRING ID...")
-  if(is.null(choose_scores) || choose_scores == ""){
+  if(is.null(choose_scores)){
     choose_scores = "combined_score"
   }else if(length(choose_scores)%in% 2:(ncol(protein_links_detail)-3) && "combined_score" %in% choose_scores){
     warning("choose_scores should be NULL or 'combined_score' or a subset of sub scores in c('neighborhood','fusion','cooccurence'",
