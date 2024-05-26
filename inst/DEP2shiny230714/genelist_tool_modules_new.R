@@ -66,7 +66,7 @@ exctract_genelist_Server <- function(id, ID, Omics_Serv_res, suffix = ""){
                        selectizeInput(ns("contrast"),
                                       "Contrast",
                                       choices = get_contrast(test_res()),
-                                        # grep("_p.adj$",colnames(rowData(test_res())),value = T) %>% gsub("_p.adj", "", .),
+                                      # grep("_p.adj$",colnames(rowData(test_res())),value = T) %>% gsub("_p.adj", "", .),
                                       multiple = T),
                        fluidRow(
                          column(width = 6, radioButtons(ns("trend"),
@@ -457,12 +457,12 @@ genelist_tool_UI <- function(id,labelname = "GenelisttoolUI"){
                                      "color panel",
                                      choices = c("BrBG", "PiYG", "PRGn", "PuOr", "RdBu", "RdGy", "RdYlBu", "RdYlGn", "Spectral"),
                                      selected = c("RdBu"), multiple = FALSE),
-                      ),
+               ),
                column(width = 2,
                       numericInput(ns("heatmap_color_limit"),
                                    "color limit",
                                    min = 0, max = 16, value = 4),
-                      ),
+               ),
                column(width = 2,
                       numericInput(ns("row_font_size"),
                                    "row font size",
@@ -588,15 +588,21 @@ genelist_tool_Server <- function(id, Omics_res){
             }
           })
         }else{return(NULL)}
+
+        # remove NULL elements
+        dropzone_input_list3 = dropzone_input_list3[!unlist(lapply(dropzone_input_list3,is.null))]
         return(dropzone_input_list3)
       })
 
       venn_data <- reactive({
         dropzone_input_list3 = dropzone_input_list()
+        # dropzone_input_list3 = dropzone_input_list3[!unlist(lapply(dropzone_input_list3,is.null))]
+        # dropzone_input_list31 <<- dropzone_input_list3
 
         if( length(dropzone_input_list3) > 1 ){
           venn <- ggVennDiagram::Venn(dropzone_input_list3)
           data <- ggVennDiagram::process_data(venn)
+          # venn_data1 <<- data
           return(data)
         }else{
           return(NULL)
@@ -606,8 +612,13 @@ genelist_tool_Server <- function(id, Omics_res){
 
       venn_output_df <- reactive({
         data <- venn_data()
-        venn_list = data@region$item
-        region_names = data@region$name
+        # @region is abandoned in ggVennDiagram(>1.4.8)
+        # venn_list = data@region$item
+        # region_names = data@region$name
+
+        # Use $regionData in ggVennDiagram(>1.5)
+        venn_list = data$regionData$item
+        region_names = data$regionData$name
         df <- data.frame(sapply(venn_list, "[", i = 1:max(sapply(venn_list, length))))
         df[is.na(df)] <- ""
         colnames(df) <- region_names
@@ -619,14 +630,20 @@ genelist_tool_Server <- function(id, Omics_res){
         data <- venn_data()
 
         req(!is.null(data))
-        items <- data@region %>% dplyr::rowwise() %>%
+        # items <- data@region
+        items <- data$regionData %>% dplyr::rowwise() %>%
           dplyr::mutate(text = stringr::str_wrap(paste0(.data$item, collapse = " "), width = 40)) %>%
           # sf::st_as_sf() %>%
-          dplyr::mutate(ratio = round(count/sum(data@region$count),3)) %>%
+          dplyr::mutate(ratio = round(count/sum(data$regionData$count),3)) %>%
           dplyr::mutate(count2 = paste(count,"(",ratio*100,"%)",sep = ""))
-        label_coord = sf::st_centroid(items$geometry) %>% sf::st_coordinates()
-        items$textx = label_coord[,1]
-        items$texty = label_coord[,2]
+        # label_coord = sf::st_centroid(items$geometry) %>% sf::st_coordinates()
+        label_coord =venn_regionlabel(data)
+        items$textx = label_coord$X
+        items$texty = label_coord$Y
+        # label_coord = venn_setlabel(data)
+        # items$textx = label_coord$X
+        # items$texty = label_coord$Y
+        # venn_items1 <<- items
         return(items)
       })
 
@@ -640,7 +657,7 @@ genelist_tool_Server <- function(id, Omics_res){
       observeEvent(venn_click()$key,{
         # venn_click2 = venn_click2(NULL)
         # if(!is.null(venn_click()$key))  ## venn_click2 changed whenever the venn_click$key changed and wasn't null
-          venn_click2 = venn_click2(venn_click()$key)
+        venn_click2 = venn_click2(venn_click()$key)
 
       }, ignoreNULL = F)
 
@@ -945,11 +962,11 @@ genelist_tool_Server <- function(id, Omics_res){
         #   dropZoneServer(session, "dropzone4", exctract_genelist_UI4)
         #   return(drop_input)
         # }else {
-          # column(width = 12,
-          #        textAreaInput(inputId = session$ns("text_input_4"),
-          #                      label = "Paste your gene list",
-          #                      placeholder = "TP53\nPTEN\n\nor\n\nTP53  6.21\nPTEN  -1.53", rows = 27, resize = "none")
-          # )
+        # column(width = 12,
+        #        textAreaInput(inputId = session$ns("text_input_4"),
+        #                      label = "Paste your gene list",
+        #                      placeholder = "TP53\nPTEN\n\nor\n\nTP53  6.21\nPTEN  -1.53", rows = 27, resize = "none")
+        # )
         #
         # }
         # })
@@ -1008,10 +1025,10 @@ genelist_tool_Server <- function(id, Omics_res){
         if(is.null(venn_click2))
           return(NULL)
 
-        items = venn_items()
+        # items = venn_items()
         data = venn_data()
         validate(need(!is.null(venn_data()), "At least need two list"))
-        selected_proteins <- data@region$item[which(data@region$id %in% venn_click2)] %>% unlist() %>% unique()
+        selected_proteins <- data$regionData$item[which(data$regionData$id %in% venn_click2)] %>% unlist() %>% unique()
 
         print(input$dropzone1)
         dropzone_selected_omics <- c(input$dropzone1, input$dropzone2, input$dropzone3, input$dropzone4)
@@ -1164,17 +1181,44 @@ genelist_tool_Server <- function(id, Omics_res){
 
         p1 <- items %>% highlight_key(~id) %>% {
           ggplot(.) +
-            geom_sf(aes_string(fill = "count"),lwd=0.5,color ="grey80") +
-            geom_sf_text(aes_string(label = "name"), data = data@setLabel,inherit.aes = F) +
-            geom_text(aes_string(label = "count2", text = "text", x = "textx", y = "texty"), show.legend = FALSE,size=4) +
+            # 1. region count layer
+            geom_polygon(aes(X, Y, fill = count, group = id),
+                         data = venn_regionedge(data)) +
             scale_fill_gradient(low = "#F4FAFE", high = "#4981BF") +
-            theme_void()} %>%
+            # 2. set edge layer
+            geom_path(aes(X, Y, group = id),
+                      data = venn_setedge(data),
+                      ,lwd=0.5,color ="grey80",
+                      show.legend = FALSE) +
+            # 3. set label layer
+            geom_text(aes(X, Y, label = name),
+                      data = venn_setlabel(data)) +
+            # 4. region label layer
+            geom_text(aes(textx, texty, label = count, text = text),
+                      # data = venn_regionlabel(data),
+                      size=4) +
+            ggplot2::scale_x_continuous(expand = expansion(mult = .2)) +
+            coord_equal() +
+            theme_void()
+        } %>%
           ggplotly(tooltip = "text",
                    # layout.dragmode = 'select',
                    source  = session$ns("venn_plotly")) %>%
           highlight(on = c("plotly_selected"),off = "plotly_deselect",layout.dragmode = 'select')
-        # %>%
-        #   layout(dragmode = "select")
+
+        # p1 <- items %>% highlight_key(~id) %>% {
+        #   ggplot(.) +
+        #     geom_sf(aes_string(fill = "count"),lwd=0.5,color ="grey80") +
+        #     geom_sf_text(aes_string(label = "name"), data = data@setLabel,inherit.aes = F) +
+        #     geom_text(aes_string(label = "count2", text = "text", x = "textx", y = "texty"), show.legend = FALSE,size=4) +
+        #     scale_fill_gradient(low = "#F4FAFE", high = "#4981BF") +
+        #     theme_void()} %>%
+        #   ggplotly(tooltip = "text",
+        #            # layout.dragmode = 'select',
+        #            source  = session$ns("venn_plotly")) %>%
+        #   highlight(on = c("plotly_selected"),off = "plotly_deselect",layout.dragmode = 'select')
+        # # %>%
+        # #   layout(dragmode = "select")
 
         return(p1)
       })
