@@ -54,7 +54,7 @@ imputed <- impute(norm, fun = "MinDet", q = 0.01)
 diff <- test_diff(imputed, "control", "PBS")
 dep <- add_rejections(diff, alpha = 0.05, lfc = 1)
 # the curve method
-dep <- add_rejections(diff, method = "curve")
+dep <- add_rejections(diff, thresholdmethod = "curve")
 
 # For peptide workflow -----
 ## Load example peptide data

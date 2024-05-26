@@ -993,7 +993,7 @@ setGeneric("add_rejections", function(diff, alpha = 0.05, lfc = 1,thresholdmetho
 #' diff <- test_diff(imputed, "control", "PBS")
 #' dep <- add_rejections(diff, alpha = 0.05, lfc = 1)
 #' # the curve method
-#' dep <- add_rejections(diff, method = "curve")
+#' dep <- add_rejections(diff, thresholdmethod = "curve")
 #'
 #' # For peptide workflow -----
 #' ## Load example peptide data
