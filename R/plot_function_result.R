@@ -394,7 +394,7 @@ setGeneric("plot_heatmap", function(object,
 #' filt <- filter_se(se, thr = 0, fraction = 0.4, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
 #' norm <- normalize_vsn(filt)
 #' imputed <- impute(norm, fun = "MinProb", q = 0.05)
-#' diff <- test_diff(imputed, type = "manual", control  = c("PBS"), fdr.type = "Storey's qvalue")
+#' diff <- test_diff(imputed, type = "control", control  = c("PBS"), fdr.type = "Storey's qvalue")
 #' dep <- add_rejections(diff, alpha = 0.01,lfc = 2)
 #'
 #' # Heatmap
@@ -1520,62 +1520,158 @@ plot_multi_heatmap <- function(omics_list, choose_name, to_upper = FALSE,
 }
 
 
-#' Plot venn plot of specified genes/proteins across multiple omics results
+#' Plot venn plot of specified genes/proteins, or upon signicant results from
 #'
 #' Plot a venn plot for significant candidate in muitiple omics results, based on identifiers('name')
 #'
-#' @param omics_list A list composed of SummarizedExperiment or DEGdata objects or.
+#' @param x A list or a result SummarizedExperiment or DEGdata object.
+#' If x is a list, it should be a list composed of vector or SummarizedExperiment or DEGdata,
+#' plot_multi_venn compares vectors and significant result of SE objects in each list elements.
+#' If x is a SummarizedExperiment or DEGdata object, it should be a result from add_rejections and contain more than than contrasts,
+#' plot_multi_venn compares significant results in each contrasts.
+#'
 #' @param to_upper Logical, whether transform all identifiers to upper
 #' @param background NULL or character vector of names of background protein/gene pool.
-#' If background is provided, plot_multi_venn only consider candidates in background.
+#' If background is provided, plot_multi_venn only consider candidates in background (the significant members in omics_list that also exist in background).
+#' Else, if background is NULL, venn is ploted upon all candidates in omics_list.
 #' @param plot  Logical(1), return a venn plot or a table.
-#'
+#' @param contrasts NULL or vectors of characters. It only works when x is a SummarizedExperiment or DEGdata object from add_rejections.
+#' To Specify compared contrasts in venn.
+#' @inheritParams ggVennDiagram::ggVennDiagram
+#' @param ... Additional arguments for imputation functions as depicted in
+#' \code{\link{manual_impute}}, \code{\link[missForest]{missForest}} and \code{\link[MsCoreUtils]{impute_matrix}}.
+
 #' @return
-#' A venn plot by ggVennDiagram or a table.
+#' A venn plot by ggVennDiagram or a tibble (plot = F).
 #'
 #' @export
+#' @importFrom ggVennDiagram ggVennDiagram Venn process_data
+#' @examples
+#' data(Silicosis_pg)
+#' data <- Silicosis_pg
+#' data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
 #'
-plot_multi_venn <- function(omics_list, to_upper = F, plot = T, background = NULL){
-  assertthat::assert_that(class(omics_list) == "list", length(omics_list) > 0,
+#' # Make SummarizedExperiment
+#' ecols <- grep("LFQ.", colnames(data_unique))
+#' se <- make_se_parse(data_unique, ecols, mode = "delim", sep = "_")
+#'
+#' filt <- filter_se(se, thr = 0, fraction = 0.3, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
+#' norm <- normalize_vsn(filt)
+#' imputed <- impute(norm, fun = "MinDet", q = 0.01)
+#'
+#' # Test for differentially expressed proteins
+#' diff <- test_diff(imputed, "control", "PBS", fdr.type = "BH")
+#' dep <- add_rejections(diff, alpha = 0.01, lfc = 1)
+#'
+#' get_contrast(dep)
+#'
+#' # Plot venn of result
+#' plot_multi_venn(
+#'   dep,
+#'   label_size = 2.5
+#' )
+#'
+#' # Plot venn for some contrasts
+#' get_contrast(dep)
+#' plot_multi_venn(dep,contrasts = c("W10_vs_PBS", "W6_vs_PBS"), set_size = 3)
+#'
+#' # Compare with intersted geneset
+#' IL1_relative_genes = c("Irg1", "Il1rn", "Saa3", "Zbp1", "Ccl6",
+#'                        "Serpine1", "Ccl21a", "Pycard", "Irak2", "Vrk2",
+#'                        "Fn1", "Il1r1", "Irf1", "Ccl9", "Mapk11", "Tank",
+#'                        "Mapk13")
+#' plot_multi_venn(
+#'   list(W10 = get_signicant(dep,contrasts = "W10_vs_PBS"),
+#'        W6 = get_signicant(dep,contrasts = "W6_vs_PBS"),
+#'        IL1_genes = IL1_relative_genes
+#'   )
+#' )
+#'
+#' # Use background geneset
+#' plot_multi_venn(
+#'   list(W10 = get_signicant(dep,contrasts = "W10_vs_PBS"),
+#'        W6 = get_signicant(dep,contrasts = "W6_vs_PBS"),
+#'        IL1_genes = IL1_relative_genes
+#'   ),
+#'   background = IL1_relative_genes
+#' )
+#'
+#' # Return a tibble
+#' plot_multi_venn(
+#'   dep,contrasts = c("W10_vs_PBS", "W6_vs_PBS"), plot = F,
+#'   to_upper = T # transform all identifiers to upper
+#' )
+#'
+plot_multi_venn <- function(x, to_upper = F, plot = T, contrasts = NULL,
+                            background = NULL,
+                            set_size = 5, label_size = 3, label_geom = "text",...){
+  assertthat::assert_that(class(x) == "list" | inherits(x,"SummarizedExperiment"),
                           is.logical(to_upper), length(to_upper) == 1,
+                          is.null(contrasts) | is.character(contrasts),
                           is.logical(plot), length(plot) == 1
   )
 
-  classes <- omics_list %>% sapply(., class)
-  if(!all(classes %in% c("SummarizedExperiment","DEGdata")))
-    get_signicant()
-  gene_list <- lapply(omics_list, get_signicant, return_type = "names")
+  if(inherits(x,"SummarizedExperiment")){
+    # check SE contrasts.
+    exist_contrasts = try({get_contrast(x)},silent = T)
+    if(class(exist_contrasts)== "try-error"|length(exist_contrasts) < 1)
+      stop("Check your input x! If x is a SummarizedExperiment or a DEGdata object, it should be an output from add_rejections!")
+    if(length(exist_contrasts) == 1)
+      stop(paste0("Check your input! Input x only has one contrast: ", contrasts,"."))
 
-  if(!is.null(background)){
-    gene_list <- lapply(gene_list, function(x){intersect(x,background)})
+    # Used contrasts that are in exist_
+    if(is.null(contrasts)){
+      message(exist_contrasts)
+      contrasts = exist_contrasts
+
+    }else if(is.character(contrasts)){
+      contrasts = intersect(contrasts, exist_contrasts)
+
+      if(length(contrasts) < 1)
+        stop(paste0("Check your input contrast! Only one contrast of no contrast is in ", deparse(substitute(diff))))
+
+      message("Use contrasted: ",paste0(contrasts, collapse = ", "))
+    }
+
+    gene_list = lapply(contrasts,get_signicant, object = x, return_type = "names")
+    names(gene_list) = contrasts
+  }else if(is.list(x)){
+    if(length(x) <= 1)
+      stop("Check your input ",deparse(substitute(x)),". The x should have more than one elements.")
+
+    # check list elements
+    all_LISTorSE = x %>% lapply(function(y){
+      is.character(y) | inherits(y,"SummarizedExperiment")
+    }) %>% unlist
+    if(!all(all_LISTorSE))
+      stop("Check your input ",deparse(substitute(x)),". If x is a list, its elements should be a list composed of charecter vectors, SummarizedExperiment, or DEGdata objects")
+
+    # extract significant results from SE elements
+    gene_list = lapply(x, function(y){
+      if(inherits(y,"SummarizedExperiment"))
+        y = get_signicant(y, return_type = "names")
+      return(y)
+    })
   }
 
-  venn <- RVenn::Venn(gene_list)
-  data <- ggVennDiagram::process_data(venn)
+  if(to_upper){
+    gene_list = lapply(gene_list, function(y){toupper(y)})
+  }
 
-  items <- data@region %>% dplyr::rowwise() %>%
-    dplyr::mutate(text = stringr::str_wrap(paste0(.data$item, collapse = " "), width = 40)) %>%
-    # sf::st_as_sf() %>%
-    dplyr::mutate(ratio = round(count/sum(data@region$count),3)) %>%
-    dplyr::mutate(count2 = paste(count,"(",ratio*100,"%)",sep = ""))
-  label_coord = sf::st_centroid(items$geometry) %>% sf::st_coordinates()
-  items$textx = label_coord[,1]
-  items$texty = label_coord[,2]
-
-
-  ggp <- ggplot(items) +
-    geom_sf(aes_string(fill = "count"),lwd=0.5,color ="grey80") +
-    geom_sf_text(aes_string(label = "name"), data = data@setLabel,inherit.aes = F) +
-    geom_text(aes_string(label = "count2",
-                         # text = "text",
-                         x = "textx", y = "texty"), show.legend = FALSE,size=4) +
-    scale_fill_gradient(low = "#F4FAFE", high = "#4981BF") +
-    theme_void()
+  if(!is.null(background)){
+    gene_list = lapply(gene_list, function(y){intersect(y,background)})
+  }
 
   if(plot){
+    ggp <- ggVennDiagram::ggVennDiagram(gene_list,
+                                        set_size = set_size, label_size = label_size, label_geom = "text",
+                                        ...)
+    ggp = ggp + ggplot2::scale_x_continuous(expand = expansion(mult = .2))
     return(ggp)
   }else{
-    return(venn)
+    venn <- ggVennDiagram::Venn(gene_list)
+    data <- ggVennDiagram::process_data(venn)
+    return(data$regionData)
   }
   # plotlyp <- ggp %>%
   #   ggplotly(tooltip = "text")

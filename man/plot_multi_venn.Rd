@@ -2,23 +2,107 @@
 % Please edit documentation in R/plot_function_result.R
 \name{plot_multi_venn}
 \alias{plot_multi_venn}
-\title{Plot venn plot of specified genes/proteins across multiple omics results}
+\title{Plot venn plot of specified genes/proteins, or upon signicant results from}
 \usage{
-plot_multi_venn(omics_list, to_upper = F, plot = T, background = NULL)
+plot_multi_venn(
+  x,
+  to_upper = F,
+  plot = T,
+  contrasts = NULL,
+  background = NULL,
+  set_size = 5,
+  label_size = 3,
+  label_geom = "text",
+  ...
+)
 }
 \arguments{
-\item{omics_list}{A list composed of SummarizedExperiment or DEGdata objects or.}
+\item{x}{A list or a result SummarizedExperiment or DEGdata object.
+If x is a list, it should be a list composed of vector or SummarizedExperiment or DEGdata,
+plot_multi_venn compares vectors and significant result of SE objects in each list elements.
+If x is a SummarizedExperiment or DEGdata object, it should be a result from add_rejections and contain more than than contrasts,
+plot_multi_venn compares significant results in each contrasts.}
 
 \item{to_upper}{Logical, whether transform all identifiers to upper}
 
 \item{plot}{Logical(1), return a venn plot or a table.}
 
+\item{contrasts}{NULL or vectors of characters. It only works when x is a SummarizedExperiment or DEGdata object from add_rejections.
+To Specify compared contrasts in venn.}
+
 \item{background}{NULL or character vector of names of background protein/gene pool.
-If background is provided, plot_multi_venn only consider candidates in background.}
+If background is provided, plot_multi_venn only consider candidates in background (the significant members in omics_list that also exist in background).
+Else, if background is NULL, venn is ploted upon all candidates in omics_list.}
+
+\item{set_size}{size of set labels (NA)}
+
+\item{label_size}{size of region labels (NA)}
+
+\item{label_geom}{layer of region labels, choose from c("label", "text")}
+
+\item{...}{Additional arguments for imputation functions as depicted in
+\code{\link{manual_impute}}, \code{\link[missForest]{missForest}} and \code{\link[MsCoreUtils]{impute_matrix}}.}
 }
 \value{
-A venn plot by ggVennDiagram or a table.
+A venn plot by ggVennDiagram or a tibble (plot = F).
 }
 \description{
 Plot a venn plot for significant candidate in muitiple omics results, based on identifiers('name')
+}
+\examples{
+data(Silicosis_pg)
+data <- Silicosis_pg
+data_unique <- make_unique(data, "Gene.names", "Protein.IDs", delim = ";")
+
+# Make SummarizedExperiment
+ecols <- grep("LFQ.", colnames(data_unique))
+se <- make_se_parse(data_unique, ecols, mode = "delim", sep = "_")
+
+filt <- filter_se(se, thr = 0, fraction = 0.3, filter_formula = ~ Reverse != "+" & Potential.contaminant!="+")
+norm <- normalize_vsn(filt)
+imputed <- impute(norm, fun = "MinDet", q = 0.01)
+
+# Test for differentially expressed proteins
+diff <- test_diff(imputed, "control", "PBS", fdr.type = "BH")
+dep <- add_rejections(diff, alpha = 0.01, lfc = 1)
+
+get_contrast(dep)
+
+# Plot venn of result
+plot_multi_venn(
+  dep,
+  label_size = 2.5
+)
+
+# Plot venn for some contrasts
+get_contrast(dep)
+plot_multi_venn(dep,contrasts = c("W10_vs_PBS", "W6_vs_PBS"), set_size = 3)
+
+# Compare with intersted geneset
+IL1_relative_genes = c("Irg1", "Il1rn", "Saa3", "Zbp1", "Ccl6",
+                       "Serpine1", "Ccl21a", "Pycard", "Irak2", "Vrk2",
+                       "Fn1", "Il1r1", "Irf1", "Ccl9", "Mapk11", "Tank",
+                       "Mapk13")
+plot_multi_venn(
+  list(W10 = get_signicant(dep,contrasts = "W10_vs_PBS"),
+       W6 = get_signicant(dep,contrasts = "W6_vs_PBS"),
+       IL1_genes = IL1_relative_genes
+  )
+)
+
+# Use background geneset
+plot_multi_venn(
+  list(W10 = get_signicant(dep,contrasts = "W10_vs_PBS"),
+       W6 = get_signicant(dep,contrasts = "W6_vs_PBS"),
+       IL1_genes = IL1_relative_genes
+  ),
+  background = IL1_relative_genes
+)
+
+# Return a tibble
+plot_multi_venn(
+  dep,contrasts = c("W10_vs_PBS", "W6_vs_PBS"), plot = F,
+  to_upper = T # transform all identifiers to upper
+)
+
 }

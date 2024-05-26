@@ -14,7 +14,7 @@
 #' Required if thresholdmethod is 'curve', default is 0.6.
 #' @param x0_fold Numeric(1), decides the x0 ratio to the standard deviations of L2FC. The x0 usually is set to 1(medium confidence) or 2(high confidence) standard deviations.
 #' Required if thresholdmethod is 'curve', default is 2.
-#' @param change_trend Character(1), one of "all","up","down". Exctract all, upregulated(L2FC > 0) or downregulated(L2FC < 0) subset.
+#' @param change_trend Character(1), one of "all","up","down". Exctract all, upregulated (L2FC > 0) or downregulated (L2FC < 0) results.
 #' @param return_type One of "subset", "table", "names","genelist","idlist". "subset" return a subset object, "table" return a result data.frame,
 #' names return name vector of object. "genelist" and "idlist" require a contrasts input and
 #' return the vector of l2fc, the names of vector are the names or the ids. If contrasts is more than one, return the first input contrasts l2fc;
@@ -57,13 +57,13 @@ get_signicant <- function(object,
                           diff = NULL, alpha = NULL,
                           curvature = NULL,
                           x0_fold = NULL,
-                          # change_trend = c("all","up","down"),
+                          change_trend = c("all","up","down"),
                           return_type = c("subset", "table", "names","genelist","idlist")
 ){
   row_data = rowData(object)
   return_type = match.arg(return_type)
-  # change_trend = match.arg(change_trend)
-  change_trend = "all"
+  change_trend = match.arg(change_trend)
+  # change_trend = "all"
 
   if(is.null(thresholdmethod)){
     if((!is.null(diff)) & (!is.null(alpha))){
@@ -146,12 +146,12 @@ get_signicant <- function(object,
   }
   if(change_trend == "up"){
     if(length(contrasts) > 1 )
-      stop("contrasts is more than one, can not use change_trend")
+      stop("Contrasts is more than one. You should assign one contrasts when change_trend is 'up' or 'down'")
     rd = rowData(filtered)
     filtered = filtered[which(rd[,paste0(contrasts,"_diff")] > 0 ),]
   }else if(change_trend == "down"){
     if(length(contrasts) > 1 )
-      stop("contrasts is more than one, can not use change_trend")
+      stop("Contrasts is more than one. You should assign one contrasts when change_trend is 'up' or 'down'")
     rd = rowData(filtered)
     filtered = filtered[which(rd[,paste0(contrasts,"_diff")] < 0 ),]
   }
