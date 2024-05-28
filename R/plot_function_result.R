@@ -1538,11 +1538,11 @@ plot_multi_heatmap <- function(omics_list, choose_name, to_upper = FALSE,
 #' @param contrasts NULL or vectors of characters. It only works when x is a SummarizedExperiment or DEGdata object from add_rejections.
 #' To Specify compared contrasts in venn.
 #' @inheritParams ggVennDiagram::ggVennDiagram
-#' @param ... Additional arguments for imputation functions as depicted in
-#' \code{\link{manual_impute}}, \code{\link[missForest]{missForest}} and \code{\link[MsCoreUtils]{impute_matrix}}.
-
+#' @param ... Additional arguments for imputation functions as depicted in \code{\link[ggVennDiagram]{ggVennDiagram}}.
 #' @return
 #' A venn plot by ggVennDiagram or a tibble (plot = F).
+#' @note
+#' Since DEP2 0.5.27, plot_multi_venn depends on ggVennDiagram (higher than 1.5).
 #'
 #' @export
 #' @importFrom ggVennDiagram ggVennDiagram Venn process_data

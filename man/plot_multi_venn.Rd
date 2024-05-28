@@ -40,14 +40,16 @@ Else, if background is NULL, venn is ploted upon all candidates in omics_list.}
 
 \item{label_geom}{layer of region labels, choose from c("label", "text")}
 
-\item{...}{Additional arguments for imputation functions as depicted in
-\code{\link{manual_impute}}, \code{\link[missForest]{missForest}} and \code{\link[MsCoreUtils]{impute_matrix}}.}
+\item{...}{Additional arguments for imputation functions as depicted in \code{\link[ggVennDiagram]{ggVennDiagram}}.}
 }
 \value{
 A venn plot by ggVennDiagram or a tibble (plot = F).
 }
 \description{
 Plot a venn plot for significant candidate in muitiple omics results, based on identifiers('name')
+}
+\note{
+Since DEP2 0.5.27, plot_multi_venn depends on ggVennDiagram (higher than 1.5).
 }
 \examples{
 data(Silicosis_pg)
