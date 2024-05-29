@@ -300,6 +300,7 @@ add_rejections.DEGdata <- function (diff, alpha = 0.05, lfc = 1,
   cols_diff <- grep("_diff", colnames(test_result))
 
   if(thresholdmethod == "intersect"){
+    ## Intersect cutoff
     if (is.integer(alpha))
       alpha <- as.numeric(alpha)
     if (is.integer(lfc))
@@ -331,9 +332,10 @@ add_rejections.DEGdata <- function (diff, alpha = 0.05, lfc = 1,
       test_result <- cbind(test_result, as.data.frame(sign_df))
       diff@test_result = DataFrame(test_result)
     }
-    rowData(diff) <- cbind(rowData(diff), diff@test_result)
-    return(diff)
+    # rowData(diff) <- cbind(rowData(diff), diff@test_result)
+    # return(diff)
   }else if(thresholdmethod == "curve"){
+    ## Curve cutoff
     if (is.integer(curvature))
       curvature <- as.numeric(curvature)
     if (is.integer(x0_fold))
@@ -383,15 +385,17 @@ add_rejections.DEGdata <- function (diff, alpha = 0.05, lfc = 1,
       diff@test_result = DataFrame(test_result)
     }
 
-    ## add the test_result to the rowData of DEGdata
-    rd = rowData(diff)
-    suffix = diff@test_result %>% colnames %>%gsub(".*_","_",.) %>% unique()
-    rd = rd[,-( grep( paste0(suffix,collapse = "|",sep = "$") , colnames(rd)) ) ]
 
-    rowData(diff) <- DataFrame(cbind(rd, diff@test_result))
-    return(diff)
   }else stop("thresholdmethod should be one of 'intersect'/'curve'",
              call. = FALSE)
+
+  ## add the test_result to the rowData of DEGdata
+  rd = rowData(diff)
+  suffix = diff@test_result %>% colnames %>% gsub(".*_","_",.) %>% unique()
+  rd = rd[,-( grep( paste0(suffix,collapse = "|",sep = "$") , colnames(rd)) ) ]
+
+  rowData(diff) <- DataFrame(cbind(rd, diff@test_result))
+  return(diff)
 
 }
 
