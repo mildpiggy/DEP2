@@ -153,7 +153,9 @@ filter_missval <- function(se, thr = 0) {
                      filter(miss_val <= thr) %>%
                      spread(condition, miss_val))
 
-  se_fltrd <- se[keep$rowname, ]
+  # Keep rownames
+  keep2 = intersect(rownames(se),keep$rowname)
+  se_fltrd <- se[keep2, ]
   return(se_fltrd)
 }
 
@@ -174,7 +176,11 @@ filter_fraction <- function(se, fraction){
               valid = sum(value),
               frac = valid / n) %>%
     filter(frac >= fraction)
-  filtered <- se[keep$rowname, ]
+
+  # keep rownames
+  keep2 = intersect(rownames(se),keep$rowname)
+  filtered <- se[keep2, ]
+  return(filtered)
 }
 
 ##' @importFrom lazyeval f_eval
