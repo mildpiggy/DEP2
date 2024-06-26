@@ -489,6 +489,9 @@ DEP_ptm_body_mod <- function(id){
                                                      box(
 
                                                        uiOutput(ns("selected_proteins_ptm")),
+                                                       numericInput(ns("max.overlaps"),
+                                                                    "max.overlaps",
+                                                                    min = 0, max = 100000, value = 30),
                                                        numericInput(ns("showNum_ptm"),
                                                                     "show number",
                                                                     min = 0, max = 100000, value = 20),
@@ -536,6 +539,7 @@ DEP_ptm_body_mod <- function(id){
                                                    # shinyBS::bsTooltip("Peptides2_ptm", "Set the color of the points which the number of Peptides == 2", "top", options = list(container = "body")),
                                                    # shinyBS::bsTooltip(ns("stroke_ptm"), "Set the thickness of black line around the point", "top", options = list(container = "body")),
                                                    shinyBS::bsTooltip(ns("selected_proteins_ptm"), "Choose the point labels to show, act when [label Way] is selected peptides", "top", options = list(container = "body")),
+                                                   shinyBS::bsTooltip(ns("max.overlaps"), "Decides labels overlap", "top", options = list(container = "body")),
                                                    shinyBS::bsTooltip(ns("showNum_ptm"), "Set the number of the labels to add, act when [label way] is significant, up or down. Note that, when it is larger than the number of significant result, it is seted to the number of significant result", "top", options = list(container = "body")),
                                                    shinyBS::bsTooltip(ns("fontSize_ptm"), "Set the font size of the label", "top", options = list(container = "body")),
                                                    shinyBS::bsTooltip(ns("dotsize_ptm"), "Set the dot size of the label", "top", options = list(container = "body")),
@@ -2054,6 +2058,7 @@ DEP_ptm_server_module <- function(id, Omics_res){
                                  down_color = input$down_color_ptm,
                                  stable_color = input$stable_color_ptm,
                                  up_color = input$up_color_ptm,
+                                 max.overlaps = input$max.overlaps
               )
             })
           }

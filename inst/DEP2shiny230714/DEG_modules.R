@@ -561,6 +561,9 @@ DEG_body_mod <- function(id){
                                                  "labeled",
                                                  value = FALSE),
                                    uiOutput(ns("selected_proteins_for_RNAseq")),
+                                   numericInput(ns("max.overlaps"),
+                                                "max.overlaps",
+                                                min = 0, max = 100000, value = 30),
                                    numericInput(ns("showNum_for_RNAseq"),
                                                 "show number",
                                                 min = 0, max = 100000, value = 20),
@@ -596,6 +599,7 @@ DEG_body_mod <- function(id){
                                # shinyBS::bsTooltip(ns("stroke_for_RNAseq"), "Set the thickness of black line around the point", "top", options = list(container = "body")),
                                shinyBS::bsTooltip(ns("labeled_for_RNAseq_customvolcano"), "Whether use the labelway : selected genes", "top", options = list(container = "body")),
                                shinyBS::bsTooltip(ns("selected_proteins_for_RNAseq"), "Choose the point labels to show, act when [label Way] is selected genes", "top", options = list(container = "body")),
+                               shinyBS::bsTooltip(ns("max.overlaps"), "Decides labels overlap", "top", options = list(container = "body")),
                                shinyBS::bsTooltip(ns("showNum_for_RNAseq"), "Set the number of the labels to add, act when [label way] is significant, up or down. Note that, when it is larger than the number of significant result, it is seted to the number of significant result", "top", options = list(container = "body")),
                                shinyBS::bsTooltip(ns("fontSize_for_RNAseq"), "Set the font size of the label", "top", options = list(container = "body")),
                                shinyBS::bsTooltip(ns("dotsize_for_RNAseq"), "Set the dot size of the label", "top", options = list(container = "body")),
@@ -1688,7 +1692,8 @@ DEG_server_module <- function(id){
                                pCutoff = input$p,
                                down_color = input$down_color_for_RNAseq,
                                stable_color = input$stable_color_for_RNAseq,
-                               up_color = input$up_color_for_RNAseq
+                               up_color = input$up_color_for_RNAseq,
+                               max.overlaps = input$max.overlaps
                                )
           })
         })

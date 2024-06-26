@@ -430,6 +430,9 @@ DEP_pg_body_mod <- function(id){
                                                        uiOutput(ns("Peptides2"))
                                       ),
                                       uiOutput(ns("selected_proteins")),
+                                      numericInput(ns("max.overlaps"),
+                                                   "max.overlaps",
+                                                   min = 0, max = 100000, value = 30),
                                       numericInput(ns("showNum"),
                                                    "show number",
                                                    min = 0, max = 100000, value = 20),
@@ -480,7 +483,8 @@ DEP_pg_body_mod <- function(id){
                                   shinyBS::bsTooltip(ns("Peptides2"), "Set the color of the points which the number of Peptides == 2", "top", options = list(container = "body")),
                                   # shinyBS::bsTooltip(ns("stroke"), "Set the thickness of black line around the point", "top", options = list(container = "body")),
                                   shinyBS::bsTooltip(ns("selected_proteins"), "Choose the point labels to show, act when [label Way] is selected proteins", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("showNum"), "Set the number of the labels to add, act when [label way] is significant, up or down. Note that, when it is larger than the number of significant result, it is seted to the number of significant result", "top", options = list(container = "body")),
+                                  shinyBS::bsTooltip(ns("max.overlaps"), "Decides labels overlap", "top", options = list(container = "body")),
+                                  shinyBS::bsTooltip(ns("showNum"), "Set the number of the name labels overlap.Exclude text labels when they overlap too many other things.", "top", options = list(container = "body")),
                                   shinyBS::bsTooltip(ns("fontSize"), "Set the font size of the label", "top", options = list(container = "body")),
                                   shinyBS::bsTooltip(ns("dotsize"), "Set the dot size of the label", "top", options = list(container = "body")),
                                   shinyBS::bsTooltip(ns("custom_volcano_Width"), "Width of the figure to export", "top", options = list(container = "body")),
@@ -1898,7 +1902,8 @@ DEP_pg_server_module <- function(id){
                                  stable_color = input$stable_color,
                                  up_color = input$up_color,
                                  peptide_1_color = input$Peptides_1,
-                                 peptide_2_color = input$Peptides_2
+                                 peptide_2_color = input$Peptides_2,
+                                 max.overlaps = input$max.overlaps
               )
             })
           }
