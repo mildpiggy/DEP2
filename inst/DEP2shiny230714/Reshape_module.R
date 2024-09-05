@@ -551,8 +551,8 @@ trim_table_character <- function(thedata,length_lim = 14){
 
     t_df <- data.frame(ori = unique(x))
     t_df$trans_code = stringr::str_conv(t_df$ori,"UTF-8")
-    t_df$trans_char = ifelse(stringr::str_length(t_df$trans_code) > len_limit,
-                             paste0(stringr::str_sub(t_df$trans_code,1,len_limit),"..."),
+    t_df$trans_char = ifelse(stringr::str_length(t_df$trans_code) > length_lim,
+                             paste0(stringr::str_sub(t_df$trans_code,1,length_lim),"..."),
                              t_df$trans_code)
     x <- t_df$trans_char[match(x,t_df$ori)]
     thedata[,character_cols] = x
