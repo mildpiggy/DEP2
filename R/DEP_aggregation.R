@@ -49,7 +49,7 @@ make_pe <- function(Peptide, columns,
       stop("columns should be the columns in ", deparse(substitute(Peptide)), "but ", columns[!columns %in% colnames(Peptide)],"do not exist.")
     columns = which(colnames(Peptide) %in% columns)
   }else if(is.integer(columns)){
-    assert_that(all(columns %in% 1:nrow(Peptide)))
+    assert_that(all(columns %in% 1:ncol(Peptide)))
   }
   if (any(!apply(Peptide[, columns], 2, is.numeric))) {
     stop("Specified 'columns' should be numeric", "\nRun make_pe() with the appropriate columns as argument.",

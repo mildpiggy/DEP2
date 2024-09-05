@@ -346,7 +346,7 @@ make_se <- function (proteins_unique, columns, expdesign, log2transform = TRUE)
       stop("columns should be the columns in ", deparse(substitute(proteins_unique)), "but ", columns[!columns %in% colnames(proteins_unique)],"do not exist.")
     columns = which(colnames(proteins_unique) %in% columns)
   }else if(is.integer(columns)){
-    assert_that(all(columns %in% 1:nrow(proteins_unique)))
+    assert_that(all(columns %in% 1:ncol(proteins_unique)))
   }
   if (any(!c("name", "ID") %in% colnames(proteins_unique))) {
     stop("'name' and/or 'ID' columns are not present in '",
