@@ -6,7 +6,7 @@
 \usage{
 test_diff(
   se,
-  type = c("all", "control", "manual"),
+  type = c("all", "control", "manual", "advanced_manual"),
   control = NULL,
   test = NULL,
   design_formula = formula(~0 + condition),
@@ -22,7 +22,7 @@ For proteomics data directly from quantity table, it is adviced to first remove
 low quanlity and undesired rows by \code{\link{filter_se}()}, and missing values are imputed by \code{\link{impute}()}.
 Normalization is recommended in both workflow.}
 
-\item{type}{"control", "all" or "manual",
+\item{type}{"all", "control", "manual" or "advanced_manual".
 The type of contrasts that will be tested.
 This can be all possible pairwise comparisons ("all"),
 limited to the comparisons versus the control ("control"), or

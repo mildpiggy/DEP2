@@ -724,7 +724,7 @@ manual_impute <- function(se, scale = 0.3, shift = 1.8) {
 #' low quanlity and undesired rows by \code{\link{filter_se}()}, and missing values are imputed by \code{\link{impute}()}.
 #' Normalization is recommended in both workflow.
 #'
-#' @param type "control", "all" or "manual",
+#' @param type "all", "control", "manual" or "advanced_contrast".
 #' The type of contrasts that will be tested.
 #' This can be all possible pairwise comparisons ("all"),
 #' limited to the comparisons versus the control ("control"), or
@@ -781,7 +781,7 @@ manual_impute <- function(se, scale = 0.3, shift = 1.8) {
 #' diff <- test_diff(imputed, "manual", test = "PBS_vs_W6", fdr.type = "Storey's qvalue")
 #'
 #' @export
-test_diff <- function(se, type = c("all", "control", "manual"),
+test_diff <- function(se, type = c("all", "control", "manual", "advanced_contrast"),
                       control = NULL, test = NULL,
                       design_formula = formula(~ 0 + condition),
                       advanced_contrast = NULL,
@@ -864,7 +864,7 @@ test_diff <- function(se, type = c("all", "control", "manual"),
     }
     cntrst <- gsub("_vs_", " - ", test)
   }
-  if (type == "advanced_manual"){
+  if (type == "advanced_contrast"){
     cntrst = advanced_contrast
   }
   message("Tested contrasts: ", paste(gsub(" - ", "_vs_", cntrst),
@@ -914,7 +914,7 @@ test_diff <- function(se, type = c("all", "control", "manual"),
   message(fdr.type)
 
   limma_res <- purrr::map_df(cntrst, retrieve_fun, fdr.type = fdr.type)
-  if(type != "advanced_manual"){
+  if(type != "advanced_contrast"){
     limma_res$comparison = gsub(" - ", "_vs_", limma_res$comparison)
   }else
     limma_res$comparison = names(cntrst)[match(limma_res$comparison, cntrst)]
