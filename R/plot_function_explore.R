@@ -528,12 +528,20 @@ plot_pca <- function(object, x = 1, y = 2, indicate = c("condition", "replicate"
     p <- p + geom_point(aes(col = pca_df[[indicate[1]]],
                             shape = pca_df[[indicate[2]]]), size = point_size) +
       labs(col = indicate[1], shape = indicate[2])
+
+    if(length(unique(pca_df[[indicate[2]]])) > 6){
+      p <- p + scale_shape_manual( values = seq(1, length(unique(pca_df[[indicate[2]]]))) )
+    }
   }
   if (length(indicate) == 3) {
     p <- p + geom_point(aes(col = pca_df[[indicate[1]]],
                             shape = pca_df[[indicate[2]]]), size = point_size) +
       facet_wrap(~pca_df[[indicate[3]]]) +
       labs(col = indicate[1], shape = indicate[2])
+
+    if(length(unique(pca_df[[indicate[2]]])) > 6){
+      p <- p + scale_shape_manual( values = seq(1, length(unique(pca_df[[indicate[2]]]))) )
+    }
   }
   if (label) {
     p <- p + geom_text(aes(label = rowname), size = label_size)
@@ -664,12 +672,20 @@ plot_Tsne <- function (object, indicate = c("condition",
     p <- p + geom_point(aes(col = as.factor(Tsne_df[[indicate[1]]]),
                             shape = as.factor(Tsne_df[[indicate[2]]])), size = point_size) +
       labs(col = indicate[1], shape = indicate[2])
+
+    if(length(unique(Tsne_df[[indicate[2]]])) > 6){
+      p <- p + scale_shape_manual( values = seq(1, length(unique(Tsne_df[[indicate[2]]]))) )
+    }
   }
   if (length(indicate) == 3) {
     p <- p + geom_point(aes(col = as.factor(Tsne_df[[indicate[1]]]),
                             shape = as.factor(Tsne_df[[indicate[2]]])), size = point_size) +
       facet_wrap(~Tsne_df[[indicate[3]]]) +
       labs(col = indicate[1], shape = indicate[2])
+
+    if(length(unique(Tsne_df[[indicate[2]]])) > 6){
+      p <- p + scale_shape_manual( values = seq(1, length(unique(Tsne_df[[indicate[2]]]))) )
+    }
   }
   if (label) {
     p <- p + geom_text(aes(label = rowname), size = label_size)
@@ -807,12 +823,20 @@ plot_umap <- function (object, indicate = c("condition",
     p <- p + geom_point(aes(col = as.factor(umap_df[[indicate[1]]]),
                             shape = as.factor(umap_df[[indicate[2]]])), size = point_size) +
       labs(col = indicate[1], shape = indicate[2])
+
+    if(length(unique(umap_df[[indicate[2]]])) > 6){
+      p <- p + scale_shape_manual( values = seq(1, length(unique(umap_df[[indicate[2]]]))) )
+    }
   }
   if (length(indicate) == 3) {
     p <- p + geom_point(aes(col = as.factor(umap_df[[indicate[1]]]),
                             shape = as.factor(umap_df[[indicate[2]]])), size = point_size) +
       facet_wrap(~umap_df[[indicate[3]]]) +
       labs(col = indicate[1], shape = indicate[2])
+
+    if(length(unique(umap_df[[indicate[2]]])) > 6){
+      p <- p + scale_shape_manual( values = seq(1, length(unique(umap_df[[indicate[2]]]))) )
+    }
   }
   if (label) {
     p <- p + geom_text(aes(label = rowname), size = label_size)
