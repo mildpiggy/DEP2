@@ -924,7 +924,7 @@ test_diff <- function(se, type = c("all", "control", "manual", "advanced_contras
     # mutate(comparison = gsub(" - ", "_vs_", comparison)) %>%
     gather(variable, value, -c(rowname, comparison)) %>%
     mutate(variable = recode(variable, logFC = "diff",  t = "t.stastic", P.Value = "p.val", qval = "p.adj")) %>%
-    unite(temp, comparison, variable) %>% spread(temp, value)
+    unite(temp, comparison, variable) %>% tidyr::spread(temp, value)
 
   ## Fixed the issue https://github.com/mildpiggy/DEP2/issues/3#issue-2202171893。
   ## If diff contain Missing Values in assay, test result will report NAs for the features which are all replication quantity are NAs in one condition of contrast.
