@@ -1317,7 +1317,7 @@ plot_volcano <- function (object, contrast = get_contrast(object)[1],
   # if
   if(onlyhighlight_Choose & length(chooseTolabel) > 0){
     df$change[which(! df$name %in% chooseTolabel)] = "stable"
-
+    df$change[which(df$name %in% chooseTolabel)] = ifelse(df[which(df$name %in% chooseTolabel)]$x > 0,'up','down')
   }
 
   name1 <- gsub("_vs_.*", "", contrast)
