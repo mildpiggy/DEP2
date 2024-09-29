@@ -350,6 +350,9 @@ genelist_tool_UI <- function(id,labelname = "GenelisttoolUI"){
              #   icon = icon("retweet")
              # ),
              shinyBS::bsTooltip(ns("refresh"), "Click to refresh dragzone options and clear dropzone inputs", "top", options = list(container = "body")),
+             radioButtons(ns("intersect_union"),label = "Extract intersect or union in each dropzone (if dropzone contains mult-input)",
+                          choices = c("union","intersect")
+             ),
              # h5("Dropzone Values"),
              # verbatimTextOutput(ns("showme")),
              # textInput("item", label = h3("Item to append or select"), value = ""),
@@ -570,13 +573,29 @@ genelist_tool_Server <- function(id, Omics_res){
         if( length(dropzone_input_list2) > 0 ){
           dropzone_input_list3 = dropzone_input_list2 %>% lapply(., function(x){
             the_results = c()
+
+
             if(length(x) > 0 ){
-              for (i in 1:length(x)) {
-                the_res = x[[i]]()
-                if(!all(is.na(the_res)) && !is.null(the_res) && nrow(the_res) > 0 ){
-                  the_results = c(the_results,the_res$name)
+              if(input$intersect_union == "union"){
+                for (i in 1:length(x)) {
+                  the_res = x[[i]]()
+                  if(!all(is.na(the_res)) && !is.null(the_res) && nrow(the_res) > 0 ){
+                    the_results = c(the_results,the_res$name)
+                  }
                 }
               }
+
+              if(input$intersect_union == "intersect"){
+                res_ls = list()
+                for (i in 1:length(x)) {
+                  the_res = x[[i]]()
+                  if(!all(is.na(the_res)) && !is.null(the_res) && nrow(the_res) > 0 ){
+                    res_ls[[i]] = c(the_results,the_res$name)
+                  }
+                }
+                the_results = Reduce(intersect, res_ls)
+              }
+
             }
             the_results = the_results %>% unique()
             if(length(the_results) > 0){
