@@ -23,179 +23,207 @@ DEP_pg_sidebar_mod <-  function(id,labelname){
 
   tagList(
     # sidebarLayout(
-      sidebarPanel(
-        width = 3,
-        h3(labelname),
-        bsCollapse(
-          id = ns("DEPpg_sidebar"),
-          bsCollapsePanel("Files",
-                          style = "primary",
-                          fluidRow(
-                            column(width = 12,
-                                   radioButtons(ns("uploadmode"),"Upload mode",
-                                                choices = c("From result table" = "fromTable",
-                                                            "From saved log file" = "fromLog"),
-                                                selected = "fromTable")
-                            )
-                          ),
-                          hr(),
+    sidebarPanel(
+      width = 3,
+      h3(labelname),
+      bsCollapse(
+        id = ns("DEPpg_sidebar"),
+        bsCollapsePanel("Files",
+                        style = "primary",
+                        fluidRow(
+                          column(width = 12,
+                                 radioButtons(ns("uploadmode"),"Upload mode",
+                                              choices = c("From result table" = "fromTable",
+                                                          "From saved log file" = "fromLog"),
+                                              selected = "fromTable")
+                          )
+                        ),
+                        hr(),
 
-                          # file input options, from Quantity table
-                          conditionalPanel(
-                            condition = paste0("input['",ns("uploadmode"),"']","== 'fromTable'"), ## condition in mod
-                            fluidRow(
-                              column(width = 9,
-                                     fileInput(ns('file1'),width = "300px",
-                                               'ProteinGroups.txt',
+                        # file input options, from Quantity table
+                        conditionalPanel(
+                          condition = paste0("input['",ns("uploadmode"),"']","== 'fromTable'"), ## condition in mod
+                          fluidRow(
+                            column(width = 9,
+                                   fileInput(ns('file1'),width = "300px",
+                                             'ProteinGroups.txt',
+                                             accept=c('text/csv',
+                                                      'text/comma-separated-values,text/plain',
+                                                      '.csv',
+                                                      '.gz',
+                                                      '.tsv')),
+                                   conditionalPanel(
+                                     condition = paste0("input['",ns("anno"),"']","== 'expdesign'"),
+                                     fileInput(ns('file2'),width = "300px",
+                                               'ExperimentalDesign.txt',
                                                accept=c('text/csv',
                                                         'text/comma-separated-values,text/plain',
-                                                        '.csv',
-                                                        '.gz',
-                                                        '.tsv')),
-                                     conditionalPanel(
-                                       condition = paste0("input['",ns("anno"),"']","== 'expdesign'"),
-                                       fileInput(ns('file2'),width = "300px",
-                                                 'ExperimentalDesign.txt',
-                                                 accept=c('text/csv',
-                                                          'text/comma-separated-values,text/plain',
-                                                          '.csv','.gz',
-                                                          '.tsv'))
-                                     )
-                                     # ,
-                                     # fileInput(ns('resultRData'),'Load saved result RData',width = "300px")
+                                                        '.csv','.gz',
+                                                        '.tsv'))
+                                   )
+                                   # ,
+                                   # fileInput(ns('resultRData'),'Load saved result RData',width = "300px")
+                            ),
+                            column(
+                              width = 1, h4(),
+                              br(),
+                              actionButton(ns("help_format_DEP"),
+                                           label = "", icon = icon("question-circle"),
+                                           style = "color: #f6f6f6; background-color: #2c3b41; border-color: #2c3b41"
                               ),
-                              column(
-                                width = 1, h4(),
-                                br(),
-                                actionButton(ns("help_format_DEP"),
-                                             label = "", icon = icon("question-circle"),
-                                             style = "color: #f6f6f6; background-color: #2c3b41; border-color: #2c3b41"
-                                ),
-                                shinyBS::bsTooltip(
-                                  ns("help_format_DEP"),
-                                  "How to provide your input data",
-                                  "top",
-                                  options = list(container = "body")
-                                )
+                              shinyBS::bsTooltip(
+                                ns("help_format_DEP"),
+                                "How to provide your input data",
+                                "top",
+                                options = list(container = "body")
                               )
                             )
-
-                          ),
-
-                          # file input options, from log file
-                          conditionalPanel(
-                            condition = paste0("input['",ns("uploadmode"),"']","== 'fromLog'"),
-                            fluidRow(
-                              column(width = 9,
-                                     fileInput(ns('file_log'),width = "300px",
-                                               'The saved ".logrds" file',
-                                               accept=c('.logrds')),
-                              )
-                            )
-                          ),
-                          hr(),
-
-                          ## how to generate experiment design
-                          radioButtons(ns("anno"),
-                                       "Sample annotation",
-                                       choices = list("Parse from columns" = "columns",
-                                                      "Use Experimental Design" = "expdesign"),
-                                       selected = "columns")
-
-          ),
-          # menuItemOutput("columns"),
-          bsCollapsePanel("Columns",
-                          style = "primary",
-                          uiOutput(outputId = ns("name")),
-                          uiOutput(outputId = ns("id")),
-                          selectizeInput(inputId = ns("delim"), "Delimiter", choices = c(";", "|"), selected = ";"),
-                          uiOutput(ns("intensitycols")),
-                          uiOutput(ns("peptidescol")),
-                          # menuItem("Expression columns", icon = icon("th"),
-                          #   uiOutput("intensitycols")),
-                          uiOutput(ns("filt")),
-                          numericInput(ns("thr"), "Allowed max.miss.num at least one condition", min = 0, max = 20, value = 0),
-                          uiOutput(ns("order")),
-                          uiOutput(ns("control")),
-                          uiOutput(ns("test_manual")),
-                          shinyBS::bsTooltip(ns("order"), "Set order of groups", "top", options = list(container = "body"))
-          ),
-          bsCollapsePanel("Imputation options",
-                          style = "primary",
-                          radioButtons(inputId = ns("imputation"),
-                                       label = "Imputation type",
-                                       choices = c(c("man", "bpca", "knn", "QRILC", "MLE", "MinDet", "MinProb", "min", "zero"), "mixed on proteins",
-                                                   # "mixed on samples",  # 'mixed on samples' impute control and other condition with different method
-                                                   "RF"),  ## increase "RF" opt 20211023
-                                       selected = "MinProb"),
-                          shinyBS::bsTooltip(ns("imputation"), "Choose an imputation method", "right", options = list(container = "body")),
-                          actionButton(ns("help_imputation"),
-                                       label = "Detailed information", #icon = icon("question-circle"),
-                                       style = "color: #f6f6f6; background-color: #2c3b41; border-color: #2c3b41; text-align: left; margin: 0 0 0px 0px",
-                                       #rgba(255, 255, 255, 0.1) rgba(0, 0, 0, 0.1)
-                          ),
-                          shinyBS::bsTooltip(
-                            ns("help_imputation"),
-                            "The detailed information of imputation methods",
-                            "right",
-                            options = list(container = "body")
                           )
-                          # p(a("Detailed information link",
-                          #     href = "https://www.rdocumentation.org/packages/MSnbase/versions/1.20.7/topics/impute-methods",
-                          #     target="_blank"))
-          ),
-          bsCollapsePanel("FDR correction",  ## DEP FDR correct options
-                          style = "primary",
-                          radioButtons(ns("FDR_type"),
-                                       "type of FDR value",
-                                       choices = c("Strimmer's qvalue(t)","Strimmer's qvalue(p)","BH","Storey's qvalue")),
-                          shinyBS::bsTooltip("fdr_correction", "Choose the method of pvalue adjustment", "right", options = list(container = "body"))
-          ),
-          bsCollapsePanel("Threshold method",
-                          style = "primary",
-                          radioButtons(ns("threshold_method"),
-                                       "Threshold method",
-                                       choices = c("intersect", "curve"),
-                                       selected = "intersect"),
-                          shinyBS::bsTooltip(ns("threshold_method"), "Choose the method that the cutoff of significant proteins based on. [intersect] means by adjusted pvalue and log2 fold change cutoff and [curve] means by curvature and x0 fold cutoff", "right", options = list(container = "body"))
-          ),
-          open = "Files"
+
+                        ),
+
+                        # file input options, from log file
+                        conditionalPanel(
+                          condition = paste0("input['",ns("uploadmode"),"']","== 'fromLog'"),
+                          fluidRow(
+                            column(width = 9,
+                                   fileInput(ns('file_log'),width = "300px",
+                                             'The saved ".logrds" file',
+                                             accept=c('.logrds')),
+                            )
+                          )
+                        ),
+                        hr(),
+
+                        ## how to generate experiment design
+                        radioButtons(ns("anno"),
+                                     "Sample annotation",
+                                     choices = list("Parse from columns" = "columns",
+                                                    "Use Experimental Design" = "expdesign"),
+                                     selected = "columns")
+
         ),
+        # menuItemOutput("columns"),
+        bsCollapsePanel("Columns",
+                        style = "primary",
+                        uiOutput(outputId = ns("name")),
+                        uiOutput(outputId = ns("id")),
+                        selectizeInput(inputId = ns("delim"), "Delimiter", choices = c(";", "|"), selected = ";"),
+                        uiOutput(ns("intensitycols")),
+                        uiOutput(ns("peptidescol")),
+                        # menuItem("Expression columns", icon = icon("th"),
+                        #   uiOutput("intensitycols")),
+                        uiOutput(ns("filt")),
+                        numericInput(ns("thr"), "Allowed max.miss.num at least one condition", min = 0, max = 20, value = 0),
+                        uiOutput(ns("order")),
+                        uiOutput(ns("control")),
+                        uiOutput(ns("test_manual")),
+                        shinyBS::bsTooltip(ns("order"), "Set order of groups", "top", options = list(container = "body"))
+        ),
+        bsCollapsePanel("Normalization",
+                        style = "primary",
+                        radioButtons(inputId = ns("Normalization_method"),
+                                     label = "Nomalization method",
+                                     choices = c("Log2 only",
+                                                 "vsn", "diff.median",
+                                                 "quantiles"
+                                                 # , "quantiles.robust"
+                                     ),
+                                     selected = "vsn"),
+                        actionButton(ns("help_normalization"),
+                                     label = "Detailed information", #icon = icon("question-circle"),
+                                     style = "color: #f6f6f6; background-color: #2c3b41; border-color: #2c3b41; text-align: left; margin: 0 0 0px 0px",
+                                     #rgba(255, 255, 255, 0.1) rgba(0, 0, 0, 0.1)
+                        ),
+                        br(),br(),
 
-        shinyBS::bsTooltip(ns("anno"), "Sample annotation type", "top", options = list(container = "body")),
-        shinyBS::bsTooltip(ns("name"), "Name of the column containing feature names", "right", options = list(container = "body")),
-        shinyBS::bsTooltip(ns("id"), "Name of the column containing feature IDs", "right", options = list(container = "body")),
-        shinyBS::bsTooltip(ns("delim"), "Set the delimiter separating the name and id column", "right", options = list(container = "body")),
-        shinyBS::bsTooltip(ns("intensitycols"), "Choose the expression columns of your data", "right", options = list(container = "body")),
-        shinyBS::bsTooltip(ns("remove_prefix"), "remove the prefix character of expression columns names, such as 'LFQ intensity' or 'intensity' in Maxquant result",
-                           "right", options = list(container = "body")),
-        shinyBS::bsTooltip(ns("remove_suffix"), "remove the suffix character of expression columns names",
-                           "right", options = list(container = "body")),
-        shinyBS::bsTooltip(ns("peptidescol"), "Choose the peptides column of your data. And this column should be numeric. It is only used to plot heatmap and custom volcano to color the peptides number 1 and 2 to help user check the accuracy of the quantification. Of course, if your data does not have this column, You can leave it blank", "right", options = list(container = "body")),
-        shinyBS::bsTooltip(ns("filt"), "The filtered columns based on", "right", options = list(container = "body")),
-        shinyBS::bsTooltip(ns("thr"), "Set the threshold for the allowed number of missing values in at least one condition", "right", options = list(container = "body")),
-        shinyBS::bsTooltip(ns("control"), "Choose your control condition", "right", options = list(container = "body")),
-        shinyBS::bsTooltip(ns("test_manual"), "Choose the contrasts that you want to test", "right", options = list(container = "body")),
+                        prettySwitch(
+                          inputId = ns("Adjust_by_standar_protein"),
+                          label = "Adjust intensity by selected proteins.",
+                          status = "primary",
+                          fill = F
+                        ),
+                        conditionalPanel(
+                          condition = paste0("input['",ns("Adjust_by_standar_protein"),"']"), ## condition in mod
+                          textInput(ns("standar_protein"), "Input standar proteins")
+                        )
+        ),
+        bsCollapsePanel("Imputation options",
+                        style = "primary",
+                        radioButtons(inputId = ns("imputation"),
+                                     label = "Imputation type",
+                                     choices = c(c("man", "bpca", "knn", "QRILC", "MLE", "MinDet", "MinProb", "min", "zero"), "mixed on proteins",
+                                                 # "mixed on samples",  # 'mixed on samples' impute control and other condition with different method
+                                                 "RF"),  ## increase "RF" opt 20211023
+                                     selected = "MinDet"),
+                        shinyBS::bsTooltip(ns("imputation"), "Choose an imputation method", "right", options = list(container = "body")),
+                        actionButton(ns("help_imputation"),
+                                     label = "Detailed information", #icon = icon("question-circle"),
+                                     style = "color: #f6f6f6; background-color: #2c3b41; border-color: #2c3b41; text-align: left; margin: 0 0 0px 0px",
+                                     #rgba(255, 255, 255, 0.1) rgba(0, 0, 0, 0.1)
+                        ),
+                        shinyBS::bsTooltip(
+                          ns("help_imputation"),
+                          "The detailed information of imputation methods",
+                          "right",
+                          options = list(container = "body")
+                        )
+                        # p(a("Detailed information link",
+                        #     href = "https://www.rdocumentation.org/packages/MSnbase/versions/1.20.7/topics/impute-methods",
+                        #     target="_blank"))
+        ),
+        bsCollapsePanel("FDR correction",  ## DEP FDR correct options
+                        style = "primary",
+                        radioButtons(ns("FDR_type"),
+                                     "type of FDR value",
+                                     choices = c("Strimmer's qvalue(t)","Strimmer's qvalue(p)","BH","Storey's qvalue")),
+                        shinyBS::bsTooltip("fdr_correction", "Choose the method of pvalue adjustment", "right", options = list(container = "body"))
+        ),
+        bsCollapsePanel("Threshold method",
+                        style = "primary",
+                        radioButtons(ns("threshold_method"),
+                                     "Threshold method",
+                                     choices = c("intersect", "curve"),
+                                     selected = "intersect"),
+                        shinyBS::bsTooltip(ns("threshold_method"), "Choose the method that the cutoff of significant proteins based on. [intersect] means by adjusted pvalue and log2 fold change cutoff and [curve] means by curvature and x0 fold cutoff", "right", options = list(container = "body"))
+        ),
+        open = "Files"
+      ),
 
-        actionButton(ns("analyze"), "Analyze"),
+      shinyBS::bsTooltip(ns("anno"), "Sample annotation type", "top", options = list(container = "body")),
+      shinyBS::bsTooltip(ns("name"), "Name of the column containing feature names", "right", options = list(container = "body")),
+      shinyBS::bsTooltip(ns("id"), "Name of the column containing feature IDs", "right", options = list(container = "body")),
+      shinyBS::bsTooltip(ns("delim"), "Set the delimiter separating the name and id column", "right", options = list(container = "body")),
+      shinyBS::bsTooltip(ns("intensitycols"), "Choose the expression columns of your data", "right", options = list(container = "body")),
+      shinyBS::bsTooltip(ns("remove_prefix"), "remove the prefix character of expression columns names, such as 'LFQ intensity' or 'intensity' in Maxquant result",
+                         "right", options = list(container = "body")),
+      shinyBS::bsTooltip(ns("remove_suffix"), "remove the suffix character of expression columns names",
+                         "right", options = list(container = "body")),
+      shinyBS::bsTooltip(ns("peptidescol"), "Choose the peptides column of your data. And this column should be numeric. It is only used to plot heatmap and custom volcano to color the peptides number 1 and 2 to help user check the accuracy of the quantification. Of course, if your data does not have this column, You can leave it blank", "right", options = list(container = "body")),
+      shinyBS::bsTooltip(ns("filt"), "The filtered columns based on", "right", options = list(container = "body")),
+      shinyBS::bsTooltip(ns("thr"), "Set the threshold for the allowed number of missing values in at least one condition", "right", options = list(container = "body")),
+      shinyBS::bsTooltip(ns("control"), "Choose your control condition", "right", options = list(container = "body")),
+      shinyBS::bsTooltip(ns("test_manual"), "Choose the contrasts that you want to test", "right", options = list(container = "body")),
 
-        shinyBS::bsTooltip("analyze", "Click on it to analyze your data", "right", options = list(container = "body")),
-        tags$hr(),
-        tags$style(type="text/css", "#downloadData {background-color:white;color: black;font-family: Source Sans Pro}"),
-        uiOutput(ns("downloadTable")),
-        uiOutput(ns("downloadButton")),
-        h6(),
-        tags$style(type="text/css", "#Save_RData {background-color:white;color: black;font-family: Source Sans Pro}"),
-        # uiOutput(ns("downloadButton_for_save_RData")),
-        hr(),
-        uiOutput(ns("downloadButton_for_log")),
-        shinyBS::bsTooltip(ns("downloadTable"), "Choose a dataset to save, and here we offer four forms of datasets for downloading including results.txt, significant_proteins.txt, displayed_subset.txt, full_dataset.txt", "right", options = list(container = "body")),
-        shinyBS::bsTooltip(ns("downloadButton"), "Click on it to download the selected dataset", "right", options = list(container = "body")),
-        shinyBS::bsTooltip(ns("downloadButton_for_save_RData"), "Click on it to Save the RData, and when you upload the results.RData in the menuItem [Files] next time, you can get the same result as this time", "right", options = list(container = "body")),
+      actionButton(ns("analyze"), "Analyze"),
 
-        # ),
-        # mainPanel("bbb")
-      )
+      shinyBS::bsTooltip("analyze", "Click on it to analyze your data", "right", options = list(container = "body")),
+      tags$hr(),
+      tags$style(type="text/css", "#downloadData {background-color:white;color: black;font-family: Source Sans Pro}"),
+      uiOutput(ns("downloadTable")),
+      uiOutput(ns("downloadButton")),
+      h6(),
+      tags$style(type="text/css", "#Save_RData {background-color:white;color: black;font-family: Source Sans Pro}"),
+      # uiOutput(ns("downloadButton_for_save_RData")),
+      hr(),
+      uiOutput(ns("downloadButton_for_log")),
+      shinyBS::bsTooltip(ns("downloadTable"), "Choose a dataset to save, and here we offer four forms of datasets for downloading including results.txt, significant_proteins.txt, displayed_subset.txt, full_dataset.txt", "right", options = list(container = "body")),
+      shinyBS::bsTooltip(ns("downloadButton"), "Click on it to download the selected dataset", "right", options = list(container = "body")),
+      shinyBS::bsTooltip(ns("downloadButton_for_save_RData"), "Click on it to Save the RData, and when you upload the results.RData in the menuItem [Files] next time, you can get the same result as this time", "right", options = list(container = "body")),
+
+      # ),
+      # mainPanel("bbb")
+    )
   )
 }
 
@@ -430,8 +458,12 @@ DEP_pg_body_mod <- function(id){
                                                        uiOutput(ns("Peptides2"))
                                       ),
                                       uiOutput(ns("selected_proteins")),
+                                      checkboxInput(ns("onlyhighlight_Choose"),
+                                                    "Only highlight selected proteins",
+                                                    value = FALSE),
+
                                       numericInput(ns("max.overlaps"),
-                                                   "max.overlaps",
+                                                   "show number",
                                                    min = 0, max = 100000, value = 30),
                                       numericInput(ns("showNum"),
                                                    "show number",
@@ -483,8 +515,8 @@ DEP_pg_body_mod <- function(id){
                                   shinyBS::bsTooltip(ns("Peptides2"), "Set the color of the points which the number of Peptides == 2", "top", options = list(container = "body")),
                                   # shinyBS::bsTooltip(ns("stroke"), "Set the thickness of black line around the point", "top", options = list(container = "body")),
                                   shinyBS::bsTooltip(ns("selected_proteins"), "Choose the point labels to show, act when [label Way] is selected proteins", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("max.overlaps"), "Decides labels overlap", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("showNum"), "Set the number of the name labels overlap.Exclude text labels when they overlap too many other things.", "top", options = list(container = "body")),
+                                  shinyBS::bsTooltip(ns("onlyhighlight_Choose"), "Only highlight selected proteins (by color)", "top", options = list(container = "body")),
+                                  shinyBS::bsTooltip(ns("showNum"), "Set the number of the labels to add, act when [label way] is significant, up or down. Note that, when it is larger than the number of significant result, it is seted to the number of significant result", "top", options = list(container = "body")),
                                   shinyBS::bsTooltip(ns("fontSize"), "Set the font size of the label", "top", options = list(container = "body")),
                                   shinyBS::bsTooltip(ns("dotsize"), "Set the dot size of the label", "top", options = list(container = "body")),
                                   shinyBS::bsTooltip(ns("custom_volcano_Width"), "Width of the figure to export", "top", options = list(container = "body")),
@@ -497,371 +529,371 @@ DEP_pg_body_mod <- function(id){
 
                        ## QC tabs ----
                        tabsetPanel(id = ns("DEP_QC_tabs"),
-                       # tabBox(title = "QC Plots", width = 12, id = ns("DEP_QC_tabs"),
-                         tabPanel(title = "Pca plot",
-                                  fluidRow(
-                                    box(selectizeInput(ns("Indicate"),
-                                                       "Color and shape",
-                                                       choices = c("condition", "replicate", "Condition", "Replicate"),
-                                                       selected = c("condition", "replicate"), multiple = TRUE), width = 6),
-                                    box(checkboxInput(ns("if_square"),
-                                                      "if square",
-                                                      value = FALSE),
-                                        width = 3)),
-                                  fluidRow(
-                                    box(uiOutput(ns("pca_top_n")),width = 9)
-                                  ),
-                                  fluidRow(
-                                    box(numericInput(ns("pca_Width"),
-                                                     "width",
-                                                     min = 1, max = 30, value = 7), width = 6),
-                                    box(numericInput(ns("pca_Height"),
-                                                     "height",
-                                                     min = 1, max = 30, value = 7), width = 6)
-                                  ),
-                                  fluidRow(
-                                    plotOutput(ns("pca"), height = 600),
-                                    downloadButton(ns('downloadPca'), 'Save')
-                                  ),
-                                  shinyBS::bsTooltip(ns("Indicate"), "Set the color, shape and facet_wrap of the plot", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("if_square"), "Whether x limit is equal to y limit", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("pca_top_n"), "Set the number of top variable proteins to consider", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("pca_Width"), "Width of the figure to export", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("pca_Height"), "Height of the figure to export", "top", options = list(container = "body"))
-                         ),
-                         tabPanel(title = "UMAP plot",
-                                  fluidRow(
-                                    box(selectizeInput(ns("umap_Indicate"),
-                                                       "Color and shape",
-                                                       choices = c("condition", "replicate", "Condition", "Replicate"),
-                                                       selected = c("condition", "replicate"), multiple = TRUE), width = 6),
-                                    box(checkboxInput(ns("umap_if_square"),
-                                                      "if square",
-                                                      value = FALSE),
-                                        width = 6)),
-                                  fluidRow(
-                                    box(uiOutput(ns("umap_n_neighbors")),width = 10)
-                                  ),
-                                  fluidRow(
-                                    box(numericInput(ns("umap_Width"),
-                                                     "width",
-                                                     min = 1, max = 30, value = 7), width = 6),
-                                    box(numericInput(ns("umap_Height"),
-                                                     "height",
-                                                     min = 1, max = 30, value = 7), width = 6)
-                                  ),
-                                  fluidRow(
-                                    plotOutput(ns("umap"), height = 600),
-                                    downloadButton(ns('downloadUMAP'), 'Save')
-                                  ),
-                                  shinyBS::bsTooltip(ns("umap_Indicate"), "Set the color, shape and facet_wrap of the plot", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("umap_if_square"), "Whether x limit is equal to y limit", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("umap_Width"), "Width of the figure to export", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("umap_Height"), "Height of the figure to export", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("umap_n_neighbors"), "number of nearest neighbors for umap", "top", options = list(container = "body"))
-                         ),
-                         tabPanel(title = "t-SNE plot",
-                                  fluidRow(
-                                    box(selectizeInput(ns("Tsne_Indicate"),
-                                                       "Color and shape",
-                                                       choices = c("condition", "replicate", "Condition", "Replicate"),
-                                                       selected = c("condition", "replicate"), multiple = TRUE), width = 6),
-                                    box(checkboxInput(ns("Tsne_if_square"),
-                                                      "if square",
-                                                      value = FALSE),
-                                        width = 6)
-                                  ),
-                                  fluidRow(
-                                    box(uiOutput(ns("Tsne_perplexity")),width = 8),
-                                    box(numericInput(ns("Tsne_theseed"),
-                                                     "set seed for t-SNE",
-                                                     value = 42),
-                                        width = 4)
-                                  ),
-                                  fluidRow(
-                                    box(numericInput(ns("Tsne_Width"),
-                                                     "width",
-                                                     min = 1, max = 30, value = 7), width = 6),
-                                    box(numericInput(ns("Tsne_Height"),
-                                                     "height",
-                                                     min = 1, max = 30, value = 7), width = 6)
-                                  ),
-                                  fluidRow(
-                                    plotOutput(ns("Tsne"), height = 600),
-                                    downloadButton(ns('downloadTSNE'), 'Save')
-                                  ),
-                                  shinyBS::bsTooltip(ns("Tsne_Indicate"), "Set the color, shape and facet_wrap of the plot", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("Tsne_if_square"), "Whether x limit is equal to y limit", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("Tsne_Width"), "Width of the figure to export", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("Tsne_Height"), "Height of the figure to export", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("Tsne_perplexity"), "perplexity for t-SNE", "top", options = list(container = "body"))
-                         ),
-                         #tabPanel(title = "Pca plot",
-                         #         plotOutput("pca", height = 600),
-                         #         downloadButton('downloadPca', 'Save')
-                         #)
-                         tabPanel(title = "Statistical plot",
-                                  # fluidRow(
-                                  #   box(uiOutput(ns("Volcano_cntrst_stastical_plot")), width = 8),
-                                  #   box(radioButtons(ns("stastical_plot_type"),
-                                  #                    "plot type",
-                                  #                    choices = c("x-y","histogram")), width = 4)
-                                  # ),
-                                  fluidRow(
-                                    box(selectInput(ns("stastical_plot_x"),
-                                                    "plot statistics",
-                                                    choices = c("diff","t.stastic","p.val","p.adj"),
-                                                    multiple = T,
-                                                    selected = c("diff","t.stastic","p.val","p.adj")),
-                                        width = 6),
-                                    # box(selectInput(ns("stastical_plot_y"),
-                                    #                 "y",
-                                    #                 choices = c("-log10.padj", "-log10.pval","padj","pval","t")), width = 6)
-                                    box(uiOutput(ns("plot_stat_contrasts")),
+                                   # tabBox(title = "QC Plots", width = 12, id = ns("DEP_QC_tabs"),
+                                   tabPanel(title = "Pca plot",
+                                            fluidRow(
+                                              box(selectizeInput(ns("Indicate"),
+                                                                 "Color and shape",
+                                                                 choices = c("condition", "replicate", "Condition", "Replicate"),
+                                                                 selected = c("condition", "replicate"), multiple = TRUE), width = 6),
+                                              box(checkboxInput(ns("if_square"),
+                                                                "if square",
+                                                                value = FALSE),
+                                                  width = 3)),
+                                            fluidRow(
+                                              box(uiOutput(ns("pca_top_n")),width = 9)
+                                            ),
+                                            fluidRow(
+                                              box(numericInput(ns("pca_Width"),
+                                                               "width",
+                                                               min = 1, max = 30, value = 7), width = 6),
+                                              box(numericInput(ns("pca_Height"),
+                                                               "height",
+                                                               min = 1, max = 30, value = 7), width = 6)
+                                            ),
+                                            fluidRow(
+                                              plotOutput(ns("pca"), height = 600),
+                                              downloadButton(ns('downloadPca'), 'Save')
+                                            ),
+                                            shinyBS::bsTooltip(ns("Indicate"), "Set the color, shape and facet_wrap of the plot", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("if_square"), "Whether x limit is equal to y limit", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("pca_top_n"), "Set the number of top variable proteins to consider", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("pca_Width"), "Width of the figure to export", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("pca_Height"), "Height of the figure to export", "top", options = list(container = "body"))
+                                   ),
+                                   tabPanel(title = "UMAP plot",
+                                            fluidRow(
+                                              box(selectizeInput(ns("umap_Indicate"),
+                                                                 "Color and shape",
+                                                                 choices = c("condition", "replicate", "Condition", "Replicate"),
+                                                                 selected = c("condition", "replicate"), multiple = TRUE), width = 6),
+                                              box(checkboxInput(ns("umap_if_square"),
+                                                                "if square",
+                                                                value = FALSE),
+                                                  width = 6)),
+                                            fluidRow(
+                                              box(uiOutput(ns("umap_n_neighbors")),width = 10)
+                                            ),
+                                            fluidRow(
+                                              box(numericInput(ns("umap_Width"),
+                                                               "width",
+                                                               min = 1, max = 30, value = 7), width = 6),
+                                              box(numericInput(ns("umap_Height"),
+                                                               "height",
+                                                               min = 1, max = 30, value = 7), width = 6)
+                                            ),
+                                            fluidRow(
+                                              plotOutput(ns("umap"), height = 600),
+                                              downloadButton(ns('downloadUMAP'), 'Save')
+                                            ),
+                                            shinyBS::bsTooltip(ns("umap_Indicate"), "Set the color, shape and facet_wrap of the plot", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("umap_if_square"), "Whether x limit is equal to y limit", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("umap_Width"), "Width of the figure to export", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("umap_Height"), "Height of the figure to export", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("umap_n_neighbors"), "number of nearest neighbors for umap", "top", options = list(container = "body"))
+                                   ),
+                                   tabPanel(title = "t-SNE plot",
+                                            fluidRow(
+                                              box(selectizeInput(ns("Tsne_Indicate"),
+                                                                 "Color and shape",
+                                                                 choices = c("condition", "replicate", "Condition", "Replicate"),
+                                                                 selected = c("condition", "replicate"), multiple = TRUE), width = 6),
+                                              box(checkboxInput(ns("Tsne_if_square"),
+                                                                "if square",
+                                                                value = FALSE),
+                                                  width = 6)
+                                            ),
+                                            fluidRow(
+                                              box(uiOutput(ns("Tsne_perplexity")),width = 8),
+                                              box(numericInput(ns("Tsne_theseed"),
+                                                               "set seed for t-SNE",
+                                                               value = 42),
+                                                  width = 4)
+                                            ),
+                                            fluidRow(
+                                              box(numericInput(ns("Tsne_Width"),
+                                                               "width",
+                                                               min = 1, max = 30, value = 7), width = 6),
+                                              box(numericInput(ns("Tsne_Height"),
+                                                               "height",
+                                                               min = 1, max = 30, value = 7), width = 6)
+                                            ),
+                                            fluidRow(
+                                              plotOutput(ns("Tsne"), height = 600),
+                                              downloadButton(ns('downloadTSNE'), 'Save')
+                                            ),
+                                            shinyBS::bsTooltip(ns("Tsne_Indicate"), "Set the color, shape and facet_wrap of the plot", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("Tsne_if_square"), "Whether x limit is equal to y limit", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("Tsne_Width"), "Width of the figure to export", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("Tsne_Height"), "Height of the figure to export", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("Tsne_perplexity"), "perplexity for t-SNE", "top", options = list(container = "body"))
+                                   ),
+                                   #tabPanel(title = "Pca plot",
+                                   #         plotOutput("pca", height = 600),
+                                   #         downloadButton('downloadPca', 'Save')
+                                   #)
+                                   tabPanel(title = "Statistical plot",
+                                            # fluidRow(
+                                            #   box(uiOutput(ns("Volcano_cntrst_stastical_plot")), width = 8),
+                                            #   box(radioButtons(ns("stastical_plot_type"),
+                                            #                    "plot type",
+                                            #                    choices = c("x-y","histogram")), width = 4)
+                                            # ),
+                                            fluidRow(
+                                              box(selectInput(ns("stastical_plot_x"),
+                                                              "plot statistics",
+                                                              choices = c("diff","t.stastic","p.val","p.adj"),
+                                                              multiple = T,
+                                                              selected = c("diff","t.stastic","p.val","p.adj")),
+                                                  width = 6),
+                                              # box(selectInput(ns("stastical_plot_y"),
+                                              #                 "y",
+                                              #                 choices = c("-log10.padj", "-log10.pval","padj","pval","t")), width = 6)
+                                              box(uiOutput(ns("plot_stat_contrasts")),
 
-                                        width = 6)
-                                  ),
-                                  fluidRow(
-                                    box(numericInput(ns("stastical_plot_Width"),
-                                                     "width",
-                                                     min = 1, max = 30, value = 7), width = 6),
-                                    box(numericInput(ns("stastical_plot_Height"),
-                                                     "height",
-                                                     min = 1, max = 30, value = 7), width = 6)
-                                  ),
-                                  fluidRow(
-                                    plotOutput(ns("stastical_plot"),height=600),
-                                    downloadButton(ns('downloadstastical_plot'), 'Save')
-                                  ),
-                                  shinyBS::bsTooltip(ns("stastical_plot_x"), "Select the statistic to plot", "top", options = list(container = "body")),
-                                  # shinyBS::bsTooltip(ns("stastical_plot_y"), "Set the vector that y axis represents", "top", options = list(container = "body")),
-                                  # shinyBS::bsTooltip(ns("stastical_plot_type"), "Set the plot type: x-y represents that X-axis represents your selected x, and y-axis represents your selected y; histogram represents the histogram plot of your selected x", "top", options = list(container = "body")),
-                                  # shinyBS::bsTooltip(ns("Volcano_cntrst_stastical_plot"), "Choose the contrast to plot", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("stastical_plot_Width"), "Width of the figure to export when save", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("stastical_plot_Height"), "Height of the figure to export when save", "top", options = list(container = "body"))
-                         ),
-                         tabPanel(title = "meanSdPlot",
-                                  fluidRow(
-                                    box(numericInput(ns("meanSdPlot_Width"),
-                                                     "width",
-                                                     min = 1, max = 30, value = 7), width = 6),
-                                    box(numericInput(ns("meanSdPlot_Height"),
-                                                     "height",
-                                                     min = 1, max = 30, value = 7), width = 6)
-                                  ),
-                                  fluidRow(
-                                    plotOutput(ns("meanSdPlot"), height = 600),
-                                    downloadButton(ns('downloadmeanSdPlot'), 'Save dataset')
-                                  ),
-                                  shinyBS::bsTooltip(ns("meanSdPlot_Width"), "Width of the figure to export", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("meanSdPlot_Height"), "Height of the figure to export", "top", options = list(container = "body"))
-                         ),
-                         tabPanel(title = "Pearson correlation",
-                                  fluidRow(
-                                    box(selectizeInput(ns("Pearson_pal"),
-                                                       "color panel",
-                                                       choices = c("BrBG", "PiYG", "PRGn", "PuOr", "RdBu", "RdGy", "RdYlBu", "RdYlGn", "Spectral", "Blues",  "BuGn", "BuPu", "GnBu", "Greens" , "Greys", "Oranges", "OrRd", "PuBu", "PuBuGn", "PuRd", "Purples", "RdPu", "Reds", "YlGn", "YlGnBu", "YlOrBr", "YlOrRd"),
-                                                       selected = c("PRGn"), multiple = FALSE),
-                                        checkboxInput(ns("Pearson_pal_rev"),
-                                                      "pal rev",
-                                                      value = FALSE), width = 4),
-                                    box(numericInput(ns("Pearson_Width"),
-                                                     "width",
-                                                     min = 1, max = 30, value = 7),
-                                        numericInput(ns("Pearson_Height"),
-                                                     "height",
-                                                     min = 1, max = 30, value = 7), width = 4),
-                                    box(numericInput(ns("Pearson_lower"),
-                                                     "lower",
-                                                     min = -1, max = 1, value = -1),
-                                        numericInput(ns("Pearson_upper"),
-                                                     "upper",
-                                                     min = -1, max = 1, value = 1), width = 4)
-                                  ),
-                                  fluidRow(
-                                    box(checkboxInput(ns("add_values_for_DEP_person"),
-                                                      "Add values",
-                                                      value = FALSE),
-                                        numericInput(ns("value_size_for_DEP_person"),
-                                                     "Value size",
-                                                     min = 1, max = 30, value = 10),
-                                        numericInput(ns("value_digits_for_DEP_person"),
-                                                     "Value digits",
-                                                     min = 1, max = 30, value = 2), width = 12, collapsible = TRUE, collapsed = TRUE)
-                                  ),
-                                  fluidRow(
-                                    plotOutput(ns("Pearson_correlation"), height = 600),
-                                    downloadButton(ns('download_Pearson_correlation'), 'Save')
-                                  ),
-                                  shinyBS::bsTooltip(ns("Pearson_pal"), "Set the color panel (from RColorBrewer)", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("Pearson_pal_rev"), "Whether or not to invert the color palette", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("Pearson_Width"), "Width of the figure to export", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("Pearson_Height"), "Height of the figure to export", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("Pearson_lower"), "Set the lower limit of the color scale", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("Pearson_upper"), "Set the upper limit of the color scale", "top", options = list(container = "body"))
-                         ),
-                         tabPanel(title = "Gower's distance",
-                                  fluidRow(
-                                    box(selectizeInput(ns("Gower_pal"),
-                                                       "color panel",
-                                                       choices = c("BrBG", "PiYG", "PRGn", "PuOr", "RdBu", "RdGy", "RdYlBu", "RdYlGn", "Spectral", "Blues",  "BuGn", "BuPu", "GnBu", "Greens" , "Greys", "Oranges", "OrRd", "PuBu", "PuBuGn", "PuRd", "Purples", "RdPu", "Reds", "YlGn", "YlGnBu", "YlOrBr", "YlOrRd"),
-                                                       selected = c("YlOrRd"), multiple = FALSE),
-                                        checkboxInput(ns("Gower_pal_rev"),
-                                                      "pal rev",
-                                                      value = TRUE), width = 6),
-                                    box(numericInput(ns("Gower_Width"),
-                                                     "width",
-                                                     min = 1, max = 30, value = 7),
-                                        numericInput(ns("Gower_Height"),
-                                                     "height",
-                                                     min = 1, max = 30, value = 7), width = 6)
-                                  ),
-                                  fluidRow(
-                                    box(checkboxInput(ns("add_values_for_DEP_gower"),
-                                                      "Add values",
-                                                      value = FALSE),
-                                        numericInput(ns("value_size_for_DEP_gower"),
-                                                     "Value size",
-                                                     min = 1, max = 30, value = 10),
-                                        numericInput(ns("value_digits_for_DEP_gower"),
-                                                     "Value digits",
-                                                     min = 1, max = 30, value = 2), width = 12, collapsible = TRUE, collapsed = TRUE)
-                                  ),
-                                  fluidRow(
-                                    plotOutput(ns("Gowers_distance"), height = 600),
-                                    downloadButton(ns('download_Gowers_distance'), 'Save')
-                                  ),
-                                  shinyBS::bsTooltip(ns("Gower_pal"), "Set the color panel (from RColorBrewer)", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("Gower_pal_rev"), "Whether or not to invert the color palette", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("Gower_Width"), "Width of the figure to export", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("Gower_Height"), "Height of the figure to export", "top", options = list(container = "body"))
-                         ),
-                         tabPanel(title = "Sample CVs",
-                                  fluidRow(
-                                    box(numericInput(ns("Sample_CVs_Width"),
-                                                     "width",
-                                                     min = 1, max = 30, value = 7),
-                                        width = 6),
-                                    box(
-                                      numericInput(ns("Sample_CVs_Height"),
-                                                   "height",
-                                                   min = 1, max = 30, value = 7), width = 6
-                                    )
-                                  ),
-                                  fluidRow(
-                                    plotOutput(ns("Sample_CVs"), height = 600),
-                                    downloadButton(ns('download_Sample_CVs'), 'Save')
-                                  ),
-                                  shinyBS::bsTooltip(ns("Sample_CVs_Width"), "Width of the figure to export", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("Sample_CVs_Height"), "Height of the figure to export", "top", options = list(container = "body"))
-                         ),
-                         tabPanel(title = "Protein Numbers",
-                                  fluidRow(
-                                    box(numericInput(ns("numbers_Width"),
-                                                     "width",
-                                                     min = 1, max = 30, value = 7), width = 6),
-                                    box(numericInput(ns("numbers_Height"),
-                                                     "height",
-                                                     min = 1, max = 30, value = 7), width = 6)
-                                  ),
-                                  fluidRow(
-                                    plotOutput(ns("numbers"), height = 600),
-                                    downloadButton(ns('downloadNumbers'), 'Save')
-                                  ),
-                                  shinyBS::bsTooltip(ns("numbers_Width"), "Width of the figure to export", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("numbers_Height"), "Height of the figure to export", "top", options = list(container = "body"))
-                         ),
-                         tabPanel(title = "Sample coverage",
-                                  fluidRow(
-                                    box(numericInput(ns("coverage_Width"),
-                                                     "width",
-                                                     min = 1, max = 30, value = 7), width = 6),
-                                    box(numericInput(ns("coverage_Height"),
-                                                     "height",
-                                                     min = 1, max = 30, value = 7), width = 6)
-                                  ),
-                                  fluidRow(
-                                    plotOutput(ns("coverage"), height = 600),
-                                    downloadButton(ns('downloadCoverage'), 'Save')
+                                                  width = 6)
+                                            ),
+                                            fluidRow(
+                                              box(numericInput(ns("stastical_plot_Width"),
+                                                               "width",
+                                                               min = 1, max = 30, value = 7), width = 6),
+                                              box(numericInput(ns("stastical_plot_Height"),
+                                                               "height",
+                                                               min = 1, max = 30, value = 7), width = 6)
+                                            ),
+                                            fluidRow(
+                                              plotOutput(ns("stastical_plot"),height=600),
+                                              downloadButton(ns('downloadstastical_plot'), 'Save')
+                                            ),
+                                            shinyBS::bsTooltip(ns("stastical_plot_x"), "Select the statistic to plot", "top", options = list(container = "body")),
+                                            # shinyBS::bsTooltip(ns("stastical_plot_y"), "Set the vector that y axis represents", "top", options = list(container = "body")),
+                                            # shinyBS::bsTooltip(ns("stastical_plot_type"), "Set the plot type: x-y represents that X-axis represents your selected x, and y-axis represents your selected y; histogram represents the histogram plot of your selected x", "top", options = list(container = "body")),
+                                            # shinyBS::bsTooltip(ns("Volcano_cntrst_stastical_plot"), "Choose the contrast to plot", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("stastical_plot_Width"), "Width of the figure to export when save", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("stastical_plot_Height"), "Height of the figure to export when save", "top", options = list(container = "body"))
+                                   ),
+                                   tabPanel(title = "meanSdPlot",
+                                            fluidRow(
+                                              box(numericInput(ns("meanSdPlot_Width"),
+                                                               "width",
+                                                               min = 1, max = 30, value = 7), width = 6),
+                                              box(numericInput(ns("meanSdPlot_Height"),
+                                                               "height",
+                                                               min = 1, max = 30, value = 7), width = 6)
+                                            ),
+                                            fluidRow(
+                                              plotOutput(ns("meanSdPlot"), height = 600),
+                                              downloadButton(ns('downloadmeanSdPlot'), 'Save dataset')
+                                            ),
+                                            shinyBS::bsTooltip(ns("meanSdPlot_Width"), "Width of the figure to export", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("meanSdPlot_Height"), "Height of the figure to export", "top", options = list(container = "body"))
+                                   ),
+                                   tabPanel(title = "Pearson correlation",
+                                            fluidRow(
+                                              box(selectizeInput(ns("Pearson_pal"),
+                                                                 "color panel",
+                                                                 choices = c("BrBG", "PiYG", "PRGn", "PuOr", "RdBu", "RdGy", "RdYlBu", "RdYlGn", "Spectral", "Blues",  "BuGn", "BuPu", "GnBu", "Greens" , "Greys", "Oranges", "OrRd", "PuBu", "PuBuGn", "PuRd", "Purples", "RdPu", "Reds", "YlGn", "YlGnBu", "YlOrBr", "YlOrRd"),
+                                                                 selected = c("PRGn"), multiple = FALSE),
+                                                  checkboxInput(ns("Pearson_pal_rev"),
+                                                                "pal rev",
+                                                                value = FALSE), width = 4),
+                                              box(numericInput(ns("Pearson_Width"),
+                                                               "width",
+                                                               min = 1, max = 30, value = 7),
+                                                  numericInput(ns("Pearson_Height"),
+                                                               "height",
+                                                               min = 1, max = 30, value = 7), width = 4),
+                                              box(numericInput(ns("Pearson_lower"),
+                                                               "lower",
+                                                               min = -1, max = 1, value = -1),
+                                                  numericInput(ns("Pearson_upper"),
+                                                               "upper",
+                                                               min = -1, max = 1, value = 1), width = 4)
+                                            ),
+                                            fluidRow(
+                                              box(checkboxInput(ns("add_values_for_DEP_person"),
+                                                                "Add values",
+                                                                value = FALSE),
+                                                  numericInput(ns("value_size_for_DEP_person"),
+                                                               "Value size",
+                                                               min = 1, max = 30, value = 10),
+                                                  numericInput(ns("value_digits_for_DEP_person"),
+                                                               "Value digits",
+                                                               min = 1, max = 30, value = 2), width = 12, collapsible = TRUE, collapsed = TRUE)
+                                            ),
+                                            fluidRow(
+                                              plotOutput(ns("Pearson_correlation"), height = 600),
+                                              downloadButton(ns('download_Pearson_correlation'), 'Save')
+                                            ),
+                                            shinyBS::bsTooltip(ns("Pearson_pal"), "Set the color panel (from RColorBrewer)", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("Pearson_pal_rev"), "Whether or not to invert the color palette", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("Pearson_Width"), "Width of the figure to export", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("Pearson_Height"), "Height of the figure to export", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("Pearson_lower"), "Set the lower limit of the color scale", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("Pearson_upper"), "Set the upper limit of the color scale", "top", options = list(container = "body"))
+                                   ),
+                                   tabPanel(title = "Gower's distance",
+                                            fluidRow(
+                                              box(selectizeInput(ns("Gower_pal"),
+                                                                 "color panel",
+                                                                 choices = c("BrBG", "PiYG", "PRGn", "PuOr", "RdBu", "RdGy", "RdYlBu", "RdYlGn", "Spectral", "Blues",  "BuGn", "BuPu", "GnBu", "Greens" , "Greys", "Oranges", "OrRd", "PuBu", "PuBuGn", "PuRd", "Purples", "RdPu", "Reds", "YlGn", "YlGnBu", "YlOrBr", "YlOrRd"),
+                                                                 selected = c("YlOrRd"), multiple = FALSE),
+                                                  checkboxInput(ns("Gower_pal_rev"),
+                                                                "pal rev",
+                                                                value = TRUE), width = 6),
+                                              box(numericInput(ns("Gower_Width"),
+                                                               "width",
+                                                               min = 1, max = 30, value = 7),
+                                                  numericInput(ns("Gower_Height"),
+                                                               "height",
+                                                               min = 1, max = 30, value = 7), width = 6)
+                                            ),
+                                            fluidRow(
+                                              box(checkboxInput(ns("add_values_for_DEP_gower"),
+                                                                "Add values",
+                                                                value = FALSE),
+                                                  numericInput(ns("value_size_for_DEP_gower"),
+                                                               "Value size",
+                                                               min = 1, max = 30, value = 10),
+                                                  numericInput(ns("value_digits_for_DEP_gower"),
+                                                               "Value digits",
+                                                               min = 1, max = 30, value = 2), width = 12, collapsible = TRUE, collapsed = TRUE)
+                                            ),
+                                            fluidRow(
+                                              plotOutput(ns("Gowers_distance"), height = 600),
+                                              downloadButton(ns('download_Gowers_distance'), 'Save')
+                                            ),
+                                            shinyBS::bsTooltip(ns("Gower_pal"), "Set the color panel (from RColorBrewer)", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("Gower_pal_rev"), "Whether or not to invert the color palette", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("Gower_Width"), "Width of the figure to export", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("Gower_Height"), "Height of the figure to export", "top", options = list(container = "body"))
+                                   ),
+                                   tabPanel(title = "Sample CVs",
+                                            fluidRow(
+                                              box(numericInput(ns("Sample_CVs_Width"),
+                                                               "width",
+                                                               min = 1, max = 30, value = 7),
+                                                  width = 6),
+                                              box(
+                                                numericInput(ns("Sample_CVs_Height"),
+                                                             "height",
+                                                             min = 1, max = 30, value = 7), width = 6
+                                              )
+                                            ),
+                                            fluidRow(
+                                              plotOutput(ns("Sample_CVs"), height = 600),
+                                              downloadButton(ns('download_Sample_CVs'), 'Save')
+                                            ),
+                                            shinyBS::bsTooltip(ns("Sample_CVs_Width"), "Width of the figure to export", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("Sample_CVs_Height"), "Height of the figure to export", "top", options = list(container = "body"))
+                                   ),
+                                   tabPanel(title = "Protein Numbers",
+                                            fluidRow(
+                                              box(numericInput(ns("numbers_Width"),
+                                                               "width",
+                                                               min = 1, max = 30, value = 7), width = 6),
+                                              box(numericInput(ns("numbers_Height"),
+                                                               "height",
+                                                               min = 1, max = 30, value = 7), width = 6)
+                                            ),
+                                            fluidRow(
+                                              plotOutput(ns("numbers"), height = 600),
+                                              downloadButton(ns('downloadNumbers'), 'Save')
+                                            ),
+                                            shinyBS::bsTooltip(ns("numbers_Width"), "Width of the figure to export", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("numbers_Height"), "Height of the figure to export", "top", options = list(container = "body"))
+                                   ),
+                                   tabPanel(title = "Sample coverage",
+                                            fluidRow(
+                                              box(numericInput(ns("coverage_Width"),
+                                                               "width",
+                                                               min = 1, max = 30, value = 7), width = 6),
+                                              box(numericInput(ns("coverage_Height"),
+                                                               "height",
+                                                               min = 1, max = 30, value = 7), width = 6)
+                                            ),
+                                            fluidRow(
+                                              plotOutput(ns("coverage"), height = 600),
+                                              downloadButton(ns('downloadCoverage'), 'Save')
 
-                                  ),
-                                  shinyBS::bsTooltip(ns("coverage_Width"), "Width of the figure to export", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("coverage_Height"), "Height of the figure to export", "top", options = list(container = "body"))
-                         ),
-                         tabPanel(title = "Normalization",
-                                  fluidRow(
-                                    box(numericInput(ns("norm_Width"),
-                                                     "width",
-                                                     min = 1, max = 30, value = 7), width = 6),
-                                    box(numericInput(ns("norm_Height"),
-                                                     "height",
-                                                     min = 1, max = 30, value = 7), width = 6)
-                                  ),
-                                  fluidRow(
-                                    plotOutput(ns("norm"), height = 600),
-                                    downloadButton(ns('downloadNorm'), 'Save')
+                                            ),
+                                            shinyBS::bsTooltip(ns("coverage_Width"), "Width of the figure to export", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("coverage_Height"), "Height of the figure to export", "top", options = list(container = "body"))
+                                   ),
+                                   tabPanel(title = "Normalization",
+                                            fluidRow(
+                                              box(numericInput(ns("norm_Width"),
+                                                               "width",
+                                                               min = 1, max = 30, value = 7), width = 6),
+                                              box(numericInput(ns("norm_Height"),
+                                                               "height",
+                                                               min = 1, max = 30, value = 7), width = 6)
+                                            ),
+                                            fluidRow(
+                                              plotOutput(ns("norm"), height = 600),
+                                              downloadButton(ns('downloadNorm'), 'Save')
 
-                                  ),
-                                  shinyBS::bsTooltip(ns("norm_Width"), "Width of the figure to export", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("norm_Height"), "Height of the figure to export", "top", options = list(container = "body"))
-                         ),
-                         tabPanel(title = "Missing values - Quant",
-                                  fluidRow(
-                                    box(numericInput(ns("detect_Width"),
-                                                     "width",
-                                                     min = 1, max = 30, value = 7), width = 6),
-                                    box(numericInput(ns("detect_Height"),
-                                                     "height",
-                                                     min = 1, max = 30, value = 7), width = 6)
-                                  ),
-                                  fluidRow(
-                                    plotOutput(ns("detect"), height = 600),
-                                    downloadButton(ns('downloadDetect'), 'Save')
-                                  ),
-                                  shinyBS::bsTooltip(ns("detect_Width"), "Width of the figure to export", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("detect_Height"), "Height of the figure to export", "top", options = list(container = "body"))
-                         ),
-                         tabPanel(title = "Missing values - Heatmap",
-                                  fluidRow(
-                                    box(
-                                      checkboxInput(ns("cluster_columns_for_missval_heatmap"),
-                                                    "Cluster columns",
-                                                    value = TRUE), width = 4),
-                                    box(uiOutput(ns("Custom_columns_order_for_missval_heatmap")),
-                                        width = 8)
-                                  ),
-                                  fluidRow(
-                                    box(numericInput(ns("missval_heatmap_Width"),
-                                                     "width",
-                                                     min = 1, max = 30, value = 7), width = 6),
-                                    box(numericInput(ns("missval_heatmap_Height"),
-                                                     "height",
-                                                     min = 1, max = 30, value = 10), width = 6)),
-                                  fluidRow(
-                                    plotOutput(ns("missval"), height = 600),
-                                    downloadButton(ns('downloadMissval'), 'Save')
-                                  ),
-                                  shinyBS::bsTooltip(ns("cluster_columns_for_missval_heatmap"), "Whether make cluster on columns", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("Custom_columns_order_for_missval_heatmap"), "Order of column, act when [Cluster columns] is FALSE", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("missval_heatmap_Width"), "Width of the figure to export", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("missval_heatmap_Height"), "Height of the figure to export", "top", options = list(container = "body"))
-                         ),
-                         tabPanel(title = "Imputation",
-                                  fluidRow(
-                                    box(numericInput(ns("imputation_Width"),
-                                                     "width",
-                                                     min = 1, max = 30, value = 7), width = 6),
-                                    box(numericInput(ns("imputation_Height"),
-                                                     "height",
-                                                     min = 1, max = 30, value = 7), width = 6)
-                                  ),
-                                  fluidRow(
-                                    plotOutput(ns("imputation"), height = 600),
-                                    downloadButton(ns('downloadImputation'), 'Save')
-                                  ),
-                                  shinyBS::bsTooltip(ns("imputation_Width"), "Width of the figure to export", "top", options = list(container = "body")),
-                                  shinyBS::bsTooltip(ns("imputation_Height"), "Height of the figure to export", "top", options = list(container = "body"))
-                         )
+                                            ),
+                                            shinyBS::bsTooltip(ns("norm_Width"), "Width of the figure to export", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("norm_Height"), "Height of the figure to export", "top", options = list(container = "body"))
+                                   ),
+                                   tabPanel(title = "Missing values - Quant",
+                                            fluidRow(
+                                              box(numericInput(ns("detect_Width"),
+                                                               "width",
+                                                               min = 1, max = 30, value = 7), width = 6),
+                                              box(numericInput(ns("detect_Height"),
+                                                               "height",
+                                                               min = 1, max = 30, value = 7), width = 6)
+                                            ),
+                                            fluidRow(
+                                              plotOutput(ns("detect"), height = 600),
+                                              downloadButton(ns('downloadDetect'), 'Save')
+                                            ),
+                                            shinyBS::bsTooltip(ns("detect_Width"), "Width of the figure to export", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("detect_Height"), "Height of the figure to export", "top", options = list(container = "body"))
+                                   ),
+                                   tabPanel(title = "Missing values - Heatmap",
+                                            fluidRow(
+                                              box(
+                                                checkboxInput(ns("cluster_columns_for_missval_heatmap"),
+                                                              "Cluster columns",
+                                                              value = TRUE), width = 4),
+                                              box(uiOutput(ns("Custom_columns_order_for_missval_heatmap")),
+                                                  width = 8)
+                                            ),
+                                            fluidRow(
+                                              box(numericInput(ns("missval_heatmap_Width"),
+                                                               "width",
+                                                               min = 1, max = 30, value = 7), width = 6),
+                                              box(numericInput(ns("missval_heatmap_Height"),
+                                                               "height",
+                                                               min = 1, max = 30, value = 10), width = 6)),
+                                            fluidRow(
+                                              plotOutput(ns("missval"), height = 600),
+                                              downloadButton(ns('downloadMissval'), 'Save')
+                                            ),
+                                            shinyBS::bsTooltip(ns("cluster_columns_for_missval_heatmap"), "Whether make cluster on columns", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("Custom_columns_order_for_missval_heatmap"), "Order of column, act when [Cluster columns] is FALSE", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("missval_heatmap_Width"), "Width of the figure to export", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("missval_heatmap_Height"), "Height of the figure to export", "top", options = list(container = "body"))
+                                   ),
+                                   tabPanel(title = "Imputation",
+                                            fluidRow(
+                                              box(numericInput(ns("imputation_Width"),
+                                                               "width",
+                                                               min = 1, max = 30, value = 7), width = 6),
+                                              box(numericInput(ns("imputation_Height"),
+                                                               "height",
+                                                               min = 1, max = 30, value = 7), width = 6)
+                                            ),
+                                            fluidRow(
+                                              plotOutput(ns("imputation"), height = 600),
+                                              downloadButton(ns('downloadImputation'), 'Save')
+                                            ),
+                                            shinyBS::bsTooltip(ns("imputation_Width"), "Width of the figure to export", "top", options = list(container = "body")),
+                                            shinyBS::bsTooltip(ns("imputation_Height"), "Height of the figure to export", "top", options = list(container = "body"))
+                                   )
 
                        )
                 )
@@ -1279,8 +1311,12 @@ DEP_pg_server_module <- function(id){
               return(NULL)
             }else{
               label <- colnames(data())[cols]
+              # clean and regularize expression colnames, try to avoid error caused by unconventional sample names.
+              label = clean_ecolnames(label)
+
               expdesign <- get_exdesign_parse(label, mode = "delim", sep = "_",
-                                              remove_prefix = input$remove_prefix, remove_suffix = input$remove_suffix)
+                                              remove_prefix = input$remove_prefix,
+                                              remove_suffix = input$remove_suffix)
             }
           }else if(input$anno == "expdesign" & (!is.null(inFile)) & (!is.null(data())) ){
             cat("Use expdesign from upload table\n")
@@ -1322,10 +1358,10 @@ DEP_pg_server_module <- function(id){
         if (length(coln.int64) > 0L)
           my_data[, c(coln.int64) := lapply(.SD, as.numeric), .SDcols = coln.int64]
         my_data = as.data.frame(my_data)
-        ## replace the [xxx] characters in colnames
-        colnames(my_data) = gsub("^\\[(.*)\\] ","",colnames(my_data))
+        ## replace the '[xxx]' characters in colnames
+        colnames(my_data) = gsub("^\\[(.*)\\] ","", colnames(my_data))
+        colnames(my_data) = gsub("-", "_", colnames(my_data), perl=TRUE) # replace '-' by '_'
         colnames(my_data) = make.names(colnames(my_data))
-
         my_data
       })
 
@@ -1349,7 +1385,10 @@ DEP_pg_server_module <- function(id){
           )
         }
 
-        unique_names <- DEP2::make_unique(proteins = data, names = ifelse(input$name == "", input$id, input$name), ids = ifelse(input$id == "", input$name, input$id), delim = input$delim)
+        unique_names <- DEP2::make_unique(proteins = data,
+                                          names = ifelse(input$name == "", input$id, input$name),
+                                          ids = ifelse(input$id == "", input$name, input$id),
+                                          delim = input$delim)
 
         ind_empty = c(grep("^\\.\\d*$", unique_names$name), which(unique_names$name == ""))
         if(length(ind_empty) > 0) {
@@ -1366,7 +1405,12 @@ DEP_pg_server_module <- function(id){
         # }
 
         # make se
-        se <- DEP2::make_se(unique_names, cols, expdesign()) ## when input$anno == "columns", use expdesign() and make_se instead of make_se_parse
+        expdesign <- expdesign()
+        colnames(unique_names)[cols] = expdesign$label  ## replace the colnames if remove_su
+        unique_names1 <<- unique_names
+        cols1 <<- cols
+        expdesign2 <<- expdesign
+        se <- DEP2::make_se(unique_names, cols, expdesign) ## when input$anno == "columns", use expdesign() and make_se instead of make_se_parse
         colData(se)$replicate = as.character(colData(se)$replicate)
 
         # filter by identify info
@@ -1421,11 +1465,31 @@ DEP_pg_server_module <- function(id){
       # })
 
       norm <- reactive({
-        my_norm <- try({normalize_vsn(filt())})
-        if(class(my_norm) == "try-error"){
-          ## if vsn failed for a small matrix, skip vsn normalization
-          my_norm = filt()
+        Normalization_method = input$Normalization_method
+        filt = filt()
+        if(Normalization_method == "Log2 only"){
+          my_norm = filt
+        }else if(Normalization_method == "vsn"){
+          my_norm <- try({normalize_vsn(filt())})
+          if(class(my_norm) == "try-error"){
+            ## if vsn failed for a small matrix, skip vsn normalization
+            my_norm = filt()
+          }
+        }else{
+          my_norm = normalize_se(filt, Normalization_method)
         }
+
+        if(input$Adjust_by_standar_protein & input$standar_protein!=""){
+          standar_protein = input$standar_protein
+          standar_proteins = strsplit(standar_protein,",| ")[[1]] %>% unique()
+          standar_proteins = intersect(standar_proteins,names(my_norm))
+          standar_proteins1 <<- standar_proteins
+          my_norm0 <<- my_norm
+          if(length(standar_proteins) >= 1){
+            my_norm = correct_AP_by_protein(my_norm,standar_proteins)
+          }
+        }
+
         my_norm
       })
 
@@ -1528,7 +1592,7 @@ DEP_pg_server_module <- function(id){
         if(is.null(inFile1)){
           if(input$contrasts == "control"){
             df <- DEP2::test_diff(se = imp(), type = input$contrasts, control = input$control,
-                            fdr.type = FDR_type())
+                                  fdr.type = FDR_type())
           }
 
           if(input$contrasts == "all") {
@@ -1538,25 +1602,25 @@ DEP_pg_server_module <- function(id){
 
           if(input$contrasts == "manual") {
             df <- DEP2::test_diff(se = imp(), type = input$contrasts, test = input$test_manual,
-                            fdr.type = FDR_type())
+                                  fdr.type = FDR_type())
           }
         } else {
           #load your saved RData in order to get the same result (imp is the key of if result from two analysis being the same)
           load(file = inFile1$datapath)
           if(input$contrasts == "control"){
             df <- DEP2::test_diff(se = my_imp, type = input$contrasts, control = input$control,
-                            fdr.type = FDR_type())
+                                  fdr.type = FDR_type())
           }
 
           if(input$contrasts == "all") {
             load(file = inFile1$datapath)
             df <- DEP2::test_diff(se = my_imp, type = "all",
-                                      fdr.type = FDR_type())
+                                  fdr.type = FDR_type())
           }
 
           if(input$contrasts == "manual") {
             df <- DEP2::test_diff(se = my_imp, type = input$contrasts, test = input$test_manual,
-                            fdr.type = FDR_type())
+                                  fdr.type = FDR_type())
           }
         }
         df
@@ -1891,6 +1955,7 @@ DEP_pg_server_module <- function(id){
                                  label_number = input$showNum,
                                  label_trend = input$labelWay,
                                  chooseTolabel = input$selected_proteins,
+                                 onlyhighlight_Choose = input$onlyhighlight_Choose,
                                  x_symmetry = input$Same_width,
                                  fcCutoff = input$lfc,
                                  pCutoff = input$p,
@@ -2287,6 +2352,19 @@ DEP_pg_server_module <- function(id){
           size = "l"
         ))
       })
+
+      ### help normalization
+      observeEvent(input$help_normalization, {
+        showModal(modalDialog(
+          title = "The detailed information of normalization methods",
+          # includeMarkdown(system.file("extdata", "impute.md", package = "DEP2")),
+          includeMarkdown("www/DEP_normalization.md"),
+          easyClose = TRUE,
+          footer = NULL,
+          size = "l"
+        ))
+      })
+
 
       return(df)
 

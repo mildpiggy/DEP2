@@ -16,6 +16,7 @@ plot_volcano(
   down_color = "#2166AC",
   stable_color = "#BEBEBE",
   chooseTolabel = NULL,
+  onlyhighlight_Choose = FALSE,
   adjusted = FALSE,
   plot = TRUE,
   x_symmetry = TRUE,
@@ -63,6 +64,11 @@ one of c("all","up","down"), plot all significant, up-regulated ones or down-reg
 \item{chooseTolabel}{Character, Specify names to plot,
 no matter whether they are significant.}
 
+\item{onlyhighlight_Choose}{Logical(1), only highlight chosen labels.
+Only work when parameter 'chooseTolabel' specify some feature names.
+Features(proteins) in chooseTolabel will be highlighted by color, while
+others will be colored in 'stable_color'.}
+
 \item{adjusted}{Logical(1),
 Whether or not to use adjusted p values.}
 
@@ -102,7 +108,7 @@ and \code{peptide_2_color}. Require the peptide number variable(specified by \co
 
 \item{peptide_column}{Character(1), the varable column name storing the peptide number.}
 
-\item{max.overlaps}{A parameter from \code{\link[ggrepel]{geom_label_repel}}, which decides labels overlap when add_names is TRUE.
+\item{max.overlaps}{A parameter from \code{\link[ggrepel]{geom_label_repel}}, which desides labels overlap when add_names is TRUE.
 Exclude text labels when they overlap too many other things. Defaults to 30. Higher value allows more crowded labels.}
 }
 \value{

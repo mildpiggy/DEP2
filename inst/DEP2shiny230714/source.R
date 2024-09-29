@@ -5,14 +5,74 @@ library(tidyr)
 library(limma)
 library(colourpicker)
 library(tibble)
-library(ggplot2)
 library(RColorBrewer)
 library(BiocParallel)
 library(DESeq2)
 library(dplyr)
 
 
+# Normalize SE object, like normalize_pe.
+normalize_se = function(se,
+                        method = c("vsn", "diff.median", "quantiles", "quantiles.robust")
+){
+  assertthat::assert_that(inherits(se, "SummarizedExperiment"))
+  method = match.arg(method)
 
+  if(method == "vsn"){
+    norm = normalize_vsn(se)
+  }else{
+    norm = se
+    mt = assay(norm)
+    mt = normalize_matrix(mt, method)
+    assay(norm) = mt
+  }
+  return(norm)
+
+}
+
+# Adjuct protein intensity though standard proteins, like spike-in proteins.
+correct_AP_by_protein = function(object, standard_protein,
+                                 correct_key = c("name", "ID")
+){
+  assertthat::assert_that(inherits(object, "SummarizedExperiment"),
+                          is.character(standard_protein), is.character(correct_key))
+
+  mt = assay(object)
+  rd = rowData(object)
+
+  correct_key = match.arg(correct_key)
+
+  standard_protein = standard_protein[standard_protein %in% rd[,correct_key]]
+  if(length(standard_protein)<1){
+    stop("The standart_protein do not exist in the object! Please check your input!")
+  }
+  message("The assay is corrected based on proteins ",paste0(standard_protein,collapse = ", "))
+
+  mt_stander = mt[which(rd[,correct_key] %in% standard_protein),]
+  standarmean = rowMeans(mt_stander)
+  correct_coefficient = colMeans(mt_stander - standarmean)
+
+  mt_corrected = t(t(mt) - correct_coefficient)
+
+  assay(object) = mt_corrected
+  return(object)
+}
+
+# Clean expression colnames, make sure labels are suitable for get_exdesign_parse
+clean_ecolnames = function(label){
+  endpattern = paste0("\\d+",get_suffix(label),"+$")
+
+  # remove '-' by "_"
+  label = gsub("-", "-", label, perl=TRUE)
+  # if it is '.' that connect replication, replacement '.' by' _'. like 'A.1' to 'A_2'
+  label = gsub(paste0("\\.(?=",endpattern,")"), "_", label, perl=TRUE)
+  # remove '_' except the last one which link last numbers (replication)
+  label = gsub(paste0("\\_(?!",endpattern,")"), ".", label, perl=TRUE)
+  # remove '_' except the last one which link last numbers (replication)
+  label = gsub(paste0("_(?!",endpattern,")"), ".", label, perl=TRUE)
+
+  return(label)
+}
 
 
 
@@ -46,7 +106,7 @@ library(dplyr)
 #' @return An object created by \code{ggplot}
 #' @export
 ggplot_Counts <- function(dds, gene, intgroup = "condition", annotation_obj = NULL,
-                         transform = TRUE, ylimZero = TRUE, add_labels = F, labels_repel = T) {
+                          transform = TRUE, ylimZero = TRUE, add_labels = F, labels_repel = T) {
   df <- plotCounts(dds, gene, intgroup, returnData = TRUE)
   df$sampleID <- rownames(df)
 
