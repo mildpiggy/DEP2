@@ -14,11 +14,11 @@ impute_pe(
 )
 }
 \arguments{
-\item{pe}{A QFeature object}
+\item{pe}{A QFeature object.}
 
 \item{fun}{Character(1), imputation strategy, see \link{impute}.}
 
-\item{i}{A numeric or a character giving the index or the name, respectively, of the assay(s) to be processed.}
+\item{i}{Character(1), the assay name of which to be imputed.}
 
 \item{name}{Character(1), naming the new normalized assay. defaule is "peptideImp".}
 

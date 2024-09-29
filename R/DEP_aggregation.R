@@ -49,7 +49,7 @@ make_pe <- function(Peptide, columns,
       stop("columns should be the columns in ", deparse(substitute(Peptide)), "but ", columns[!columns %in% colnames(Peptide)],"do not exist.")
     columns = which(colnames(Peptide) %in% columns)
   }else if(is.integer(columns)){
-    assert_that(all(columns %in% 1:ncol(Peptide)))
+    assert_that(all(columns %in% 1:nrow(Peptide)))
   }
   if (any(!apply(Peptide[, columns], 2, is.numeric))) {
     stop("Specified 'columns' should be numeric", "\nRun make_pe() with the appropriate columns as argument.",
@@ -265,7 +265,7 @@ filter_pe <- function(pe,
 
   if(!assay_name %in% names(pe))
     stop("'assay_name' should be one of exist assay in ", deparse(substitute(pe)),": ", paste(names(pe),collapse = ", "))
-    # stop("'assay_name' do not exist in pe, please validate")
+  # stop("'assay_name' do not exist in pe, please validate")
 
   se <- pe[["peptideRaw"]]
   keep_row = filter_se(se, thr = thr, missnum = missnum, fraction = fraction,
@@ -531,7 +531,7 @@ smallestUniqueGroups <- function(proteins,
 
 
 aggregateFeatures = function(object, i, fcol, name = "newAssay",
-                           fun = MsCoreUtils::robustSummary, ...) {
+                             fun = MsCoreUtils::robustSummary, ...) {
   if (S4Vectors::isEmpty(object))
     return(object)
   if (name %in% names(object))
@@ -557,10 +557,10 @@ aggregateFeatures = function(object, i, fcol, name = "newAssay",
                                 name = name)
   ## Link the input assay to the aggregated assay
   QFeatures::addAssayLink(object,
-               from = i,
-               to  = name,
-               varFrom = fcol,
-               varTo = fcol)
+                          from = i,
+                          to  = name,
+                          varFrom = fcol,
+                          varTo = fcol)
 }
 
 
@@ -570,9 +570,9 @@ aggregateFeatures = function(object, i, fcol, name = "newAssay",
 #' Impute the \code{i} assay in QFeatures object though \link{impute} function.
 #' The normalized assay is saved in the \code{name} assay.
 #'
-#' @param pe
+#' @param pe A QFeature object.
 #' @param fun Character(1), imputation strategy, see \link{impute}.
-#' @param i
+#' @param i Character(1), the assay name of which to be imputed.
 #' @param name Character(1), naming the new normalized assay. defaule is "peptideImp".
 #' @param ... Other parameters to be passed to \link{impute} function.
 #'
