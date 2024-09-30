@@ -94,7 +94,7 @@ make_pe <- function(Peptide, columns,
   raw <- raw[, !is.na(colnames(raw))][rownames(expdesign)]
   colnames(Peptide)[columns] = colnames(raw)
 
-  QF <- readQFeatures(table = Peptide, ecol = columns,
+  QF <- readQFeatures(Peptide, ecol = columns, # Change parameter names in Qfeature
                       fnames = fnames,
                       name = assay_name)
   rowData(QF[[assay_name]])$nNonZero <- rowSums(assay(QF[[assay_name]]) > 0)
@@ -206,7 +206,7 @@ make_pe_parse <- function(Peptide,
     return(as.numeric(x))
   })
 
-  QF <- readQFeatures(table = Peptide, ecol = columns,
+  QF <- readQFeatures(Peptide, ecol = columns,
                       fnames = fnames,
                       name = assay_name)
   rowData(QF[[assay_name]])$nNonZero <- rowSums(assay(QF[[assay_name]]) > 0)
