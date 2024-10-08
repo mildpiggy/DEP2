@@ -1461,7 +1461,7 @@ DEP_ptm_server_module <- function(id, Omics_res){
         data <- data()
         cols <- which(colnames(data) %in% input$intensitycols)
         data[,cols] = apply(data[,cols], 2, function(x){
-          x[!(!grepl("[A-z]",x) & grepl("\\d",x))] = 0
+          # x[!(!grepl("[A-z]",x) & grepl("\\d",x))] = 0
           return(as.numeric(x))
         })
 

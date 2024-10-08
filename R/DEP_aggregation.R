@@ -94,6 +94,11 @@ make_pe <- function(Peptide, columns,
   raw <- raw[, !is.na(colnames(raw))][rownames(expdesign)]
   colnames(Peptide)[columns] = colnames(raw)
 
+  Peptide[,columns] = apply(Peptide[,columns], 2, function(x){
+    # x[!(!grepl("[A-z]",x) & grepl("\\d",x))] = 0
+    return(as.numeric(x))
+  })
+
   QF <- readQFeatures(Peptide, ecol = columns, # Change parameter names in Qfeature
                       fnames = fnames,
                       name = assay_name)
@@ -202,7 +207,7 @@ make_pe_parse <- function(Peptide,
   colnames(Peptide)[match(expdesign$label, colnames(Peptide))] <- expdesign$ID
 
   Peptide[,columns] = apply(Peptide[,columns], 2, function(x){
-    x[!(!grepl("[A-z]",x) & grepl("\\d",x))] = 0
+    # x[!(!grepl("[A-z]",x) & grepl("\\d",x))] = 0
     return(as.numeric(x))
   })
 
