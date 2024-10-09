@@ -174,7 +174,7 @@ get_signicant <- function(object,
 
 
   return_val = switch(return_type, subset = filtered, table = get_results(filtered),
-                      names = rownames(row_data_filtered), genelist = l2fc,
+                      names = rownames(filtered), genelist = l2fc,
                       idlist = l2fc)
   return(return_val)
 }
