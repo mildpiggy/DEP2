@@ -27,7 +27,8 @@ in at least one condition. At least in one condition, missing values number < or
 Sets the threshold for the allowed max number among all samples,
 missing values number < or = 'missnum' in each row.}
 
-\item{fraction}{A numeric from 0 to 1, threshold of missing occupancy of each row}
+\item{fraction}{A numeric from 0 to 1, threshold of quantitative fraction of each feature (each row).
+Only the features with a valid quantity ratio exceeding \code{fraction} threshold will be kept.}
 
 \item{filter_formula}{Formula or character(1).
 A filter expression, written as a formula.}

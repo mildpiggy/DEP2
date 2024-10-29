@@ -32,7 +32,9 @@ NAiszero <- function(se){
 #' @param missnum Integer(1),
 #' Sets the threshold for the allowed max number among all samples,
 #' missing values number < or = 'missnum' in each row.
-#' @param fraction A numeric from 0 to 1, threshold of missing occupancy of each row
+#' @param fraction A numeric from 0 to 1, threshold of quantitative fraction of each feature (each row).
+#' Only the features with a valid quantity ratio exceeding \code{fraction} threshold will be kept.
+#'
 #' @param filter_formula Formula or character(1).
 #' A filter expression, written as a formula.
 #' @param rowsum_threshold A numeric, row sum of intensity(abundance) must larger than it.
