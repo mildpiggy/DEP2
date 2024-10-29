@@ -979,7 +979,7 @@ get_annotation <- function(dep, indicate) {
       cols <- c("black")
     if(length(var) == 2)
       cols <- c("orangered", "cornflowerblue")
-    if(length(var) < 7 & length(var) > 2)
+    if(length(var) <= 7 & length(var) > 2)
       cols <- RColorBrewer::brewer.pal(length(var), "Pastel1")
     if(length(var) > 7)
       cols <- RColorBrewer::brewer.pal(length(var), "Set3")
