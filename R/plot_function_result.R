@@ -61,16 +61,16 @@ plot_single <- function(object, proteins, type = c("contrast", "centered"), plot
   row_data <- rowData(object, use.names = FALSE)
   if (any(!c("label", "condition", "replicate") %in% colnames(colData(object)))) {
     stop("'label', 'condition' and/or 'replicate' columns are not present in '",
-         objectarse(substitute(object)), "'\nRun make_se() or make_se_parse() to obtain the required columns",
+         deparse(substitute(object)), "'\nRun make_se() or make_se_parse() to obtain the required columns",
          call. = FALSE)
   }
   if (length(grep("_p.adj|_diff", colnames(row_data))) < 1) {
     stop("'[contrast]_diff' and '[contrast]_p.adj' columns are not present in '",
-         objectarse(substitute(object)), "'\nRun test_diff() to obtain the required columns",
+         deparse(substitute(object)), "'\nRun test_diff() to obtain the required columns",
          call. = FALSE)
   }
   if (!"name" %in% colnames(row_data)) {
-    stop("'name' column not present in '", objectarse(substitute(object)),
+    stop("'name' column not present in '", deparse(substitute(object)),
          "'\nRun make_se() or make_se_parse() to obtain the required columns",
          call. = FALSE)
   }
